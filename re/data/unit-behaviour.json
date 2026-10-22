@@ -16,33 +16,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TWIN LASERS",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1382_agamemnonFortress_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "DEFENSE MODE",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1382_agamemnonFortress_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "PLASMA BLAST!",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1382_agamemnonFortress_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "AGAMEMNON DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1382_agamemnonFortress_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -309,44 +313,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Mega Shot",
-     "icon": null,
+     "icon": "1315_anvilPatternMech_1",
      "handler": "megaShot",
-     "extraLiterals": [
-      "No target close enough",
-      "Mega Shot"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Mega Shot"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Super Charge",
-     "icon": null,
+     "icon": "1315_anvilPatternMech_2",
      "handler": "startCharge",
-     "extraLiterals": [
-      "You are too close to a building, wall or tree",
-      "Super Charge"
-     ]
+     "cantMessage": "You are too close to a building, wall or tree",
+     "tooltip": "Super Charge"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Ray Storm",
-     "icon": null,
+     "icon": "1315_anvilPatternMech_3",
      "handler": "rayStorm",
-     "extraLiterals": [
-      "No target close enough",
-      "Ray Storm"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Ray Storm"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Anvil Pattern Drone",
-     "icon": null,
-     "handler": "NUM_DRONES",
-     "extraLiterals": [
-      "Anvil Pattern Drone"
-     ]
+     "icon": "1315_anvilPatternMech_4",
+     "handler": "doDrones",
+     "cantMessage": "#0# Anvil Pattern Drone Max",
+     "tooltip": "Anvil Pattern Drone"
     }
    ],
    "projectiles": [
@@ -439,33 +436,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "RIPPLE EFFECT",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1367_atomicBonecrusha_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BERSERK MODE",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1367_atomicBonecrusha_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "ATOMIC SPHERE",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1367_atomicBonecrusha_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
-     "name": "BONECRUSHA\\' SWARM",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "name": "BONECRUSHA' SWARM",
+     "icon": "1367_atomicBonecrusha_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -681,10 +682,8 @@
      "name": "Frontal Attack",
      "icon": "1287_special_1",
      "handler": "doFrontalAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Frontal Attack"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Frontal Attack"
     },
     {
      "index": 1,
@@ -692,10 +691,8 @@
      "name": "Ray Attack",
      "icon": "1287_special_2",
      "handler": "doRayAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Ray Attack"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Ray Attack"
     },
     {
      "index": 2,
@@ -703,20 +700,17 @@
      "name": "Paralisis!",
      "icon": "1287_special_3",
      "handler": "doParalisisAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Paralisis!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Paralisis!"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Drone!",
      "icon": "1287_special_4",
-     "handler": "_maxDrones",
-     "extraLiterals": [
-      "Spawns drone"
-     ]
+     "handler": "_spawnDrone",
+     "cantMessage": "Max #0# drones",
+     "tooltip": "Spawns drone"
     }
    ],
    "projectiles": [],
@@ -840,10 +834,8 @@
      "name": "Power Balls",
      "icon": "1167_bahamut_balls",
      "handler": "doPowerBalls",
-     "extraLiterals": [
-      "No target close enough",
-      "Shoots a burst of deadly power balls"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Shoots a burst of deadly power balls"
     },
     {
      "index": 1,
@@ -851,10 +843,8 @@
      "name": "Rockets out",
      "icon": "1167_bahamut_rockets",
      "handler": "doChestRocket",
-     "extraLiterals": [
-      "No targets nearby",
-      "Launch a rocket from the chest"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Launch a rocket from the chest"
     },
     {
      "index": 2,
@@ -862,10 +852,8 @@
      "name": "Call draggy",
      "icon": "1167_bahamut_draggy",
      "handler": "spawnDrone",
-     "extraLiterals": [
-      "Can\\'t control more draggies",
-      "Call a bahamut draggy to assist"
-     ]
+     "cantMessage": "Can't control more draggies",
+     "tooltip": "Call a bahamut draggy to assist"
     },
     {
      "index": 3,
@@ -873,10 +861,8 @@
      "name": "Tornado",
      "icon": "1167_bahamut_tornado",
      "handler": "doTornado",
-     "extraLiterals": [
-      "No targets nearby",
-      "Spin and damage nearby enemies. You should move the bahamut!"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Spin and damage nearby enemies. You should move the bahamut!"
     }
    ],
    "projectiles": [
@@ -1065,42 +1051,36 @@
      "kind": "SpecialUnitAttack",
      "name": "Rockets storm",
      "icon": "1256_special_1",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Many Rockets attack from chest"
-     ]
+     "handler": "doRocketAttack",
+     "cantMessage": "No target",
+     "tooltip": "Many Rockets attack from chest"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Mega explotion",
      "icon": "1256_special_3",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Sinks both blades in the ground and creates an energy explosion."
-     ]
+     "handler": "doMegaPunch",
+     "cantMessage": "",
+     "tooltip": "Sinks both blades in the ground and creates an energy explosion."
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Blade tornado",
      "icon": "1256_special_2",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Blade tornado"
-     ]
+     "handler": "whirlwindAttack",
+     "cantMessage": "",
+     "tooltip": "Blade tornado"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn Drone",
      "icon": "1256_special_4",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "3 drone max",
-      "Spawn Drone"
-     ]
+     "handler": "doSpawn",
+     "cantMessage": "3 drone max",
+     "tooltip": "Spawn Drone"
     }
    ],
    "projectiles": [
@@ -1249,33 +1229,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Deck Fire",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1353_bismark_SA1",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Omni-Shoot!",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1353_bismark_SA2",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Colossal Stamp",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1353_bismark_SA3",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Bismark Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1353_bismark_SA4",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -1364,7 +1348,8 @@
      "name": "Megacharge",
      "icon": "1279_special_1",
      "handler": "_doMegachargeAttack",
-     "extraLiterals": []
+     "cantMessage": "",
+     "tooltip": "Adds extra power for #0# seconds!"
     },
     {
      "index": 1,
@@ -1372,10 +1357,8 @@
      "name": "Mega Jump",
      "icon": "1279_special_2",
      "handler": "_doMegaJumpAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Performs Mega Jump!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Performs Mega Jump!"
     }
    ],
    "projectiles": [],
@@ -1479,45 +1462,37 @@
      "index": 0,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Call draggy!",
-     "icon": null,
-     "handler": null,
-     "extraLiterals": [
-      "Can\\'t have more draggies!",
-      "Calls a draggy to assist"
-     ]
+     "icon": "black_dragon_Boton01",
+     "handler": "spawnMinionFromEgg",
+     "cantMessage": "Can't have more draggies!",
+     "tooltip": "Calls a draggy to assist"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Red plasma balls!",
-     "icon": null,
+     "icon": "black_dragon_Boton02",
      "handler": "doSpecialBallsAttack",
-     "extraLiterals": [
-      "No target",
-      "Throws deadly plasma balls \\nupon the enemy"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Throws deadly plasma balls \nupon the enemy"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Red beams!",
-     "icon": null,
+     "icon": "black_dragon_Boton03",
      "handler": "doSpecialBeamsAttack",
-     "extraLiterals": [
-      "No target",
-      "Mortal dome attack"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Mortal dome attack"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Burn!",
-     "icon": null,
+     "icon": "black_dragon_Boton04",
      "handler": "doSpecialBurnAttack",
-     "extraLiterals": [
-      "No target",
-      "Burn attack!"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Burn attack!"
     }
    ],
    "projectiles": [
@@ -1585,33 +1560,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Tracking Laser",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1377_blackHole_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Rocket Whirlwind",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1377_blackHole_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Supermassive Black Hole",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1377_blackHole_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Black Hole Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1377_blackHole_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -1699,44 +1678,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Big Bang Attack",
-     "icon": null,
+     "icon": "1317_bladestormMech_button1",
      "handler": "doBigBangAttack",
-     "extraLiterals": [
-      "No target close enough",
-      "Big Bang Attack"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Big Bang Attack"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Megabombs Rain",
-     "icon": null,
+     "icon": "1317_bladestormMech_button2",
      "handler": "doBombsrain",
-     "extraLiterals": [
-      "No target close enough",
-      "Megabombs Rain"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Megabombs Rain"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Satellite Laser",
-     "icon": null,
+     "icon": "1317_bladestormMech_button3",
      "handler": "doSatellite",
-     "extraLiterals": [
-      "No target close enough",
-      "Satellite Laser"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Satellite Laser"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "BladeStorm Drone",
-     "icon": null,
+     "icon": "1317_bladestormMech_button4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "BladeStorm Drone"
-     ]
+     "cantMessage": "#0# BladeStorm Drone Max",
+     "tooltip": "BladeStorm Drone"
     }
    ],
    "projectiles": [
@@ -1833,33 +1805,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SLIDING CHARGE",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1398_blueAnvil_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "ORBITAL STRIKE",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1398_blueAnvil_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SLICING LASER",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1398_blueAnvil_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BLUE ANVIL MECH",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1398_blueAnvil_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -1979,41 +1955,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Massive Mortar",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": [
-      "Massive Mortar"
-     ]
+     "icon": "1329_bombardierMech_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": "Massive Mortar"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Zenith Shooting",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": [
-      "Zenith Shooting"
-     ]
+     "icon": "1329_bombardierMech_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": "Zenith Shooting"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Nuclear Stomach-Bomb",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": [
-      "Nuclear Stomach-Bomb"
-     ]
+     "icon": "1329_bombardierMech_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": "Nuclear Stomach-Bomb"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Bombardier Mech Drone",
-     "icon": null,
-     "handler": "NUM_DRONES",
-     "extraLiterals": [
-      "Bombardier Mech Drone"
-     ]
+     "icon": "1329_bombardierMech_button_04",
+     "handler": "doDrones",
+     "cantMessage": "#0#  Drone Max",
+     "tooltip": "Bombardier Mech Drone"
     }
    ],
    "projectiles": [],
@@ -2100,33 +2072,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Colossal Smash",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1356_bonecrusha_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Frenzy Mode",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1356_bonecrusha_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Spiky Sphere",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1356_bonecrusha_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
-     "name": "Bonecrusha\\' Swarm",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "name": "Bonecrusha' Swarm",
+     "icon": "1356_bonecrusha_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -2215,33 +2191,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BRAWLER-PUNCH!",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1360_brawler_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "UNDERGROUND ENERGY",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1360_brawler_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BURNING RAY",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1360_brawler_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BRAWLER DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1360_brawler_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -2326,7 +2306,8 @@
      "name": "Megacharge",
      "icon": "1217_bot2",
      "handler": "_doMegachargeAttack",
-     "extraLiterals": []
+     "cantMessage": "",
+     "tooltip": "Adds extra power for #0# seconds!"
     },
     {
      "index": 1,
@@ -2334,10 +2315,8 @@
      "name": "Mega Jump",
      "icon": "1217_bot1",
      "handler": "_doMegaJumpAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Performs Mega Jump!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Performs Mega Jump!"
     }
    ],
    "projectiles": [],
@@ -2483,33 +2462,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "ELECTRIC RAILGUN",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1358_bushwacker_button_1",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SEARCH AND SEIZURE",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1358_bushwacker_button_2",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "EGM PULSE",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1358_bushwacker_button_3",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BRUTAL LAND MINE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1358_bushwacker_button_4",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -2603,42 +2586,36 @@
      "kind": "SpecialUnitAttack",
      "name": "Rotor Storm",
      "icon": "1215_massive_cannon_mech_special1",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Rotor Storm"
-     ]
+     "handler": "doRotationAttack",
+     "cantMessage": "",
+     "tooltip": "Rotor Storm"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Hecatomb Shot",
      "icon": "1215_massive_cannon_mech_special2",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Hecatomb Shot"
-     ]
+     "handler": "megaCannon",
+     "cantMessage": "No target",
+     "tooltip": "Hecatomb Shot"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Hexashield",
      "icon": "1215_massive_cannon_mech_special3",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Hexashield"
-     ]
+     "handler": "doProtection",
+     "cantMessage": "",
+     "tooltip": "Hexashield"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn Drone",
      "icon": "1215_massive_cannon_mech_special4",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "3 drone max",
-      "Spawn Drone"
-     ]
+     "handler": "doSpawn",
+     "cantMessage": "3 drone max",
+     "tooltip": "Spawn Drone"
     }
    ],
    "projectiles": [
@@ -2739,10 +2716,11 @@
     {
      "index": 0,
      "kind": "SpecialUnitAttack",
-     "name": null,
-     "icon": null,
+     "name": "Megacharge",
+     "icon": "btn_celestial_mega_mech",
      "handler": "doMegacharge",
-     "extraLiterals": []
+     "cantMessage": "No target nearby",
+     "tooltip": "Damages all enemies nearby."
     }
    ],
    "projectiles": [
@@ -2808,33 +2786,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "DOUBLE BEAM",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1349_centaur_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "OCTOMISSILES",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1349_centaur_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TESLA FIELD",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1349_centaur_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "CENTAUR DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1349_centaur_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -2923,33 +2905,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "CANNON LASER",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1396_chemicalGunner_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "FIRE SWEEP",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1396_chemicalGunner_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "CHEMICAL GAS",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1396_chemicalGunner_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "CHEMICAL GUNNER DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1396_chemicalGunner_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -3038,33 +3024,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TETRA MISSILES",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1416_crimsonCenturion_button02",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "FINGER LASER",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1416_crimsonCenturion_button01",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "RAIN OF BULLETS",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1416_crimsonCenturion_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Crimson Centurion Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1416_crimsonCenturion_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -3164,9 +3154,8 @@
      "name": "Hammer Rift",
      "icon": "btn_1150_hammer",
      "handler": "doHammerRift",
-     "extraLiterals": [
-      "Open a rift where small enemies will fall"
-     ]
+     "cantMessage": "",
+     "tooltip": "Open a rift where small enemies will fall"
     },
     {
      "index": 1,
@@ -3174,10 +3163,8 @@
      "name": "Son Of Thunder",
      "icon": "btn_1150_lightning",
      "handler": "doSonOfThunder",
-     "extraLiterals": [
-      "No targets nearby",
-      "Summon lightning to smite your foes"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Summon lightning to smite your foes"
     },
     {
      "index": 2,
@@ -3185,10 +3172,8 @@
      "name": "Lethal Stomp",
      "icon": "btn_1150_stomp",
      "handler": "doStomp",
-     "extraLiterals": [
-      "No enemy nearby",
-      "Crush a small enemy under bot\\'s feet"
-     ]
+     "cantMessage": "No enemy nearby",
+     "tooltip": "Crush a small enemy under bot's feet"
     },
     {
      "index": 3,
@@ -3196,10 +3181,8 @@
      "name": "Plasma Spin",
      "icon": "btn_1150_spin",
      "handler": "doPlasmaSpin",
-     "extraLiterals": [
-      "No targets nearby",
-      "Spin while shooting plasma balls in all directions"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Spin while shooting plasma balls in all directions"
     }
    ],
    "projectiles": [
@@ -3312,11 +3295,9 @@
      "kind": "SpecialUnitAttack",
      "name": "Convert",
      "icon": "btn_1151_convert",
-     "handler": "CONVERT_COOLDOWN",
-     "extraLiterals": [
-      "No weak enemies nearby",
-      "Turns a weak enemy unit into a friendly"
-     ]
+     "handler": "doConvert",
+     "cantMessage": "No weak enemies nearby",
+     "tooltip": "Turns a weak enemy unit into a friendly"
     }
    ],
    "projectiles": [
@@ -3376,44 +3357,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Backbone Rockets",
-     "icon": null,
+     "icon": "1325_crusherMonarchMech_button_01",
      "handler": "doBackRockets",
-     "extraLiterals": [
-      "No targets in range",
-      "Backbone Rockets"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Backbone Rockets"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Moving Helix",
-     "icon": null,
+     "icon": "1325_crusherMonarchMech_button_02",
      "handler": "_onBoomerang",
-     "extraLiterals": [
-      "No targets in rage",
-      "Moving Helix"
-     ]
+     "cantMessage": "No targets in rage",
+     "tooltip": "Moving Helix"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "A Fistful of Explosions",
-     "icon": null,
+     "icon": "1325_crusherMonarchMech_button_03",
      "handler": "_onMegaHit",
-     "extraLiterals": [
-      "No targets in range",
-      "A Fistful of Explosions"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "A Fistful of Explosions"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Crusher Monarch Drone",
-     "icon": null,
-     "handler": "NUM_DRONES",
-     "extraLiterals": [
-      " Crusher Monarch Drone"
-     ]
+     "icon": "1325_crusherMonarchMech_button_04",
+     "handler": "doDrones",
+     "cantMessage": "#0# Drones Max",
+     "tooltip": " Crusher Monarch Drone"
     }
    ],
    "projectiles": [],
@@ -3495,33 +3469,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BEAM OF DEATH",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1420_cyberInquisitor_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "LIGHTNING WHIP",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1420_cyberInquisitor_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "CYBERNETIC SEAL",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1420_cyberInquisitor_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "CYBER-INQUISITOR DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1420_cyberInquisitor_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -3611,10 +3589,8 @@
      "name": "Scissors",
      "icon": "btn_1237_scissors",
      "handler": "doScissors",
-     "extraLiterals": [
-      "No target close enough",
-      "Scissors attack"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Scissors attack"
     },
     {
      "index": 1,
@@ -3622,10 +3598,8 @@
      "name": "Missiles",
      "icon": "btn_1237_missiles",
      "handler": "doMissiles",
-     "extraLiterals": [
-      "No target close enough",
-      "Shoot missiles from the chest holes"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Shoot missiles from the chest holes"
     },
     {
      "index": 2,
@@ -3633,9 +3607,8 @@
      "name": "Blades",
      "icon": "btn_1237_blades",
      "handler": "doBlades",
-     "extraLiterals": [
-      "Throw blades like boomerangs"
-     ]
+     "cantMessage": "",
+     "tooltip": "Throw blades like boomerangs"
     },
     {
      "index": 3,
@@ -3643,9 +3616,8 @@
      "name": "Drone",
      "icon": "btn_1237_drone",
      "handler": "doDrones",
-     "extraLiterals": [
-      "Spawn drone"
-     ]
+     "cantMessage": "#0# Drones Max",
+     "tooltip": "Spawn drone"
     }
    ],
    "projectiles": [
@@ -3731,33 +3703,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TIMELESS LASER",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1394_cycloneBattlesuit_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "PULSE STOMP",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1394_cycloneBattlesuit_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "GROUND STAB",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1394_cycloneBattlesuit_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "CYCLONE BATTLESUITE DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1394_cycloneBattlesuit_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -3847,33 +3823,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Blue Energy Balls",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1337_cycloneMech_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Dummy Special Attack",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1337_cycloneMech_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Dummy Special Attack",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1337_cycloneMech_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Cyclone Mech Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1337_cycloneMech_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -4010,43 +3990,36 @@
      "kind": "SpecialUnitAttack",
      "name": "Fireballs",
      "icon": "1239_dark_ether_messiah_sw1",
-     "handler": null,
-     "extraLiterals": [
-      "No target",
-      "Fireballs"
-     ]
+     "handler": "fireBallsAttack",
+     "cantMessage": "No target",
+     "tooltip": "Fireballs"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Spears Attack",
      "icon": "1239_dark_ether_messiah_sw2",
-     "handler": null,
-     "extraLiterals": [
-      "No target",
-      "Spears attack"
-     ]
+     "handler": "spearsAttack",
+     "cantMessage": "No target",
+     "tooltip": "Spears attack"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Whirlwind",
      "icon": "1239_dark_ether_messiah_sw3",
-     "handler": null,
-     "extraLiterals": [
-      "Whirlwind"
-     ]
+     "handler": "whirlwindAttack",
+     "cantMessage": "",
+     "tooltip": "Whirlwind"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn Drone",
      "icon": "1239_dark_ether_messiah_sw4",
-     "handler": null,
-     "extraLiterals": [
-      "1 drone max",
-      "Spawn Drone"
-     ]
+     "handler": "doSpawn",
+     "cantMessage": "1 drone max",
+     "tooltip": "Spawn Drone"
     }
    ],
    "projectiles": [],
@@ -4128,10 +4101,8 @@
      "name": "Electric beam",
      "icon": "1225_special1",
      "handler": "doBeam",
-     "extraLiterals": [
-      "No target",
-      "Throws deadly electric beams \\nupon the enemy"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Throws deadly electric beams \nupon the enemy"
     }
    ],
    "projectiles": [
@@ -4208,9 +4179,8 @@
      "name": "Rotor Storm",
      "icon": "1215_massive_cannon_mech_special1",
      "handler": "doRotationAttack",
-     "extraLiterals": [
-      "Rotor Storm"
-     ]
+     "cantMessage": "",
+     "tooltip": "Rotor Storm"
     },
     {
      "index": 1,
@@ -4218,10 +4188,8 @@
      "name": "Hecatomb Shot",
      "icon": "1215_massive_cannon_mech_special2",
      "handler": "doMegaCannon",
-     "extraLiterals": [
-      "No target",
-      "Hecatomb Shot"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Hecatomb Shot"
     },
     {
      "index": 2,
@@ -4229,9 +4197,8 @@
      "name": "Hexashield",
      "icon": "1215_massive_cannon_mech_special3",
      "handler": "doProtection",
-     "extraLiterals": [
-      "Hexashield"
-     ]
+     "cantMessage": "",
+     "tooltip": "Hexashield"
     },
     {
      "index": 3,
@@ -4239,10 +4206,8 @@
      "name": "Spawn Drone",
      "icon": "btn_drone_dualcannon",
      "handler": "doDrones",
-     "extraLiterals": [
-      "3 drone max",
-      "Spawn Drone"
-     ]
+     "cantMessage": "3 drone max",
+     "tooltip": "Spawn Drone"
     }
    ],
    "projectiles": [
@@ -4609,10 +4574,8 @@
      "name": "Canon!",
      "icon": "1192_botones_ataques_sw_1",
      "handler": "_onCanonAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Canon attack!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Canon attack!"
     },
     {
      "index": 1,
@@ -4620,10 +4583,8 @@
      "name": "Jump!",
      "icon": "1192_botones_ataques_sw_2",
      "handler": "_onJumpAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Jump attack!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Jump attack!"
     },
     {
      "index": 2,
@@ -4631,19 +4592,17 @@
      "name": "Whirlwind!",
      "icon": "1192_botones_ataques_sw_3",
      "handler": "_onWhirlwindAttack",
-     "extraLiterals": [
-      "Whirlwind attack!"
-     ]
+     "cantMessage": "",
+     "tooltip": "Whirlwind attack!"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Drone!",
      "icon": "1192_botones_ataques_sw_4",
-     "handler": "_maxDrones",
-     "extraLiterals": [
-      "Spawn drone!"
-     ]
+     "handler": "_onDronesAttack",
+     "cantMessage": "#0# drones max",
+     "tooltip": "Spawn drone!"
     }
    ],
    "projectiles": [],
@@ -4716,10 +4675,8 @@
      "name": "Rocket blast",
      "icon": "btn_1084_rocket",
      "handler": "doLaunchMissiles",
-     "extraLiterals": [
-      "No enemies nearby",
-      "Launches a rocket rain"
-     ]
+     "cantMessage": "No enemies nearby",
+     "tooltip": "Launches a rocket rain"
     },
     {
      "index": 1,
@@ -4727,10 +4684,8 @@
      "name": "Gatling rage",
      "icon": "btn_1084_gatling",
      "handler": "doLaunchGatling",
-     "extraLiterals": [
-      "No target",
-      "Uses a bigger laser for a short time"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Uses a bigger laser for a short time"
     }
    ],
    "projectiles": [
@@ -4889,33 +4844,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "2 SUPRESSOR GUNNERS",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1400_droneMaster2_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "6 TESLA DRONES",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1400_droneMaster2_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "3 IMMOLATOR BOTS",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1400_droneMaster2_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "1 PHALANX BOT",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1400_droneMaster2_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -4989,33 +4948,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "10 BOMBERBOTS",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1370_masterDrone_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "4 GUNNERBOTS",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1370_masterDrone_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "2 FLYING HEALER DRONES",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1370_masterDrone_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "LASER TANK DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1370_masterDrone_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -5091,10 +5054,8 @@
      "name": "Mega hit!",
      "icon": "1205_botones_ataques_sw4",
      "handler": "_onMegaHit",
-     "extraLiterals": [
-      "No targets in sight",
-      "Mega hit!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Mega hit!"
     },
     {
      "index": 1,
@@ -5102,10 +5063,8 @@
      "name": "Boomerang!",
      "icon": "1205_botones_ataques_sw3",
      "handler": "_onBoomerang",
-     "extraLiterals": [
-      "No targets in sight",
-      "Boomerang!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Boomerang!"
     },
     {
      "index": 2,
@@ -5113,20 +5072,17 @@
      "name": "Mega Shield!",
      "icon": "1205_botones_ataques_sw",
      "handler": "_onMegaShield",
-     "extraLiterals": [
-      "No targets in sight",
-      "Mega Shield!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Mega Shield!"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawning drone!",
      "icon": "1205_botones_ataques_sw2",
-     "handler": "_maxDrones",
-     "extraLiterals": [
-      "Spawn Drone!"
-     ]
+     "handler": "_spawnDrone",
+     "cantMessage": "#0# Drones Max",
+     "tooltip": "Spawn Drone!"
     }
    ],
    "projectiles": [],
@@ -5222,10 +5178,8 @@
      "name": "Multi Spear Attack",
      "icon": "1271_special_1",
      "handler": "doSmash",
-     "extraLiterals": [
-      "No target close enough",
-      "Jumps in the air and throws multiple spears to the ground below him"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Jumps in the air and throws multiple spears to the ground below him"
     },
     {
      "index": 1,
@@ -5233,10 +5187,8 @@
      "name": "Megacharge",
      "icon": "1271_special_2",
      "handler": "_onMegaShield",
-     "extraLiterals": [
-      "No target close enough",
-      "Frontal charge with the shield."
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Frontal charge with the shield."
     },
     {
      "index": 2,
@@ -5244,10 +5196,8 @@
      "name": "Multi Stab Attack",
      "icon": "1271_special_3",
      "handler": "doStab",
-     "extraLiterals": [
-      "No target",
-      "Pinches an enemy with the spear and throws him away"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Pinches an enemy with the spear and throws him away"
     },
     {
      "index": 3,
@@ -5255,9 +5205,8 @@
      "name": "Drone",
      "icon": "1271_special_4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "Spawn drone"
-     ]
+     "cantMessage": "#0# Drones Max",
+     "tooltip": "Spawn drone"
     }
    ],
    "projectiles": [],
@@ -5356,45 +5305,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Plasma balls!",
-     "icon": null,
+     "icon": "electric_dragon_Boton01",
      "handler": "doSpecialBallsAttack",
-     "extraLiterals": [
-      "No target",
-      "Throws deadly plasma balls \\nupon the enemy"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Throws deadly plasma balls \nupon the enemy"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Rays!",
-     "icon": null,
+     "icon": "electric_dragon_Boton02",
      "handler": "doSpecialBeamsAttack",
-     "extraLiterals": [
-      "No target",
-      "Mortal dome attack"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Mortal dome attack"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Call draggy!",
-     "icon": null,
-     "handler": null,
-     "extraLiterals": [
-      "Can\\'t have more draggies!",
-      "Calls a draggy to assist"
-     ]
+     "icon": "electric_dragon_Boton03",
+     "handler": "spawnMinionFromEgg",
+     "cantMessage": "Can't have more draggies!",
+     "tooltip": "Calls a draggy to assist"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Tornado",
-     "icon": null,
+     "icon": "electric_dragon_Boton04",
      "handler": "doTornado",
-     "extraLiterals": [
-      "No target",
-      "Whirlwinds and affects both\\n ground and air units!"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Whirlwinds and affects both\n ground and air units!"
     }
    ],
    "projectiles": [
@@ -5610,10 +5551,8 @@
      "name": "Bazooka",
      "icon": "btn_special_terminator_bazooka",
      "handler": "startBazooka",
-     "extraLiterals": [
-      "No targets in range",
-      "Shoot the bazooka"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Shoot the bazooka"
     },
     {
      "index": 1,
@@ -5621,10 +5560,8 @@
      "name": "Flame Thrower",
      "icon": "btn_special_terminator_flamethrower",
      "handler": "startFlame",
-     "extraLiterals": [
-      "No targets in range",
-      "Burn the enemies"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Burn the enemies"
     }
    ],
    "projectiles": [
@@ -5684,33 +5621,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Boomerang Disc-Saw",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1351_evilSlaughterer_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Extreme Ripper",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1351_evilSlaughterer_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Whirlwind",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1351_evilSlaughterer_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Evil Slaughterer Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1351_evilSlaughterer_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -5803,10 +5744,8 @@
      "name": "Mega Laser Shot",
      "icon": "1290_special_1",
      "handler": "doSpecial1",
-     "extraLiterals": [
-      "No target",
-      "Mega Laser Shot"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Mega Laser Shot"
     },
     {
      "index": 1,
@@ -5814,10 +5753,8 @@
      "name": "Rotor Attack",
      "icon": "1290_special_2",
      "handler": "doSpecial2",
-     "extraLiterals": [
-      "No target",
-      "Rotor Attack"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Rotor Attack"
     },
     {
      "index": 2,
@@ -5825,10 +5762,8 @@
      "name": "Energy Bubble",
      "icon": "1290_special_3",
      "handler": "doSpecial3",
-     "extraLiterals": [
-      "No target",
-      "Energy Bubble"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Energy Bubble"
     },
     {
      "index": 3,
@@ -5836,10 +5771,8 @@
      "name": "Spawn Drone",
      "icon": "1290_special_4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "3 drone max",
-      "Spawn Drone"
-     ]
+     "cantMessage": "3 drone max",
+     "tooltip": "Spawn Drone"
     }
    ],
    "projectiles": [],
@@ -5931,33 +5864,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BREATH OF FIRE",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1392_fireGamera_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "FLAMING THRUSTERS",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1392_fireGamera_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "FIRE VOMITS",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1392_fireGamera_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "FIRE GAMERA DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1392_fireGamera_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -6044,10 +5981,8 @@
      "name": "Flaming Whirlwind",
      "icon": "1305_special_2",
      "handler": "doSpecial1",
-     "extraLiterals": [
-      "No target close enough",
-      "Flaming Whirlwind"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Flaming Whirlwind"
     },
     {
      "index": 1,
@@ -6055,10 +5990,8 @@
      "name": "Burning Balls",
      "icon": "1305_special_3",
      "handler": "doSpecial2",
-     "extraLiterals": [
-      "No target close enough",
-      "Burning Balls"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Burning Balls"
     },
     {
      "index": 2,
@@ -6066,10 +5999,8 @@
      "name": "Flaring Rain",
      "icon": "1305_special_1",
      "handler": "doSpecial3",
-     "extraLiterals": [
-      "No target close enough",
-      "Flaring Rain"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Flaring Rain"
     },
     {
      "index": 3,
@@ -6077,10 +6008,8 @@
      "name": "Fire Extreme Draggies",
      "icon": "1305_special_4",
      "handler": "_spawnDrone",
-     "extraLiterals": [
-      "Can\\'t have more draggies!",
-      "Calls a draggy to assist"
-     ]
+     "cantMessage": "Can't have more draggies!",
+     "tooltip": "Calls a draggy to assist"
     }
    ],
    "projectiles": [
@@ -6352,10 +6281,8 @@
      "name": "Fire rain!",
      "icon": "1243_forge_dragon_1",
      "handler": "_doFireInvocationAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Fire rain!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Fire rain!"
     },
     {
      "index": 1,
@@ -6363,10 +6290,8 @@
      "name": "Flamethrower!",
      "icon": "1243_forge_dragon_2",
      "handler": "_doFlamethrowerAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Flamethrower!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Flamethrower!"
     },
     {
      "index": 2,
@@ -6374,9 +6299,8 @@
      "name": "Whirlwind!",
      "icon": "1243_forge_dragon_3",
      "handler": "_doWhirlwindAttack",
-     "extraLiterals": [
-      "Whirlwind!"
-     ]
+     "cantMessage": null,
+     "tooltip": "Whirlwind!"
     },
     {
      "index": 3,
@@ -6384,10 +6308,8 @@
      "name": "Spawn draggy!",
      "icon": "1243_forge_dragon_4",
      "handler": "_doSpawnDraggyAttack",
-     "extraLiterals": [
-      "Max 1 draggy!",
-      "Spanws a draggy!"
-     ]
+     "cantMessage": "Max 1 draggy!",
+     "tooltip": "Spanws a draggy!"
     }
    ],
    "projectiles": [
@@ -6457,41 +6379,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Energy Bomb",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": [
-      "Energy Bomb"
-     ]
+     "icon": "1331_forgelordMech_button_02",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": "Energy Bomb"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Multi Energy Ray",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": [
-      "Multi Energy Ray"
-     ]
+     "icon": "1331_forgelordMech_button_04",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": "Multi Energy Ray"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Special Whirlwind",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": [
-      "Special Whirlwind"
-     ]
+     "icon": "1331_forgelordMech_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": "Special Whirlwind"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Forgelord Mech Drone",
-     "icon": null,
-     "handler": "NUM_DRONES",
-     "extraLiterals": [
-      "Forgelord Mech Drone"
-     ]
+     "icon": "1331_forgelordMech_button_01",
+     "handler": "doDrones",
+     "cantMessage": "#0#  Drone Max",
+     "tooltip": "Forgelord Mech Drone"
     }
    ],
    "projectiles": [],
@@ -6584,10 +6502,8 @@
      "name": "Megacharge!",
      "icon": "1280_speacial_1",
      "handler": "_onMegaShield",
-     "extraLiterals": [
-      "No target",
-      "Megacharge!"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Megacharge!"
     },
     {
      "index": 1,
@@ -6595,10 +6511,8 @@
      "name": "Radial Attack!",
      "icon": "1280_speacial_2",
      "handler": "doRadialAttack",
-     "extraLiterals": [
-      "No target",
-      "Radial Attack!"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Radial Attack!"
     },
     {
      "index": 2,
@@ -6606,21 +6520,17 @@
      "name": "WhirlWind!",
      "icon": "1280_speacial_3",
      "handler": "doWhirlWind",
-     "extraLiterals": [
-      "No target",
-      "WhirlWind!"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "WhirlWind!"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Call draggy!",
      "icon": "1280_speacial_4",
-     "handler": null,
-     "extraLiterals": [
-      "Can\\'t have more draggies!",
-      "Calls a draggy to assist"
-     ]
+     "handler": "spawnMinionFromEgg",
+     "cantMessage": "Can't have more draggies!",
+     "tooltip": "Calls a draggy to assist"
     }
    ],
    "projectiles": [],
@@ -6715,10 +6625,8 @@
      "name": "MOUTH BOMBING",
      "icon": "1299_special_1",
      "handler": "doMouthAttack",
-     "extraLiterals": [
-      "No target close enough",
-      "MOUTH BOMBING"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "MOUTH BOMBING"
     },
     {
      "index": 1,
@@ -6726,10 +6634,8 @@
      "name": "FLYING CHARGE",
      "icon": "1299_special_2",
      "handler": "doCharge",
-     "extraLiterals": [
-      "No target close enough",
-      "FLYING CHARGE"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "FLYING CHARGE"
     },
     {
      "index": 2,
@@ -6737,9 +6643,8 @@
      "name": "UFO SHELL",
      "icon": "1299_special_3",
      "handler": "doWhirlind",
-     "extraLiterals": [
-      "UFO SHELL"
-     ]
+     "cantMessage": null,
+     "tooltip": "UFO SHELL"
     },
     {
      "index": 3,
@@ -6747,9 +6652,8 @@
      "name": "GAMERA DRONE",
      "icon": "1299_special_4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "GAMERA DRONE"
-     ]
+     "cantMessage": "#0# GAMERA DRONE Max",
+     "tooltip": "GAMERA DRONE"
     }
    ],
    "projectiles": [
@@ -6891,10 +6795,8 @@
      "name": "Gatling Shot",
      "icon": "1307_special_1",
      "handler": "doGatlingShot",
-     "extraLiterals": [
-      "No target close enough",
-      "Gatling Shot"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Gatling Shot"
     },
     {
      "index": 1,
@@ -6902,10 +6804,8 @@
      "name": "Symmetric Boomerangs",
      "icon": "1307_special_2",
      "handler": "doBoomerangs",
-     "extraLiterals": [
-      "No target close enough",
-      "Symmetric Boomerangs"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Symmetric Boomerangs"
     },
     {
      "index": 2,
@@ -6913,10 +6813,8 @@
      "name": "Satellite Laser",
      "icon": "1307_special_3",
      "handler": "doSatellite",
-     "extraLiterals": [
-      "No target close enough",
-      "Satellite Laser"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Satellite Laser"
     },
     {
      "index": 3,
@@ -6924,9 +6822,8 @@
      "name": "Glaivestorm Drone",
      "icon": "1307_special_4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "Glaivestorm Drone"
-     ]
+     "cantMessage": "#0# Glaivestorm Drone Max",
+     "tooltip": "Glaivestorm Drone"
     }
    ],
    "projectiles": [],
@@ -7004,10 +6901,8 @@
      "name": "Spinning Tail",
      "icon": "1293_special_1",
      "handler": "doSpecial1",
-     "extraLiterals": [
-      "No target close enough",
-      "Spinning Tail"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Spinning Tail"
     },
     {
      "index": 1,
@@ -7015,10 +6910,8 @@
      "name": "Chest Rockets",
      "icon": "1293_special_2",
      "handler": "doSpecial2",
-     "extraLiterals": [
-      "No target close enough",
-      "Chest Rockets"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Chest Rockets"
     },
     {
      "index": 2,
@@ -7026,10 +6919,8 @@
      "name": "Enemy clash",
      "icon": "1293_special_3",
      "handler": "doSpecial3",
-     "extraLiterals": [
-      "No target close enough",
-      "Enemy clash"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Enemy clash"
     },
     {
      "index": 3,
@@ -7037,10 +6928,8 @@
      "name": "Mechagodzilla Minions!",
      "icon": "1293_special_4",
      "handler": "_spawnDrone",
-     "extraLiterals": [
-      "Can\\'t have more draggies!",
-      "Calls a draggy to assist"
-     ]
+     "cantMessage": "Can't have more draggies!",
+     "tooltip": "Calls a draggy to assist"
     }
    ],
    "projectiles": [
@@ -7285,33 +7174,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TWIN BEAMS",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1388_guardian_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SHELL MISSILES",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1388_guardian_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "PLASMA BLAST",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1388_guardian_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "GUARDIAN DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1388_guardian_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -7440,33 +7333,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Bullet Sweep",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1364_hammerhead_button1",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Missile Wings",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1364_hammerhead_button2",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Turbo-Firestorm",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1364_hammerhead_button3",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Hammerhead Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1364_hammerhead_button4",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -7556,33 +7453,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SCYTHE SWIPE",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1381_harvester_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "360º WOOSH",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1381_harvester_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "STAB-BLAST",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1381_harvester_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "DEATH BY SPEAR",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1381_harvester_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -7663,33 +7564,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SUPERMASSIVE LASER",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1362_havoc_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "GROUND SHOT",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1362_havoc_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "ORBITAL STRIKE",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1362_havoc_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "HAVOC DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1362_havoc_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -7826,10 +7731,8 @@
      "name": "Super Fire Ball",
      "icon": "1311_special_1",
      "handler": "shootFireball",
-     "extraLiterals": [
-      "No target close enough",
-      "Super Fire Ball"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Super Fire Ball"
     },
     {
      "index": 1,
@@ -7837,10 +7740,8 @@
      "name": "Fire Whirlwind",
      "icon": "1311_special_2",
      "handler": "whirlwindAttack",
-     "extraLiterals": [
-      "You are too close to a building, wall or tree",
-      "Fire Whirlwind"
-     ]
+     "cantMessage": "You are too close to a building, wall or tree",
+     "tooltip": "Fire Whirlwind"
     },
     {
      "index": 2,
@@ -7848,10 +7749,8 @@
      "name": "Mega Fire Burst",
      "icon": "1311_special_3",
      "handler": "megaFireBeam",
-     "extraLiterals": [
-      "No target close enough",
-      "Mega Fire Burst"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Mega Fire Burst"
     },
     {
      "index": 3,
@@ -7859,9 +7758,8 @@
      "name": "HellFire Drone",
      "icon": "1311_special_4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "HellFire Drone"
-     ]
+     "cantMessage": "#0# HellFire Drone Max",
+     "tooltip": "HellFire Drone"
     }
    ],
    "projectiles": [],
@@ -7947,9 +7845,8 @@
      "name": "Lasers",
      "icon": "1197_botones_ataques_sw",
      "handler": "_onLasersAttack",
-     "extraLiterals": [
-      "Lasers whirlwind"
-     ]
+     "cantMessage": "",
+     "tooltip": "Lasers whirlwind"
     },
     {
      "index": 1,
@@ -7957,10 +7854,8 @@
      "name": "Kick",
      "icon": "1197_botones_ataques_sw1",
      "handler": "_onKickAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Kick attack"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Kick attack"
     }
    ],
    "projectiles": [
@@ -8029,10 +7924,8 @@
      "name": "Energy Charge!",
      "icon": "1242_herkules_mech_1",
      "handler": "_doEnergyCharge",
-     "extraLiterals": [
-      "No target!",
-      "Energy charge!"
-     ]
+     "cantMessage": "No target!",
+     "tooltip": "Energy charge!"
     },
     {
      "index": 1,
@@ -8040,10 +7933,8 @@
      "name": "Mega Jump!",
      "icon": "1242_herkules_mech_2",
      "handler": "_doJump",
-     "extraLiterals": [
-      "No targets in sight!",
-      "Mega Jump!"
-     ]
+     "cantMessage": "No targets in sight!",
+     "tooltip": "Mega Jump!"
     }
    ],
    "projectiles": [],
@@ -8104,10 +7995,8 @@
      "name": "Jump Plasma",
      "icon": "btn_1123_plasma",
      "handler": "doJumpPlasma",
-     "extraLiterals": [
-      "No target",
-      "Jumps and shoots a plasma ball"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Jumps and shoots a plasma ball"
     },
     {
      "index": 1,
@@ -8115,10 +8004,8 @@
      "name": "Jump Blade",
      "icon": "btn_1123_blade",
      "handler": "doJumpBlade",
-     "extraLiterals": [
-      "No target",
-      "Jumps and hits with the blade"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Jumps and hits with the blade"
     },
     {
      "index": 2,
@@ -8126,10 +8013,8 @@
      "name": "Whirlwind",
      "icon": "btn_1123_whirlwind",
      "handler": "doWhirlwind",
-     "extraLiterals": [
-      "No target",
-      "Whirlwind with blade"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Whirlwind with blade"
     },
     {
      "index": 3,
@@ -8137,10 +8022,8 @@
      "name": "Spawn Drone",
      "icon": "btn_1123_drone",
      "handler": "doSpawn",
-     "extraLiterals": [
-      "Maximum reached",
-      "Spawn a drone"
-     ]
+     "cantMessage": "Maximum reached",
+     "tooltip": "Spawn a drone"
     }
    ],
    "projectiles": [],
@@ -8214,33 +8097,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "UPPERCUT!",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1379_ignition_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "PUNCHSTORM",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1379_ignition_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "FIRE WAVEDASH",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1379_ignition_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "KAMIKAZE DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1379_ignition_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -8329,33 +8216,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Dummy Special Attack",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1430_intruder_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Dummy Special Attack",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1430_intruder_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Dummy Special Attack",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1430_intruder_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Intruder Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1430_intruder_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -8580,43 +8471,36 @@
      "kind": "SpecialUnitAttack",
      "name": "MultiPunch",
      "icon": "1184_special_1",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "MultiPunch attack"
-     ]
+     "handler": "multiPunchAttack",
+     "cantMessage": "No target",
+     "tooltip": "MultiPunch attack"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "FireBalls",
      "icon": "1184_special_2",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Fireballs"
-     ]
+     "handler": "fireBallsAttack",
+     "cantMessage": "No target",
+     "tooltip": "Fireballs"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Air tornado",
      "icon": "1184_special_3",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Air tornado"
-     ]
+     "handler": "whirlwindAttack",
+     "cantMessage": "",
+     "tooltip": "Air tornado"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Autohealing",
      "icon": "1184_special_4",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Autohealing"
-     ]
+     "handler": "healAttack",
+     "cantMessage": "No target",
+     "tooltip": "Autohealing"
     }
    ],
    "projectiles": [],
@@ -8708,21 +8592,18 @@
      "kind": "SpecialUnitAttack",
      "name": "Super Shot",
      "icon": "1252_special_1",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Super Shot"
-     ]
+     "handler": "specialShotAttack",
+     "cantMessage": "No target",
+     "tooltip": "Super Shot"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Air tornado",
      "icon": "1252_special_2",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Air tornado"
-     ]
+     "handler": "whirlwindAttack",
+     "cantMessage": "",
+     "tooltip": "Air tornado"
     }
    ],
    "projectiles": [],
@@ -8814,9 +8695,8 @@
      "name": "Energy Aura",
      "icon": "1297_special_1",
      "handler": "doEnergyShield",
-     "extraLiterals": [
-      "Energy Aura"
-     ]
+     "cantMessage": null,
+     "tooltip": "Energy Aura"
     },
     {
      "index": 1,
@@ -8824,10 +8704,8 @@
      "name": "Two at a time",
      "icon": "1297_special_2",
      "handler": "doGrab",
-     "extraLiterals": [
-      "No target close enough",
-      "Two at a time"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Two at a time"
     },
     {
      "index": 2,
@@ -8835,10 +8713,8 @@
      "name": "Simian Earthquake",
      "icon": "1297_special_3",
      "handler": "doEarthEat",
-     "extraLiterals": [
-      "No target",
-      "Simian Earthquake"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Simian Earthquake"
     },
     {
      "index": 3,
@@ -8846,9 +8722,8 @@
      "name": "King Kongs Drone",
      "icon": "1297_special_4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "Spawn King Kongs Drone"
-     ]
+     "cantMessage": "#0# King Kongs Drone Max",
+     "tooltip": "Spawn King Kongs Drone"
     }
    ],
    "projectiles": [
@@ -8993,33 +8868,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SPARKLY STAB",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1390_knightExosuit_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "CHARGE!",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1390_knightExosuit_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "ELECTRICAL TURBINES",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1390_knightExosuit_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "KNIGHT EXOSUIT DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1390_knightExosuit_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -9108,33 +8987,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "EARTH-SHATTER",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1422_knuckledragger_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "FISTS OF FIRE",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1422_knuckledragger_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "PROPELLED PUNCHES!",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1422_knuckledragger_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "KNUCKLEDRAGGER DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1422_knuckledragger_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -9222,10 +9105,8 @@
      "name": "Mega hit!",
      "icon": "1248_boton_1",
      "handler": "_onMegaHit",
-     "extraLiterals": [
-      "No targets in sight",
-      "Mega hit!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Mega hit!"
     },
     {
      "index": 1,
@@ -9233,10 +9114,8 @@
      "name": "Boomerang!",
      "icon": "1248_boton_2",
      "handler": "_onBoomerang",
-     "extraLiterals": [
-      "No targets in sight",
-      "Boomerang!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Boomerang!"
     },
     {
      "index": 2,
@@ -9244,20 +9123,17 @@
      "name": "Mega Shield!",
      "icon": "1248_boton_3",
      "handler": "_onMegaShield",
-     "extraLiterals": [
-      "No targets in sight",
-      "Mega Shield!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Mega Shield!"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawning drone!",
      "icon": "1248_boton_4",
-     "handler": "_maxDrones",
-     "extraLiterals": [
-      "Spawn Drone!"
-     ]
+     "handler": "_spawnDrone",
+     "cantMessage": "#0# Drones Max",
+     "tooltip": "Spawn Drone!"
     }
    ],
    "projectiles": [],
@@ -9321,42 +9197,36 @@
      "kind": "SpecialUnitAttack",
      "name": "Acid Rain",
      "icon": "btn_liquid_mech_acid_rain",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Acid Rain"
-     ]
+     "handler": "acidRainAttack",
+     "cantMessage": "No target",
+     "tooltip": "Acid Rain"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Acid Balls",
      "icon": "btn_liquid_mech_acid_balls",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Acid Balls"
-     ]
+     "handler": "acidBallsAttack",
+     "cantMessage": "No target",
+     "tooltip": "Acid Balls"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Clone",
      "icon": "btn_liquid_mech_clone",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Clone"
-     ]
+     "handler": "cloneAttack",
+     "cantMessage": "",
+     "tooltip": "Clone"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn Drone",
      "icon": "btn_liquid_mech_drone",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Spawn Drone"
-     ]
+     "handler": "doSpawn",
+     "cantMessage": null,
+     "tooltip": "Spawn Drone"
     }
    ],
    "projectiles": [
@@ -9640,33 +9510,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "MORTAR SHOOT",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1367_marauderBattleChasis_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TWIN LASERS",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1367_marauderBattleChasis_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "STERN-DRIVE ENGINES",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1367_marauderBattleChasis_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "GLIDING DAMAGE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1367_marauderBattleChasis_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -9752,10 +9626,8 @@
      "name": "Mega Shot",
      "icon": "1303_special_1",
      "handler": "doMegaShot",
-     "extraLiterals": [
-      "No target close enough",
-      "Mega Shot"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Mega Shot"
     },
     {
      "index": 1,
@@ -9763,10 +9635,8 @@
      "name": "Back Rockets",
      "icon": "1303_special_2",
      "handler": "doBackRockets",
-     "extraLiterals": [
-      "No target close enough",
-      "Back Rockets"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Back Rockets"
     },
     {
      "index": 2,
@@ -9774,10 +9644,8 @@
      "name": "SOL Laser",
      "icon": "1303_special_3",
      "handler": "doSolLaser",
-     "extraLiterals": [
-      "No target close enough",
-      "SOL Laser"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "SOL Laser"
     },
     {
      "index": 3,
@@ -9785,9 +9653,8 @@
      "name": "Gunner Drone",
      "icon": "1303_special_4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "Gunner Drone"
-     ]
+     "cantMessage": "#0# Gunner Drone Max",
+     "tooltip": "Gunner Drone"
     }
    ],
    "projectiles": [
@@ -9923,43 +9790,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Flash",
-     "icon": null,
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Flash"
-     ]
+     "icon": "1171_LANZA_LLAMAS",
+     "handler": "_onFlashAttack",
+     "cantMessage": "No target",
+     "tooltip": "Flash"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Fireball",
-     "icon": null,
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Fireball"
-     ]
+     "icon": "1171_FIRE",
+     "handler": "_onFireballAttack",
+     "cantMessage": "",
+     "tooltip": "Fireball"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Fireballs Whirlwind",
-     "icon": null,
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Fireballs Whirlwind"
-     ]
+     "icon": "1171_GIRO_360",
+     "handler": "_onFireballsWhirlwindAttack",
+     "cantMessage": "",
+     "tooltip": "Fireballs Whirlwind"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn Drone",
-     "icon": null,
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "1 drone max",
-      "Spawn Drone"
-     ]
+     "icon": "1171_DRONE",
+     "handler": "spawnDrone",
+     "cantMessage": "1 drone max",
+     "tooltip": "Spawn Drone"
     }
    ],
    "projectiles": [],
@@ -10120,43 +9981,36 @@
      "kind": "SpecialUnitAttack",
      "name": "Fireballs",
      "icon": "1178_ether_messiah_especial02",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Fireballs"
-     ]
+     "handler": "fireBallsAttack",
+     "cantMessage": "No target",
+     "tooltip": "Fireballs"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Spears Attack",
      "icon": "1178_ether_messiah_especial03",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Spears attack"
-     ]
+     "handler": "spearsAttack",
+     "cantMessage": "No target",
+     "tooltip": "Spears attack"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Whirlwind",
      "icon": "1178_ether_messiah_especial01",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Whirlwind"
-     ]
+     "handler": "whirlwindAttack",
+     "cantMessage": "",
+     "tooltip": "Whirlwind"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn Drone",
      "icon": "1178_ether_messiah_especial04",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "1 drone max",
-      "Spawn Drone"
-     ]
+     "handler": "doSpawn",
+     "cantMessage": "1 drone max",
+     "tooltip": "Spawn Drone"
     }
    ],
    "projectiles": [
@@ -10275,45 +10129,37 @@
      "index": 0,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Call draggy!",
-     "icon": null,
-     "handler": null,
-     "extraLiterals": [
-      "Can\\'t have more draggies!",
-      "Calls a draggy to assist"
-     ]
+     "icon": "metal_dragon_Boton01",
+     "handler": "spawnMinionFromEgg",
+     "cantMessage": "Can't have more draggies!",
+     "tooltip": "Calls a draggy to assist"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Metallic balls!",
-     "icon": null,
+     "icon": "metal_dragon_Boton03",
      "handler": "doSpecialBallsAttack",
-     "extraLiterals": [
-      "No target",
-      "Throws deadly metallic balls \\nupon the enemy"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Throws deadly metallic balls \nupon the enemy"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Metallic beams!",
-     "icon": null,
+     "icon": "metal_dragon_Boton04",
      "handler": "doSpecialBeamsAttack",
-     "extraLiterals": [
-      "No target",
-      "Magic beams attack"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Magic beams attack"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Burn!",
-     "icon": null,
+     "icon": "metal_dragon_Boton02",
      "handler": "doSpecialBurnAttack",
-     "extraLiterals": [
-      "No target",
-      "Burn attack!"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Burn attack!"
     }
    ],
    "projectiles": [
@@ -10381,45 +10227,37 @@
      "index": 0,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Call draggy",
-     "icon": null,
+     "icon": "btn_1105_callDraggy",
      "handler": "doCallDraggies",
-     "extraLiterals": [
-      "Can\\'t have more draggies!",
-      "Calls a draggy to assist"
-     ]
+     "cantMessage": "Can't have more draggies!",
+     "tooltip": "Calls a draggy to assist"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Metallic balls",
-     "icon": null,
+     "icon": "btn_1105_metallicBalls",
      "handler": "doBalls",
-     "extraLiterals": [
-      "No target",
-      "Throws deadly metallic balls \\nupon the enemy"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Throws deadly metallic balls \nupon the enemy"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Metallic tornado",
-     "icon": null,
+     "icon": "btn_1105_metallicTornado",
      "handler": "doTornado",
-     "extraLiterals": [
-      "No target",
-      "Whirlwinds and affects both\\n ground and air units!"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Whirlwinds and affects both\n ground and air units!"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Metallic bomb",
-     "icon": null,
+     "icon": "btn_1105_metallicBomb",
      "handler": "doBomb",
-     "extraLiterals": [
-      "No target",
-      "Launches a bomb from it\\'s \\nchest that burns enemies"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Launches a bomb from it's \nchest that burns enemies"
     }
    ],
    "projectiles": [
@@ -10528,10 +10366,8 @@
      "name": "Mortal Charge!",
      "icon": "1226_special1",
      "handler": "doMetallicSpecial",
-     "extraLiterals": [
-      "No target",
-      "Selects targets and charges towards them doing push in air"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Selects targets and charges towards them doing push in air"
     },
     {
      "index": 1,
@@ -10539,10 +10375,8 @@
      "name": "Rocket Assault",
      "icon": "1226_special2",
      "handler": "doSpecialBallsAttack",
-     "extraLiterals": [
-      "No target",
-      "Launches a bomb from it\\'s \\nchest that burns enemies"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Launches a bomb from it's \nchest that burns enemies"
     },
     {
      "index": 2,
@@ -10550,21 +10384,17 @@
      "name": "Grenade Frenzy!",
      "icon": "1226_special3",
      "handler": "goGranadeAttack",
-     "extraLiterals": [
-      "No target",
-      "Launches granades"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Launches granades"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Call draggy!",
      "icon": "1226_special4",
-     "handler": null,
-     "extraLiterals": [
-      "Can\\'t have more draggies!",
-      "Calls a draggy to assist"
-     ]
+     "handler": "spawnMinionFromEgg",
+     "cantMessage": "Can't have more draggies!",
+     "tooltip": "Calls a draggy to assist"
     }
    ],
    "projectiles": [
@@ -10727,10 +10557,8 @@
      "name": "Multi Morph!",
      "icon": "1274_special_1",
      "handler": "summon",
-     "extraLiterals": [
-      "No targets in sight",
-      "Multi Morph!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Multi Morph!"
     }
    ],
    "projectiles": [],
@@ -10996,21 +10824,17 @@
      "name": "Beams!",
      "icon": "1199_boton_ataqueavatardragon",
      "handler": "_shootBeams",
-     "extraLiterals": [
-      "No targets in sight",
-      "Beams!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Beams!"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawning Draggy!",
-     "icon": null,
+     "icon": "botonGreenDraggis",
      "handler": "_spawnDraggy",
-     "extraLiterals": [
-      "1 draggy max",
-      "Spawns draggy"
-     ]
+     "cantMessage": "1 draggy max",
+     "tooltip": "Spawns draggy"
     }
    ],
    "projectiles": [
@@ -11082,10 +10906,8 @@
      "name": "Fire Ray!",
      "icon": "1219_special_1",
      "handler": "_shootFireRays",
-     "extraLiterals": [
-      "No targets in sight",
-      "Fire Ray!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Fire Ray!"
     },
     {
      "index": 1,
@@ -11093,10 +10915,8 @@
      "name": "Spawning Draggy!",
      "icon": "1219_special_2",
      "handler": "_spawnDraggy",
-     "extraLiterals": [
-      "1 draggy max",
-      "Spawns draggy"
-     ]
+     "cantMessage": "1 draggy max",
+     "tooltip": "Spawns draggy"
     }
    ],
    "projectiles": [
@@ -11201,10 +11021,8 @@
      "name": "Nebular earthquake",
      "icon": "1228_special1",
      "handler": "pushAttack",
-     "extraLiterals": [
-      "No targets nearby",
-      "Nebular earthquake"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Nebular earthquake"
     },
     {
      "index": 1,
@@ -11212,10 +11030,8 @@
      "name": "Spawning minions!",
      "icon": "1228_special2",
      "handler": "spawnMonsters",
-     "extraLiterals": [
-      "5 minions max",
-      "Spawn minions"
-     ]
+     "cantMessage": "5 minions max",
+     "tooltip": "Spawn minions"
     }
    ],
    "projectiles": [],
@@ -11421,9 +11237,8 @@
      "name": "Hide",
      "icon": "btn_1220_special1",
      "handler": "doHideUnit",
-     "extraLiterals": [
-      ""
-     ]
+     "cantMessage": "",
+     "tooltip": "Hides the Snipper for #0# seconds"
     },
     {
      "index": 1,
@@ -11431,10 +11246,8 @@
      "name": "Headshot",
      "icon": "btn_1220_special2",
      "handler": "doBigShot",
-     "extraLiterals": [
-      "No unit in range",
-      "Shoot an unit in a vulnerable point"
-     ]
+     "cantMessage": "No unit in range",
+     "tooltip": "Shoot an unit in a vulnerable point"
     }
    ],
    "projectiles": [],
@@ -11504,43 +11317,36 @@
      "kind": "SpecialUnitAttack",
      "name": "Jump and Mega Punch",
      "icon": "1254_special1",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Jump and Mega punch on the ground. Directional attack."
-     ]
+     "handler": "doMegaPunch",
+     "cantMessage": "",
+     "tooltip": "Jump and Mega punch on the ground. Directional attack."
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Mega triple Cannon shot",
      "icon": "1254_special2",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Mega triple Cannon shot, all at once"
-     ]
+     "handler": "megaCannon",
+     "cantMessage": "No target",
+     "tooltip": "Mega triple Cannon shot, all at once"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Rockets storm",
      "icon": "1254_special3",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Many Rockets attack from chest"
-     ]
+     "handler": "doRocketAttack",
+     "cantMessage": "No target",
+     "tooltip": "Many Rockets attack from chest"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn Drone",
      "icon": "1254_special4",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "3 drone max",
-      "Spawn Drone"
-     ]
+     "handler": "doSpawn",
+     "cantMessage": "3 drone max",
+     "tooltip": "Spawn Drone"
     }
    ],
    "projectiles": [
@@ -11730,10 +11536,11 @@
     {
      "index": 0,
      "kind": "SpecialUnitAttack",
-     "name": null,
-     "icon": null,
+     "name": "Grab Attack!",
+     "icon": "boton_pinzas",
      "handler": "_doGrabAttack",
-     "extraLiterals": []
+     "cantMessage": "No targets close enough",
+     "tooltip": "Grabs enemy and throws him in air"
     }
    ],
    "projectiles": [
@@ -11799,22 +11606,18 @@
      "kind": "SpecialUnitAttack",
      "name": "Spinning Saw",
      "icon": "btn_saw_attack",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No targets in range",
-      "Launch Spinning Saw"
-     ]
+     "handler": "spiningSaw",
+     "cantMessage": "No targets in range",
+     "tooltip": "Launch Spinning Saw"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Misile Storm",
      "icon": "btn_misile_storm",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No targets in range",
-      "Launch Misile Storm"
-     ]
+     "handler": "misileStorm",
+     "cantMessage": "No targets in range",
+     "tooltip": "Launch Misile Storm"
     }
    ],
    "projectiles": [
@@ -11935,33 +11738,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "MINI-MISSILES VOLLEY",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1406_overseer_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TESLA FIELD",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1406_overseer_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BACKFIRE LASERS",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1406_overseer_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "OVERSEER DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1406_overseer_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -12048,33 +11855,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SHOULDER MISSILES",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1412_pauldronMech_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "GUNFIRE!",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1412_pauldronMech_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "HEROIC DOUBLE-SHOT",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1412_pauldronMech_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "PAULDRON DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1412_pauldronMech_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -12779,22 +12590,18 @@
      "kind": "SpecialUnitAttack",
      "name": "Laser Beams",
      "icon": "btn_laser_punisher",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No targets in range",
-      "Shoot eye laser beams"
-     ]
+     "handler": "shootLaserBeams",
+     "cantMessage": "No targets in range",
+     "tooltip": "Shoot eye laser beams"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Rockets",
      "icon": "btn_misil_punisher",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No targets in range",
-      "Double rocket shot"
-     ]
+     "handler": "shootBazooka",
+     "cantMessage": "No targets in range",
+     "tooltip": "Double rocket shot"
     }
    ],
    "projectiles": [
@@ -12863,10 +12670,8 @@
      "name": "Slash throat",
      "icon": "btn_special_rambo_slash",
      "handler": "doSlashThroat",
-     "extraLiterals": [
-      "No enemies nearby",
-      "Attack with knife. Needs to be close to enemy infantry."
-     ]
+     "cantMessage": "No enemies nearby",
+     "tooltip": "Attack with knife. Needs to be close to enemy infantry."
     },
     {
      "index": 1,
@@ -12874,10 +12679,8 @@
      "name": "Grenade",
      "icon": "btn_special_rambo_grenade",
      "handler": "doThrowGrenade",
-     "extraLiterals": [
-      "No targets in range",
-      "Throw a grenade"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Throw a grenade"
     }
    ],
    "projectiles": [
@@ -12938,41 +12741,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Blade Attack",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": [
-      "Blade Attack"
-     ]
+     "icon": "1335_ravenMech_1",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": "Blade Attack"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Multi Rocket",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": [
-      "Multi Rocket"
-     ]
+     "icon": "1335_ravenMech_5",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": "Multi Rocket"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Blue Soul Blade",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": [
-      "Blue Soul Blade"
-     ]
+     "icon": "1335_ravenMech_3",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": "Blue Soul Blade"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Raven Mech Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": [
-      "Raven Mech Drone"
-     ]
+     "icon": "1335_ravenMech_4",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": "Raven Mech Drone"
     }
    ],
    "projectiles": [],
@@ -13060,33 +12859,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SCYTHE LASER",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1375_reaper_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "NECK MISSILE",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1375_reaper_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "LASER SWEEP",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1375_reaper_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "REAPER DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1375_reaper_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -13180,10 +12983,11 @@
     {
      "index": 0,
      "kind": "SpecialUnitAttack",
-     "name": null,
-     "icon": null,
+     "name": "Missile strike",
+     "icon": "btn_1075_misil",
      "handler": "doLaunchSpecialAttack",
-     "extraLiterals": []
+     "cantMessage": "I don't have a target!",
+     "tooltip": "Launches a missile over a target and \nbecomes unreachable for 5 seconds"
     }
    ],
    "projectiles": [
@@ -13276,26 +13080,29 @@
     {
      "index": 0,
      "kind": "SpecialUnitAttack",
-     "name": null,
-     "icon": null,
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": []
+     "name": "Fire Balls",
+     "icon": "btn_bolas_dragon",
+     "handler": "shootFireballs",
+     "cantMessage": "No targets in range",
+     "tooltip": "Shoot fire balls"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
-     "name": null,
-     "icon": null,
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": []
+     "name": "Heavy Machine Guns",
+     "icon": "btn_laser_dragon",
+     "handler": "shootWeapons",
+     "cantMessage": "No targets in range",
+     "tooltip": "Laser guns"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttackSpawn",
-     "name": null,
-     "icon": null,
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": []
+     "name": "Spawn Draggies",
+     "icon": "botonGreenDraggis",
+     "handler": "spawnDraggy",
+     "cantMessage": "Maximum Draggies Reached",
+     "tooltip": "Spawn Draggies"
     }
    ],
    "projectiles": [
@@ -13408,10 +13215,11 @@
     {
      "index": 0,
      "kind": "SpecialUnitAttack",
-     "name": null,
-     "icon": null,
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": []
+     "name": "Tornado Attack",
+     "icon": "btn_optimus",
+     "handler": "tornado",
+     "cantMessage": "No targets in range",
+     "tooltip": "Launch Tornado Attack"
     }
    ],
    "projectiles": [
@@ -13471,10 +13279,8 @@
      "name": "Fire Balls",
      "icon": "1245_special_1",
      "handler": "doFireBalls",
-     "extraLiterals": [
-      "No target close enough",
-      "Shoots a burst of deadly power balls"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Shoots a burst of deadly power balls"
     },
     {
      "index": 1,
@@ -13482,10 +13288,8 @@
      "name": "Burn Area",
      "icon": "1245_special_2",
      "handler": "doWhirlWind",
-     "extraLiterals": [
-      "No targets nearby",
-      "Whirlwind while throwing fire from mouth and fires enemies"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Whirlwind while throwing fire from mouth and fires enemies"
     }
    ],
    "projectiles": [
@@ -13660,10 +13464,8 @@
      "name": "Robot blast",
      "icon": "btn_1180_hiper",
      "handler": "doHiperBlast",
-     "extraLiterals": [
-      "No robots close enough",
-      "Jump and shoot a powerful blast that greatly damages enemy nearby robots"
-     ]
+     "cantMessage": "No robots close enough",
+     "tooltip": "Jump and shoot a powerful blast that greatly damages enemy nearby robots"
     },
     {
      "index": 1,
@@ -13671,10 +13473,8 @@
      "name": "Charged blast",
      "icon": "btn_1180_blast",
      "handler": "doChargedBlast",
-     "extraLiterals": [
-      "No targets nearby",
-      "Shoot a high-power laser that hurts the target for a few seconds"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Shoot a high-power laser that hurts the target for a few seconds"
     },
     {
      "index": 2,
@@ -13682,10 +13482,8 @@
      "name": "Energy shield",
      "icon": "btn_1180_shield",
      "handler": "doEnergyShield",
-     "extraLiterals": [
-      "Wait till attack ends",
-      "Deploy an energy shield that nullifies damage for 10 seconds"
-     ]
+     "cantMessage": "Wait till attack ends",
+     "tooltip": "Deploy an energy shield that nullifies damage for 10 seconds"
     },
     {
      "index": 3,
@@ -13693,10 +13491,8 @@
      "name": "Death wheel",
      "icon": "btn_1180_wheel",
      "handler": "doDeathWheel",
-     "extraLiterals": [
-      "No enemy nearby",
-      "Spin quickly shooting at all nearby targets"
-     ]
+     "cantMessage": "No enemy nearby",
+     "tooltip": "Spin quickly shooting at all nearby targets"
     }
    ],
    "projectiles": [
@@ -13822,43 +13618,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Saber Jump",
-     "icon": null,
+     "icon": "BOTON1_NINJA",
      "handler": "doSaberJumpAttack",
-     "extraLiterals": [
-      "No targets in range",
-      "Jump and hit enemy with a saber"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Jump and hit enemy with a saber"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Spinning Saber",
-     "icon": null,
+     "icon": "BOTON2_NINJA",
      "handler": "doSpinningSaberAttack",
-     "extraLiterals": [
-      "Spinning saber for 8 seconds"
-     ]
+     "cantMessage": "",
+     "tooltip": "Spinning saber for 8 seconds"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Whirlwind",
-     "icon": null,
+     "icon": "BOTON4_NINJA",
      "handler": "doWhirlwindAttack",
-     "extraLiterals": [
-      "Spinning 360°"
-     ]
+     "cantMessage": "",
+     "tooltip": "Spinning 360°"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn minibot",
-     "icon": null,
+     "icon": "BOTON3_NINJA",
      "handler": "doSpawnMinibots",
-     "extraLiterals": [
-      "3 minibots max",
-      "Spawns up to 5 minibots"
-     ]
+     "cantMessage": "3 minibots max",
+     "tooltip": "Spawns up to 5 minibots"
     }
    ],
    "projectiles": [],
@@ -13927,10 +13717,8 @@
      "name": "X Double Blade Attack!",
      "icon": "1210_2sword",
      "handler": "doXDoubleAttack",
-     "extraLiterals": [
-      "No targets selected",
-      "X Double Blade Attack"
-     ]
+     "cantMessage": "No targets selected",
+     "tooltip": "X Double Blade Attack"
     },
     {
      "index": 1,
@@ -13938,10 +13726,8 @@
      "name": "Samurai Power!",
      "icon": "1210_rain",
      "handler": "doSamuraiPowerAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Samurai Power!"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Samurai Power!"
     },
     {
      "index": 2,
@@ -13949,19 +13735,17 @@
      "name": "Whirlwind!",
      "icon": "1210_remolino",
      "handler": "doWhirlwindAttack",
-     "extraLiterals": [
-      "Whirlwind!°"
-     ]
+     "cantMessage": "",
+     "tooltip": "Whirlwind!°"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn drone!",
      "icon": "1210_drone",
-     "handler": "_maxMinibots",
-     "extraLiterals": [
-      "Spawns drone!"
-     ]
+     "handler": "doSpawnMinibots",
+     "cantMessage": "#0# drones max",
+     "tooltip": "Spawns drone!"
     }
    ],
    "projectiles": [],
@@ -14023,33 +13807,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Charging Shoot",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1347_scarab_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Grenade Rain",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1347_scarab_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Earthquake Wave",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1347_scarab_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Scarab Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1347_scarab_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -14138,33 +13926,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "CHEST LASER",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1355_superfulcrumArmor_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "DEATH STORM",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1355_superfulcrumArmor_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SHOULDER LASERS",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1355_superfulcrumArmor_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1355_superfulcrumArmor_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -14254,33 +14046,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "WORM MISSILES",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1345_servoworm_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "THE DRILL-MOUTH",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1345_servoworm_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "GROUND EMERSION",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1345_servoworm_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SERVOWORM DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1345_servoworm_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -14364,33 +14160,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "COMPULSIVE STABBING",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1414_sharkbite_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "LASER MACHINE GUN",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1414_sharkbite_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "DROP DA BOMB",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1414_sharkbite_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SHARKBITE DRONES",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1414_sharkbite_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -14473,41 +14273,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Electromagnetic Wave",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": [
-      "Electromagnetic Wave"
-     ]
+     "icon": "1333_shredderMech_button_02",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": "Electromagnetic Wave"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Atomic Bombs",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": [
-      "Atomic Bombs"
-     ]
+     "icon": "1333_shredderMech_button_03",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": "Atomic Bombs"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Smashing Jump",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": [
-      "Smashing Jump"
-     ]
+     "icon": "1333_shredderMech_button_04",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": "Smashing Jump"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Shredder Mech Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": [
-      "Shredder Mech Drone"
-     ]
+     "icon": "1333_shredderMech_button_01",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": "Shredder Mech Drone"
     }
    ],
    "projectiles": [],
@@ -14598,33 +14394,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SKORPION CANNON",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1410_skorpionFortress_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "MASSIVE SMASH",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1410_skorpionFortress_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BACK MORTARS",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1410_skorpionFortress_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SKORPION DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1410_skorpionFortress_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -14768,10 +14568,8 @@
      "name": "Disc Saw",
      "icon": "1323_slaughterer_01",
      "handler": "_onMegaHit",
-     "extraLiterals": [
-      "No targets in sight",
-      "Jump in the air to vertically attack with the disc saw"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Jump in the air to vertically attack with the disc saw"
     },
     {
      "index": 1,
@@ -14779,10 +14577,8 @@
      "name": "Extreme Ripper",
      "icon": "1323_slaughterer_02",
      "handler": "doStab",
-     "extraLiterals": [
-      "No target",
-      "Pinches an enemy with the chainsaw and throws him away"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Pinches an enemy with the chainsaw and throws him away"
     },
     {
      "index": 2,
@@ -14790,10 +14586,8 @@
      "name": "Piston Rain",
      "icon": "1323_slaughterer_03",
      "handler": "doBombsrain",
-     "extraLiterals": [
-      "No target close enough",
-      "Pistons Rain"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Pistons Rain"
     },
     {
      "index": 3,
@@ -14801,9 +14595,8 @@
      "name": "Slaughterer Drone",
      "icon": "1323_slaughterer_04",
      "handler": "doDrones",
-     "extraLiterals": [
-      "Spawn drone"
-     ]
+     "cantMessage": "#0# Drones Max",
+     "tooltip": "Spawn drone"
     }
    ],
    "projectiles": [
@@ -14918,10 +14711,8 @@
      "name": "Multi Spear Attack",
      "icon": "1263_special_1",
      "handler": "doSmash",
-     "extraLiterals": [
-      "No target close enough",
-      "Jumps in the air and throws multiple spears to the ground below him"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Jumps in the air and throws multiple spears to the ground below him"
     },
     {
      "index": 1,
@@ -14929,10 +14720,8 @@
      "name": "Megacharge",
      "icon": "1263_special_2",
      "handler": "_onMegaShield",
-     "extraLiterals": [
-      "No target close enough",
-      "Frontal charge with the shield."
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Frontal charge with the shield."
     },
     {
      "index": 2,
@@ -14940,10 +14729,8 @@
      "name": "Stab Attack",
      "icon": "1263_special_3",
      "handler": "doStab",
-     "extraLiterals": [
-      "No target",
-      "Pinches an enemy with the spear and throws him away"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Pinches an enemy with the spear and throws him away"
     },
     {
      "index": 3,
@@ -14951,9 +14738,8 @@
      "name": "Drone",
      "icon": "1263_special_4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "Spawn drone"
-     ]
+     "cantMessage": "#0# Drones Max",
+     "tooltip": "Spawn drone"
     }
    ],
    "projectiles": [],
@@ -15047,22 +14833,18 @@
      "kind": "SpecialUnitAttack",
      "name": "Blue Ray",
      "icon": "1262_special_1",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Blue ray shot from the frontal ship blue jewel"
-     ]
+     "handler": "doRay",
+     "cantMessage": "No target",
+     "tooltip": "Blue ray shot from the frontal ship blue jewel"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Energy Bomb",
      "icon": "1262_special_2",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Energy loads and throws an eneergy bomb from machine-gun"
-     ]
+     "handler": "megaCannon",
+     "cantMessage": "No target",
+     "tooltip": "Energy loads and throws an eneergy bomb from machine-gun"
     }
    ],
    "projectiles": [
@@ -15182,10 +14964,8 @@
      "name": "Machinegun Charge",
      "icon": "1267_spatial_space_ship_1",
      "handler": "_doMachinegunChargeAttack",
-     "extraLiterals": [
-      "No target in sight",
-      "Machinegun Charge"
-     ]
+     "cantMessage": "No target in sight",
+     "tooltip": "Machinegun Charge"
     },
     {
      "index": 1,
@@ -15193,10 +14973,8 @@
      "name": "Rockets!",
      "icon": "1267_spatial_space_ship_2",
      "handler": "_doRocketsAttack",
-     "extraLiterals": [
-      "No target in sight",
-      "Rockets"
-     ]
+     "cantMessage": "No target in sight",
+     "tooltip": "Rockets"
     }
    ],
    "projectiles": [],
@@ -15255,10 +15033,8 @@
      "name": "Energy Bubble",
      "icon": "1288_special_1",
      "handler": "doEnergy",
-     "extraLiterals": [
-      "No target in sight",
-      "Energy Bubble"
-     ]
+     "cantMessage": "No target in sight",
+     "tooltip": "Energy Bubble"
     },
     {
      "index": 1,
@@ -15266,10 +15042,8 @@
      "name": "Cristal Rain",
      "icon": "1288_special_2",
      "handler": "doCristal",
-     "extraLiterals": [
-      "No target in sight",
-      "Cristal Rain"
-     ]
+     "cantMessage": "No target in sight",
+     "tooltip": "Cristal Rain"
     }
    ],
    "projectiles": [
@@ -15811,10 +15585,8 @@
      "name": "Magic Way",
      "icon": "1291_special_1",
      "handler": "doSpecial1",
-     "extraLiterals": [
-      "No target",
-      "Magic Way"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Magic Way"
     },
     {
      "index": 1,
@@ -15822,10 +15594,8 @@
      "name": "Sword WhirlWind",
      "icon": "1291_special_2",
      "handler": "doSpecial2",
-     "extraLiterals": [
-      "No target",
-      "Hecatomb Shot"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Hecatomb Shot"
     }
    ],
    "projectiles": [],
@@ -15901,10 +15671,8 @@
      "name": "Slash throat",
      "icon": "btn_special_ops_slash_throat",
      "handler": "doSlashThroat",
-     "extraLiterals": [
-      "No target nearby",
-      "Attack with knife. Needs to be close to enemy infantry."
-     ]
+     "cantMessage": "No target nearby",
+     "tooltip": "Attack with knife. Needs to be close to enemy infantry."
     },
     {
      "index": 1,
@@ -15912,10 +15680,8 @@
      "name": "Hide",
      "icon": "btn_special_ops_hide",
      "handler": "doStealth",
-     "extraLiterals": [
-      "You\\'ve been discovered",
-      "Hide"
-     ]
+     "cantMessage": "You've been discovered",
+     "tooltip": "Hide"
     },
     {
      "index": 1,
@@ -15923,10 +15689,8 @@
      "name": "Hide",
      "icon": "btn_special_ops_hide",
      "handler": "doStealth",
-     "extraLiterals": [
-      "You\\'ve been discovered",
-      "Hide"
-     ]
+     "cantMessage": "You've been discovered",
+     "tooltip": "Hide"
     },
     {
      "index": 1,
@@ -15934,9 +15698,8 @@
      "name": "Show",
      "icon": "btn_special_ops_show",
      "handler": "doStealth",
-     "extraLiterals": [
-      "Show"
-     ]
+     "cantMessage": "",
+     "tooltip": "Show"
     }
    ],
    "projectiles": [
@@ -15993,44 +15756,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Utra Mega Shot",
-     "icon": null,
+     "icon": "1319_spectreMech_01",
      "handler": "ultraMegaShot",
-     "extraLiterals": [
-      "No target close enough",
-      "Ultra Mega Shot"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Ultra Mega Shot"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Electric Ray",
-     "icon": null,
+     "icon": "1319_spectreMech_02",
      "handler": "electricRay",
-     "extraLiterals": [
-      "No target close enough",
-      "Electric Ray"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Electric Ray"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Earthquake",
-     "icon": null,
+     "icon": "1319_spectreMech_03",
      "handler": "earthQuake",
-     "extraLiterals": [
-      "No target close enough",
-      "Earthquake"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Earthquake"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Spectre Drone",
-     "icon": null,
-     "handler": "NUM_DRONES",
-     "extraLiterals": [
-      "Spectre Drone"
-     ]
+     "icon": "1319_spectreMech_04",
+     "handler": "doDrones",
+     "cantMessage": "#0# Spectre Drone Max",
+     "tooltip": "Spectre Drone"
     }
    ],
    "projectiles": [
@@ -16156,44 +15912,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "CrossFire Attack",
-     "icon": null,
+     "icon": "1313_splinterMech_button_1",
      "handler": "crossFire",
-     "extraLiterals": [
-      "No target close enough",
-      "CrossFire Attack "
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "CrossFire Attack "
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Super Charge",
-     "icon": null,
+     "icon": "1313_splinterMech_button_2",
      "handler": "startCharge",
-     "extraLiterals": [
-      "You are too close to a building, wall or tree",
-      "Super Charge"
-     ]
+     "cantMessage": "You are too close to a building, wall or tree",
+     "tooltip": "Super Charge"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Bullet Storm",
-     "icon": null,
+     "icon": "1313_splinterMech_button_3",
      "handler": "bulletStorm",
-     "extraLiterals": [
-      "No target close enough",
-      "Bullet Storm"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Bullet Storm"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Splinter Drone",
-     "icon": null,
+     "icon": "1313_splinterMech_button_4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "Splinter Drone"
-     ]
+     "cantMessage": "#0# Splinter Drone Max",
+     "tooltip": "Splinter Drone"
     }
    ],
    "projectiles": [],
@@ -16267,44 +16016,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Energy Bomb",
-     "icon": null,
+     "icon": "1321_stalkerMech_button01",
      "handler": "megaBomb",
-     "extraLiterals": [
-      "No target close enough",
-      "Energy Bomb"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Energy Bomb"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Parabolic Rockets",
-     "icon": null,
+     "icon": "1321_stalkerMech_button02",
      "handler": "doBackRockets",
-     "extraLiterals": [
-      "No target close enough",
-      "Parabolic Rockets"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Parabolic Rockets"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Death Whirlwind",
-     "icon": null,
+     "icon": "1321_stalkerMech_button03",
      "handler": "doWhirlwind",
-     "extraLiterals": [
-      "No target close enough",
-      "Death Whirlwind"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Death Whirlwind"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Stalker Drone",
-     "icon": null,
-     "handler": "NUM_DRONES",
-     "extraLiterals": [
-      "Stalker Drone"
-     ]
+     "icon": "1321_stalkerMech_button04",
+     "handler": "doDrones",
+     "cantMessage": "#0# Stalker Drone Max",
+     "tooltip": "Stalker Drone"
     }
    ],
    "projectiles": [],
@@ -16394,44 +16136,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Gatling Shot",
-     "icon": null,
+     "icon": "1309_stampedeMech_button2",
      "handler": "shootUnderCover",
-     "extraLiterals": [
-      "No target close enough",
-      "Undercover Shooting"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Undercover Shooting"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Symmetric Boomerangs",
-     "icon": null,
+     "icon": "1309_stampedeMech_button3",
      "handler": "startCharge",
-     "extraLiterals": [
-      "You are too close to a building, wall or tree",
-      "Super Charge"
-     ]
+     "cantMessage": "You are too close to a building, wall or tree",
+     "tooltip": "Super Charge"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Satellite Laser",
-     "icon": null,
+     "icon": "1309_stampedeMech_button1",
      "handler": "shootShotGun",
-     "extraLiterals": [
-      "No target close enough",
-      "Shotgun"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Shotgun"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Stampede Drone",
-     "icon": null,
+     "icon": "1309_stampedeMech_button4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "Stampede Drone"
-     ]
+     "cantMessage": "#0# Stampede Drone Max",
+     "tooltip": "Stampede Drone"
     }
    ],
    "projectiles": [],
@@ -16541,33 +16276,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BASH TIME!",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1424_steelgladiator_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SHIELDOZER BLADE",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1424_steelgladiator_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BACK MORTARS",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1424_steelgladiator_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "STEEL GLADIATOR DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1424_steelgladiator_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -16654,41 +16393,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Hedgehog Rockets",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": [
-      "Hedgehog Rockets"
-     ]
+     "icon": "1341_steelWandererMech_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": "Hedgehog Rockets"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Zero Zone Bomb",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": [
-      "Zero Zone Bomb"
-     ]
+     "icon": "1341_steelWandererMech_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": "Zero Zone Bomb"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Shockwave",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": [
-      "Shockwave"
-     ]
+     "icon": "1341_steelWandererMech_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": "Shockwave"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Steel Wanderer Mech Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": [
-      "Steel Wanderer Mech Drone"
-     ]
+     "icon": "1341_steelWandererMech_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": "Steel Wanderer Mech Drone"
     }
    ],
    "projectiles": [],
@@ -16775,33 +16510,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Chest Laser",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1355_superfulcrumArmor_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Bullet Shower",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1355_superfulcrumArmor_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Shoulder Missiles",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1355_superfulcrumArmor_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "EGM Bolt",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1355_superfulcrumArmor_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -16885,10 +16624,8 @@
      "name": "Missile strike",
      "icon": "btn_1075_misil",
      "handler": "doLaunchMissiles",
-     "extraLiterals": [
-      "No enemies nearby",
-      "Missile strike"
-     ]
+     "cantMessage": "No enemies nearby",
+     "tooltip": "Missile strike"
     },
     {
      "index": 1,
@@ -16896,10 +16633,8 @@
      "name": "Laser Beam",
      "icon": "btn_1075_laser",
      "handler": "doLaunchLaser",
-     "extraLiterals": [
-      "No targets in range",
-      "Shoots a laser beam to the target"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Shoots a laser beam to the target"
     }
    ],
    "projectiles": [
@@ -17091,33 +16826,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "MISSILE LAUNCH",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1428_tarantula_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "BEAM CANNON",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1428_tarantula_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "KILLER LEGS",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1428_tarantula_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TARANTULA DRONES",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1428_tarantula_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -17204,33 +16943,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "CANNON NECK",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1343_tempestMech_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TESLA RAYSTORM",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1343_tempestMech_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SPINNING TOP WHIRLWIND",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1343_tempestMech_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TEMPEST DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1343_tempestMech_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -17320,33 +17063,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "GROUND STAB",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1366_templarExosuit_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "HONEYCOMB SHIELD",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1366_templarExosuit_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "MORTAL SLASH",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1366_templarExosuit_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "ELECTRICAL TURBINES",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1366_templarExosuit_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -17478,10 +17225,8 @@
      "name": "Xplosive Ray!",
      "icon": "1272_special1",
      "handler": "doMegaRay",
-     "extraLiterals": [
-      "No target",
-      "Xplosive Ray!"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Xplosive Ray!"
     },
     {
      "index": 1,
@@ -17489,10 +17234,8 @@
      "name": "Rockets Attack",
      "icon": "1272_special2",
      "handler": "doSpecialBallsAttack",
-     "extraLiterals": [
-      "No target",
-      "Rockets Attack"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Rockets Attack"
     },
     {
      "index": 2,
@@ -17500,21 +17243,17 @@
      "name": "Grenades Burst",
      "icon": "1272_special3",
      "handler": "goGranadeAttack",
-     "extraLiterals": [
-      "No target",
-      "Grenades Burst"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Grenades Burst"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawning drone",
      "icon": "1272_special4",
-     "handler": null,
-     "extraLiterals": [
-      "MAX. 3 DRONES",
-      "Drones!"
-     ]
+     "handler": "spawnMinionFromEgg",
+     "cantMessage": "MAX. 3 DRONES",
+     "tooltip": "Drones!"
     }
    ],
    "projectiles": [],
@@ -17609,22 +17348,18 @@
      "kind": "SpecialUnitAttack",
      "name": "Plasma Arrow",
      "icon": "1027_botones_ataques_sw1",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "SuperArrow attack"
-     ]
+     "handler": "superArrowAttack",
+     "cantMessage": "No target",
+     "tooltip": "SuperArrow attack"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Arrow Storm",
      "icon": "1027_botones_ataques_sw2",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Multi arrow attack"
-     ]
+     "handler": "multiArrowAttack",
+     "cantMessage": "No target",
+     "tooltip": "Multi arrow attack"
     }
    ],
    "projectiles": [],
@@ -17688,10 +17423,8 @@
      "name": "Big shot!",
      "icon": "btn_1169_big_shot",
      "handler": "doBigShot",
-     "extraLiterals": [
-      "No target",
-      "Shoots a big laser burst"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Shoots a big laser burst"
     },
     {
      "index": 1,
@@ -17699,10 +17432,8 @@
      "name": "Spinning Attack",
      "icon": "btn_1169_spinning_attack",
      "handler": "doSpinningAttack",
-     "extraLiterals": [
-      "No target",
-      "Performs a deadly spinning attack!"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Performs a deadly spinning attack!"
     },
     {
      "index": 2,
@@ -17710,10 +17441,8 @@
      "name": "Circle shooting",
      "icon": "btn_1152_circle_shooting",
      "handler": "doCircleShooting",
-     "extraLiterals": [
-      "No targets nearby",
-      "Shoots in circles"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Shoots in circles"
     },
     {
      "index": 3,
@@ -17721,9 +17450,8 @@
      "name": "Whirlwind",
      "icon": "btn_1152_whirlwind",
      "handler": "doWhirlWind",
-     "extraLiterals": [
-      "Attacks and slows all surrounding enemies"
-     ]
+     "cantMessage": "",
+     "tooltip": "Attacks and slows all surrounding enemies"
     }
    ],
    "projectiles": [
@@ -17809,10 +17537,8 @@
      "name": "Sword!",
      "icon": null,
      "handler": "_onSwordAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Sword attack"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Sword attack"
     },
     {
      "index": 1,
@@ -17820,10 +17546,8 @@
      "name": "Beams!",
      "icon": null,
      "handler": "_onBeamsAttack",
-     "extraLiterals": [
-      "No targets in sight",
-      "Beams attack"
-     ]
+     "cantMessage": "No targets in sight",
+     "tooltip": "Beams attack"
     },
     {
      "index": 2,
@@ -17831,19 +17555,17 @@
      "name": "Whirlwind!",
      "icon": null,
      "handler": "_onWhirlwindAttack",
-     "extraLiterals": [
-      "Whirlwind attack"
-     ]
+     "cantMessage": "",
+     "tooltip": "Whirlwind attack"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Drone!",
      "icon": null,
-     "handler": "_maxDrones",
-     "extraLiterals": [
-      "Spawns drone"
-     ]
+     "handler": "_spawnDrone",
+     "cantMessage": "Max #0# drones",
+     "tooltip": "Spawns drone"
     }
    ],
    "projectiles": [],
@@ -18028,10 +17750,8 @@
      "name": "Lasers",
      "icon": "btn_1236_laser",
      "handler": "doLasers",
-     "extraLiterals": [
-      "No target close enough",
-      "Shoot some lasers"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Shoot some lasers"
     },
     {
      "index": 1,
@@ -18039,9 +17759,8 @@
      "name": "Whirlwind",
      "icon": "btn_1236_whirlwind",
      "handler": "doWhirlwind",
-     "extraLiterals": [
-      "Spin and damage nearby enemies. You should move the mech!"
-     ]
+     "cantMessage": "",
+     "tooltip": "Spin and damage nearby enemies. You should move the mech!"
     }
    ],
    "projectiles": [],
@@ -18111,33 +17830,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "FLAME SWEEP",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1383_typhoonServodragon_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "COMPACT MODE",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1383_typhoonServodragon_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "DEVOUR!",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1383_typhoonServodragon_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "TYPHOON SERVO DRAGGY",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1383_typhoonServodragon_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -18232,10 +17955,8 @@
      "name": "Capture!",
      "icon": "boton_abduccion_ufo",
      "handler": "onCaptureAttack",
-     "extraLiterals": [
-      "No suitable targets in sight",
-      "Capture unit!"
-     ]
+     "cantMessage": "No suitable targets in sight",
+     "tooltip": "Capture unit!"
     }
    ],
    "projectiles": [],
@@ -18292,10 +18013,8 @@
      "name": "Plasma burst",
      "icon": "1162_ultra_bot_plasma",
      "handler": "doPlasmaBolts",
-     "extraLiterals": [
-      "No target close enough",
-      "Shoots a burst of deadly plasma bolts"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Shoots a burst of deadly plasma bolts"
     },
     {
      "index": 1,
@@ -18303,10 +18022,8 @@
      "name": "Poison dome",
      "icon": "1162_ultra_bot_poison",
      "handler": "doPoisonDome",
-     "extraLiterals": [
-      "No targets nearby",
-      "Energy dome that poisons units within"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Energy dome that poisons units within"
     },
     {
      "index": 2,
@@ -18314,10 +18031,8 @@
      "name": "Build drone",
      "icon": "1162_ultra_bot_drone",
      "handler": "spawnDrone",
-     "extraLiterals": [
-      "Can\\'t build more drones",
-      "Bring a flying drone into the fight"
-     ]
+     "cantMessage": "Can't build more drones",
+     "tooltip": "Bring a flying drone into the fight"
     },
     {
      "index": 3,
@@ -18325,10 +18040,8 @@
      "name": "Charged plasma",
      "icon": "1162_ultra_bot_jump",
      "handler": "doJumpExplosion",
-     "extraLiterals": [
-      "No targets nearby",
-      "Jump and shoot a charged plasma blast that explodes on impact"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Jump and shoot a charged plasma blast that explodes on impact"
     }
    ],
    "projectiles": [
@@ -18442,40 +18155,38 @@
     {
      "index": 0,
      "kind": "SpecialUnitAttackSpawn",
-     "name": "Can\\'t have more drones!",
+     "name": "Summon drone!",
      "icon": "btn_1152_summon_drone_2",
      "handler": "spawnDrone",
-     "extraLiterals": [
-      "Summons a drone to assist"
-     ]
+     "cantMessage": "Can't have more drones!",
+     "tooltip": "Summons a drone to assist"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
-     "name": "No targets nearby",
+     "name": "Huge laser!",
      "icon": "btn_1152_huge_laser",
      "handler": "doHugeLaserAttack",
-     "extraLiterals": [
-      "Shoots a huge laser attack"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Shoots a huge laser attack"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
-     "name": "No targets in range",
+     "name": "Missile Launch",
      "icon": "btn_1152_missile_launch",
      "handler": "doLaunchMissiles",
-     "extraLiterals": [
-      "Missile attack"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Missile attack"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
-     "name": "No targets in range",
+     "name": "Deadly turn!",
      "icon": "btn_1152_deadly_turn",
      "handler": "doLaunchWhirlWind",
-     "extraLiterals": []
+     "cantMessage": "No targets in range",
+     "tooltip": "Deadly turn!"
     }
    ],
    "projectiles": [
@@ -18595,33 +18306,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "GRENADE VOLLEY",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1408_urbanBuster_button01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "GAS GRENADES",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1408_urbanBuster_button02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "LASER BEAM",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1408_urbanBuster_button03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "URBAN BUSTER DRONES",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1408_urbanBuster_button04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -18808,42 +18523,38 @@
     {
      "index": 0,
      "kind": "SpecialUnitAttack",
-     "name": "No targets in range",
+     "name": "Multi missile!",
      "icon": "btn_1160_multi_missile",
      "handler": "doMultiMissile",
-     "extraLiterals": [
-      "Shoots a missile rain"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Shoots a missile rain"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
-     "name": "No targets nearby",
+     "name": "Mace wheel!",
      "icon": "btn_1160_mace_wheel",
      "handler": "doMaceWheel",
-     "extraLiterals": [
-      "Turns and hits all nearby oponents"
-     ]
+     "cantMessage": "No targets nearby",
+     "tooltip": "Turns and hits all nearby oponents"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
-     "name": "No target",
+     "name": "Blinding laser!",
      "icon": "btn_1152_blinding_laser",
      "handler": "doBlindingLaser",
-     "extraLiterals": [
-      "Blinds and damages an enemy for 5 secs"
-     ]
+     "cantMessage": "No target",
+     "tooltip": "Blinds and damages an enemy for 5 secs"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
-     "name": "Can\\'t have more drones!",
+     "name": "Summon drone!",
      "icon": "btn_1152_summon_drone",
      "handler": "doSpawnDrone",
-     "extraLiterals": [
-      "Summon a drone to assist!"
-     ]
+     "cantMessage": "Can't have more drones!",
+     "tooltip": "Summon a drone to assist!"
     }
    ],
    "projectiles": [
@@ -19072,44 +18783,36 @@
      "kind": "SpecialUnitAttack",
      "name": "Smash Attack",
      "icon": "btn_smash_1161",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No targets in range",
-      "Launch smash attack and swallow enemies"
-     ]
+     "handler": "attack_spike",
+     "cantMessage": "No targets in range",
+     "tooltip": "Launch smash attack and swallow enemies"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Laser Attack",
      "icon": "btn_megalaser_1161",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No targets in range",
-      "Launch mega laser"
-     ]
+     "handler": "attack_megaLaser",
+     "cantMessage": "No targets in range",
+     "tooltip": "Launch mega laser"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Ultra Punch",
      "icon": "btn_ultrapunch_1161",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No targets in range",
-      "Launch ultra punch"
-     ]
+     "handler": "attack_ultraPunch",
+     "cantMessage": "No targets in range",
+     "tooltip": "Launch ultra punch"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn Drone",
      "icon": "btn_drone_1161",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Maximum reached",
-      "Spawn a drone"
-     ]
+     "handler": "doSpawn",
+     "cantMessage": "Maximum reached",
+     "tooltip": "Spawn a drone"
     }
    ],
    "projectiles": [
@@ -19194,9 +18897,8 @@
      "name": "Hide",
      "icon": "btn_1174_hide",
      "handler": "doHideUnit",
-     "extraLiterals": [
-      ""
-     ]
+     "cantMessage": "",
+     "tooltip": "Hides the Snipper for #0# seconds"
     },
     {
      "index": 1,
@@ -19204,10 +18906,8 @@
      "name": "Headshot",
      "icon": "btn_1174_big_shot",
      "handler": "doBigShot",
-     "extraLiterals": [
-      "No unit in range",
-      "Shoot an unit in a vulnerable point"
-     ]
+     "cantMessage": "No unit in range",
+     "tooltip": "Shoot an unit in a vulnerable point"
     }
    ],
    "projectiles": [],
@@ -19278,44 +18978,37 @@
      "index": 0,
      "kind": "SpecialUnitAttack",
      "name": "Tracking Laser",
-     "icon": null,
+     "icon": "1327_vortexMech_button_01",
      "handler": "_laser",
-     "extraLiterals": [
-      "No targets in range",
-      "Tracking Laser"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Tracking Laser"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Rocket Burst",
-     "icon": null,
+     "icon": "1327_vortexMech_button_02",
      "handler": "doBackRockets",
-     "extraLiterals": [
-      "No targets in range",
-      "Rocket Burst"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Rocket Burst"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Vortex of Void",
-     "icon": null,
+     "icon": "1327_vortexMech_button_03",
      "handler": "doJump",
-     "extraLiterals": [
-      "No targets in range",
-      "Vortex of Void"
-     ]
+     "cantMessage": "No targets in range",
+     "tooltip": "Vortex of Void"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttack",
      "name": "Vortex Drone",
-     "icon": null,
-     "handler": "NUM_DRONES",
-     "extraLiterals": [
-      "Vortex Drone"
-     ]
+     "icon": "1327_vortexMech_button_04",
+     "handler": "doDrones",
+     "cantMessage": "#0#  Drone Max",
+     "tooltip": "Vortex Drone"
     }
    ],
    "projectiles": [
@@ -19393,33 +19086,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SWEEP & FIRE",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1418_warlord_button1",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "EXPLOSIVE PATH",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1418_warlord_button2",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "AXE WHIRLWIND",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1418_warlord_button3",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "STEAM WARLORD DRONE",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1418_warlord_button4",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -19506,43 +19203,36 @@
      "kind": "SpecialUnitAttack",
      "name": "Mega Shot",
      "icon": "1268_special_1",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Charges the weapon to do a mega shot"
-     ]
+     "handler": "doMegaShot",
+     "cantMessage": "No target",
+     "tooltip": "Charges the weapon to do a mega shot"
     },
     {
      "index": 1,
      "kind": "SpecialUnitAttack",
      "name": "Rocket Launch",
      "icon": "1268_special_2",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "No target",
-      "Launches rockets from shoulder holes. The rocket explodes when touches the ground, creating an small shock wave"
-     ]
+     "handler": "doRock",
+     "cantMessage": "No target",
+     "tooltip": "Launches rockets from shoulder holes. The rocket explodes when touches the ground, creating an small shock wave"
     },
     {
      "index": 2,
      "kind": "SpecialUnitAttack",
      "name": "Circular explosion",
      "icon": "1268_special_3",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "Puts his weapon up pointinig the sky, it charges to makes a multiray shot around him, that create an circular explosion"
-     ]
+     "handler": null,
+     "cantMessage": "",
+     "tooltip": "Puts his weapon up pointinig the sky, it charges to makes a multiray shot around him, that create an circular explosion"
     },
     {
      "index": 3,
      "kind": "SpecialUnitAttackSpawn",
      "name": "Spawn Drone",
      "icon": "1268_special_4",
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": [
-      "3 drone max",
-      "Spawn Drone"
-     ]
+     "handler": "doSpawn",
+     "cantMessage": "3 drone max",
+     "tooltip": "Spawn Drone"
     }
    ],
    "projectiles": [],
@@ -19634,10 +19324,11 @@
     {
      "index": 0,
      "kind": "SpecialUnitAttack",
-     "name": null,
-     "icon": null,
-     "handler": "TIME_COOLDOWN",
-     "extraLiterals": []
+     "name": "Smash Attack",
+     "icon": "btn_garrote_orco",
+     "handler": "startGrab",
+     "cantMessage": "No targets in range",
+     "tooltip": "Launch Smash Attack"
     }
    ],
    "projectiles": [
@@ -19751,33 +19442,37 @@
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SPEAR MEGASHOT",
-     "icon": null,
-     "handler": "specialAttack1Condition",
-     "extraLiterals": []
+     "icon": "1339_yamatoMech_button_01",
+     "handler": "specialAttack1.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "SOLAR STORM",
-     "icon": null,
-     "handler": "specialAttack2Condition",
-     "extraLiterals": []
+     "icon": "1339_yamatoMech_button_02",
+     "handler": "specialAttack2.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "LANCE WHIRLWIND",
-     "icon": null,
-     "handler": "specialAttack3Condition",
-     "extraLiterals": []
+     "icon": "1339_yamatoMech_button_03",
+     "handler": "specialAttack3.execute",
+     "cantMessage": null,
+     "tooltip": null
     },
     {
      "index": null,
      "kind": "SpecialUnitAttackCreator",
      "name": "Yamato Mech Drone",
-     "icon": null,
-     "handler": "specialAttack4Condition",
-     "extraLiterals": []
+     "icon": "1339_yamatoMech_button_04",
+     "handler": "specialAttack4.execute",
+     "cantMessage": null,
+     "tooltip": null
     }
    ],
    "projectiles": [],
@@ -19867,10 +19562,8 @@
      "name": "Flying Fists",
      "icon": "1301_special_1",
      "handler": "doFlyingFists",
-     "extraLiterals": [
-      "No target close enough",
-      "Flying Fists"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Flying Fists"
     },
     {
      "index": 1,
@@ -19878,10 +19571,8 @@
      "name": "Z-Ray",
      "icon": "1301_special_2",
      "handler": "doZRay",
-     "extraLiterals": [
-      "No target close enough",
-      "Z-Ray"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Z-Ray"
     },
     {
      "index": 2,
@@ -19889,10 +19580,8 @@
      "name": "Limbs Shockwave",
      "icon": "1301_special_3",
      "handler": "doLimbsShockwave",
-     "extraLiterals": [
-      "No target close enough",
-      "Limbs Shockwave"
-     ]
+     "cantMessage": "No target close enough",
+     "tooltip": "Limbs Shockwave"
     },
     {
      "index": 3,
@@ -19900,9 +19589,8 @@
      "name": "Head Drone",
      "icon": "1301_special_4",
      "handler": "doDrones",
-     "extraLiterals": [
-      "Head Drone"
-     ]
+     "cantMessage": "#0# Head Drone Max",
+     "tooltip": "Head Drone"
     }
    ],
    "projectiles": [],

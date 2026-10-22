@@ -1294,8 +1294,13 @@ assault against the new server, and the cheat battery is fully rejected.
       client keeps three separate flags — so clicking the first badge suppresses all
       three, while clicking the second or the third suppresses only that one. It is
       recorded as a decision, not an accident
-- [ ] The remaining tooltip surfaces (the icon panel's dictionary, the special units'
-      attack tooltips and the market's) are reimplemented
+- [x] The remaining tooltip surfaces (the icon panel's dictionary, the special units'
+      attack tooltips and the market's) are reimplemented. The icon panel's four
+      sentences and the client's `#0#` substitution are modelled in
+      `packages/client/src/tooltips.ts`; the extracted attack table now carries each
+      attack's tooltip, and the 176 factory-built attacks have none; the marketplace's
+      tip reproduces the client's **one-level-low** XP bonus and its per-level life
+      truncation
 
 ### G4 — Feature parity
 

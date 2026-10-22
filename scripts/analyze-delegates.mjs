@@ -85,6 +85,190 @@ async function parseDelegateRegistrations() {
   return out;
 }
 
+/** Decode the body of an AS3 string literal. */
+function decodeAs3String(raw) {
+  const simple = {
+    n: '\n',
+    r: '\r',
+    t: '\t',
+    b: '\b',
+    f: '\f',
+    v: '\v',
+    0: '\0',
+  };
+  return raw.replace(/\\(u[0-9a-fA-F]{4}|[\s\S])/g, (_, escape) => {
+    if (escape.length === 5 && escape[0] === 'u') {
+      return String.fromCharCode(Number.parseInt(escape.slice(1), 16));
+    }
+    return simple[escape] ?? escape;
+  });
+}
+
+/** The index of the paren that closes the one at `open`. */
+function closeOf(src, open) {
+  let depth = 0;
+  let quote = null;
+  for (let i = open; i < src.length; i++) {
+    const ch = src[i];
+    if (quote) {
+      if (ch === '\\') i++;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+    } else if (ch === '(') {
+      depth++;
+    } else if (ch === ')') {
+      depth--;
+      if (depth === 0) return i;
+    }
+  }
+  return -1;
+}
+
+/** Split a call's arguments at the top-level commas. */
+function splitTopLevel(text) {
+  const args = [];
+  let depth = 0;
+  let start = 0;
+  let quote = null;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (quote) {
+      if (ch === '\\') i++;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+    } else if (ch === '(' || ch === '[' || ch === '{') {
+      depth++;
+    } else if (ch === ')' || ch === ']' || ch === '}') {
+      depth--;
+    } else if (ch === ',' && depth === 0) {
+      args.push(text.slice(start, i).trim());
+      start = i + 1;
+    }
+  }
+  args.push(text.slice(start).trim());
+  return args;
+}
+
+/** The value of a plain `"…"` argument, or null. */
+function as3String(expr) {
+  if (!expr || expr.length < 2 || expr[0] !== '"' || expr[expr.length - 1] !== '"') {
+    return null;
+  }
+  return decodeAs3String(expr.slice(1, -1));
+}
+
+/** The source literal of a `Language.getLiteral("…")` argument, or null. */
+function languageLiteral(expr) {
+  if (!expr || !/^Language\.getLiteral\s*\(/.test(expr)) return null;
+  const open = expr.indexOf('(');
+  const close = closeOf(expr, open);
+  if (close < 0) return null;
+  return as3String(splitTopLevel(expr.slice(open + 1, close))[0]);
+}
+
+/** The text of a literal argument: `Language.getLiteral("…")` or `"…"`. */
+function textOf(expr) {
+  return languageLiteral(expr) ?? as3String(expr);
+}
+
+/** The method named by a function argument, bare or dotted. */
+function functionRef(expr) {
+  const text = (expr ?? '').trim();
+  if (!text || text === 'null' || text === 'undefined') return null;
+  const match = /^(?:this\.)?([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)$/.exec(text);
+  return match ? match[1] : null;
+}
+
+/** The `arAttacks[n]` slot immediately before a constructor call. */
+function attackIndexBefore(src, at) {
+  const before = src.slice(Math.max(0, at - 160), at);
+  const index = /arAttacks\[(\d+)\]\s*=\s*$/.exec(before)?.[1];
+  return index === undefined ? null : Number(index);
+}
+
+/** `new SpecialUnitAttack(...)`, `…Spawn`, `…Limit`. */
+function directAttacks(src) {
+  const out = [];
+  const re = /\bnew\s+(SpecialUnitAttack(?:Spawn|Limit)?)\s*\(/g;
+  let match;
+  while ((match = re.exec(src))) {
+    const open = src.indexOf('(', match.index);
+    const close = closeOf(src, open);
+    if (close < 0) continue;
+    const args = splitTopLevel(src.slice(open + 1, close));
+    out.push({
+      pos: match.index,
+      index: attackIndexBefore(src, match.index),
+      kind: match[1],
+      name: textOf(args[4]),
+      icon: as3String(args[5]),
+      handler: functionRef(args[7]),
+      cantMessage: textOf(args[6]),
+      tooltip: textOf(args[9]),
+    });
+  }
+  return out;
+}
+
+/**
+ * `new SpecialUnitAttackCreator(id).withAttackName(...)...`
+ *
+ * The factory has no tooltip method; its `create()` calls the constructor
+ * with nine arguments, so the attack's tooltip is the constructor default.
+ */
+function creatorAttacks(src) {
+  const out = [];
+  const re = /\bnew\s+SpecialUnitAttackCreator\s*\(\s*(\d+)\s*\)/g;
+  let match;
+  while ((match = re.exec(src))) {
+    const open = src.indexOf('(', match.index);
+    const close = closeOf(src, open);
+    if (close < 0) continue;
+    const attack = {
+      pos: match.index,
+      index: null,
+      kind: 'SpecialUnitAttackCreator',
+      name: null,
+      icon: null,
+      handler: null,
+      cantMessage: null,
+      tooltip: null,
+    };
+    let cursor = close + 1;
+    for (;;) {
+      const call = /^\s*\.\s*(with[A-Za-z]+)\s*\(/.exec(src.slice(cursor));
+      if (!call) break;
+      const methodOpen = cursor + call[0].lastIndexOf('(');
+      const methodClose = closeOf(src, methodOpen);
+      if (methodClose < 0) break;
+      const args = splitTopLevel(src.slice(methodOpen + 1, methodClose));
+      switch (call[1]) {
+        case 'withAttackName':
+          attack.name = languageLiteral(args[0]);
+          break;
+        case 'withImageThumbName':
+          attack.icon = as3String(args[0]);
+          break;
+        case 'withCantMessage':
+          attack.cantMessage = textOf(args[0]);
+          break;
+        case 'withOnAttack':
+          attack.handler = functionRef(args[0]);
+          break;
+      }
+      cursor = methodClose + 1;
+    }
+    out.push(attack);
+  }
+  return out;
+}
+
 /** Behaviour facts extracted from one delegate source file. */
 function analyseDelegate(name, src) {
   const overrides = [...src.matchAll(/override\s+public function\s+(\w+)\s*\(/g)].map((x) => x[1]);
@@ -92,29 +276,9 @@ function analyseDelegate(name, src) {
     .map((x) => x[1])
     .filter((f) => !['get', 'set'].includes(f));
 
-  // arAttacks[n] = new SpecialUnitAttack(...)  /  SpecialUnitAttackSpawn / SpecialUnitAttackLimit
-  const attacks = [];
-  const attackRe = /new\s+(SpecialUnitAttack\w*)\s*\(([\s\S]{0,1500}?)\)\s*;/g;
-  let am;
-  while ((am = attackRe.exec(src))) {
-    const args = am[2];
-    const literals = [...args.matchAll(/getLiteral\("([^"]*)"\)/g)].map((x) => x[1]);
-    // The slot index is assigned just before the constructor: `arAttacks[n] = new ...`
-    const before = src.slice(Math.max(0, am.index - 120), am.index);
-    const index = /arAttacks\[(\d+)\]\s*=\s*$/.exec(before)?.[1];
-    const icon = /"([a-z0-9_]+)"\s*,\s*(?:Language|null|"")/.exec(args)?.[1] ?? null;
-    // The handler is the `this.<method>` argument that is not a literal.
-    const handlers = [...args.matchAll(/this\.(\w+)/g)].map((x) => x[1]);
-    const handler = handlers.find((h) => !/^(cooldown|frames|specialDesc)$/i.test(h)) ?? null;
-    attacks.push({
-      index: index !== undefined ? Number(index) : null,
-      kind: am[1],
-      name: literals[0] ?? null,
-      icon,
-      handler,
-      extraLiterals: literals.slice(1, 4),
-    });
-  }
+  const attacks = [...directAttacks(src), ...creatorAttacks(src)]
+    .sort((a, b) => a.pos - b.pos)
+    .map(({ pos, ...attack }) => attack);
 
   const projectiles = [...new Set([...src.matchAll(/ProjectileDefinition\.(\w+)/g)].map((x) => x[1]))];
   const damageClasses = [...new Set([
