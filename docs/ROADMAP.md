@@ -292,9 +292,13 @@ first means guessing at the rules being cloned.
       commented-out handlers field for field**, so the upstream author had recovered the
       same contract and simply never enabled the routes
 - [x] The marketplace and unit-bidding flow is specified (uuid / round / bidPrice)
-- [ ] The premium-account and offer-pack purchase flows are specified — **deferred to
-      Group F**: the offer-pack data is already in `config/main.json`
-      (`offer_packs`, 44 entries) and the purchase command is already in the catalogue
+- [x] The premium-account and offer-pack purchase flows are specified
+      ([`../re/docs/03-commands-quests-economy.md`](../re/docs/03-commands-quests-economy.md)
+      §2.13 and §2.15): the six premium packages and the server-owned expiry, the
+      flat, random and super mystery pack shapes, the three super-pack tiers and
+      their prices, the client's trust boundary, and the premium entry that is
+      not an offer pack. The specification notes that the offer-pack applier and
+      the store decrement are still to be implemented.
 
 **Status:** Complete.
 
