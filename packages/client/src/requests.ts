@@ -15,6 +15,7 @@
  * authority: `packages/protocol/src/commands.ts`.
  */
 import type { CommandName, NativeCommand } from '@swl/protocol';
+import type { MagicPayment } from '@swl/rules';
 import type { Neighbour } from './neighbours.ts';
 import { authorizationHeader, type ClientSession } from './session.ts';
 
@@ -204,6 +205,39 @@ export function tradeResource(resource: string, selling: boolean, amount: number
 /** Expand the town. */
 export function expand(tileId: number): NativeCommand {
   return command('expand', [tileId]);
+}
+
+/**
+ * Learn a spell, paying with gold or cash.
+ *
+ * The client names the spell and the resource; the **server** prices it from
+ * the content. Gold respects the spell's unlock level, cash does not. A
+ * purchase also grants the spell's mana cost, which the server adds.
+ */
+export function buyMagic(spellId: number, payment: MagicPayment): NativeCommand {
+  return command('buy_magic', [spellId, payment]);
+}
+
+/**
+ * Buy the fixed dark-matter pack.
+ *
+ * The amount and the payment resource are the client's; the price is the
+ * server's, and an amount that is not the content's `MANA_PER_PURCHASE` is
+ * refused.
+ */
+export function buyMana(amount: number, payment: MagicPayment): NativeCommand {
+  return command('buy_mana_new', [amount, payment]);
+}
+
+/**
+ * Cast a learned spell.
+ *
+ * The command carries only the spell id, as the original does. The server
+ * owns the mana deduction and the use counter; the battle effect is the
+ * client's rendering.
+ */
+export function useMagic(spellId: number): NativeCommand {
+  return command('use_magic', [spellId]);
 }
 
 /**
