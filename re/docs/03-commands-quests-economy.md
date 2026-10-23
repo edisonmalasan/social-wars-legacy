@@ -152,7 +152,7 @@ Notation for the **Δ res** column — `slot:amount`, only non-zero entries show
 | 13 | `buy` | `CmdBuy` | `0: int` isoID; `1: int` building/item id; `2: int` tx; `3: int` ty; `4: int` playerID (1=self); `5: int` frame; `6: int` auto-activable 0/1; `7: String` type `"b"`/`"u"`/`"n"` | if paid: `Σ −building.costs` (per key, or `c:−cost_unit_cash`); `x:+building.xp` | Y |
 | 14 | `buy_magic` | `CmdBuyMagic` | `0: int` magic spell id | `c/−param2` of `param4` type; `m:+param3` | Y |
 | 15 | `buy_mana_new` | `CmdBuyManaNew` | *(no args)* | `−param2` of `param3` type; `m:+param1` | Y |
-| 16 | `buy_offer_pack` | `CmdBuyOfferPack` | `0: int` offer pack id; `1: String` JSON array of item ids | `c:−pack.cost_cash`; `x:+pack.xp`; `g:+pack.gold`; `s:+pack.steel`; `o:+pack.oil`; `w:+pack.wood` | Y |
+| 16 | `buy_offer_pack` | `CmdBuyOfferPack` | `0: int` offer pack id; `1: String` JSON array of selected item ids | `c:−price` (the pack's `cost_cash`, or the super-pack tier price); `x:+pack.xp`; `g:+pack.gold`; `s:+pack.steel`; `o:+pack.oil`; `w:+pack.wood` | Y |
 | 17 | `buy_powerups` | `CmdSoulMixerPowerups` | `0: int` power-up level index | `c:−SOUL_MIXER_POWERUPS_LEVELS[i].cash_cost` | Y |
 | 18 | `buy_premium_account` | `CmdBuyPremiumAccount` | `0: uint` package index (0..5) | `c:−package.price` | Y |
 | 19 | `buy_resources` | `CmdBuyResources` | *(no args)* | `+gained` map (resource→amount); `−cost` map | **N** |
@@ -473,6 +473,72 @@ All per-item data lives in `config/main.json → items[]` and is consumed by `co
 | `globals.MIN_LEVEL_ATTACKS_1/2/3` | 10 / 15 / 20 |
 | `globals.MIN_LEVEL_ATTACK_SIEGE_1/2/3` | 25 / 30 / 35 |
 | `globals.NUM_ACTIVE_MISSIONS` | 5 (simultaneous active goals) |
+
+### 2.15 Offer packs and mystery boxes
+
+The store's cash packs are `config/main.json → offer_packs` (44 entries; the
+schema is in [`04-python-server-and-data.md` §8.10](./04-python-server-and-data.md#810-offer_packs-44)).
+The client has **three** purchase shapes, and they are not interchangeable:
+
+| Shape | How to recognise it | What the client does | What the server must grant |
+| --- | --- | --- | --- |
+| Flat pack | `items` is a flat array of ids (or `null` for the premium entry) | Adds **every** id to the store | Every id in the pack |
+| Random pack | Pack id is in `PromotionPacks.RANDOM_PACK_IDS` — only **4** | Rolls `Math.random() * 100`, then takes the first pair `[itemId, threshold]` whose threshold is greater than the roll; adds **one** item | One item, chosen by the **server's** roll |
+| Super mystery pack | Pack `type` is `"super"`, or the id is in `PromotionPacks.SUPER_PACK_IDS` — `6-14`, `17`, `19`, `20` | Rolls **one**, **two** or **four** items from three rarity rows; see below | The same count, chosen by the **server's** roll |
+
+The click path is `core/PromotionPacks.as`:
+
+* `buyPack(packId)` (`:127-180`) checks `canAfford(pack.cost_cash)`, adds the
+  selected items to the local store, and queues
+  `CmdBuyOfferPack(pack, itemIds)`. For a flat pack the ids are all of
+  `pack.items`; for pack 4 the loop above selects exactly one pair's id.
+* `PopupMistery.as` is only the display for pack 4: it shows the four possible
+  prizes as Rare / Uncommon / Common / Common.
+* `PopupSuperMistery.as` (`:397-421`) has three Buy buttons with prices
+  `[60, 100, 200]` by default. `PromotionPacks.PACK_PRICES` overrides pack 19 to
+  `[30, 60, 100]`; every other super pack uses the default. It calls
+  `buySuperPack(packId, tier, price)`.
+* `buySuperPack` (`PromotionPacks.as:182-290`) treats `items` as **three rows**:
+  row 0 = rare, row 1 = uncommon, row 2 = common. The tiers are:
+  * tier 0 (first button): **one** item from rows 1+2;
+  * tier 1 (second button): **one** rare plus **one** item from rows 1+2;
+  * tier 2 (third button): **one** rare plus **three** items from rows 1+2.
+  The client's picks use `Math.round(Math.random() * (n - 1))`, which is not a
+  uniform choice.
+
+`CmdBuyOfferPack` sends only `[packId, JSON array of selected ids]`
+(`commands/CmdBuyOfferPack.as`). It also declares the pack's resource delta:
+`c:−price`, `x:+xp`, `g:+gold`, `s:+steel`, `o:+oil`, `w:+wood`. The super
+pack's price is the tier price, which the client has already copied into
+`pack.cost_cash` before constructing the command.
+
+**Trust boundary.** The Python upstream parses the client's `item_list` and
+adds every id to `map["store"]` (`upstream/socialwarriors/command.py:710-718`).
+That grants any item in any quantity for free. The clone must ignore the item
+list as a *source of truth*: price the pack from content, roll the random or
+super selection server-side, and add only the resulting ids to the store. The
+super tier is identifiable from the selected-item count — 1, 2 or 4 — because
+the three tiers grant exactly those counts. A count other than 1, 2 or 4 is
+invalid. The `place_stored_item` side must then **decrement** the store entry
+when the item is placed; otherwise a pack item can be placed repeatedly.
+
+The premium entry is pack **18**: `type` is `"premium_account"`, `items` is
+`null`, and `cost_cash` is 0. It never sends `buy_offer_pack`; the store opens
+`PopupPremiumAccount` instead (`PromotionPacks.as:396-398`). The actual purchase
+is `buy_premium_account(packageIndex)` with the `PREMIUM_ACCOUNTS` index, as
+specified in §2.13. The premium is a server-owned timestamp, not a store item
+(see [ADR 0013](../../docs/adr/0013-the-premium-is-a-timestamp.md)).
+
+Known data defects to handle explicitly:
+
+* Pack 18 is the premium entry and must not be sold as a normal pack.
+* Pack 35 and packs 37-43 contain the malformed id `1072.1224` in the super
+  rows. The upstream turns that into the store key `"1072.1224"`. The clone
+  should reject the malformed entry (or normalise it deliberately) rather than
+  creating an unplaceable store item.
+* `enabled` and `position` decide whether a pack is shown; `position = 0` is
+  hidden. The server should refuse a disabled or hidden pack even if the client
+  sends its id.
 
 ---
 
