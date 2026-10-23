@@ -501,7 +501,8 @@ The click path is `core/PromotionPacks.as`:
 * `buySuperPack` (`PromotionPacks.as:182-290`) treats `items` as **three rows**:
   row 0 = rare, row 1 = uncommon, row 2 = common. The tiers are:
   * tier 0 (first button): **one** item from rows 1+2;
-  * tier 1 (second button): **one** rare plus **one** item from rows 1+2;
+  * tier 1 (second button): **one** item from all three rows, weighted by row
+    length (so it *can* be rare), plus **one** item from rows 1+2;
   * tier 2 (third button): **one** rare plus **three** items from rows 1+2.
   The client's picks use `Math.round(Math.random() * (n - 1))`, which is not a
   uniform choice.
