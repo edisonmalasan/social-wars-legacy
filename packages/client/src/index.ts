@@ -9,6 +9,7 @@ export * from './interaction.ts';
 export * from './hud.ts';
 export * from './hudstate.ts';
 export * from './buildmenu.ts';
+export * from './magic.ts';
 export * from './tutorial.ts';
 export * from './fonts.ts';
 export * from './tooltips.ts';

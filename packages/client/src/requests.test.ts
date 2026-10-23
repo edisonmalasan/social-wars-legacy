@@ -7,6 +7,8 @@ import {
   FORBIDDEN_COMMANDS,
   OWN_TOWN,
   buy,
+  buyMagic,
+  buyMana,
   claimDailyBonus,
   claimWeeklyBonus,
   collect,
@@ -24,6 +26,7 @@ import {
   tradeResource,
   train,
   upgrade,
+  useMagic,
 } from './requests.ts';
 
 /** Every builder, with arguments that satisfy its specification. */
@@ -47,6 +50,9 @@ const BUILDERS: { name: string; command: ReturnType<typeof buy> }[] = [
   { name: 'end_quest', command: endQuest(100000001, 2) },
   { name: 'trade_resource', command: tradeResource('w', false, 100) },
   { name: 'expand', command: expand(4) },
+  { name: 'buy_magic', command: buyMagic(1, 'g') },
+  { name: 'buy_mana_new', command: buyMana(5, 'c') },
+  { name: 'use_magic', command: useMagic(1) },
 ];
 
 describe('the client requests', () => {
@@ -140,6 +146,20 @@ describe('the individual requests', () => {
 
   it('end_attack marks a voluntary end', () => {
     assert.equal(endAttack('attack-1', true).args[1], '1');
+  });
+
+  it('buy_magic names the spell and the payment resource', () => {
+    assert.deepEqual(buyMagic(4, 'c').args, [4, 'c']);
+    assert.deepEqual(buyMagic(4, 'g').args, [4, 'g']);
+  });
+
+  it('buy_mana_new names the pack amount and the payment resource', () => {
+    assert.deepEqual(buyMana(5, 'c').args, [5, 'c']);
+    assert.deepEqual(buyMana(5, 'g').args, [5, 'g']);
+  });
+
+  it('use_magic names the spell and no target', () => {
+    assert.deepEqual(useMagic(7).args, [7]);
   });
 
   it('the weekly bonus carries no arguments and the daily one carries the day', () => {

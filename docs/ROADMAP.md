@@ -1159,14 +1159,14 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **99 implemented** - the clone models the screen's behaviour, and the decision
+      - **106 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **23 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **138 planned** - in scope, the client's behaviour is real, and not modelled
+      - **131 planned** - in scope, the client's behaviour is real, and not modelled
         yet
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
@@ -1185,6 +1185,13 @@ assault against the new server, and the cheat battery is fully rejected.
       **always returns false** in this build (`core/Base.as:7993-7995`), so the
       condition is simply the level, and the clone reproduces that rather than
       inventing an unlock system the client does not have
+- [x] The **magic screens** are modelled (`packages/client/src/magic.ts`): the
+      **Research LAB** lists the ten spells by unlock level, six to a page, with
+      learned/available/blocked rows; the selected spell shows the stars, the
+      progress bar and the buy panel, where **cash bypasses the unlock level and gold
+      does not**; the **battle spell book** lists the learned spells, three to a page,
+      with the quest's veto and the mana check separate. The buy, mana and cast
+      actions are requests (`buy_magic`, `buy_mana_new`, `use_magic`)
 - [x] The **HUD is drawn** (`apps/client/src/ui/hud.tsx`): the top bar is the model's
       HUD — the resources, the population, the level and the energy — and every number
       opens the popover the model writes. The interface is **React DOM**, the renderer

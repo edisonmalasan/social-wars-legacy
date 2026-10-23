@@ -194,6 +194,28 @@ export function magicUsesMap(magics: unknown): Record<string, number> {
   return out;
 }
 
+/** The two use counts at which a spell reaches levels 2 and 3. */
+export interface SpellLevelThresholds {
+  /** The number of uses that earns level 2 (`NUM_SPELL_USES_LVL2`). */
+  level2: number;
+  /** The number of uses that earns level 3 (`NUM_SPELL_USES_LVL3`). */
+  level3: number;
+}
+
+/**
+ * The spell-level thresholds the client reads from the globals.
+ *
+ * The third threshold is never below the second: a malformed content bundle
+ * must not make level 3 unreachable or level 2 impossible to reach before it.
+ */
+export function spellLevelThresholds(
+  globals: Record<string, unknown>,
+): SpellLevelThresholds {
+  const level2 = Math.max(0, integerOr(globals['NUM_SPELL_USES_LVL2'], 25));
+  const level3 = Math.max(level2, integerOr(globals['NUM_SPELL_USES_LVL3'], 50));
+  return { level2, level3 };
+}
+
 /**
  * The spell level a use count earns: `0` if unlearned, else `1`, `2` or `3`.
  *
@@ -205,8 +227,7 @@ export function spellLevel(
   globals: Record<string, unknown>,
 ): 0 | 1 | 2 | 3 {
   if (uses === null || !Number.isFinite(uses) || uses < 0) return 0;
-  const level2 = Math.max(0, integerOr(globals['NUM_SPELL_USES_LVL2'], 25));
-  const level3 = Math.max(level2, integerOr(globals['NUM_SPELL_USES_LVL3'], 50));
+  const { level2, level3 } = spellLevelThresholds(globals);
   if (uses >= level3) return 3;
   if (uses >= level2) return 2;
   return 1;
@@ -219,7 +240,7 @@ export function spellLevel(
  * the stored counter there (`upstream/socialwarriors/command.py:664-672`).
  */
 export function spellUseCap(globals: Record<string, unknown>): number {
-  return Math.max(0, integerOr(globals['NUM_SPELL_USES_LVL3'], 50));
+  return spellLevelThresholds(globals).level3;
 }
 
 /** The mana a player is granted for reaching a level (`MANA_REWARD_PER_LEVEL`). */

@@ -16,6 +16,7 @@ import {
   manaRewardPerLevel,
   parseMagicArea,
   spellLevel,
+  spellLevelThresholds,
   spellUseCap,
   type MagicSpellDefinition,
 } from './magic.ts';
@@ -136,9 +137,25 @@ describe('the spell counters', () => {
     assert.equal(spellLevel(999, GLOBALS), 3);
   });
 
+  it('reads both thresholds from the globals', () => {
+    assert.deepEqual(spellLevelThresholds(GLOBALS), { level2: 25, level3: 50 });
+    assert.deepEqual(spellLevelThresholds({}), { level2: 25, level3: 50 });
+  });
+
+  it('never lets the third threshold fall below the second', () => {
+    assert.deepEqual(
+      spellLevelThresholds({ NUM_SPELL_USES_LVL2: 30, NUM_SPELL_USES_LVL3: 10 }),
+      { level2: 30, level3: 30 },
+    );
+  });
+
   it('caps the stored counter at the third level threshold', () => {
     assert.equal(spellUseCap(GLOBALS), 50);
     assert.equal(spellUseCap({}), 50);
+    assert.equal(
+      spellUseCap({ NUM_SPELL_USES_LVL2: 30, NUM_SPELL_USES_LVL3: 10 }),
+      30,
+    );
   });
 });
 

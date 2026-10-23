@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 99,
+   "implemented": 106,
    "dropped": 23,
-   "planned": 138
+   "planned": 131
   }
  },
  "screens": [
@@ -825,8 +825,8 @@
    ],
    "overrides": [],
    "bytes": 1957,
-   "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/magic.ts` (the learned, available and blocked spell rows)."
   },
   {
    "class": "MondayBonusButton",
@@ -1105,8 +1105,8 @@
    ],
    "overrides": [],
    "bytes": 9172,
-   "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/magic.ts` (the learned stars and progress bar, the buy panel, and cash bypassing the unlock level while gold does not)."
   },
   {
    "class": "SpeakerBox",
@@ -1149,8 +1149,8 @@
    ],
    "overrides": [],
    "bytes": 3122,
-   "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/magic.ts` (the learned spell buttons, the quest veto and the separate mana check)."
   },
   {
    "class": "SubCategory",
@@ -2969,8 +2969,8 @@
    ],
    "overrides": [],
    "bytes": 581,
-   "decision": "planned",
-   "decisionNote": "The magic popup. The magic rules are already modelled."
+   "decision": "implemented",
+   "decisionNote": "The spell book's shell is modelled with its behaviour: `packages/client/src/magic.ts`."
   },
   {
    "class": null,
@@ -3599,8 +3599,8 @@
    ],
    "overrides": [],
    "bytes": 931,
-   "decision": "planned",
-   "decisionNote": "The magic. The magic rules are already modelled."
+   "decision": "implemented",
+   "decisionNote": "The Research LAB's shell is modelled with its behaviour: `packages/client/src/magic.ts`."
   },
   {
    "class": null,
@@ -4748,8 +4748,8 @@
    ],
    "overrides": [],
    "bytes": 10804,
-   "decision": "planned",
-   "decisionNote": "The magic popup. The magic rules are already modelled."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/magic.ts` (the learned spells, three to a page, with the paging and the mana check)."
   },
   {
    "class": "PopupMarket",
@@ -5628,8 +5628,8 @@
    ],
    "overrides": [],
    "bytes": 8789,
-   "decision": "planned",
-   "decisionNote": "The magic. The magic rules are already modelled."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/magic.ts` (the spell list ordered by unlock level, six to a page, with the mana pack)."
   },
   {
    "class": "SoulMixerTurbina",

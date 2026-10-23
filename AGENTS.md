@@ -60,7 +60,7 @@ Decisions" section of `docs/ROADMAP.md`) but is *not yet implemented*. Only rows
 | Upstream reference   | Python 3.9 + Flask 2.2.5                    | Present (vendored, read-only) | `upstream/socialwarriors/` |
 | Asset tooling        | JPEXS FFDec 26.3.0 (Java 21), Git LFS 3.7.1 | Present | `re/docs/05-assets-and-content-pipeline.md` |
 | Reverse engineering  | REA MCP (Ghidra 12.1.4 headless)             | Present | `re/docs/07-REA-EVIDENCE.md`     |
-| Tests                | Node's built-in test runner (`node --test`) | **Present** | `pnpm test` — 1319 tests, no test-framework dependency |
+| Tests                | Node's built-in test runner (`node --test`) | **Present** | `pnpm test` — 1354 tests, no test-framework dependency |
 
 ## Build, Test, and Development Commands
 
