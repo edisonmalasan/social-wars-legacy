@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   GOALS,
   DART_COST_CASH,
+  QUEST_ID_01_BAZOOKA,
   QUEST_ID_02_CENTRAL_NUCLEAR,
   applyCommandCost,
   buildDartsBoard,
@@ -2231,6 +2232,32 @@ describe('the active assault quest', () => {
     assert.equal(outcome.applied, false);
     assert.equal(outcome.refused, 'unknown-quest-element');
     assert.deepEqual(outcome.world, before);
+  });
+
+  it('refuses to switch to another quest mid-stream', () => {
+    const applier = createApplier(questDeps());
+
+    // QUEST_02 is active; a killed write naming another known quest is
+    // refused before any of the save is written.
+    const seeded = questWorld();
+    const beforeKill = structuredClone(seeded);
+    const switchedKill = applier(seeded, killedWrite(['commandCenter'], QUEST_ID_01_BAZOOKA));
+    assert.equal(switchedKill.applied, false);
+    assert.equal(switchedKill.refused, 'quest-mismatch');
+    assert.deepEqual(switchedKill.world, beforeKill);
+
+    // The same guard holds once the state is fully initialised: end_quest
+    // naming a different quest cannot pay out the active quest's reward.
+    const killed = applier(questWorld(), killedWrite(['commandCenter']));
+    assert.equal(killed.applied, true);
+    const beforeEnd = structuredClone(killed.world);
+    const switchedEnd = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_01_BAZOOKA, 1],
+    });
+    assert.equal(switchedEnd.applied, false);
+    assert.equal(switchedEnd.refused, 'quest-mismatch');
+    assert.deepEqual(switchedEnd.world, beforeEnd);
   });
 
   it('refuses a claimed win with no server kills', () => {
