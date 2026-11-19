@@ -8,8 +8,8 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 106,
-   "dropped": 23,
+   "implemented": 77,
+   "dropped": 52,
    "planned": 131
   }
  },
@@ -2339,8 +2339,8 @@
    ],
    "overrides": [],
    "bytes": 661,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": null,
@@ -2360,8 +2360,8 @@
    ],
    "overrides": [],
    "bytes": 766,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": null,
@@ -2990,8 +2990,8 @@
    ],
    "overrides": [],
    "bytes": 495,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the auction house: there is no live third-party service or real-money settlement to bid with. The server keeps and serves the auction commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": null,
@@ -3137,8 +3137,8 @@
    ],
    "overrides": [],
    "bytes": 509,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the neighbour profile, visit or social-gifting popups: there is no Facebook identity behind them. The neighbour strip remains; the server keeps the social-store endpoints (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": null,
@@ -3221,8 +3221,8 @@
    ],
    "overrides": [],
    "bytes": 1499,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the neighbour profile, visit or social-gifting popups: there is no Facebook identity behind them. The neighbour strip remains; the server keeps the social-store endpoints (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": null,
@@ -3431,8 +3431,8 @@
    ],
    "overrides": [],
    "bytes": 616,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the neighbour profile, visit or social-gifting popups: there is no Facebook identity behind them. The neighbour strip remains; the server keeps the social-store endpoints (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": null,
@@ -3536,8 +3536,8 @@
    ],
    "overrides": [],
    "bytes": 469,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the neighbour profile, visit or social-gifting popups: there is no Facebook identity behind them. The neighbour strip remains; the server keeps the social-store endpoints (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": null,
@@ -4771,8 +4771,8 @@
    ],
    "overrides": [],
    "bytes": 3326,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the auction house: there is no live third-party service or real-money settlement to bid with. The server keeps and serves the auction commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupMissionInfo",
@@ -4853,8 +4853,8 @@
    ],
    "overrides": [],
    "bytes": 2020,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the neighbour profile, visit or social-gifting popups: there is no Facebook identity behind them. The neighbour strip remains; the server keeps the social-store endpoints (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupNewDaily",
@@ -5020,8 +5020,8 @@
    ],
    "overrides": [],
    "bytes": 7928,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the neighbour profile, visit or social-gifting popups: there is no Facebook identity behind them. The neighbour strip remains; the server keeps the social-store endpoints (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupPremiumAccount",
@@ -5383,8 +5383,8 @@
    ],
    "overrides": [],
    "bytes": 19908,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the neighbour profile, visit or social-gifting popups: there is no Facebook identity behind them. The neighbour strip remains; the server keeps the social-store endpoints (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupSoulMixer",
@@ -5549,8 +5549,8 @@
    ],
    "overrides": [],
    "bytes": 3264,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the neighbour profile, visit or social-gifting popups: there is no Facebook identity behind them. The neighbour strip remains; the server keeps the social-store endpoints (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupWeeklyQuest",
@@ -5670,8 +5670,8 @@
    ],
    "overrides": [],
    "bytes": 3385,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "AllianceMemberInfoRendererItem",
@@ -5696,8 +5696,8 @@
    ],
    "overrides": [],
    "bytes": 11152,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "AllianceMemberInfoTip",
@@ -5715,8 +5715,8 @@
    ],
    "overrides": [],
    "bytes": 1403,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "AllianceState",
@@ -5748,8 +5748,8 @@
    ],
    "overrides": [],
    "bytes": 24142,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "JoinState",
@@ -5777,8 +5777,8 @@
    ],
    "overrides": [],
    "bytes": 8091,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupAllianceDailyBonus",
@@ -5799,8 +5799,8 @@
    ],
    "overrides": [],
    "bytes": 2417,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupAllianceIntro",
@@ -5821,8 +5821,8 @@
    ],
    "overrides": [],
    "bytes": 4210,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupAlliancesCenter",
@@ -5847,8 +5847,8 @@
    ],
    "overrides": [],
    "bytes": 3998,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupChooseAlliance",
@@ -5872,8 +5872,8 @@
    ],
    "overrides": [],
    "bytes": 2858,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupCreateAlliance",
@@ -5903,8 +5903,8 @@
    ],
    "overrides": [],
    "bytes": 10722,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupSendAllianceMessage",
@@ -5925,8 +5925,8 @@
    ],
    "overrides": [],
    "bytes": 4008,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the alliance UI: there is no Facebook identity or live third-party service behind it. The server keeps and serves the alliance commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "CrossViralIcon",
@@ -6077,8 +6077,8 @@
    ],
    "overrides": [],
    "bytes": 2117,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the auction house: there is no live third-party service or real-money settlement to bid with. The server keeps and serves the auction commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "MarketplaceUnitInfoTip",
@@ -6096,8 +6096,8 @@
    ],
    "overrides": [],
    "bytes": 1247,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the auction house: there is no live third-party service or real-money settlement to bid with. The server keeps and serves the auction commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupMarketplace",
@@ -6123,8 +6123,8 @@
    ],
    "overrides": [],
    "bytes": 12608,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the auction house: there is no live third-party service or real-money settlement to bid with. The server keeps and serves the auction commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupMarketplaceHelp",
@@ -6145,8 +6145,8 @@
    ],
    "overrides": [],
    "bytes": 2503,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the auction house: there is no live third-party service or real-money settlement to bid with. The server keeps and serves the auction commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "PopupMarketplaceUnit",
@@ -6181,8 +6181,8 @@
    ],
    "overrides": [],
    "bytes": 19586,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the auction house: there is no live third-party service or real-money settlement to bid with. The server keeps and serves the auction commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "UnitRenderer",
@@ -6205,8 +6205,8 @@
    ],
    "overrides": [],
    "bytes": 7782,
-   "decision": "implemented",
-   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
+   "decision": "dropped",
+   "decisionNote": "Dropped: The web client does not surface the auction house: there is no live third-party service or real-money settlement to bid with. The server keeps and serves the auction commands (ADR 20, docs/adr/0020-social-services-server-only.md)."
   },
   {
    "class": "popupLoadingAssault",

@@ -1374,7 +1374,13 @@ assault against the new server, and the cheat battery is fully rejected.
       of the gold or cash slot in the declared delta — never its amount — while the server
       still prices the purchase from content. A refused priced command now spends nothing,
       in both the legacy shim and the native endpoint
-- [ ] Alliances and the social features are functional, or visibly out of scope
+- [x] Alliances and the social features are **visibly out of scope for the web client**:
+      the server keeps and serves all 11 alliance variants, the 17 error codes, the auction
+      subsystem and the social store, but the client surfaces none of them — there is no
+      Facebook identity, no real-money settlement and no live third-party service. The
+      neighbour strip is the one social surface that remains. Recorded in
+      [ADR 20](./adr/0020-social-services-server-only.md), with the screen decisions
+      checked by `packages/client/src/screens.test.ts`
 - [x] The daily/weekly bonus cycles and premium expiry behave correctly across a **server
       restart** (`packages/server/src/restart.test.ts`). The server's state is
       **timestamps** - when the bonus was last claimed, when the premium runs out - and a
