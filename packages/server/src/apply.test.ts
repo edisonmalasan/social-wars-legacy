@@ -1996,6 +1996,16 @@ describe('collect_mission', () => {
   const endedChapter = (id = 1): ShimWorld =>
     chapterWorld({ id, spawned: true, ended: true }, { resources: purse({ g: 100, w: 50 }) });
 
+  it('refuses a chapter with no objective record, spending nothing', () => {
+    const applier = createApplier(chapterDeps());
+    const world = chapterWorld({}, { resources: purse({ g: 100, w: 50 }) });
+    const outcome = applier(world, { name: 'collect_mission', args: [2] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-chapter');
+    assert.deepEqual(outcome.world.resources, world.resources);
+    assert.deepEqual(chapterVars(outcome.world), {});
+  });
+
   it('refuses a chapter that has not ended, spending nothing', () => {
     const applier = createApplier(chapterDeps());
     const world = chapterWorld(
