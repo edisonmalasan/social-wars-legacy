@@ -1604,7 +1604,7 @@ product.*
       is fine if nothing the browser loads reaches it, and the check says so. It follows the
       static imports, the re-exports and the **dynamic** imports, and it resolves the
       workspace's **subpath** exports - `@swl/server/apply` is the applier and not the
-      package's index, which is the whole point of the subpath. It reaches **127** modules
+      package's index, which is the whole point of the subpath. It reaches **128** modules
 - [x] **Every pull request runs the golden-master harness.** The CI runs on every push
       and every pull request, and the golden-master corpus is one of its steps - and
       the harness fails on any difference it cannot explain
