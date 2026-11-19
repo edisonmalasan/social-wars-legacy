@@ -4,21 +4,27 @@ import assert from 'node:assert/strict';
 import {
   GOALS,
   DART_COST_CASH,
+  QUEST_ID_02_CENTRAL_NUCLEAR,
   applyCommandCost,
   buildDartsBoard,
   createGoalState,
   currentDartsGame,
   getGoalDefinition,
+  getQuestSpec,
   hashSeed,
+  type QuestState,
 } from '@swl/rules';
 
 import {
+  ACTIVE_QUEST_KEY,
   type ApplierItem,
   BUILDING_STATE_KEYS,
   GOAL_STATE_KEY,
+  QUEST_PROGRESS_KEY,
   createApplier,
   hasActivePremium,
   mapItems,
+  questRoster,
   type ApplierDeps,
   type MapItemTuple,
 } from './apply.ts';
@@ -1441,12 +1447,13 @@ describe('the claims the server does not honour', () => {
     assert.equal(outcome.world.resources['g'], 0);
   });
 
-  it('refuses a claimed end_quest', () => {
+  it('refuses a claimed end_quest with no server-recorded kills', () => {
     const applier = createApplier(deps());
     const world = worldWithBuilding({});
     const outcome = applier(world, { name: 'end_quest', args: [100000001, true] });
     assert.equal(outcome.applied, false);
-    assert.equal(outcome.refused, 'not-implemented');
+    // The claimed win is never read: there is no server quest state to resolve.
+    assert.equal(outcome.refused, 'no-victory');
     assert.equal(outcome.world.resources['g'], 0);
   });
 });
@@ -2110,5 +2117,227 @@ describe('admin_set_quest_rank', () => {
     const outcome = applier(world, { name: 'admin_set_quest_rank', args: ['7', '3'] });
     assert.equal(outcome.applied, true);
     assert.equal('questsRank' in outcome.world.save.privateState, false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Assault quests — the server-owned QuestState and end_quest
+// ---------------------------------------------------------------------------
+
+/** QUEST_02's elements, as the content supplies them. */
+const QUEST_ITEMS = new Map<number, ApplierItem>([
+  [1017, item({ id: 1017, type: 'u', subcatFunctional: 111 })], // Good Boy (key element)
+  [89, item({ id: 89, type: 'b', subcatFunctional: 112 })], // nuclear plant
+  [195, item({ id: 195, type: 'b', subcatFunctional: 113 })], // command centre
+  [1035, item({ id: 1035, type: 'u', subcatFunctional: 114 })], // truck (ITEM.truck2)
+]);
+
+const questDeps = (over: Partial<ApplierDeps> = {}): ApplierDeps =>
+  chapterDeps({ items: QUEST_ITEMS, questExpRequired: 300, ...over });
+
+/** A player's own map with a seed naming the quest being played. */
+function questWorld(
+  over: {
+    questId?: string;
+    vars?: Record<string, unknown>;
+    privateState?: Record<string, unknown>;
+    resources?: ShimWorld['resources'];
+  } = {},
+): ShimWorld {
+  return {
+    save: {
+      playerInfo: {},
+      maps: [
+        {
+          id: 0,
+          idCurrentMission: 1,
+          currentQuestVars: { ...(over.vars ?? {}) },
+        },
+      ],
+      privateState: {
+        // A seed carries only the identifier. The first validated kill grows
+        // it into a full server-owned QuestState.
+        [ACTIVE_QUEST_KEY]: { questId: over.questId ?? QUEST_ID_02_CENTRAL_NUCLEAR },
+        ...(over.privateState ?? {}),
+      },
+    },
+    resources: over.resources ?? purse({}),
+    nextCommandNumber: 1,
+  };
+}
+
+const activeState = (world: ShimWorld): QuestState =>
+  world.save.privateState[ACTIVE_QUEST_KEY] as QuestState;
+
+/** A `set_quest_var` killed write, with the quest id as its third argument. */
+const killedWrite = (refs: string[], questId?: string) => ({
+  name: 'set_quest_var',
+  args: [
+    'killed',
+    JSON.stringify(refs),
+    ...(questId === undefined ? [] : [questId]),
+  ] as unknown[],
+});
+
+describe('the active assault quest', () => {
+  it('derives the roster from the quest spec and the content items', () => {
+    const spec = getQuestSpec(QUEST_ID_02_CENTRAL_NUCLEAR)!;
+    const roster = questRoster(spec, QUEST_ITEMS);
+    assert.deepEqual(
+      roster.map((element) => [element.ref, element.itemId, element.affiliation, element.isUnit]),
+      [
+        ['goodBoy', 1017, 'self', true],
+        ['centralNuclear', 89, 'enemy', false],
+        ['commandCenter', 195, 'enemy', false],
+        ['truck', 1035, 'enemy', true],
+      ],
+    );
+    assert.equal(roster[2]?.subcatFunctional, 113);
+    assert.deepEqual(questRoster(spec).map((element) => element.isUnit), [
+      false,
+      false,
+      false,
+      false,
+    ]);
+  });
+
+  it('initialises activeQuest from the roster on the first validated killed write', () => {
+    const applier = createApplier(questDeps());
+    const outcome = applier(questWorld(), killedWrite(['commandCenter']));
+    assert.equal(outcome.applied, true);
+    const state = activeState(outcome.world);
+    assert.equal(state.questId, QUEST_ID_02_CENTRAL_NUCLEAR);
+    assert.equal(state.phase, 'map-loaded');
+    assert.deepEqual(state.script.destroyed, ['commandCenter']);
+    // loadQuestMap derived the enemy count from the roster.
+    assert.equal(state.remainingFoes, 1);
+    assert.deepEqual(chapterVars(outcome.world)['killed'], ['commandCenter']);
+  });
+
+  it('accepts a quest id argument when no quest is seeded', () => {
+    const applier = createApplier(questDeps());
+    const world = questWorld();
+    delete world.save.privateState[ACTIVE_QUEST_KEY];
+    const outcome = applier(world, killedWrite(['centralNuclear'], QUEST_ID_02_CENTRAL_NUCLEAR));
+    assert.equal(outcome.applied, true);
+    assert.deepEqual(activeState(outcome.world).script.destroyed, ['centralNuclear']);
+  });
+
+  it('refuses a killed ref outside the roster without mutating any state', () => {
+    const applier = createApplier(questDeps());
+    const world = questWorld();
+    const before = structuredClone(world);
+    const outcome = applier(world, killedWrite(['notAnElement']));
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'unknown-quest-element');
+    assert.deepEqual(outcome.world, before);
+  });
+
+  it('refuses a claimed win with no server kills', () => {
+    const applier = createApplier(questDeps());
+    const world = questWorld({ vars: {} });
+    const outcome = applier(world, {
+      name: 'end_quest',
+      args: [
+        JSON.stringify({
+          quest_id: QUEST_ID_02_CENTRAL_NUCLEAR,
+          win: true,
+          units: [[1017, 1, 0, 0]],
+          loot: { g: 1_000_000 },
+        }),
+      ],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+    assert.deepEqual(outcome.world.resources, world.resources);
+    assert.ok(ACTIVE_QUEST_KEY in outcome.world.save.privateState);
+  });
+
+  it('grants the content-derived reward, sets the rank and clears the state on a win', () => {
+    const applier = createApplier(questDeps());
+    let world = questWorld();
+    const kill = applier(world, killedWrite(['commandCenter']));
+    assert.equal(kill.applied, true);
+    world = kill.world;
+    const outcome = applier(world, {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+    assert.equal(outcome.applied, true);
+    // REWARDS_QUESTS[6] = { g: 4000, o: 1400 }; expRequired 300 gives 100 XP
+    // for the gold row. Kill XP is clamped to half the (zero) kill gold.
+    assert.equal(outcome.world.resources['g'], 4000);
+    assert.equal(outcome.world.resources['o'], 1400);
+    assert.equal(outcome.world.resources['x'], 100);
+    assert.deepEqual(outcome.world.save.privateState['questsRank'], { '6': 1 });
+    const progress = outcome.world.save.privateState[QUEST_PROGRESS_KEY] as {
+      ranks: Record<string, number>;
+      awarded: string[];
+    };
+    assert.equal(progress.ranks['6'], 1);
+    assert.deepEqual(progress.awarded, [QUEST_ID_02_CENTRAL_NUCLEAR]);
+    assert.equal(ACTIVE_QUEST_KEY in outcome.world.save.privateState, false);
+  });
+
+  it('pays nothing on a replay', () => {
+    const applier = createApplier(questDeps());
+    const killed = applier(questWorld(), killedWrite(['commandCenter']));
+    const first = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+    assert.equal(first.applied, true);
+    const replay = applier(first.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+    assert.equal(replay.applied, false);
+    assert.equal(replay.refused, 'already-awarded');
+    assert.deepEqual(replay.world.resources, first.world.resources);
+  });
+
+  it('ignores a legacy blob\'s win, units and loot', () => {
+    const applier = createApplier(questDeps());
+    const killed = applier(questWorld(), killedWrite(['commandCenter']));
+    const outcome = applier(killed.world, {
+      name: 'end_quest',
+      args: [
+        JSON.stringify({
+          quest_id: QUEST_ID_02_CENTRAL_NUCLEAR,
+          win: false, // the win comes from the server's kills, not the claim
+          units: [[1017, 10, 10, 0]],
+          loot: { g: 1_000_000, o: 1_000_000 },
+          difficulty: 3,
+        }),
+      ],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 4000);
+    assert.equal(outcome.world.resources['o'], 1400);
+    assert.deepEqual(outcome.world.save.privateState['questsRank'], { '6': 1 });
+  });
+
+  it('does not let a claimed difficulty set the rank', () => {
+    const applier = createApplier(questDeps());
+    const killed = applier(questWorld(), killedWrite(['commandCenter']));
+    const outcome = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 3],
+    });
+    assert.equal(outcome.applied, true);
+    assert.deepEqual(outcome.world.save.privateState['questsRank'], { '6': 1 });
+  });
+
+  it('resolves the legacy client\'s kills from the chapter status', () => {
+    const applier = createApplier(questDeps());
+    const world = questWorld({ vars: { killed: ['commandCenter'] } });
+    delete world.save.privateState[ACTIVE_QUEST_KEY];
+    const outcome = applier(world, {
+      name: 'end_quest',
+      args: [JSON.stringify({ quest_id: QUEST_ID_02_CENTRAL_NUCLEAR })],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 4000);
+    assert.equal(outcome.world.resources['o'], 1400);
   });
 });
