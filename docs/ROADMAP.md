@@ -2166,8 +2166,8 @@ reviewed without reconstructing the conversation that led to it.*
   three layers, and the neighbouring "first chapter is completable" items are
   still open, so ticking G4 would misstate verified progress. *Evidence:*
   `packages/server/src/apply.ts:415-420`, `apply.test.ts`'s "refuses a claimed
-  end_quest" test, `packages/server/src/shim.ts:460`, the six-row layer audit in
-  the task-5 report, and the precise gap recorded in *Externally Blocked Items*;
+  end_quest" test, `packages/server/src/shim.ts:460`, and the precise gap recorded
+  in *Externally Blocked Items*;
   full gate green — `pnpm test` 1429 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
   `check-roadmap.mjs` and `check-report-sync.mjs` all with 0 failures
 
