@@ -220,6 +220,7 @@ async function main(): Promise<void> {
       // The content, so the applier can check the **rules**: the level,
       // the population and the limits are all the game's own.
       items: contentItems(bundle),
+      offerPacks: content.offerPacks,
       populationRules: populationRules(globalsOf(bundle)),
       // Magic and tech: the ten spells and the globals their economy reads.
       magic: {

@@ -112,6 +112,34 @@ describe('computing a cost', () => {
     assert.equal(cost?.gain['g'], pack.gold);
   });
 
+  it('prices a super pack by the selected-item tier', async () => {
+    const c = await content();
+    assert.equal(computeCommandCost(c, 'buy_offer_pack', [44, '["a"]'])?.cost['c'], 60);
+    assert.equal(
+      computeCommandCost(c, 'buy_offer_pack', [44, '["a","b"]'])?.cost['c'],
+      100,
+    );
+    assert.equal(
+      computeCommandCost(c, 'buy_offer_pack', [44, '["a","b","c","d"]'])?.cost['c'],
+      200,
+    );
+    // Pack 19's own price override, even though its type is empty.
+    assert.equal(computeCommandCost(c, 'buy_offer_pack', [19, '["a"]'])?.cost['c'], 30);
+    assert.equal(
+      computeCommandCost(c, 'buy_offer_pack', [19, '["a","b"]'])?.cost['c'],
+      60,
+    );
+  });
+
+  it('refuses a malformed super tier, selection or premium pack', async () => {
+    const c = await content();
+    assert.equal(computeCommandCost(c, 'buy_offer_pack', [44, '[]']), null);
+    assert.equal(computeCommandCost(c, 'buy_offer_pack', [44, '["a","b","c"]']), null);
+    assert.equal(computeCommandCost(c, 'buy_offer_pack', [44, 'not json']), null);
+    // Pack 18 is the premium account entry, not an item pack.
+    assert.equal(computeCommandCost(c, 'buy_offer_pack', [18, '[]']), null);
+  });
+
   it('prices a premium account from the package table', async () => {
     const c = await content();
     const cost = computeCommandCost(c, 'buy_premium_account', [0]);

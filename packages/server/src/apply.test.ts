@@ -34,7 +34,7 @@ function worldWithBuilding(
   return {
     save: {
       playerInfo: {},
-      maps: [{ id: 0, items: { '7': tuple } }],
+      maps: [{ id: 0, items: { '7': tuple }, store: { '30': 1 } }],
       privateState: {},
     },
     resources: { g: 0, w: 0, o: 0, s: 0, c: 0, e: 100, x: 0, m: 0 },
@@ -48,7 +48,7 @@ function worldWithItems(items: Record<string, MapItemTuple>): ShimWorld {
   return {
     save: {
       playerInfo: {},
-      maps: [{ id: 0, items }],
+      maps: [{ id: 0, items, store: { '30': 1 } }],
       privateState: {},
     },
     resources: { g: 0, w: 0, o: 0, s: 0, c: 0, e: 100, x: 0, m: 0 },
@@ -282,13 +282,47 @@ describe('placing a building', () => {
     );
   });
 
-  it('gives each placement its own iso id', () => {
+  it('gives each placement its own iso id and spends one stored item each', () => {
     const applier = createApplier(deps({ items: new Map([[30, item()]]) }));
     const world = worldWithBuilding({});
+    const map = world.save.maps[0] as Record<string, unknown>;
+    map['store'] = { '30': 2 };
     const first = applier(world, { name: 'place_stored_item', args: [1, 30, 5, 6, 1, 0, 0] });
-    const second = applier(first.world, { name: 'place_stored_item', args: [1, 30, 8, 9, 1, 0, 0] });
+    assert.equal(first.applied, true);
+    const second = applier(first.world, {
+      name: 'place_stored_item',
+      args: [1, 30, 8, 9, 1, 0, 0],
+    });
+    assert.equal(second.applied, true);
     const items = mapItems(second.world.save.maps[0] as Record<string, unknown>);
     assert.equal(Object.keys(items).length, 3);
+    assert.deepEqual((second.world.save.maps[0] as Record<string, unknown>)['store'], {});
+  });
+
+  it('refuses to place an item the store does not hold', () => {
+    const applier = createApplier(deps({ items: new Map([[30, item()]]) }));
+    const world = worldWithBuilding({});
+    (world.save.maps[0] as Record<string, unknown>)['store'] = {};
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 30, 5, 6, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'not-stored');
+  });
+
+  it('does not place a stored unit as a building', () => {
+    const applier = createApplier(
+      deps({ items: new Map([[1001, item({ id: 1001, type: 'u' })]]) }),
+    );
+    const world = worldWithBuilding({});
+    (world.save.maps[0] as Record<string, unknown>)['store'] = { '1001': 1 };
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 1001, 5, 6, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'not-a-building');
   });
 });
 

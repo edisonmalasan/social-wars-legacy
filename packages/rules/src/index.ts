@@ -22,6 +22,7 @@ export * from './specialattacks.ts';
 export * from './authority.ts';
 export * from './goals.ts';
 export * from './commandcost.ts';
+export * from './offerpacks.ts';
 export * from './quest.ts';
 export * from './magic.ts';
 export * from './simulate.ts';
