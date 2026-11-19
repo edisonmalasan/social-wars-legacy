@@ -27,7 +27,12 @@
  */
 import { createGoalState, emptyQuestProgress } from '@swl/rules';
 
-import { GOAL_STATE_KEY, QUEST_PROGRESS_KEY } from './apply.ts';
+import {
+  ACTIVE_QUEST_KEY,
+  CHAPTER_AWARDS_KEY,
+  GOAL_STATE_KEY,
+  QUEST_PROGRESS_KEY,
+} from './apply.ts';
 
 /** The current save version. */
 export const SAVE_VERSION = 1;
@@ -258,6 +263,17 @@ export function migrateSave(input: unknown, options: MigrationOptions): Migratio
     if (!(QUEST_PROGRESS_KEY in privateState)) {
       privateState[QUEST_PROGRESS_KEY] = emptyQuestProgress();
       notes.push('added the quest progress');
+    }
+    // The server-owned assault-quest state and the chapter award log are new.
+    // Both start empty: no quest is active and no chapter reward has been paid.
+    // The appliers fill them from validated commands; the client never does.
+    if (!(ACTIVE_QUEST_KEY in privateState)) {
+      privateState[ACTIVE_QUEST_KEY] = null;
+      notes.push('added the active assault quest state');
+    }
+    if (!(CHAPTER_AWARDS_KEY in privateState)) {
+      privateState[CHAPTER_AWARDS_KEY] = {};
+      notes.push('added the chapter award log');
     }
 
     // The production state of each building did not exist.

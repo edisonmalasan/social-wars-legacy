@@ -12,7 +12,7 @@ import {
   needsMigration,
   type MigrationItem,
 } from './migrate.ts';
-import { GOAL_STATE_KEY, QUEST_PROGRESS_KEY } from './apply.ts';
+import { ACTIVE_QUEST_KEY, CHAPTER_AWARDS_KEY, GOAL_STATE_KEY, QUEST_PROGRESS_KEY } from './apply.ts';
 
 function repoRoot(): string {
   let dir = process.cwd();
@@ -89,6 +89,15 @@ describe('migrating the upstream save', () => {
     const result = migrateSave(save, { items: await items() });
     assert.ok(GOAL_STATE_KEY in result.save.privateState);
     assert.ok(QUEST_PROGRESS_KEY in result.save.privateState);
+  });
+
+  it('adds the server-owned quest state and chapter award log, both empty', async () => {
+    const save = await upstreamSave();
+    const result = migrateSave(save, { items: await items() });
+    // No assault quest is active on a freshly migrated save.
+    assert.equal(result.save.privateState[ACTIVE_QUEST_KEY], null);
+    // No chapter reward has been paid yet.
+    assert.deepEqual(result.save.privateState[CHAPTER_AWARDS_KEY], {});
   });
 
   it('adds the production state of the producing buildings', async () => {

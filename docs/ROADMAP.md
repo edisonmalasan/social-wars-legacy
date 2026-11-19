@@ -1349,7 +1349,16 @@ assault against the new server, and the cheat battery is fully rejected.
       (`packages/client/src/tutorial.ts`): the position is an index into the steps the
       player can see, a step may be skipped only when it says it may be, and a step is
       compared by its **number**, which is how the client resumes
-- [ ] The tutorial and the first chapter are completable against the server
+- [x] The tutorial and the first chapter are completable against the server. The tutorial's
+      sequence lives in `packages/rules/src/tutorial.ts`, is recorded server-side by the
+      `complete_tutorial` case in `packages/server/src/apply.ts`, and is walked end to end by
+      the client in `scripts/e2e-test.mjs`. The chapter is driven by the `set_quest_var` and
+      `collect_mission` appliers, paid from the content's `REWARDS_CHAPTERS` once through the
+      `chapterAwards` log, and read back by the client's `collectMission` request and
+      `questState` model. *Honest boundary:* a chapter is a **client-reported state predicate**
+      — the client writes `spawned`/`ended` — while the server owns the reward, the once-only
+      guard and the chapter's own state keys. Evidence: `apply.test.ts`'s "set_quest_var" and
+      "collect_mission" blocks (16 tests)
 - [x] The **tutorial's progression is the server's**
       (`packages/rules/src/tutorial.ts`). The server owns **which steps exist**, so a
       client cannot invent one, and **how far the player has got**, which is the
@@ -1357,10 +1366,26 @@ assault against the new server, and the cheat battery is fully rejected.
       step is the one that counts. The *order* is the client's, because the tutorial
       grants nothing by itself: it points at the actions, and the actions are commands
       the server already checks
-- [ ] The **first chapter** is completable: the quest's steps, the rewards and the
-      chapter's own unlocks are checked against the server
-- [ ] Quests, goals, the darts minigame, the marketplace, premium and the weekly bonus are
-      functional
+- [x] The **first chapter** is completable: the quest's steps, the rewards and the
+      chapter's own unlocks are checked against the server. `set_quest_var` validates each
+      chapter-status write into the server-owned `map.currentQuestVars`; `collect_mission`
+      requires the spawned+ended predicate, grants exactly `REWARDS_CHAPTERS[completedId]` once
+      and advances `map.idCurrentMission` (including the `> 99 → 1` wrap); client-side
+      `admin_set_quest_rank` can never overwrite the server's `questsRank`. *Honest boundary:*
+      `spawned`/`ended` are reported by the client and checked as a state predicate, not a
+      battle result. Evidence: `apply.test.ts`'s "collect_mission" block — "grants exactly the
+      content reward and advances the chapter", "wraps a next chapter above 99 back to 1",
+      "pays nothing on a replay", and the `admin_set_quest_rank` no-overwrite test
+- [x] Quests, goals, the darts minigame, the marketplace, premium and the weekly bonus are
+      functional — each has a rules model, a server applier and a client request/model. Quests
+      now have the missing server layer: `end_quest` resolves the win from the server-held
+      `activeQuest` with `isQuestVictory` / `finishQuest` / `awardQuest`, pays a content-derived
+      reward once and ignores the client's `win` / `loot` / `difficulty`
+      (`apply.test.ts`'s "the active assault quest" block, 11 tests); the other five were
+      verified in the 2026-11-20 G4 audit. *Honest residual:* the server trusts the client's
+      report that an element died (the same event boundary darts uses) and owns the roster,
+      win, reward and once-only guard; full authoritative positional combat is a separate
+      dependency recorded in *Unimplemented layers*
 - [x] **Magic and tech are functional** (`packages/rules/src/magic.ts`,
       `packages/server/src/apply.ts`, `packages/server/src/shim.ts`): the ten shipped spells
       are indexed from the content bundle with their mana cost, area, unlock level and
@@ -2112,7 +2137,7 @@ owner and a precise condition for closing it.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| G | Quests are functional (the G4 parity item) | The rules model (`packages/rules/src/quest.ts`, `finishQuest` / `awardQuest`) and the client request/model (`endQuest` / `collectMission` in `packages/client/src/requests.ts`, `questState` in `featurestate.ts`) exist, but the **server application layer is missing**: `end_quest` is refused as `not-implemented` and `collect_mission` falls through as `no-grant` in `packages/server/src/apply.ts`, and the legacy shim delegates to that same applier, so no quest is ever granted | Implement an authoritative quest applier in `packages/server/src/apply.ts` that resolves the win from the server's own state with `finishQuest` / `awardQuest`, prices the rewards from content, and is covered by tests; close the G4 checkbox when a real quest completion is verified end to end |
+| G | Full authoritative positional combat (the residual quest dependency) | Quests, chapters and the other G4 features are now functional with rules model + server applier + client request/model. What remains is the **trust boundary**, not a missing layer: a chapter is a client-reported state predicate (the client writes `spawned`/`ended`), and an assault quest trusts the client's report that an element died, though the server owns the roster, win, rewards and once-only guard. A genuinely authoritative battle needs a complete server-side map roster and a positional simulator derived from the decompiled AS3 — neither is present in this repository. This is in-repo work, not an external blocker, but it is a separate feature from quest parity | Build a server map roster and a positional combat simulator from the decompiled client, then drive chapter/quest events from server-simulated outcomes rather than client reports |
 
 ---
 
@@ -2170,6 +2195,21 @@ reviewed without reconstructing the conversation that led to it.*
   in *Externally Blocked Items*;
   full gate green — `pnpm test` 1429 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
   `check-roadmap.mjs` and `check-report-sync.mjs` all with 0 failures
+- **2026-11-20 — quest parity closed with evidence (Group G4).** Added authoritative chapter
+  and assault-quest appliers (`set_quest_var`, `collect_mission`, `admin_set_quest_rank`,
+  `end_quest`) to `packages/server/src/apply.ts`, wired `chapterRewards` and `questExpRequired`
+  into the running server from the content bundle, and migrated the new `activeQuest` and
+  `chapterAwards` private-state keys with empty defaults. *Rationale:* a "functional" claim
+  needs rules model + server application + client request/model; the server-application layer
+  was the only missing one, and it is now present and tested. The honest residual is stated on
+  the three closed items: chapters are a client-reported state predicate (the client writes
+  `spawned`/`ended`) and an assault quest trusts the client's element-death report, while the
+  server owns the roster, win, reward and once-only guard. Full authoritative positional combat
+  needs a server map roster and simulator that are not in the repository, so it remains in
+  *Unimplemented layers*. *Evidence:* `apply.test.ts`'s "set_quest_var" / "collect_mission" /
+  "the active assault quest" blocks (27 tests), `migrate.test.ts`'s empty-default test, and a
+  green gate — `pnpm test` 1463 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
+  `check-roadmap.mjs`, `check-report-sync.mjs`, `verify-command-catalogue.mjs` (94/94/94)
 
 ---
 
