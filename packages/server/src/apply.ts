@@ -32,7 +32,7 @@
  * Those live in the item's own attribute bag and in `privateState`, under the
  * names this module defines. A migration adds them to an upstream save.
  */
-import { Random, hashSeed } from '@swl/rules';
+import { Random, hashSeed, weeksBetween } from '@swl/rules';
 import {
   NUM_PRIZES,
   DART_COST_CASH,
@@ -1725,8 +1725,9 @@ function dartsStateOf(privateState: Record<string, unknown>): DartsState {
  *
  * The client's `wonExtra` argument is a claim and is ignored: the extra prize
  * exists only when the server's own state says every prize has been found.
- * The cost table charges every shot, so this step refunds the first one of the
- * day; it owns the board, the flags and the items.
+ * The cost table leaves the shot unpriced because only this step knows whether
+ * it is the free shot of the day; it charges the cash for paid shots and owns
+ * the board, the flags and the items.
  */
 function dartsShootCommand(
   world: ShimWorld,
@@ -1756,15 +1757,21 @@ function dartsShootCommand(
   const map = ownMap(world);
   if (!map) return { applied: false, refused: 'no-map', world };
 
+  // Only this step knows whether the shot is free, so the cash decision lives
+  // here rather than in the pre-applier affordability gate. A paid shot a
+  // player cannot afford is refused with the wallet and the save untouched.
+  const storedCash = world.resources['c'];
+  const cash = typeof storedCash === 'number' && Number.isFinite(storedCash) ? storedCash : 0;
+  if (!shot.free && cash < DART_COST_CASH) {
+    return { applied: false, refused: 'insufficient-resources', world };
+  }
+
   // Every check is done. Nothing below can refuse, so a rejected shot leaves
   // the save and the wallet exactly as they arrived.
-  if (shot.free) {
-    // The cost table charges the cash price of every shot; the first shot of
-    // the day is the one the rules model says is free, so put its price back.
-    world.resources = {
-      ...world.resources,
-      c: (world.resources['c'] ?? 0) + DART_COST_CASH,
-    };
+  if (!shot.free) {
+    // The cost table does not charge for a shot; the paid ones cost cash and
+    // the free first shot of the day costs nothing.
+    world.resources = { ...world.resources, c: cash - DART_COST_CASH };
   }
   privateState['dartsBalloonsShot'] = [...shot.state.shot];
   privateState['dartsHasFree'] = shot.state.hasFree;
@@ -1816,6 +1823,9 @@ function dartsNewFreeCommand(
  * The command's arguments are ignored: neither the board nor its seed is a
  * client decision. Deriving both from the server's clock and command index
  * keeps the reset reproducible and stops a player picking a favourable board.
+ * The game only resets once a week: a timestamp inside the current weekly
+ * window blocks a repeat, so a raw client cannot re-farm boards or the extra
+ * prize.
  */
 function dartsResetCommand(
   world: ShimWorld,
@@ -1825,6 +1835,14 @@ function dartsResetCommand(
   void args;
   const privateState = world.save.privateState;
   const now = deps.now();
+  const stored = Number(privateState['timeStampDartsReset'] ?? 0);
+  const last = Number.isFinite(stored) && stored > 0 ? stored : 0;
+  // weeksBetween is the rules package's own weekly window, so the gate cannot
+  // drift from the schedule that decides which board is live.
+  if (last > 0 && weeksBetween(new Date(last * 1000), new Date(now * 1000)) < 1) {
+    return { applied: false, refused: 'too-soon', world };
+  }
+
   const seed = hashSeed(`darts:${now}:${world.nextCommandNumber}`);
   const fresh = newDartsState(seed, true);
 
@@ -1846,10 +1864,11 @@ function goldOf(world: ShimWorld): number {
 /**
  * `trade_resource` - buy or sell a resource at the server-computed price.
  *
- * The cost table charges the standard 100-unit base price before this runs
+ * The cost table charges the standard 100-unit base price before a BUY runs
  * (it cannot know the amount on the legacy path). Here the server prices the
  * actual trade from the content and the map's own counter, undoes that fixed
- * charge and settles the real one. A sell reverses the direction as well.
+ * charge and settles the real one. A sell pays the player instead: the price
+ * is granted here and there is no up-front charge to undo.
  */
 function tradeResourceCommand(
   world: ShimWorld,
@@ -1891,7 +1910,7 @@ function tradeResourceCommand(
   const result = trade(rules, period, resource, amount, selling);
   if (!result.ok) return { applied: false, refused: result.reason, world };
 
-  const beforeGold = goldOf(world) + base;
+  const beforeGold = goldOf(world) + (selling ? 0 : base);
   if ((!selling && beforeGold < result.cost) ||
       (selling && (world.resources[resource] ?? 0) < amount)) {
     return { applied: false, refused: 'insufficient-resources', world };

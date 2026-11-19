@@ -1560,31 +1560,44 @@ describe('the darts appliers', () => {
     assert.equal(storeQuantity(outcome.world.save.maps[0], LIVE_GAME.extra_item), 0);
   });
 
-  it('refunds the cost table charge for the free first shot, but not a paid shot', () => {
+  it('charges cash for a paid shot, but never for the free first shot', () => {
     const applier = createApplier(featureDeps());
-    // The cost table charges every shot; simulate that settlement first.
-    const start = wallet(100);
-    const settled = applyCommandCost(start, { cost: { c: DART_COST_CASH }, gain: {} })
-      .resources;
-    const free = applier(dartsWorld({}, settled), {
+    const free = applier(dartsWorld({}, wallet(100)), {
       name: 'darts_shoot_balloon',
       args: [0, 0],
     });
     assert.equal(free.applied, true);
     assert.equal(free.world.save.privateState['dartsHasFree'], false);
-    assert.equal(free.world.resources['c'], start['c'], 'the free shot costs nothing');
+    assert.equal(free.world.resources['c'], 100, 'the free shot costs nothing');
 
-    const paidStart = dartsWorld({ dartsHasFree: false }, wallet(100));
-    const paidSettled = applyCommandCost(paidStart.resources, {
-      cost: { c: DART_COST_CASH },
-      gain: {},
-    }).resources;
-    const paid = applier(dartsWorld({ dartsHasFree: false }, paidSettled), {
+    const paid = applier(dartsWorld({ dartsHasFree: false }, wallet(100)), {
       name: 'darts_shoot_balloon',
       args: [1, 0],
     });
     assert.equal(paid.applied, true);
-    assert.equal(paid.world.resources['c'], start['c']! - DART_COST_CASH);
+    assert.equal(paid.world.resources['c'], 100 - DART_COST_CASH);
+  });
+
+  it('lets a cashless player take the free shot', () => {
+    const applier = createApplier(featureDeps());
+    const outcome = applier(dartsWorld({}, wallet(0)), {
+      name: 'darts_shoot_balloon',
+      args: [0, 0],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['c'], 0, 'a free shot spends no cash');
+  });
+
+  it('refuses a paid shot to a cashless player without spending anything', () => {
+    const applier = createApplier(featureDeps());
+    const world = dartsWorld({ dartsHasFree: false }, wallet(0));
+    const before = { ...world.save.privateState };
+    const outcome = applier(world, { name: 'darts_shoot_balloon', args: [0, 0] });
+
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'insufficient-resources');
+    assert.deepEqual(outcome.world.resources, world.resources);
+    assert.deepEqual(outcome.world.save.privateState, before);
   });
 
   it('refuses a target already shot without changing the save or spending cash', () => {
@@ -1692,6 +1705,39 @@ describe('the darts appliers', () => {
     assert.equal(state['timeStampDartsNewFree'], NOW);
     assert.equal(buildDartsBoard(state['dartsRandomSeed'] as number).length, 25);
   });
+
+  it('refuses a second reset in the same weekly window', () => {
+    const applier = createApplier(featureDeps());
+    const first = applier(dartsWorld({ timeStampDartsReset: 0 }), {
+      name: 'darts_reset',
+      args: [],
+    });
+    assert.equal(first.applied, true);
+
+    const before = { ...first.world.save.privateState };
+    const again = applier(first.world, { name: 'darts_reset', args: [] });
+    assert.equal(again.applied, false);
+    assert.equal(again.refused, 'too-soon');
+    assert.deepEqual(again.world.save.privateState, before);
+  });
+
+  it('allows a reset once the weekly window has elapsed', () => {
+    const applier = createApplier(featureDeps());
+    const world = dartsWorld({
+      timeStampDartsReset: NOW - 7 * 86400,
+      dartsBalloonsShot: [3, 7],
+      dartsHasFree: false,
+      dartsGotExtra: true,
+    });
+    const outcome = applier(world, { name: 'darts_reset', args: [] });
+
+    assert.equal(outcome.applied, true);
+    const state = outcome.world.save.privateState;
+    assert.deepEqual(state['dartsBalloonsShot'], []);
+    assert.equal(state['dartsHasFree'], true);
+    assert.equal(state['dartsGotExtra'], false);
+    assert.equal(state['timeStampDartsReset'], NOW);
+  });
 });
 
 describe('the trade applier', () => {
@@ -1715,13 +1761,29 @@ describe('the trade applier', () => {
   it('sells at the server-computed price and debits the resource', () => {
     const applier = createApplier(featureDeps());
     const before = purse({ g: 1000, w: 100 });
-    const world = marketWorld(settledPurse({ g: 1000, w: 100 }));
+    // A sell is not charged up front by the cost table, so the wallet arrives
+    // intact and the applier only adds the sell price.
+    const world = marketWorld(purse({ g: 1000, w: 100 }));
 
     const outcome = applier(world, { name: 'trade_resource', args: ['w', 1, 100] });
     assert.equal(outcome.applied, true);
-    // round(100 * 1 * 1) * 0.75 = 75 gold received, net of the settled price.
+    // round(100 * 1 * 1) * 0.75 = 75 gold received.
     assert.equal(outcome.world.resources['g'], before['g']! + 75);
     assert.equal(outcome.world.resources['w'], 0);
+  });
+
+  it('lets a player with no gold sell at the market', () => {
+    const applier = createApplier(featureDeps());
+    const world = marketWorld(purse({ g: 0, w: 100 }));
+
+    const outcome = applier(world, { name: 'trade_resource', args: ['w', 1, 100] });
+    assert.equal(outcome.applied, true);
+    // round(100 * 1 * 1) * 0.75 = 75 gold received, with no up-front charge.
+    assert.equal(outcome.world.resources['g'], 75);
+    assert.equal(outcome.world.resources['w'], 0);
+    const map = outcome.world.save.maps[0]!;
+    assert.equal(map['numTradesDone'], 1);
+    assert.deepEqual(map['resourcesTraded'], { w: 100 });
   });
 
   it('uses the price after the trades already made this period', () => {

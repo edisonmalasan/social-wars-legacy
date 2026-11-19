@@ -2036,7 +2036,7 @@ next group. The per-group **Status:** lines state which items are outstanding.*
 | D | Asset Pipeline | 32 / 0 | Complete |
 | E | Rules Engine | 37 / 1 | In progress — differential test vs the Flash client |
 | F | Authoritative Server | 54 / 0 | Complete |
-| G | Modern Client | 69 / 12 | In progress — remaining platforms and feature parity |
+| G | Modern Client | 70 / 11 | In progress — remaining platforms and feature parity |
 | H | Desktop Shell & Release | 14 / 4 | In progress — installers, signing, auto-update |
 | I | Production Readiness | 99 / 10 | In progress — the first production release |
 
