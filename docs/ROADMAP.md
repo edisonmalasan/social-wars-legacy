@@ -2198,7 +2198,10 @@ reviewed without reconstructing the conversation that led to it.*
 - **2026-11-20 — quest parity closed with evidence (Group G4).** Added authoritative chapter
   and assault-quest appliers (`set_quest_var`, `collect_mission`, `admin_set_quest_rank`,
   `end_quest`) to `packages/server/src/apply.ts`, wired `chapterRewards` and `questExpRequired`
-  into the running server from the content bundle, and migrated the new `activeQuest` and
+  into the running server from the content bundle — `chapterRewards` straight from
+  `REWARDS_CHAPTERS`, `questExpRequired` derived from `levels[4].exp_required` (= 200 in the
+  shipped bundle) with the applier's documented safe default of 100 as the fallback, as
+  `apps/server/src/main.ts` documents — and migrated the new `activeQuest` and
   `chapterAwards` private-state keys with empty defaults. *Rationale:* a "functional" claim
   needs rules model + server application + client request/model; the server-application layer
   was the only missing one, and it is now present and tested. The honest residual is stated on
