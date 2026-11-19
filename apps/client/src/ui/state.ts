@@ -18,11 +18,12 @@ import type {
   HudInput,
   HudRules,
   ItemPopulation,
+  NativeCommand,
   ResourcePanel,
   UnitPanel,
   WorldSnapshot,
 } from '@swl/client';
-import { resourcePanel, unitPanel } from '@swl/client';
+import { completeGoal, resourcePanel, unitPanel } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 import { QUEST_IDS } from '@swl/rules';
 
@@ -153,6 +154,13 @@ export interface GoalEntry {
   visited: boolean;
   /** Whether the goal is completed. */
   completed: boolean;
+  /**
+   * The claim a click on this goal sends, or null when there is none.
+   *
+   * Only a goal the server has recorded as complete can be claimed: the
+   * client sends the command and the server decides whether to grant it.
+   */
+  command: NativeCommand | null;
 }
 
 /** A record, or null. */
@@ -174,13 +182,17 @@ export function goalList(bundle: ContentBundle, world: WorldSnapshot): GoalEntry
   const state = recordOrNull(world.privateState?.['goalState']);
   const visited = recordOrNull(state?.['visited']);
   const completed = recordOrNull(state?.['completed']);
-  return (bundle.goals ?? []).map((goal, index) => ({
-    index,
-    id: goal.id,
-    title: goal.title,
-    visited: visited?.[String(goal.id)] === true,
-    completed: completed?.[String(goal.id)] === true,
-  }));
+  return (bundle.goals ?? []).map((goal, index) => {
+    const done = completed?.[String(goal.id)] === true;
+    return {
+      index,
+      id: goal.id,
+      title: goal.title,
+      visited: visited?.[String(goal.id)] === true,
+      completed: done,
+      command: done ? completeGoal(goal.id) : null,
+    };
+  });
 }
 
 /**

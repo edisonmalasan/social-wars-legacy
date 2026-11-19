@@ -482,12 +482,22 @@ async function main(): Promise<void> {
   }
 
   /**
+   * A goal's claim.
+   *
+   * The client sends the command and the server decides whether the goal
+   * is really complete. Its answer redraws both the panel and the scene.
+   */
+  function onCommand(command: NativeCommand): void {
+    void run([command]);
+  }
+
+  /**
    * The interface.
    *
    * It is drawn from the **same** world the scene is: one answer, one
    * drawing. The interface asks the server for nothing of its own.
    */
-  const ui = UI ? mountUi(UI, content, onPick, onCollect) : null;
+  const ui = UI ? mountUi(UI, content, onPick, onCollect, onCommand) : null;
   drawInterface();
   void refreshNeighbours();
 

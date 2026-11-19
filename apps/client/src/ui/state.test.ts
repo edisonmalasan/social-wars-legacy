@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
+import { completeGoal } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 
 import {
@@ -201,6 +202,33 @@ describe('the player\'s goals', () => {
     assert.equal(goals[1]!.completed, true);
   });
 
+  it('carry the claim a goal click sends, only for goals the server says are complete', () => {
+    const goals = goalList(
+      bundle({
+        goals: [
+          { id: 100000001, title: 'Build a house', description: '', hint: '', reward: {} },
+          { id: 100000002, title: 'Reach level 2', description: '', hint: '', reward: {} },
+        ],
+      }),
+      {
+        maps: [],
+        resources: {},
+        privateState: {
+          goalState: {
+            visited: { '100000001': true },
+            completed: { '100000002': true },
+          },
+        },
+      },
+    );
+    // The server has not approved the first goal's completion, so the
+    // click has no claim to send.
+    assert.equal(goals[0]!.command, null);
+    // The second goal is complete in the server's state, so the click
+    // carries its claim. The server still decides whether to grant it.
+    assert.deepEqual(goals[1]!.command, completeGoal(100000002));
+  });
+
   it('are all unvisited when the server has no goal state', () => {
     const goals = goalList(
       bundle({
@@ -210,6 +238,7 @@ describe('the player\'s goals', () => {
     );
     assert.equal(goals[0]!.visited, false);
     assert.equal(goals[0]!.completed, false);
+    assert.equal(goals[0]!.command, null);
   });
 });
 

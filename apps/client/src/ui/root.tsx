@@ -13,7 +13,12 @@
  */
 import { useMemo } from 'react';
 
-import { hudState, type Neighbour, type WorldSnapshot } from '@swl/client';
+import {
+  hudState,
+  type NativeCommand,
+  type Neighbour,
+  type WorldSnapshot,
+} from '@swl/client';
 import type { ContentBundle } from '@swl/content';
 
 import { BuildMenu } from './buildmenu.tsx';
@@ -52,6 +57,8 @@ export interface RootProps {
   onCollect?: () => void;
   /** The player picked something to build. */
   onPick?: (itemId: number) => void;
+  /** The player claimed a goal; send it through the client's transport. */
+  onCommand?: (command: NativeCommand) => void;
 }
 
 /**
@@ -70,6 +77,7 @@ export function Root({
   tutorial = null,
   onCollect,
   onPick,
+  onCommand,
 }: RootProps): React.JSX.Element {
   const state = hudState(hudInput(bundle, world));
   const items = useMemo(() => buildItems(bundle), [bundle]);
@@ -87,7 +95,7 @@ export function Root({
   return (
     <div className="swl-ui">
       <Hud state={state} placing={placingName} />
-      <Goals goals={goals} />
+      <Goals goals={goals} onCommand={onCommand} />
       <Chapters ranks={ranks} minLevels={minLevels} />
       <InfoPanel resource={panel} unit={unit} onCollect={onCollect} />
       <Neighbours neighbours={neighbours} />
