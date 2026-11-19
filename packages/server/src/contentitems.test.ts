@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { contentItems, populationRules } from './contentitems.ts';
+import { contentItems, marketRules, populationRules } from './contentitems.ts';
 
 const BUNDLE = {
   items: [
@@ -101,5 +101,34 @@ describe('the population rules', () => {
     assert.equal(rules.startMaxPopulation, 20);
     assert.equal(rules.maxPopulationCap, 175);
     assert.equal(rules.maxPopulationPerLevel, 3);
+  });
+});
+
+describe('the market rules', () => {
+  it('are the content\'s own numbers', () => {
+    const rules = marketRules({
+      MARKET_BASE_COSTS: { w: 100, o: 100, s: 150 },
+      MARKET_AMOUNT_TRADE: [100, 200, 300],
+      MARKET_INCREMENT: 0.02,
+      MARKET_SELL_PERCENTAGE: 0.75,
+      MARKET_MAX_NUM_TRADES: 20,
+      MARKET_PERIOD_HOURS: 20,
+    });
+    assert.deepEqual(rules.baseCosts, { w: 100, o: 100, s: 150 });
+    assert.deepEqual(rules.amounts, [100, 200, 300]);
+    assert.equal(rules.increment, 0.02);
+    assert.equal(rules.sellPercentage, 0.75);
+    assert.equal(rules.maxTrades, 20);
+    assert.equal(rules.periodHours, 20);
+  });
+
+  it('fall back to the game\'s own numbers', () => {
+    const rules = marketRules({});
+    assert.deepEqual(rules.baseCosts, {});
+    assert.deepEqual(rules.amounts, [100, 200, 300]);
+    assert.equal(rules.increment, 0.02);
+    assert.equal(rules.sellPercentage, 0.75);
+    assert.equal(rules.maxTrades, 20);
+    assert.equal(rules.periodHours, 20);
   });
 });

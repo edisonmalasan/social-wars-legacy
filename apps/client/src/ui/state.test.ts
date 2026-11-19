@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
+import { completeGoal } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 
 import {
@@ -201,6 +202,73 @@ describe('the player\'s goals', () => {
     assert.equal(goals[1]!.completed, true);
   });
 
+  it('carry a claim for a drawn, incomplete goal the server has not awarded', () => {
+    // A goal the server has not completed is exactly the goal drawn in a
+    // slot with a "CLICK HERE!" badge. Its click must still send the
+    // claim: the server checks its own progress in awardGoal(), not the
+    // client's completed flag. This is the dead-gesture regression.
+    const goals = goalList(
+      bundle({
+        goals: [
+          { id: 100000001, title: 'Build a house', description: '', hint: '', reward: {} },
+        ],
+      }),
+      {
+        maps: [],
+        resources: {},
+        privateState: {
+          goalState: {
+            visited: { '100000001': false },
+            completed: {},
+            awarded: {},
+          },
+        },
+      },
+    );
+    assert.equal(goals[0]!.completed, false);
+    assert.equal(goals[0]!.visited, false);
+    assert.deepEqual(goals[0]!.command, completeGoal(100000001));
+  });
+
+  it('do not carry a claim for a goal already awarded locally', () => {
+    const goals = goalList(
+      bundle({
+        goals: [
+          { id: 100000001, title: 'Build a house', description: '', hint: '', reward: {} },
+          { id: 100000002, title: 'Reach level 2', description: '', hint: '', reward: {} },
+        ],
+      }),
+      {
+        maps: [],
+        resources: {},
+        privateState: {
+          goalState: {
+            // A completed goal is still claimable until its award has
+            // been recorded; re-claiming a paid goal earns a refusal.
+            completed: { '100000002': true },
+            awarded: { '100000001': true },
+          },
+        },
+      },
+    );
+    assert.equal(goals[0]!.command, null);
+    assert.deepEqual(goals[1]!.command, completeGoal(100000002));
+  });
+
+  it('do not carry a claim for a goal with no valid numeric id', () => {
+    const goals = goalList(
+      bundle({
+        goals: [
+          { id: Number.NaN, title: 'No id', description: '', hint: '', reward: {} },
+          { id: Number.POSITIVE_INFINITY, title: 'No finite id', description: '', hint: '', reward: {} },
+        ],
+      }),
+      { maps: [], resources: {}, privateState: {} },
+    );
+    assert.equal(goals[0]!.command, null);
+    assert.equal(goals[1]!.command, null);
+  });
+
   it('are all unvisited when the server has no goal state', () => {
     const goals = goalList(
       bundle({
@@ -210,6 +278,7 @@ describe('the player\'s goals', () => {
     );
     assert.equal(goals[0]!.visited, false);
     assert.equal(goals[0]!.completed, false);
+    assert.deepEqual(goals[0]!.command, completeGoal(1));
   });
 });
 
@@ -276,16 +345,25 @@ describe('the unit panel', () => {
 });
 
 describe('the quest progress', () => {
-  it('is the map\'s own field', () => {
+  it('is the player\'s privateState.questsRank field', () => {
+    const ranks = questRanks({
+      maps: [{ id: 0, items: {} }],
+      resources: {},
+      privateState: { questsRank: { '1': 3, '2': 1 } },
+    });
+    assert.deepEqual(ranks, { 1: 3, 2: 1 });
+  });
+
+  it('does not read a map-level questsRank, which the server never writes', () => {
     const ranks = questRanks({
       maps: [{ id: 0, items: {}, questsRank: { '1': 3, '2': 1 } }],
       resources: {},
       privateState: {},
     });
-    assert.deepEqual(ranks, { 1: 3, 2: 1 });
+    assert.deepEqual(ranks, {});
   });
 
-  it('is empty when the map has no ranks', () => {
+  it('is empty when the server has no ranks', () => {
     assert.deepEqual(questRanks({ maps: [], resources: {}, privateState: {} }), {});
   });
 

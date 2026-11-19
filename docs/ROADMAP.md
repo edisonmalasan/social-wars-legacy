@@ -1246,7 +1246,7 @@ assault against the new server, and the cheat battery is fully rejected.
       chapters with the client's own titles and the model's slots — the quest the
       player is on is open, the ones they have not reached are locked, and the ones
       they have finished carry the rank they finished at. The ranks are the
-      **server's** (the map's own `questsRank` field, the way the original keeps them)
+      **server's** — the player's `privateState.questsRank`, the field the upstream writes —
       and the unlock levels are the content's
 - [x] The player can **build from the interface**: picking an entry in the build menu
       **begins a placement** — the locked entries cannot be picked, so the menu says
@@ -1374,7 +1374,13 @@ assault against the new server, and the cheat battery is fully rejected.
       of the gold or cash slot in the declared delta — never its amount — while the server
       still prices the purchase from content. A refused priced command now spends nothing,
       in both the legacy shim and the native endpoint
-- [ ] Alliances and the social features are functional, or visibly out of scope
+- [x] Alliances and the social features are **visibly out of scope for the web client**:
+      the server keeps and serves all 11 alliance variants, the 17 error codes, the auction
+      subsystem and the social store, but the client surfaces none of them — there is no
+      Facebook identity, no real-money settlement and no live third-party service. The
+      neighbour strip is the one social surface that remains. Recorded in
+      [ADR 20](./adr/0020-social-services-server-only.md), with the screen decisions
+      checked by `packages/client/src/screens.test.ts`
 - [x] The daily/weekly bonus cycles and premium expiry behave correctly across a **server
       restart** (`packages/server/src/restart.test.ts`). The server's state is
       **timestamps** - when the bonus was last claimed, when the premium runs out - and a
@@ -1598,7 +1604,7 @@ product.*
       is fine if nothing the browser loads reaches it, and the check says so. It follows the
       static imports, the re-exports and the **dynamic** imports, and it resolves the
       workspace's **subpath** exports - `@swl/server/apply` is the applier and not the
-      package's index, which is the whole point of the subpath. It reaches **127** modules
+      package's index, which is the whole point of the subpath. It reaches **128** modules
 - [x] **Every pull request runs the golden-master harness.** The CI runs on every push
       and every pull request, and the golden-master corpus is one of its steps - and
       the harness fails on any difference it cannot explain
@@ -2030,7 +2036,7 @@ next group. The per-group **Status:** lines state which items are outstanding.*
 | D | Asset Pipeline | 32 / 0 | Complete |
 | E | Rules Engine | 37 / 1 | In progress — differential test vs the Flash client |
 | F | Authoritative Server | 54 / 0 | Complete |
-| G | Modern Client | 69 / 12 | In progress — remaining platforms and feature parity |
+| G | Modern Client | 70 / 11 | In progress — remaining platforms and feature parity |
 | H | Desktop Shell & Release | 14 / 4 | In progress — installers, signing, auto-update |
 | I | Production Readiness | 99 / 10 | In progress — the first production release |
 
@@ -2057,6 +2063,59 @@ A ──► B ──► C ──► D ──┐
 
 ---
 
+## Externally Blocked Items
+
+*These items are still wanted. Each is open because it needs something this repository
+cannot supply — a live Flash session, a device, a certificate, a rights holder or a
+licensing decision. Recording the dependency is not the same as dropping the item: an item
+moves out of this table only when its unblock condition is met and the outcome is verified.
+**Non-goals** are different — they are deliberate exclusions, recorded here so they cannot
+be mistaken for unfinished work.*
+
+### Live captures and differential tests
+
+| Group | Item | Blocker | Unblock condition |
+|---|---|---|---|
+| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 131 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 131; the art gate applies to the drawn ones |
+| B | PvP `end_attack` payload captured live | Needs a live second player and the original Flash client driven over CDP | A Flash test rig with two live accounts |
+| B | `attack_player` / `spy_player` payloads captured live | Same as above | The same Flash test rig |
+| B | Premium purchase flow captured live | Needs a real-money account, which the preservation project must not use | A funded test account and explicit approval |
+| E | Golden-master harness diffs against the original Flash client | Needs the original client driven through the same 50 scenarios | The Flash test rig |
+
+### Art, platforms and release artefacts
+
+| Group | Item | Blocker | Unblock condition |
+|---|---|---|---|
+| G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout, or a licensing decision |
+| G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented | Licence or re-create the art (I6) |
+| G | Every B6 screen implemented or explicitly dropped | 131 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 131 |
+| G | Client runs in Firefox and Safari | Neither browser is installed here, and the harness speaks Chrome DevTools Protocol only | Install both browsers and use a harness that can drive them |
+| G | Desktop build runs on Windows, macOS and Linux | Only Windows is available; macOS/Linux need their own build hosts | CI runners for all three platforms |
+| G | Mobile build runs on Android and iOS | No Capacitor, Android SDK or Xcode on this machine | Install the Capacitor toolchain and SDKs |
+| G | Playable at the original resolutions and phone scales | The stage model exists; real-device verification does not | Test on the target devices |
+| G | Played on an actual phone with touch controls | No device here | A phone and touch-control implementation |
+| H | A player with no server cannot play | **Non-goal** — the product is pure online (ADR 19) | A reversal of ADR 19 |
+| H | Installers for Windows, macOS and Linux | The Tauri CLI is not installed; WiX and the other platforms' packagers are absent | Install the Tauri CLI and each platform's packager |
+| H | Code-signed binaries, notarised macOS build | No code-signing certificate or Apple developer account exists | Obtain the credentials |
+| H | Auto-update with clean rollback | Needs a release endpoint and a signed release stream | Release infrastructure |
+| I | A corrections request actually received and honoured | No rights holder has made a request; the policy and log exist | A real request through `docs/CORRECTIONS.md` |
+| I | Stable frame rate on the largest documented battle | Needs a real GPU and a large-battle fixture; a headless browser's frames are throttled | A GPU test host and the fixture |
+| I | Frame rate measured on a real GPU | Same as above | The same GPU test host |
+| I | First production release published and monitored | Blocked by the art licence gate and by every release artefact above | Clear the licence gate and the release checklist |
+| All deferred items | Facebook integration, the original PHP backend, missing builds/assets, 3D, clean-room art | Intentionally postponed; see *Deferred / Future Work* | A decision to take one on |
+
+### Unimplemented layers
+
+*Unlike the items above, these are gaps inside this repository, not external
+dependencies. They are recorded here so an open parity checkbox has a precise
+owner and a precise condition for closing it.*
+
+| Group | Item | Blocker | Unblock condition |
+|---|---|---|---|
+| G | Quests are functional (the G4 parity item) | The rules model (`packages/rules/src/quest.ts`, `finishQuest` / `awardQuest`) and the client request/model (`endQuest` / `collectMission` in `packages/client/src/requests.ts`, `questState` in `featurestate.ts`) exist, but the **server application layer is missing**: `end_quest` is refused as `not-implemented` and `collect_mission` falls through as `no-grant` in `packages/server/src/apply.ts`, and the legacy shim delegates to that same applier, so no quest is ever granted | Implement an authoritative quest applier in `packages/server/src/apply.ts` that resolves the win from the server's own state with `finishQuest` / `awardQuest`, prices the rewards from content, and is covered by tests; close the G4 checkbox when a real quest completion is verified end to end |
+
+---
+
 ## Roadmap Amendment Log
 
 *The Locked Decisions section is binding: changing it, closing a deferred item, or adding
@@ -2078,6 +2137,39 @@ reviewed without reconstructing the conversation that led to it.*
   started" while the body and `scripts/check-roadmap.mjs` showed most groups complete.
   Replaced with the measured done/open counts and a note explaining how they are derived,
   so the summary cannot silently drift from the checkboxes again
+- **2026-11-20 — externally blocked items recorded.** The remaining open items were
+  classified against the toolchain and the environment: live Flash captures, the Flash
+  differential test, the FX art licence, the missing browsers/devices/SDKs, the absent
+  code-signing credentials and Tauri CLI, and the unexercised corrections policy are all
+  explicitly external. Walls-and-turrets and no-server play are recorded as **non-goals**,
+  not unfinished work. *Rationale:* an open checkbox with no reason is ambiguous; a
+  recorded dependency is actionable by whoever can supply it. *Evidence:* the toolchain
+  and browser checks in PR #13's verification notes
+- **2026-11-20 — G4 feature-parity item dispositioned; left open on quests.**
+  Audited all six named sub-features against the definition used by the checked
+  magic item — rules model + server application + client request/model. Five
+  have all three: goals (`packages/rules/src/goals.ts` → `awardGoal`,
+  `completeGoalCommand` in `packages/server/src/apply.ts`, `completeGoal` in
+  `packages/client/src/requests.ts` and `goalState` in `apps/client/src/ui/state.ts`),
+  darts (`dartsboard.ts` → `shootDarts`, `dartsShootCommand` /
+  `dartsNewFreeCommand` / `dartsResetCommand`, `shootBalloon` / `claimFreeDarts` /
+  `resetDarts` and `dartsState`), the market (`market.ts` → `trade`,
+  `tradeResourceCommand` and `packages/server/src/marketplace.ts`, `tradeResource`
+  and `marketState`), premium (`premium.ts` → `premiumExpiry`,
+  `buyPremiumCommand`, `buyPremium` / `premiumUpgrade` and `premiumState`) and
+  the weekly bonus (`bonuses.ts` → `mondayBonusState` / `mondayBonusReward`,
+  `weeklyRewardCommand`, `claimWeeklyBonus` and `bonusState`).
+  **Quests have the rules model and the client request/model but no server
+  application**: `end_quest` is refused `not-implemented`, `collect_mission` is
+  unhandled in `apply.ts`, and the legacy shim delegates to that same applier, so
+  no quest reward is ever granted. *Rationale:* a functional claim needs all
+  three layers, and the neighbouring "first chapter is completable" items are
+  still open, so ticking G4 would misstate verified progress. *Evidence:*
+  `packages/server/src/apply.ts:415-420`, `apply.test.ts`'s "refuses a claimed
+  end_quest" test, `packages/server/src/shim.ts:460`, and the precise gap recorded
+  in *Externally Blocked Items*;
+  full gate green — `pnpm test` 1429 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
+  `check-roadmap.mjs` and `check-report-sync.mjs` all with 0 failures
 
 ---
 

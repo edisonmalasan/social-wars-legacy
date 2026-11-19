@@ -33,12 +33,12 @@ import {
   type PlayerStore,
 } from '@swl/server';
 import { PGlite } from '@electric-sql/pglite';
-import type { CostContent } from '@swl/rules';
+import type { CostContent, DartsGame } from '@swl/rules';
 
 import { createApp, type AppRequest } from './app.ts';
 import { DEFAULT_LIMITS } from './limits.ts';
 import { MemoryPlayerStore } from '@swl/server';
-import { contentItems, populationRules } from '@swl/server';
+import { contentItems, marketRules, populationRules } from '@swl/server';
 import { createApplier, initialWorld, tracedDatabase } from '@swl/server';
 
 /** The port to listen on. */
@@ -110,7 +110,7 @@ function migrationItems(bundle: {
 async function main(): Promise<void> {
   const bundle = JSON.parse(await readFile(CONTENT_PATH, 'utf8')) as Parameters<
     typeof costContentFrom
-  >[0];
+  >[0] & { dartsItems?: readonly DartsGame[] };
   const content = costContentFrom(bundle);
 
   const sessions = new SessionStore();
@@ -222,6 +222,9 @@ async function main(): Promise<void> {
       items: contentItems(bundle),
       offerPacks: content.offerPacks,
       populationRules: populationRules(globalsOf(bundle)),
+      // The darts schedule and the market prices are the content's own.
+      dartsItems: bundle.dartsItems,
+      market: marketRules(globalsOf(bundle)),
       // Magic and tech: the ten spells and the globals their economy reads.
       magic: {
         spells: magicCatalogFrom(Array.isArray(bundle.magics) ? bundle.magics : []),

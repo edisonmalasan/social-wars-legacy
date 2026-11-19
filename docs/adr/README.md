@@ -28,3 +28,4 @@ reasoning.
 | 17 | [The substitute fonts are scaled to the original's metrics](./0017-the-substitute-fonts-are-scaled.md) | accepted |
 | 18 | [The roadmap's item counts are checked](./0018-the-roadmaps-item-counts-are-checked.md) | accepted |
 | 19 | [The product is pure online](./0019-pure-online.md) | accepted |
+| 20 | [The social services are server-only, and out of scope for the web client](./0020-social-services-server-only.md) | accepted |

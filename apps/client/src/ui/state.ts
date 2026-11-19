@@ -18,11 +18,12 @@ import type {
   HudInput,
   HudRules,
   ItemPopulation,
+  NativeCommand,
   ResourcePanel,
   UnitPanel,
   WorldSnapshot,
 } from '@swl/client';
-import { resourcePanel, unitPanel } from '@swl/client';
+import { completeGoal, resourcePanel, unitPanel } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 import { QUEST_IDS } from '@swl/rules';
 
@@ -153,6 +154,15 @@ export interface GoalEntry {
   visited: boolean;
   /** Whether the goal is completed. */
   completed: boolean;
+  /**
+   * The claim a click on this goal sends, or null when there is none.
+   *
+   * Every drawn goal carries a claim, complete or not: the client asks and
+   * the server decides what its own goal state allows. Only an invalid id
+   * or a locally recorded award suppresses it, because re-claiming a paid
+   * goal would only earn a refusal.
+   */
+  command: NativeCommand | null;
 }
 
 /** A record, or null. */
@@ -174,24 +184,35 @@ export function goalList(bundle: ContentBundle, world: WorldSnapshot): GoalEntry
   const state = recordOrNull(world.privateState?.['goalState']);
   const visited = recordOrNull(state?.['visited']);
   const completed = recordOrNull(state?.['completed']);
-  return (bundle.goals ?? []).map((goal, index) => ({
-    index,
-    id: goal.id,
-    title: goal.title,
-    visited: visited?.[String(goal.id)] === true,
-    completed: completed?.[String(goal.id)] === true,
-  }));
+  const awarded = recordOrNull(state?.['awarded']);
+  return (bundle.goals ?? []).map((goal, index) => {
+    const done = completed?.[String(goal.id)] === true;
+    // The server owns completion (awardGoal reads its own progress), so
+    // the client must send the claim for an incomplete goal too — that is
+    // the gesture the panel draws. Only a goal it cannot name, or one it
+    // has already been paid for, has nothing worth sending.
+    const canClaim =
+      Number.isFinite(goal.id) && awarded?.[String(goal.id)] !== true;
+    return {
+      index,
+      id: goal.id,
+      title: goal.title,
+      visited: visited?.[String(goal.id)] === true,
+      completed: done,
+      command: canClaim ? completeGoal(goal.id) : null,
+    };
+  });
 }
 
 /**
  * The player's quest ranks.
  *
- * The ranks are the **server's** — they are the map's own field, the
- * way the original keeps them — and they are keyed by the quest's
+ * The ranks are the **server's** — the player's `privateState.questsRank`,
+ * the field the upstream writes — and they are keyed by the quest's
  * index, which is its position in the quest list.
  */
 export function questRanks(world: WorldSnapshot): Record<number, number> {
-  const ranks = world.maps[0]?.questsRank;
+  const ranks = world.privateState['questsRank'];
   if (typeof ranks !== 'object' || ranks === null) return {};
   const out: Record<number, number> = {};
   for (const [index, rank] of Object.entries(ranks)) {

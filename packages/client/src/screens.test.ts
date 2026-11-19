@@ -100,6 +100,36 @@ describe('the screen inventory', () => {
       assert.equal(screen.decision, 'dropped', `${screen.path} is not dropped`);
     }
   });
+
+  it('records the social screens as out of scope for the client', async () => {
+    // The server keeps and serves the alliance and auction services, but
+    // the web client does not surface them (ADR 20). A server model is not
+    // a client screen: these are dropped with a reason, or still planned.
+    const all = await screens();
+    const social = all.filter(
+      (screen) =>
+        screen.path.startsWith('popups/alliances/') ||
+        screen.path.startsWith('popups/marketplace/') ||
+        screen.path === 'PopupAlliancesCenterAsset.as',
+    );
+    assert.ok(social.length > 0, 'there are no social screens in the inventory');
+    assert.ok(
+      social.some((screen) => screen.decision === 'dropped'),
+      'none of the social screens is visibly out of scope',
+    );
+    for (const screen of social) {
+      assert.ok(
+        ['dropped', 'planned'].includes(screen.decision),
+        `${screen.path} is ${screen.decision}, not dropped or planned`,
+      );
+      if (screen.decision === 'dropped') {
+        assert.ok(
+          screen.decisionNote.startsWith('Dropped: '),
+          `${screen.path} is dropped without a reason`,
+        );
+      }
+    }
+  });
 });
 
 describe('the screens the clone has modelled', () => {

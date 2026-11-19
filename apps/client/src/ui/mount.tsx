@@ -7,7 +7,7 @@
  * map are one answer, drawn twice.
  */
 import { createRoot } from 'react-dom/client';
-import type { Neighbour, WorldSnapshot } from '@swl/client';
+import type { NativeCommand, Neighbour, WorldSnapshot } from '@swl/client';
 import type { ContentBundle } from '@swl/content';
 
 import { Root } from './root.tsx';
@@ -31,6 +31,7 @@ export function mountUi(
   bundle: ContentBundle,
   onPick?: (itemId: number) => void,
   onCollect?: () => void,
+  onCommand?: (command: NativeCommand) => void,
 ): UiHandle {
   const root = createRoot(element);
   return {
@@ -45,6 +46,7 @@ export function mountUi(
           tutorial={tutorial}
           onPick={onPick}
           onCollect={onCollect}
+          onCommand={onCommand}
         />,
       ),
   };

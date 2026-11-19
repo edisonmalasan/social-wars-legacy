@@ -240,6 +240,75 @@ export function useMagic(spellId: number): NativeCommand {
   return command('use_magic', [spellId]);
 }
 
+/** Claim the free darts shot of the day. */
+export function claimFreeDarts(): NativeCommand {
+  return command('darts_new_free', []);
+}
+
+/** Start a fresh darts board from the server's seed. */
+export function resetDarts(seed: number): NativeCommand {
+  return command('darts_reset', [seed]);
+}
+
+/**
+ * Shoot one balloon.
+ *
+ * The only claim is whether the EXTRA prize was found. Whether the shot was
+ * free is the server's decision, and the client names no prize of its own.
+ */
+export function shootBalloon(targetIndex: number, wonExtra: boolean): NativeCommand {
+  return command('darts_shoot_balloon', [targetIndex, wonExtra ? 1 : 0]);
+}
+
+/** Buy an offer pack, naming the pack and the chosen item ids. The price is the server's. */
+export function buyOfferPack(packId: number, itemIds: readonly number[]): NativeCommand {
+  return command('buy_offer_pack', [packId, JSON.stringify(itemIds)]);
+}
+
+/** Buy a premium package by its index in the content's `PREMIUM_ACCOUNTS`. */
+export function buyPremium(packageIndex: number): NativeCommand {
+  return command('buy_premium_account', [packageIndex]);
+}
+
+/**
+ * Replace a building with its upgraded version.
+ *
+ * Argument 0 is the OLD iso id and argument 1 the NEW one, as the table says;
+ * the clicks and the price are the server's to check.
+ */
+export function premiumUpgrade(
+  oldIsoId: number,
+  newIsoId: number,
+  newItemId: number,
+  clicksToBuild: number,
+): NativeCommand {
+  return command('premium_upgrade', [oldIsoId, newIsoId, newItemId, clicksToBuild]);
+}
+
+/** Finish a chapter. The argument is the NEXT chapter id, not the one just finished. */
+export function collectMission(nextChapterId: number): NativeCommand {
+  return command('collect_mission', [nextChapterId]);
+}
+
+/**
+ * Buy a resource pack.
+ *
+ * The client names the resource, the amount and the payment resource; it
+ * never names a price, which the server derives from the content bundle.
+ */
+export function buyResources(
+  resource: 'g' | 'w' | 'o' | 's',
+  amount: number,
+  payment: 'c' | 'g',
+): NativeCommand {
+  return command('buy_resources', [resource, amount, payment]);
+}
+
+/** Exchange cash for gold. The rate is the server's; the client claims no amount. */
+export function exchangeCash(): NativeCommand {
+  return command('exchange_cash', []);
+}
+
 /**
  * The commands the client sends, and the ones it must never send.
  *

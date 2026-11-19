@@ -12,6 +12,7 @@
 import { useState } from 'react';
 
 import {
+  type NativeCommand,
   CLICK_HERE_LABEL,
   MARKER_SLOTS,
   activeGoals,
@@ -28,6 +29,8 @@ export interface GoalsProps {
   tutorialMode?: boolean;
   /** Whether the first badge has been clicked. */
   firstMarkerClicked?: boolean;
+  /** Send a goal's claim through the client's command transport. */
+  onCommand?: (command: NativeCommand) => void;
 }
 
 /**
@@ -41,6 +44,7 @@ export function Goals({
   goals,
   tutorialMode = false,
   firstMarkerClicked = false,
+  onCommand,
 }: GoalsProps): React.JSX.Element {
   const [clicked, setClicked] = useState(firstMarkerClicked);
   const active = activeGoals(goals, 0, MARKER_SLOTS);
@@ -49,6 +53,9 @@ export function Goals({
     firstMarkerClicked: clicked,
   });
   const titles = new Map(goals.map((goal) => [goal.index, goal.title]));
+  // activeGoals() draws the same entries, narrowed to the model's shape,
+  // so the claim each slot sends is looked up by the entry's index.
+  const commands = new Map(goals.map((goal) => [goal.index, goal.command]));
 
   return (
     <div className="swl-goals">
@@ -63,6 +70,10 @@ export function Goals({
                   type="button"
                   className="swl-goal-title"
                   onClick={() => {
+                    // Every drawn goal carries a claim; the server checks
+                    // its own progress and decides what a claim grants.
+                    const command = commands.get(goal.index);
+                    if (command) onCommand?.(command);
                     // The client's quirk: the first badge suppresses
                     // all three, the others suppress only their own.
                     if (badge) setClicked(true);

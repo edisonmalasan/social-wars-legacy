@@ -333,10 +333,11 @@ export function computeCommandCost(
     }
 
     case 'darts_shoot_balloon': {
-      // The shot is free once a day; the client sends the delta, but the
-      // server charges the cash itself when the shot was not free.
-      const cost = Number(content.globals['DART_COST_CASH'] ?? 20);
-      return { cost: { c: cost }, gain: {} };
+      // The first shot of the day is free, and only the applier knows whether
+      // a given shot is that one. Charging here would make the affordability
+      // gate refuse a cashless player before the applier can see `shot.free`,
+      // so the shot is unpriced here and the applier charges the paid ones.
+      return NO_COST;
     }
 
     case 'expand': {
@@ -357,6 +358,10 @@ export function computeCommandCost(
       const resource = String(args[0] ?? '');
       const base = content.marketBaseCosts[resource];
       if (base === undefined) return null;
+      // A sell pays the player; it must not require gold up front, or the
+      // affordability gate would refuse a player with an empty wallet before
+      // the applier can grant the sell price.
+      if (Number(args[1]) === 1) return NO_COST;
       return { cost: { g: base }, gain: {} };
     }
 

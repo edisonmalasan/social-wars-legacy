@@ -146,10 +146,25 @@ describe('computing a cost', () => {
     assert.equal(cost?.cost['c'], 800);
   });
 
-  it('prices a paid darts shot', async () => {
+  it('leaves a darts shot unpriced for the applier to charge', async () => {
     const c = await content();
+    // The first shot of the day is free. The applier knows whether a shot is
+    // free, so the cost table must not put a cash charge in front of it.
     const cost = computeCommandCost(c, 'darts_shoot_balloon', [3, 0]);
-    assert.deepEqual(cost?.cost, { c: 20 });
+    assert.deepEqual(cost?.cost, {});
+    assert.deepEqual(cost?.gain, {});
+  });
+
+  it('does not charge gold up front for a market sell', async () => {
+    const c = await content();
+    assert.deepEqual(computeCommandCost(c, 'trade_resource', ['w', 0, 100]), {
+      cost: { g: 100 },
+      gain: {},
+    });
+    assert.deepEqual(computeCommandCost(c, 'trade_resource', ['w', 1, 100]), {
+      cost: {},
+      gain: {},
+    });
   });
 
   it('prices an expansion from the price table, not from the argument', async () => {
