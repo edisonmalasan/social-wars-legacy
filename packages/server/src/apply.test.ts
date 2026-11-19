@@ -1860,3 +1860,245 @@ describe('the trade applier', () => {
     assert.equal(outcome.world.resources['g'], 1000 - 100);
   });
 });
+
+/** The content's REWARDS_CHAPTERS global, which the server pays from. */
+const CHAPTER_REWARDS = {
+  1: { g: 250, w: 200 },
+  2: { g: 500, o: 400 },
+  99: { g: 3000, s: 2400 },
+};
+
+const chapterDeps = (over: Partial<ApplierDeps> = {}): ApplierDeps =>
+  deps({ chapterRewards: CHAPTER_REWARDS, ...over });
+
+/** A player's own map with a chapter status in `currentQuestVars`. */
+function chapterWorld(
+  vars: Record<string, unknown> = {},
+  over: {
+    resources?: ShimWorld['resources'];
+    privateState?: Record<string, unknown>;
+  } = {},
+): ShimWorld {
+  return {
+    save: {
+      playerInfo: {},
+      maps: [
+        {
+          id: 0,
+          idCurrentMission: 1,
+          timestampLastChapter: 0,
+          currentQuestVars: { ...vars },
+        },
+      ],
+      privateState: { ...(over.privateState ?? {}) },
+    },
+    resources: over.resources ?? purse({}),
+    nextCommandNumber: 1,
+  };
+}
+
+const chapterVars = (world: ShimWorld): Record<string, unknown> =>
+  world.save.maps[0]!['currentQuestVars'] as Record<string, unknown>;
+
+describe('set_quest_var', () => {
+  it('refuses a key outside the chapter-status whitelist', () => {
+    const applier = createApplier(chapterDeps());
+    const world = chapterWorld({ id: 1 });
+    const outcome = applier(world, {
+      name: 'set_quest_var',
+      args: ['hacked', JSON.stringify(1)],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'unknown-quest-var');
+    assert.deepEqual(chapterVars(outcome.world), { id: 1 });
+    assert.equal(outcome.world.save.maps[0]!['idCurrentMission'], 1);
+  });
+
+  it('refuses malformed value shapes without touching the saved state', () => {
+    const applier = createApplier(chapterDeps());
+    const badValues: [string, unknown][] = [
+      ['spawned', 1],
+      ['ended', 'true'],
+      ['visited', {}],
+      ['activators', [1, 'x']],
+      ['boss', {}],
+      ['treasure', [null]],
+      ['killed', [1, 2]],
+      ['id', 1.5],
+    ];
+    for (const [key, value] of badValues) {
+      const world = chapterWorld({ id: 1, spawned: true });
+      const outcome = applier(world, {
+        name: 'set_quest_var',
+        args: [key, JSON.stringify(value)],
+      });
+      assert.equal(outcome.applied, false, key);
+      assert.equal(outcome.refused, 'bad-quest-var-value', key);
+      assert.deepEqual(chapterVars(outcome.world), { id: 1, spawned: true }, key);
+      assert.equal(outcome.world.save.maps[0]!['idCurrentMission'], 1, key);
+    }
+  });
+
+  it('ignores idSimpleChapter as the upstream does', () => {
+    const applier = createApplier(chapterDeps());
+    const outcome = applier(chapterWorld({ id: 1 }), {
+      name: 'set_quest_var',
+      args: ['idSimpleChapter', JSON.stringify(12)],
+    });
+    assert.equal(outcome.applied, true);
+    assert.deepEqual(chapterVars(outcome.world), { id: 1 });
+    assert.equal(outcome.world.save.maps[0]!['idCurrentMission'], 1);
+  });
+
+  it('mirrors an id write into the map current mission', () => {
+    const applier = createApplier(chapterDeps());
+    const outcome = applier(chapterWorld({ id: 1 }), {
+      name: 'set_quest_var',
+      args: ['id', JSON.stringify(4)],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(chapterVars(outcome.world)['id'], 4);
+    assert.equal(outcome.world.save.maps[0]!['idCurrentMission'], 4);
+  });
+
+  it('refuses ended without a spawned chapter', () => {
+    const applier = createApplier(chapterDeps());
+    const outcome = applier(chapterWorld({ id: 1 }), {
+      name: 'set_quest_var',
+      args: ['ended', 'true'],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'chapter-not-spawned');
+    assert.deepEqual(chapterVars(outcome.world), { id: 1 });
+  });
+
+  it('stores a valid write in currentQuestVars', () => {
+    const applier = createApplier(chapterDeps());
+    const spawned = applier(chapterWorld({ id: 1 }), {
+      name: 'set_quest_var',
+      args: ['spawned', 'true'],
+    });
+    assert.equal(spawned.applied, true);
+    assert.equal(chapterVars(spawned.world)['spawned'], true);
+    const killed = applier(spawned.world, {
+      name: 'set_quest_var',
+      args: ['killed', JSON.stringify(['e1', 't2'])],
+    });
+    assert.equal(killed.applied, true);
+    assert.deepEqual(chapterVars(killed.world)['killed'], ['e1', 't2']);
+    const ended = applier(killed.world, { name: 'set_quest_var', args: ['ended', 'true'] });
+    assert.equal(ended.applied, true);
+    assert.equal(chapterVars(ended.world)['ended'], true);
+  });
+});
+
+describe('collect_mission', () => {
+  const endedChapter = (id = 1): ShimWorld =>
+    chapterWorld({ id, spawned: true, ended: true }, { resources: purse({ g: 100, w: 50 }) });
+
+  it('refuses a chapter that has not ended, spending nothing', () => {
+    const applier = createApplier(chapterDeps());
+    const world = chapterWorld(
+      { id: 1, spawned: true, ended: false },
+      { resources: purse({ g: 100, w: 50 }) },
+    );
+    const outcome = applier(world, { name: 'collect_mission', args: [2] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'chapter-not-ended');
+    assert.deepEqual(outcome.world.resources, world.resources);
+    assert.equal(outcome.world.save.maps[0]!['idCurrentMission'], 1);
+    assert.equal(outcome.world.save.maps[0]!['timestampLastChapter'], 0);
+    assert.deepEqual(chapterVars(outcome.world), { id: 1, spawned: true, ended: false });
+  });
+
+  it('refuses a chapter that was never spawned', () => {
+    const applier = createApplier(chapterDeps());
+    const world = chapterWorld({ id: 1, ended: true });
+    const outcome = applier(world, { name: 'collect_mission', args: [2] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'chapter-not-spawned');
+    assert.deepEqual(outcome.world.resources, world.resources);
+    assert.deepEqual(chapterVars(outcome.world), { id: 1, ended: true });
+  });
+
+  it('grants exactly the content reward and advances the chapter', () => {
+    const applier = createApplier(chapterDeps());
+    const outcome = applier(endedChapter(), { name: 'collect_mission', args: [2] });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 350);
+    assert.equal(outcome.world.resources['w'], 250);
+    assert.equal(outcome.world.resources['o'], 0);
+    const map = outcome.world.save.maps[0]!;
+    assert.equal(map['idCurrentMission'], '2');
+    assert.equal(map['timestampLastChapter'], NOW);
+    assert.deepEqual(map['currentQuestVars'], {});
+    const awards = outcome.world.save.privateState['chapterAwards'] as
+      | Record<string, number>
+      | undefined;
+    assert.equal(awards?.['1'], NOW);
+  });
+
+  it('wraps a next chapter above 99 back to 1', () => {
+    const applier = createApplier(chapterDeps());
+    const outcome = applier(endedChapter(99), { name: 'collect_mission', args: [100] });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.save.maps[0]!['idCurrentMission'], '1');
+    assert.equal(outcome.world.resources['g'], 3100);
+  });
+
+  it('pays nothing on a replay, even after the vars are rewritten', () => {
+    const applier = createApplier(chapterDeps());
+    const first = applier(endedChapter(), { name: 'collect_mission', args: [2] });
+    assert.equal(first.applied, true);
+    const replayWorld = chapterWorld(
+      { id: 1, spawned: true, ended: true },
+      { resources: first.world.resources, privateState: first.world.save.privateState },
+    );
+    const second = applier(replayWorld, { name: 'collect_mission', args: [2] });
+    assert.equal(second.applied, false);
+    assert.equal(second.refused, 'already-awarded');
+    assert.deepEqual(second.world.resources, first.world.resources);
+  });
+
+  it('ignores a client reward delta', () => {
+    const applier = createApplier(chapterDeps());
+    const outcome = applier(endedChapter(), {
+      name: 'collect_mission',
+      args: [2, { g: 1_000_000, w: 1_000_000, o: 1_000_000 }],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 350);
+    assert.equal(outcome.world.resources['w'], 250);
+    assert.equal(outcome.world.resources['o'], 0);
+  });
+
+  it('refuses a chapter with no content reward', () => {
+    const applier = createApplier(chapterDeps());
+    const world = endedChapter(500);
+    const outcome = applier(world, { name: 'collect_mission', args: [501] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-chapter-reward');
+    assert.deepEqual(outcome.world.resources, world.resources);
+    assert.deepEqual(chapterVars(outcome.world), { id: 500, spawned: true, ended: true });
+  });
+});
+
+describe('admin_set_quest_rank', () => {
+  it('is accepted for the client flow but never overwrites the server ranks', () => {
+    const applier = createApplier(chapterDeps());
+    const world = chapterWorld({}, { privateState: { questsRank: { '7': 2 } } });
+    const outcome = applier(world, { name: 'admin_set_quest_rank', args: ['7', '3'] });
+    assert.equal(outcome.applied, true);
+    assert.deepEqual(outcome.world.save.privateState['questsRank'], { '7': 2 });
+    assert.deepEqual(outcome.world.resources, world.resources);
+    assert.deepEqual(outcome.world.save.privateState['chapterAwards'], undefined);
+  });
+
+  it('does not create a rank when none is stored', () => {
+    const applier = createApplier(chapterDeps());
+    const world = chapterWorld();
+    const outcome = applier(world, { name: 'admin_set_quest_rank', args: ['7', '3'] });
+    assert.equal(outcome.applied, true);
+    assert.equal('questsRank' in outcome.world.save.privateState, false);
+  });
+});
