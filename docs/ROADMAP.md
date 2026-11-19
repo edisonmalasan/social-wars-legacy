@@ -2104,6 +2104,16 @@ be mistaken for unfinished work.*
 | I | First production release published and monitored | Blocked by the art licence gate and by every release artefact above | Clear the licence gate and the release checklist |
 | All deferred items | Facebook integration, the original PHP backend, missing builds/assets, 3D, clean-room art | Intentionally postponed; see *Deferred / Future Work* | A decision to take one on |
 
+### Unimplemented layers
+
+*Unlike the items above, these are gaps inside this repository, not external
+dependencies. They are recorded here so an open parity checkbox has a precise
+owner and a precise condition for closing it.*
+
+| Group | Item | Blocker | Unblock condition |
+|---|---|---|---|
+| G | Quests are functional (the G4 parity item) | The rules model (`packages/rules/src/quest.ts`, `finishQuest` / `awardQuest`) and the client request/model (`endQuest` / `collectMission` in `packages/client/src/requests.ts`, `questState` in `featurestate.ts`) exist, but the **server application layer is missing**: `end_quest` is refused as `not-implemented` and `collect_mission` falls through as `no-grant` in `packages/server/src/apply.ts`, and the legacy shim delegates to that same applier, so no quest is ever granted | Implement an authoritative quest applier in `packages/server/src/apply.ts` that resolves the win from the server's own state with `finishQuest` / `awardQuest`, prices the rewards from content, and is covered by tests; close the G4 checkbox when a real quest completion is verified end to end |
+
 ---
 
 ## Roadmap Amendment Log
@@ -2135,6 +2145,31 @@ reviewed without reconstructing the conversation that led to it.*
   not unfinished work. *Rationale:* an open checkbox with no reason is ambiguous; a
   recorded dependency is actionable by whoever can supply it. *Evidence:* the toolchain
   and browser checks in PR #13's verification notes
+- **2026-11-20 — G4 feature-parity item dispositioned; left open on quests.**
+  Audited all six named sub-features against the definition used by the checked
+  magic item — rules model + server application + client request/model. Five
+  have all three: goals (`packages/rules/src/goals.ts` → `awardGoal`,
+  `completeGoalCommand` in `packages/server/src/apply.ts`, `completeGoal` in
+  `packages/client/src/requests.ts` and `goalState` in `apps/client/src/ui/state.ts`),
+  darts (`dartsboard.ts` → `shootDarts`, `dartsShootCommand` /
+  `dartsNewFreeCommand` / `dartsResetCommand`, `shootBalloon` / `claimFreeDarts` /
+  `resetDarts` and `dartsState`), the market (`market.ts` → `trade`,
+  `tradeResourceCommand` and `packages/server/src/marketplace.ts`, `tradeResource`
+  and `marketState`), premium (`premium.ts` → `premiumExpiry`,
+  `buyPremiumCommand`, `buyPremium` / `premiumUpgrade` and `premiumState`) and
+  the weekly bonus (`bonuses.ts` → `mondayBonusState` / `mondayBonusReward`,
+  `weeklyRewardCommand`, `claimWeeklyBonus` and `bonusState`).
+  **Quests have the rules model and the client request/model but no server
+  application**: `end_quest` is refused `not-implemented`, `collect_mission` is
+  unhandled in `apply.ts`, and the legacy shim delegates to that same applier, so
+  no quest reward is ever granted. *Rationale:* a functional claim needs all
+  three layers, and the neighbouring "first chapter is completable" items are
+  still open, so ticking G4 would misstate verified progress. *Evidence:*
+  `packages/server/src/apply.ts:415-420`, `apply.test.ts`'s "refuses a claimed
+  end_quest" test, `packages/server/src/shim.ts:460`, the six-row layer audit in
+  the task-5 report, and the precise gap recorded in *Externally Blocked Items*;
+  full gate green — `pnpm test` 1429 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
+  `check-roadmap.mjs` and `check-report-sync.mjs` all with 0 failures
 
 ---
 
