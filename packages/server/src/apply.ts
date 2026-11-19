@@ -34,6 +34,9 @@
  */
 import { Random, hashSeed, weeksBetween } from '@swl/rules';
 import {
+  type QuestElement,
+  type QuestSpec,
+  type QuestState,
   NUM_PRIZES,
   DART_COST_CASH,
   allDiscovered,
@@ -66,6 +69,16 @@ import {
   collect as collectProduction,
   awardQuest,
   emptyQuestProgress,
+  getQuestSpec,
+  prepareQuest,
+  startQuest,
+  loadQuestMap,
+  killQuestElement,
+  isQuestVictory,
+  finishQuest,
+  applyQuestVar,
+  readChapterStatus,
+  QUEST_VAR_KEYS,
   applyCommandCost,
   assaultLoot,
   canPlaceBuilding,
@@ -166,6 +179,16 @@ export const DEFAULT_COLLECT_PERIOD = 2;
 export const GOAL_STATE_KEY = 'goalState';
 /** The private-state key the quest progress uses. */
 export const QUEST_PROGRESS_KEY = 'questProgress';
+/**
+ * The private-state key holding the server-owned assault-quest state.
+ *
+ * The value is a JSON-safe `QuestState`: a first kill may leave only a
+ * `{ questId }` seed, and the first validated kill grows it into the full
+ * state derived from the quest spec's roster.
+ */
+export const ACTIVE_QUEST_KEY = 'activeQuest';
+/** The private-state log of the chapters whose reward has been paid. */
+export const CHAPTER_AWARDS_KEY = 'chapterAwards';
 /** The private-state counter that keeps two offer-pack rolls distinct. */
 export const OFFER_PACK_ROLLS_KEY = 'offerPackRolls';
 
@@ -225,6 +248,12 @@ export interface ApplierItem {
   buildingLimitSameScf: number;
   /** The sub-category, for the per-sub-category limit. */
   subcategoryId: number;
+  /**
+   * The item's `subcat_functional`; 221 is a wall.
+   *
+   * The quest roster uses it to decide whether a kill earns the minimum XP.
+   */
+  subcatFunctional?: number;
   /** The footprint, in tiles. */
   width: number;
   height: number;
@@ -270,6 +299,20 @@ export interface ApplierDeps {
   dartsItems?: readonly DartsGame[];
   /** The market rules, for `trade_resource`. */
   market?: MarketRules;
+  /**
+   * The content's `REWARDS_CHAPTERS` global, for `collect_mission`.
+   *
+   * The shipped content stores it as an array indexed by chapter id; a plain
+   * object keyed by chapter id is accepted too. It is read defensively — a
+   * missing or malformed table grants nothing.
+   */
+  chapterRewards?: unknown;
+  /**
+   * The content global used as the XP context for a quest's static reward
+   * row (`finishQuest` caps the gold row's extra XP at a third of this).
+   * The safe default is 100; the running server passes the content value.
+   */
+  questExpRequired?: number;
   /** The population rules, for the population check. */
   populationRules?: {
     startMaxPopulation: number;
@@ -410,14 +453,20 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return dartsResetCommand(world, command.args, deps);
       case 'trade_resource':
         return tradeResourceCommand(world, command.args, deps);
+      case 'set_quest_var':
+        return setQuestVarCommand(world, command.args, deps);
+      case 'collect_mission':
+        return collectMissionCommand(world, command.args, deps);
+      case 'admin_set_quest_rank':
+        // Accepted so the client's flow does not stall, but it never writes
+        // the server's ranks: those come only from awardQuest.
+        return adminSetQuestRankCommand(world, command.args);
       case 'end_attack':
         return endAttackCommand(world, command.args, deps);
+      // `system_reset_quest` has no case: like every other unhandled command,
+      // it falls through to `no-grant` and changes nothing.
       case 'end_quest':
-        // The client may claim a win. The server does not listen: these are
-        // resolved from the server's own state by the battle and quest
-        // simulators, which are not wired yet. Until they are, the claim is
-        // refused rather than honoured.
-        return { applied: false, refused: 'not-implemented', world };
+        return endQuestCommand(world, command.args, deps);
       default:
         return { applied: false, refused: 'no-grant', world };
     }
@@ -1933,5 +1982,443 @@ function tradeResourceCommand(
   traded[resource] = (Number.isFinite(previous) ? previous : 0) + amount;
   map['resourcesTraded'] = traded;
 
+  return { applied: true, world };
+}
+
+// ---------------------------------------------------------------------------
+// Chapter quests — the state machine on the player's own map
+// ---------------------------------------------------------------------------
+
+/** The resource keys a chapter reward row may pay. */
+const CHAPTER_REWARD_KEYS = new Set(['g', 'w', 'o', 's', 'c', 'e', 'x', 'm']);
+
+/** The chapter status on the player's own map. */
+function currentQuestVars(map: Record<string, unknown> | undefined): Record<string, unknown> {
+  const raw = map?.['currentQuestVars'];
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
+  return raw as Record<string, unknown>;
+}
+
+/** The chapters whose reward has already been paid. */
+function chapterAwards(privateState: Record<string, unknown>): Record<string, unknown> {
+  const raw = privateState[CHAPTER_AWARDS_KEY];
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
+  return raw as Record<string, unknown>;
+}
+
+/**
+ * Decode the client's quest-variable value.
+ *
+ * `CmdSetQuestVar` puts `JSON.stringify(value)` in `args[1]`, but a few legacy
+ * captures carry a raw string, so an unparseable string is left as-is and the
+ * shape check decides whether it is acceptable.
+ */
+function questVarValue(raw: unknown): unknown {
+  if (typeof raw !== 'string') return raw;
+  try {
+    return JSON.parse(raw) as unknown;
+  } catch {
+    return raw;
+  }
+}
+
+/** The shape each whitelisted chapter key must have. */
+function validQuestVar(key: string, value: unknown): boolean {
+  const numericArray = (candidate: unknown): boolean =>
+    Array.isArray(candidate) &&
+    candidate.every((entry) => typeof entry === 'number' && Number.isFinite(entry));
+  const stringArray = (candidate: unknown): boolean =>
+    Array.isArray(candidate) && candidate.every((entry) => typeof entry === 'string');
+
+  switch (key) {
+    case 'spawned':
+    case 'ended':
+    case 'visited':
+      return typeof value === 'boolean';
+    case 'activators':
+    case 'boss':
+    case 'treasure':
+      return numericArray(value);
+    case 'killed':
+      return stringArray(value);
+    case 'id':
+      return typeof value === 'number' && Number.isInteger(value);
+    default:
+      // The remaining whitelisted keys (`translation`, `playerLevel`,
+      // `startTile`, `idSimpleChapter`) are read defensively by
+      // `readChapterStatus`, which ignores anything malformed.
+      return true;
+  }
+}
+
+/**
+ * `set_quest_var` - one validated write into the chapter status machine.
+ *
+ * The upstream server writes whatever the client sends, including `ended`
+ * and `idSimpleChapter` (`upstream/socialwarriors/command.py:87-117`). The
+ * whitelist and the value shapes come from the rules package, `idSimpleChapter`
+ * is ignored as upstream ignores it, and an `ended` write is only honoured
+ * once the chapter has actually been spawned.
+ */
+function setQuestVarCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const key = String(args[0] ?? '');
+  if (!QUEST_VAR_KEYS.includes(key)) {
+    return { applied: false, refused: 'unknown-quest-var', world };
+  }
+  const value = questVarValue(args[1]);
+  if (!validQuestVar(key, value)) {
+    return { applied: false, refused: 'bad-quest-var-value', world };
+  }
+
+  const map = ownMap(world);
+  if (!map) return { applied: false, refused: 'no-map', world };
+  const vars = currentQuestVars(map);
+  if (key === 'ended' && value === true && vars['spawned'] !== true) {
+    return { applied: false, refused: 'chapter-not-spawned', world };
+  }
+
+  // A `killed` write also advances the server's assault-quest state. The
+  // quest id is an identifier, never a win: it comes from the stored seed or
+  // from an optional third argument. Every ref is checked against the
+  // server's roster before anything is written, so a malformed ref is
+  // refused with the wallet and the whole save untouched.
+  let advanced: QuestState | undefined;
+  if (key === 'killed' && Array.isArray(value)) {
+    const stored = readActiveQuest(world.save.privateState);
+    const named = args[2];
+    const questId =
+      typeof named === 'string' || typeof named === 'number' ? String(named) : stored?.questId;
+    if (questId !== undefined) {
+      if (stored && stored.questId !== questId) {
+        return { applied: false, refused: 'quest-mismatch', world };
+      }
+      const spec = getQuestSpec(questId);
+      if (!spec) return { applied: false, refused: 'unknown-quest', world };
+      const ensured = ensureActiveQuest(world, questId, deps);
+      if (!ensured.ok) return { applied: false, refused: ensured.reason, world };
+      const kills = applyQuestKills(ensured.state, value as string[], spec, deps);
+      if (!kills.ok) return { applied: false, refused: kills.reason, world };
+      advanced = kills.state;
+    }
+  }
+
+  const applied = applyQuestVar(vars, key, value);
+  if (applied.rejected) {
+    return { applied: false, refused: 'unknown-quest-var', world };
+  }
+  // An ignored write (idSimpleChapter) is accepted as a no-op, so the client
+  // can keep replaying the endless chapter past 99.
+  map['currentQuestVars'] = { ...applied.vars };
+  if (applied.currentMissionId !== undefined) {
+    map['idCurrentMission'] = applied.currentMissionId;
+  }
+  if (advanced) world.save.privateState[ACTIVE_QUEST_KEY] = advanced;
+  return { applied: true, world };
+}
+
+/** Read one chapter's reward row out of the content's REWARDS_CHAPTERS. */
+function chapterRewardFor(table: unknown, id: number): Record<string, number> | null {
+  let row: unknown;
+  if (Array.isArray(table)) {
+    row = table[id];
+  } else if (table && typeof table === 'object') {
+    row = (table as Record<string, unknown>)[String(id)];
+  } else {
+    return null;
+  }
+  if (!row || typeof row !== 'object' || Array.isArray(row)) return null;
+
+  const reward: Record<string, number> = {};
+  for (const [key, value] of Object.entries(row)) {
+    if (!CHAPTER_REWARD_KEYS.has(key)) continue;
+    if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) continue;
+    reward[key] = value;
+  }
+  return Object.keys(reward).length > 0 ? reward : null;
+}
+
+/**
+ * `collect_mission` - finish the chapter whose status says it ended.
+ *
+ * The client sends only the NEXT chapter id (and, in the legacy dialect, a
+ * reward delta it computed). The completed chapter and its payment come from
+ * the server's own status and content; the delta is never read. The award log
+ * makes the payment once-only even if the client rewrites `ended` later.
+ */
+function collectMissionCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const next = Number(args[0]);
+  if (!Number.isInteger(next) || next < 1) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+  const map = ownMap(world);
+  if (!map) return { applied: false, refused: 'no-map', world };
+
+  const status = readChapterStatus(currentQuestVars(map));
+  if (!status) return { applied: false, refused: 'no-chapter', world };
+  if (!status.spawned) return { applied: false, refused: 'chapter-not-spawned', world };
+  if (!status.ended) return { applied: false, refused: 'chapter-not-ended', world };
+
+  const privateState = world.save.privateState;
+  const awarded = chapterAwards(privateState);
+  if (awarded[String(status.id)] !== undefined) {
+    return { applied: false, refused: 'already-awarded', world };
+  }
+  const reward = chapterRewardFor(deps.chapterRewards, status.id);
+  if (!reward) {
+    return {
+      applied: false,
+      refused: deps.chapterRewards === undefined ? 'not-implemented' : 'no-chapter-reward',
+      world,
+    };
+  }
+
+  // Every check is done; the wallet, the award log and the map move together.
+  const resources = { ...world.resources };
+  for (const [key, amount] of Object.entries(reward)) {
+    resources[key] = (resources[key] ?? 0) + amount;
+  }
+  world.resources = resources;
+  privateState[CHAPTER_AWARDS_KEY] = { ...awarded, [String(status.id)]: deps.now() };
+
+  const nextId = next > 99 ? 1 : next;
+  map['idCurrentMission'] = String(nextId);
+  map['timestampLastChapter'] = deps.now();
+  map['currentQuestVars'] = {};
+  return { applied: true, world };
+}
+
+/**
+ * `admin_set_quest_rank` - accepted, but never obeyed.
+ *
+ * The client sends `[questIndex, difficulty]` and the upstream writes it into
+ * `privateState.questsRank`, which unlocks goals. Here ranks are earned by
+ * `awardQuest` from a server-resolved win, so the command is acknowledged
+ * without changing anything.
+ */
+function adminSetQuestRankCommand(world: ShimWorld, args: readonly unknown[]): CommandOutcome {
+  void args;
+  return { applied: true, world };
+}
+
+// ---------------------------------------------------------------------------
+// Assault quests — the server-owned QuestState
+// ---------------------------------------------------------------------------
+
+/**
+ * Derive the quest's map elements from the spec and the content items.
+ *
+ * The spec owns the refs and item ids; the content owns whether an item is a
+ * unit and its `subcat_functional`. A losing (key) element belongs to the
+ * player's side; every other scripted element is an enemy.
+ */
+export function questRoster(
+  spec: QuestSpec,
+  items?: Map<number, ApplierItem>,
+): QuestElement[] {
+  const keyRefs = new Set(spec.keyElementRefs);
+  return spec.elements.map((element) => {
+    const contentItem = items?.get(element.itemId);
+    return {
+      ref: element.ref,
+      itemId: element.itemId,
+      affiliation: keyRefs.has(element.ref) ? ('self' as const) : ('enemy' as const),
+      isUnit: contentItem?.type === 'u',
+      ...(typeof contentItem?.subcatFunctional === 'number'
+        ? { subcatFunctional: contentItem.subcatFunctional }
+        : {}),
+    };
+  });
+}
+
+/** Read the stored quest state, accepting a `{ questId }` seed. */
+function readActiveQuest(
+  privateState: Record<string, unknown>,
+): { questId: string; state: QuestState | null } | null {
+  const raw = privateState[ACTIVE_QUEST_KEY];
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const stored = raw as Record<string, unknown>;
+  const questId = stored['questId'];
+  if (typeof questId !== 'string' || !getQuestSpec(questId)) return null;
+  const complete =
+    stored['phase'] !== undefined &&
+    stored['script'] !== undefined &&
+    typeof stored['script'] === 'object' &&
+    stored['script'] !== null;
+  return { questId, state: complete ? (stored as unknown as QuestState) : null };
+}
+
+type QuestStateResult = { ok: true; state: QuestState } | { ok: false; reason: string };
+
+/**
+ * Get the active quest state, building it from the roster on first use.
+ *
+ * `prepareQuest` → `startQuest` → `loadQuestMap` is the client's own init
+ * sequence; the chapter status is passed in so a resumed quest can keep its
+ * visited state. This is pure: the caller owns the write.
+ */
+function ensureActiveQuest(
+  world: ShimWorld,
+  questId: string,
+  deps: ApplierDeps,
+): QuestStateResult {
+  const privateState = world.save.privateState;
+  const stored = readActiveQuest(privateState);
+  if (stored?.state && stored.questId === questId) {
+    return { ok: true, state: stored.state };
+  }
+  if (stored && stored.questId !== questId) {
+    return { ok: false, reason: 'quest-mismatch' };
+  }
+  const spec = getQuestSpec(questId);
+  if (!spec) return { ok: false, reason: 'unknown-quest' };
+  const ranks = questProgress(privateState).ranks;
+  const prepared = prepareQuest(questId, {
+    questVars: currentQuestVars(ownMap(world)),
+    hasRank: ranks[String(spec.playIndex)] !== undefined,
+  });
+  return { ok: true, state: loadQuestMap(startQuest(prepared), questRoster(spec, deps.items)) };
+}
+
+/** Feed validated kill refs into the state, newest first-check-all. */
+function applyQuestKills(
+  state: QuestState,
+  refs: readonly string[],
+  spec: QuestSpec,
+  deps: ApplierDeps,
+): QuestStateResult {
+  const byRef = new Map(questRoster(spec, deps.items).map((element) => [element.ref, element]));
+  for (const ref of refs) {
+    if (!byRef.has(ref)) return { ok: false, reason: 'unknown-quest-element' };
+  }
+  let next = state;
+  for (const ref of refs) {
+    if (next.script.destroyed.includes(ref)) continue;
+    next = killQuestElement(next, byRef.get(ref)!).state;
+  }
+  return { ok: true, state: next };
+}
+
+/** The quest id an `end_quest` names — native number, or a legacy JSON blob. */
+function questIdFromEndArgs(args: readonly unknown[]): string | null {
+  const raw = args[0];
+  if (typeof raw === 'string' && raw.trim().startsWith('{')) {
+    let blob: unknown;
+    try {
+      blob = JSON.parse(raw) as unknown;
+    } catch {
+      return null;
+    }
+    if (!blob || typeof blob !== 'object') return null;
+    const named = (blob as Record<string, unknown>)['quest_id'] ??
+      (blob as Record<string, unknown>)['questId'];
+    if (typeof named === 'string') return named;
+    if (typeof named === 'number' && Number.isInteger(named)) return String(named);
+    return null;
+  }
+  if (typeof raw === 'string' || typeof raw === 'number') return String(raw);
+  return null;
+}
+
+/** The XP context for a quest reward, from the content with a safe default. */
+function questExpRequired(deps: ApplierDeps): number {
+  const value = deps.questExpRequired;
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 100;
+}
+
+/** The server's rank log, read defensively out of the private state. */
+function questRanks(privateState: Record<string, unknown>): Record<string, number> {
+  const raw = privateState['questsRank'];
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
+  const out: Record<string, number> = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof value === 'number' && Number.isFinite(value)) out[key] = value;
+  }
+  return out;
+}
+
+/**
+ * `end_quest` — resolve the win from the server's own quest state.
+ *
+ * The client sends only an identifier (native `[questId, difficulty]`, legacy
+ * `[JSON blob]`). Its claimed win, units, loot and difficulty are never read
+ * for the award: the win is `isQuestVictory(state)`, the reward is
+ * `finishQuest` → `awardQuest`, and the once-only guard is `awardQuest`.
+ */
+function endQuestCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const questId = questIdFromEndArgs(args);
+  if (questId === null) return { applied: false, refused: 'bad-argument', world };
+  const spec = getQuestSpec(questId);
+  if (!spec) return { applied: false, refused: 'unknown-quest', world };
+
+  const privateState = world.save.privateState;
+  const stored = readActiveQuest(privateState);
+  let state: QuestState;
+  if (stored?.state && stored.questId === questId) {
+    state = stored.state;
+  } else {
+    // The legacy client has no quest-start command: its kill events only
+    // reach the chapter status. Replay those validated refs into a fresh
+    // server state built from the named quest's roster.
+    const ensured = ensureActiveQuest(world, questId, deps);
+    if (!ensured.ok) return { applied: false, refused: ensured.reason, world };
+    const pending = currentQuestVars(ownMap(world))['killed'];
+    const refs = Array.isArray(pending)
+      ? pending.filter((ref): ref is string => typeof ref === 'string')
+      : [];
+    // The chapter status is shared with the chapter's own machine, so a
+    // half-finished chapter can leave stale chapter refs beside quest refs.
+    // Only this quest's roster is replayed here; direct `set_quest_var` writes
+    // still refuse any off-roster ref outright.
+    const rosterRefs = new Set(questRoster(spec, deps.items).map((element) => element.ref));
+    const kills = applyQuestKills(
+      ensured.state,
+      refs.filter((ref) => rosterRefs.has(ref)),
+      spec,
+      deps,
+    );
+    if (!kills.ok) return { applied: false, refused: kills.reason, world };
+    state = kills.state;
+  }
+
+  // An empty roster would satisfy a `countersZero` win with zero events
+  // (loadQuestMap seeds enemiesAlive = 0), minting currency for no work. A
+  // recorded loss is never payable either. Both are refused before any award.
+  if (state.result === 'loss' || state.script.destroyed.length === 0) {
+    return { applied: false, refused: 'no-victory', world };
+  }
+  if (!isQuestVictory(state)) return { applied: false, refused: 'no-victory', world };
+
+  const outcome = finishQuest(state, true, { expRequired: questExpRequired(deps) });
+  const awarded = awardQuest(questProgress(privateState), outcome);
+  if (!awarded.award.awarded) return { applied: false, refused: 'already-awarded', world };
+
+  // Every check has passed; the wallet, the progress, the client-visible rank
+  // and the active-state clear move together.
+  const resources = { ...world.resources };
+  for (const reward of awarded.award.rewards) {
+    // A gold row's extra XP is capped at a third of expRequired, which can be
+    // fractional; the wallet holds whole resources only.
+    const amount = reward.key === 'x' ? Math.round(reward.amount) : reward.amount;
+    resources[reward.key] = (resources[reward.key] ?? 0) + amount;
+  }
+  world.resources = resources;
+  privateState[QUEST_PROGRESS_KEY] = awarded.progress;
+  privateState['questsRank'] = {
+    ...questRanks(privateState),
+    [String(spec.playIndex)]: awarded.award.rank,
+  };
+  delete privateState[ACTIVE_QUEST_KEY];
   return { applied: true, world };
 }

@@ -65,6 +65,9 @@ export function contentItems(bundle: { items?: unknown[] }): Map<number, Applier
       buildingLimitSameId: numberOr(item['building_limit_same_id'], -1),
       buildingLimitSameScf: numberOr(item['building_limit_same_scf'], -1),
       subcategoryId: numberOr(item['subcategory_id'], 0),
+      // The quest roster needs it to decide whether a kill earns the
+      // minimum XP; a missing value falls back to "not a wall".
+      subcatFunctional: numberOr(item['subcat_functional'], 0),
       width: numberOr(item['width'], 1),
       height: numberOr(item['height'], 1),
       trainsIds: Array.isArray(item['trains_ids'])

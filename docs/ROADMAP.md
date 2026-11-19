@@ -1349,7 +1349,16 @@ assault against the new server, and the cheat battery is fully rejected.
       (`packages/client/src/tutorial.ts`): the position is an index into the steps the
       player can see, a step may be skipped only when it says it may be, and a step is
       compared by its **number**, which is how the client resumes
-- [ ] The tutorial and the first chapter are completable against the server
+- [x] The tutorial and the first chapter are completable against the server. The tutorial's
+      sequence lives in `packages/rules/src/tutorial.ts`, is recorded server-side by the
+      `complete_tutorial` case in `packages/server/src/apply.ts`, and is walked end to end by
+      the client in `scripts/e2e-test.mjs`. The chapter is driven by the `set_quest_var` and
+      `collect_mission` appliers, paid from the content's `REWARDS_CHAPTERS` once through the
+      `chapterAwards` log, and read back by the client's `collectMission` request and
+      `questState` model. *Honest boundary:* a chapter is a **client-reported state predicate**
+      — the client writes `spawned`/`ended` — while the server owns the reward, the once-only
+      guard and the chapter's own state keys. Evidence: `apply.test.ts`'s "set_quest_var" and
+      "collect_mission" blocks (16 tests)
 - [x] The **tutorial's progression is the server's**
       (`packages/rules/src/tutorial.ts`). The server owns **which steps exist**, so a
       client cannot invent one, and **how far the player has got**, which is the
@@ -1357,10 +1366,28 @@ assault against the new server, and the cheat battery is fully rejected.
       step is the one that counts. The *order* is the client's, because the tutorial
       grants nothing by itself: it points at the actions, and the actions are commands
       the server already checks
-- [ ] The **first chapter** is completable: the quest's steps, the rewards and the
-      chapter's own unlocks are checked against the server
+- [x] The **first chapter** is completable: the applier checks the chapter status shape
+      and the spawned+ended predicate. `set_quest_var` validates each
+      chapter-status write into the server-owned `map.currentQuestVars`; `collect_mission`
+      requires the spawned+ended predicate, grants exactly `REWARDS_CHAPTERS[completedId]` once
+      and advances `map.idCurrentMission` (including the `> 99 → 1` wrap); client-side
+      `admin_set_quest_rank` can never overwrite the server's `questsRank`. *Honest boundary:*
+      `spawned`/`ended` are reported by the client and checked as a state predicate, not a
+      battle result. Evidence: `apply.test.ts`'s "collect_mission" block — "grants exactly the
+      content reward and advances the chapter", "wraps a next chapter above 99 back to 1",
+      "pays nothing on a replay", and the `admin_set_quest_rank` no-overwrite test
 - [ ] Quests, goals, the darts minigame, the marketplace, premium and the weekly bonus are
-      functional
+      functional — darts, the market, goals, premium and the weekly bonus are each verified
+      with a rules model, a server applier and a client request/model. **Assault quests are
+      only partly resolved:** `end_quest` does resolve a `destroyAll` quest with scripted
+      elements from the server-held `activeQuest` (`isQuestVictory` / `finishQuest` /
+      `awardQuest`, a content-derived reward paid once, the client's `win` / `loot` /
+      `difficulty` ignored, and empty-roster and recorded-loss wins refused), but the
+      applier has no path for `nearDeathQuestElement`, `defendersClearedQuestElement`,
+      `setQuestCounter` or `addQuestCounter`. Quests won by `nearDeathAll`,
+      `defendersClearedAll`, `countersAtLeast` or unarmed `countersZero` therefore cannot
+      resolve. The precise dependency — new event commands or a server map roster plus
+      positional simulator, and a scope decision — is in *Unimplemented layers*
 - [x] **Magic and tech are functional** (`packages/rules/src/magic.ts`,
       `packages/server/src/apply.ts`, `packages/server/src/shim.ts`): the ten shipped spells
       are indexed from the content bundle with their mana cost, area, unlock level and
@@ -2036,7 +2063,7 @@ next group. The per-group **Status:** lines state which items are outstanding.*
 | D | Asset Pipeline | 32 / 0 | Complete |
 | E | Rules Engine | 37 / 1 | In progress — differential test vs the Flash client |
 | F | Authoritative Server | 54 / 0 | Complete |
-| G | Modern Client | 70 / 11 | In progress — remaining platforms and feature parity |
+| G | Modern Client | 72 / 9 | In progress — remaining platforms and feature parity |
 | H | Desktop Shell & Release | 14 / 4 | In progress — installers, signing, auto-update |
 | I | Production Readiness | 99 / 10 | In progress — the first production release |
 
@@ -2112,7 +2139,7 @@ owner and a precise condition for closing it.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| G | Quests are functional (the G4 parity item) | The rules model (`packages/rules/src/quest.ts`, `finishQuest` / `awardQuest`) and the client request/model (`endQuest` / `collectMission` in `packages/client/src/requests.ts`, `questState` in `featurestate.ts`) exist, but the **server application layer is missing**: `end_quest` is refused as `not-implemented` and `collect_mission` falls through as `no-grant` in `packages/server/src/apply.ts`, and the legacy shim delegates to that same applier, so no quest is ever granted | Implement an authoritative quest applier in `packages/server/src/apply.ts` that resolves the win from the server's own state with `finishQuest` / `awardQuest`, prices the rewards from content, and is covered by tests; close the G4 checkbox when a real quest completion is verified end to end |
+| G | Full authoritative positional combat (the residual quest dependency) | Chapters, goals, darts, the market, premium and the weekly bonus each have a rules model + server applier + client request/model. The quest applier resolves **only `destroyAll` wins with scripted elements**: it fills `script.destroyed` from validated kill reports, refuses empty-roster and recorded-loss wins, and owns the roster, win, rewards and once-only guard. There is no applier path for `nearDeathQuestElement`, `defendersClearedQuestElement`, `setQuestCounter` or `addQuestCounter`, so `nearDeathAll`, `defendersClearedAll`, `countersAtLeast` and unarmed `countersZero` wins cannot resolve; an assault quest also still trusts the client's report that an element died. This is in-repo work, not an external blocker | Either add commands carrying the missing near-death / defenders-cleared / counter events, or build a server map roster and a positional simulator from the decompiled client and drive quest events from server-simulated outcomes. Which to build needs a scope decision; until then the G4 quest item stays open |
 
 ---
 
@@ -2170,6 +2197,44 @@ reviewed without reconstructing the conversation that led to it.*
   in *Externally Blocked Items*;
   full gate green — `pnpm test` 1429 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
   `check-roadmap.mjs` and `check-report-sync.mjs` all with 0 failures
+- **2026-11-20 — quest parity closed with evidence (Group G4).** Added authoritative chapter
+  and assault-quest appliers (`set_quest_var`, `collect_mission`, `admin_set_quest_rank`,
+  `end_quest`) to `packages/server/src/apply.ts`, wired `chapterRewards` and `questExpRequired`
+  into the running server from the content bundle — `chapterRewards` straight from
+  `REWARDS_CHAPTERS`, `questExpRequired` derived from `levels[4].exp_required` (= 200 in the
+  shipped bundle) with the applier's documented safe default of 100 as the fallback, as
+  `apps/server/src/main.ts` documents — and migrated the new `activeQuest` and
+  `chapterAwards` private-state keys with empty defaults. *Rationale:* a "functional" claim
+  needs rules model + server application + client request/model; the server-application layer
+  was the only missing one, and it is now present and tested. The honest residual is stated on
+  the three closed items: chapters are a client-reported state predicate (the client writes
+  `spawned`/`ended`) and an assault quest trusts the client's element-death report, while the
+  server owns the roster, win, reward and once-only guard. Full authoritative positional combat
+  needs a server map roster and simulator that are not in the repository, so it remains in
+  *Unimplemented layers*. *Evidence:* `apply.test.ts`'s "set_quest_var" / "collect_mission" /
+  "the active assault quest" blocks (27 tests), `migrate.test.ts`'s empty-default test, and a
+  green gate — `pnpm test` 1463 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
+  `check-roadmap.mjs`, `check-report-sync.mjs`, `verify-command-catalogue.mjs` (94/94/94)
+- **2026-11-20 — whole-branch review corrections (Group G4).** Reopened the G4
+  "Quests, goals, … are functional" item and narrowed the first-chapter item's
+  claim. The final review found that `end_quest` paid a `countersZero` win on
+  the eight hardcore quests with **zero** server events (`loadQuestMap` seeds
+  `enemiesAlive = 0` from an empty roster), and that the applier populates only
+  `script.destroyed`: no path exists for `nearDeathQuestElement`,
+  `defendersClearedQuestElement`, `setQuestCounter` or `addQuestCounter`, so
+  four win-condition kinds were unreachable while the item claimed quests were
+  functional. *Rationale:* an open item with a precise dependency is honest; a
+  closed item overstating what the code resolves is not, and the two chapter
+  items depend on `set_quest_var` / `collect_mission`, not on the vacuous quest
+  win, so they stay closed with a corrected claim. *Evidence:* `end_quest` now
+  refuses empty-roster and recorded-loss wins, rounds fractional XP, replays
+  only on-roster refs from the shared chapter kill list, and still ignores
+  client claims; four new tests in `apply.test.ts`'s "the active assault quest"
+  block reproduced the exploit (RED) and verify the guards (GREEN), 141 pass /
+  0 fail on that file. The residual dependency is recorded in *Unimplemented
+  layers*. Full gate green — `pnpm test` 1467 pass / 0 fail, `pnpm typecheck`,
+  `pnpm lint`, `check-roadmap.mjs`, `check-report-sync.mjs`,
+  `verify-command-catalogue.mjs` (94/94/94) all with exit 0
 
 ---
 

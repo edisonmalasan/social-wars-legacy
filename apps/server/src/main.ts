@@ -77,6 +77,23 @@ function globalsOf(bundle: { globals?: unknown }): Record<string, unknown> {
 }
 
 /**
+ * The XP context for a quest's static reward row.
+ *
+ * The original client caps the gold row's extra XP at
+ * `arLevelList[level].exp_required / 3` - the **player's current level**
+ * (`quest/AbstractQuest.as:449-457`, `re/docs/12-quest-system.md:297-298`).
+ * The applier is built once at boot and serves every level, so the running
+ * server passes a representative **content** value: the level table's entry
+ * for the questing level (`Config.QUESTS_MIN_LEVEL = 4`). The applier's own
+ * documented safe default of 100 is the fallback if the content lacks it.
+ * This is content-shaped, never a client-supplied number.
+ */
+function questExpRequiredOf(bundle: { levels?: { exp_required?: number }[] }): number {
+  const value = bundle.levels?.[4]?.exp_required;
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 100;
+}
+
+/**
  * The content items the save migration needs.
  *
  * The migration gives a building its production state, and it needs the
@@ -110,7 +127,7 @@ function migrationItems(bundle: {
 async function main(): Promise<void> {
   const bundle = JSON.parse(await readFile(CONTENT_PATH, 'utf8')) as Parameters<
     typeof costContentFrom
-  >[0] & { dartsItems?: readonly DartsGame[] };
+  >[0] & { dartsItems?: readonly DartsGame[]; levels?: { exp_required?: number }[] };
   const content = costContentFrom(bundle);
 
   const sessions = new SessionStore();
@@ -225,6 +242,11 @@ async function main(): Promise<void> {
       // The darts schedule and the market prices are the content's own.
       dartsItems: bundle.dartsItems,
       market: marketRules(globalsOf(bundle)),
+      // Chapters and assault quests are paid from the content's own tables.
+      // The chapter reward rows come straight from REWARDS_CHAPTERS; the XP
+      // context for a quest's static reward row is derived from the level table.
+      chapterRewards: globalsOf(bundle)['REWARDS_CHAPTERS'],
+      questExpRequired: questExpRequiredOf(bundle),
       // Magic and tech: the ten spells and the globals their economy reads.
       magic: {
         spells: magicCatalogFrom(Array.isArray(bundle.magics) ? bundle.magics : []),
