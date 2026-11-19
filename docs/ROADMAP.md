@@ -292,9 +292,13 @@ first means guessing at the rules being cloned.
       commented-out handlers field for field**, so the upstream author had recovered the
       same contract and simply never enabled the routes
 - [x] The marketplace and unit-bidding flow is specified (uuid / round / bidPrice)
-- [ ] The premium-account and offer-pack purchase flows are specified — **deferred to
-      Group F**: the offer-pack data is already in `config/main.json`
-      (`offer_packs`, 44 entries) and the purchase command is already in the catalogue
+- [x] The premium-account and offer-pack purchase flows are specified — **deferred to
+      Group F and closed there**: the offer-pack data is already in `config/main.json`
+      (`offer_packs`, 44 entries) and the purchase command is already in the catalogue.
+      The server now reads a pack's content shape to decide flat / random / super /
+      premium, prices a super pack from the selected-item count, and rolls its own reward
+      (`packages/rules/src/offerpacks.ts`); the grant path is in
+      `packages/server/src/apply.ts`. See F1
 
 **Status:** Complete.
 
@@ -807,6 +811,25 @@ protocol and the original dialect.*
       the collection timer and lets the client declare the amount, prints a line for
       `complete_goal`, takes the daily bonus index *and the item id* from the client,
       and lets the client pop a unit that is still training
+- [x] **Offer packs are granted by the server from the pack's own content**
+      (`packages/rules/src/offerpacks.ts`, `packages/server/src/apply.ts`): the client's
+      selected-item list is only a **super-pack tier selector** (one, two or four items),
+      never a grant list. A flat pack grants its whole list, a random pack rolls once
+      against the list's thresholds, and a super pack rolls from its three rarity rows —
+      all with a **seeded `Random`**, so the reward is reproducible and auditable. Every
+      candidate is checked against the content items before anything is written, so a
+      malformed id such as `1072.1224` is refused rather than becoming an unplaceable
+      store entry; a hidden or disabled pack and the premium entry are refused outright.
+      A refusal spends nothing, because the shim refunds a price the cost table charged
+      before the applier refused
+- [x] The **item store is the server's and a placement consumes exactly one entry**
+      (`packages/server/src/mapstore.ts`): the legacy save keeps bought-but-unplaced items
+      on the map as `store[itemId] = quantity`, and the upstream's `remove_store_item`
+      never checked that the entry existed — the same building could be placed over and
+      over. Placement now finds a positive whole quantity and removes exactly one **after**
+      the placement has succeeded, so a refused placement (a taken tile, the level, the
+      population) costs the player nothing. A stored **unit** cannot be placed as a
+      building, and a new player's store starts empty
 - [x] The applier **has the content**: the items' costs, durations, limits and
       population are the game's own configuration, and without them the server could
       not place a building at all — every `buy` and every `place_stored_item` was
@@ -1575,7 +1598,7 @@ product.*
       is fine if nothing the browser loads reaches it, and the check says so. It follows the
       static imports, the re-exports and the **dynamic** imports, and it resolves the
       workspace's **subpath** exports - `@swl/server/apply` is the applier and not the
-      package's index, which is the whole point of the subpath. It reaches **106** modules
+      package's index, which is the whole point of the subpath. It reaches **127** modules
 - [x] **Every pull request runs the golden-master harness.** The CI runs on every push
       and every pull request, and the golden-master corpus is one of its steps - and
       the harness fails on any difference it cannot explain
@@ -1991,18 +2014,25 @@ up, licensed and documented.
 
 ## Status Summary
 
-| Group | Milestone | Status |
-|---|---|---|
-| 0 | Investigation & Documentation | Complete (1 item moved to B8) |
-| A | Vendor & Provenance | Not started |
-| B | Complete the Evidence Sweep | Not started |
-| C | Monorepo & Content Pipeline | Not started |
-| D | Asset Pipeline | Not started |
-| E | Rules Engine | Not started |
-| F | Authoritative Server | Not started |
-| G | Modern Client | Not started |
-| H | Desktop Shell & Release | Not started |
-| I | Production Readiness | Not started |
+*The counts and statuses below come from `node scripts/check-roadmap.mjs`, which parses
+this file; they are a reading of the per-group checkboxes, not a second opinion.
+**Complete** means every item in the group is verified; **In progress** means at least one
+is still open. A group whose exit criteria are met can still have open items — those are
+the live captures and the platform checks that are deferred, not work that blocks the
+next group. The per-group **Status:** lines state which items are outstanding.*
+
+| Group | Milestone | Done / open | Status |
+|---|---|---|---|
+| 0 | Investigation & Documentation | — | Complete (1 item moved to B8) |
+| A | Vendor & Provenance | 9 / 0 | Complete |
+| B | Complete the Evidence Sweep | 42 / 4 | In progress — live PvP and premium captures |
+| C | Monorepo & Content Pipeline | 14 / 0 | Complete |
+| D | Asset Pipeline | 32 / 0 | Complete |
+| E | Rules Engine | 37 / 1 | In progress — differential test vs the Flash client |
+| F | Authoritative Server | 54 / 0 | Complete |
+| G | Modern Client | 69 / 12 | In progress — remaining platforms and feature parity |
+| H | Desktop Shell & Release | 14 / 4 | In progress — installers, signing, auto-update |
+| I | Production Readiness | 99 / 10 | In progress — the first production release |
 
 ### Critical path
 
@@ -2024,6 +2054,30 @@ A ──► B ──► C ──► D ──┐
 * D (asset pipeline) and E (rules engine) are independent once C is done.
 * Within G, the renderer (G1) and the UI (G3) can proceed in parallel against the B6
   inventory.
+
+---
+
+## Roadmap Amendment Log
+
+*The Locked Decisions section is binding: changing it, closing a deferred item, or adding
+a milestone needs a written rationale. This is that record. Each entry names the date,
+what changed, why, and the evidence that makes the change verifiable, so a decision can be
+reviewed without reconstructing the conversation that led to it.*
+
+- **2026-11-20 — offer packs and the item store (Groups B7, F1).** Closed the deferred
+  B7 item and added two F1 outcomes. The upstream server credited whatever item list the
+  client declared on `buy_offer_pack`; the list is now only a super-pack tier selector and
+  the server rolls the reward from the pack's own content with a seeded generator.
+  Placement now consumes exactly one stored entry after it succeeds. *Rationale:* F3 and
+  the locked decision that the server is authoritative require it, and the cheat battery
+  already treats a free `buy_offer_pack` as an attack. *Evidence:*
+  `packages/rules/src/offerpacks.ts`, `packages/server/src/mapstore.ts`,
+  `packages/server/src/apply.ts` and 27 new tests; `pnpm test` 1381 pass, `pnpm typecheck`
+  clean, coverage 97.3 / 85.2 / 94.3 above the floors. Merged in PR #11
+- **2026-11-20 — status summary corrected.** The summary said every group was "Not
+  started" while the body and `scripts/check-roadmap.mjs` showed most groups complete.
+  Replaced with the measured done/open counts and a note explaining how they are derived,
+  so the summary cannot silently drift from the checkboxes again
 
 ---
 
