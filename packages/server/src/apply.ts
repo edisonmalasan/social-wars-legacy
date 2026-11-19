@@ -2377,11 +2377,27 @@ function endQuestCommand(
     const refs = Array.isArray(pending)
       ? pending.filter((ref): ref is string => typeof ref === 'string')
       : [];
-    const kills = applyQuestKills(ensured.state, refs, spec, deps);
+    // The chapter status is shared with the chapter's own machine, so a
+    // half-finished chapter can leave stale chapter refs beside quest refs.
+    // Only this quest's roster is replayed here; direct `set_quest_var` writes
+    // still refuse any off-roster ref outright.
+    const rosterRefs = new Set(questRoster(spec, deps.items).map((element) => element.ref));
+    const kills = applyQuestKills(
+      ensured.state,
+      refs.filter((ref) => rosterRefs.has(ref)),
+      spec,
+      deps,
+    );
     if (!kills.ok) return { applied: false, refused: kills.reason, world };
     state = kills.state;
   }
 
+  // An empty roster would satisfy a `countersZero` win with zero events
+  // (loadQuestMap seeds enemiesAlive = 0), minting currency for no work. A
+  // recorded loss is never payable either. Both are refused before any award.
+  if (state.result === 'loss' || state.script.destroyed.length === 0) {
+    return { applied: false, refused: 'no-victory', world };
+  }
   if (!isQuestVictory(state)) return { applied: false, refused: 'no-victory', world };
 
   const outcome = finishQuest(state, true, { expRequired: questExpRequired(deps) });
@@ -2392,7 +2408,10 @@ function endQuestCommand(
   // and the active-state clear move together.
   const resources = { ...world.resources };
   for (const reward of awarded.award.rewards) {
-    resources[reward.key] = (resources[reward.key] ?? 0) + reward.amount;
+    // A gold row's extra XP is capped at a third of expRequired, which can be
+    // fractional; the wallet holds whole resources only.
+    const amount = reward.key === 'x' ? Math.round(reward.amount) : reward.amount;
+    resources[reward.key] = (resources[reward.key] ?? 0) + amount;
   }
   world.resources = resources;
   privateState[QUEST_PROGRESS_KEY] = awarded.progress;

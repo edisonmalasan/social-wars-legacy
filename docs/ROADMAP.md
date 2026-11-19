@@ -1366,8 +1366,8 @@ assault against the new server, and the cheat battery is fully rejected.
       step is the one that counts. The *order* is the client's, because the tutorial
       grants nothing by itself: it points at the actions, and the actions are commands
       the server already checks
-- [x] The **first chapter** is completable: the quest's steps, the rewards and the
-      chapter's own unlocks are checked against the server. `set_quest_var` validates each
+- [x] The **first chapter** is completable: the applier checks the chapter status shape
+      and the spawned+ended predicate. `set_quest_var` validates each
       chapter-status write into the server-owned `map.currentQuestVars`; `collect_mission`
       requires the spawned+ended predicate, grants exactly `REWARDS_CHAPTERS[completedId]` once
       and advances `map.idCurrentMission` (including the `> 99 → 1` wrap); client-side
@@ -1376,16 +1376,18 @@ assault against the new server, and the cheat battery is fully rejected.
       battle result. Evidence: `apply.test.ts`'s "collect_mission" block — "grants exactly the
       content reward and advances the chapter", "wraps a next chapter above 99 back to 1",
       "pays nothing on a replay", and the `admin_set_quest_rank` no-overwrite test
-- [x] Quests, goals, the darts minigame, the marketplace, premium and the weekly bonus are
-      functional — each has a rules model, a server applier and a client request/model. Quests
-      now have the missing server layer: `end_quest` resolves the win from the server-held
-      `activeQuest` with `isQuestVictory` / `finishQuest` / `awardQuest`, pays a content-derived
-      reward once and ignores the client's `win` / `loot` / `difficulty`
-      (`apply.test.ts`'s "the active assault quest" block, 11 tests); the other five were
-      verified in the 2026-11-20 G4 audit. *Honest residual:* the server trusts the client's
-      report that an element died (the same event boundary darts uses) and owns the roster,
-      win, reward and once-only guard; full authoritative positional combat is a separate
-      dependency recorded in *Unimplemented layers*
+- [ ] Quests, goals, the darts minigame, the marketplace, premium and the weekly bonus are
+      functional — darts, the market, goals, premium and the weekly bonus are each verified
+      with a rules model, a server applier and a client request/model. **Assault quests are
+      only partly resolved:** `end_quest` does resolve a `destroyAll` quest with scripted
+      elements from the server-held `activeQuest` (`isQuestVictory` / `finishQuest` /
+      `awardQuest`, a content-derived reward paid once, the client's `win` / `loot` /
+      `difficulty` ignored, and empty-roster and recorded-loss wins refused), but the
+      applier has no path for `nearDeathQuestElement`, `defendersClearedQuestElement`,
+      `setQuestCounter` or `addQuestCounter`. Quests won by `nearDeathAll`,
+      `defendersClearedAll`, `countersAtLeast` or unarmed `countersZero` therefore cannot
+      resolve. The precise dependency — new event commands or a server map roster plus
+      positional simulator, and a scope decision — is in *Unimplemented layers*
 - [x] **Magic and tech are functional** (`packages/rules/src/magic.ts`,
       `packages/server/src/apply.ts`, `packages/server/src/shim.ts`): the ten shipped spells
       are indexed from the content bundle with their mana cost, area, unlock level and
@@ -2061,7 +2063,7 @@ next group. The per-group **Status:** lines state which items are outstanding.*
 | D | Asset Pipeline | 32 / 0 | Complete |
 | E | Rules Engine | 37 / 1 | In progress — differential test vs the Flash client |
 | F | Authoritative Server | 54 / 0 | Complete |
-| G | Modern Client | 70 / 11 | In progress — remaining platforms and feature parity |
+| G | Modern Client | 72 / 9 | In progress — remaining platforms and feature parity |
 | H | Desktop Shell & Release | 14 / 4 | In progress — installers, signing, auto-update |
 | I | Production Readiness | 99 / 10 | In progress — the first production release |
 
@@ -2137,7 +2139,7 @@ owner and a precise condition for closing it.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| G | Full authoritative positional combat (the residual quest dependency) | Quests, chapters and the other G4 features are now functional with rules model + server applier + client request/model. What remains is the **trust boundary**, not a missing layer: a chapter is a client-reported state predicate (the client writes `spawned`/`ended`), and an assault quest trusts the client's report that an element died, though the server owns the roster, win, rewards and once-only guard. A genuinely authoritative battle needs a complete server-side map roster and a positional simulator derived from the decompiled AS3 — neither is present in this repository. This is in-repo work, not an external blocker, but it is a separate feature from quest parity | Build a server map roster and a positional combat simulator from the decompiled client, then drive chapter/quest events from server-simulated outcomes rather than client reports |
+| G | Full authoritative positional combat (the residual quest dependency) | Chapters, goals, darts, the market, premium and the weekly bonus each have a rules model + server applier + client request/model. The quest applier resolves **only `destroyAll` wins with scripted elements**: it fills `script.destroyed` from validated kill reports, refuses empty-roster and recorded-loss wins, and owns the roster, win, rewards and once-only guard. There is no applier path for `nearDeathQuestElement`, `defendersClearedQuestElement`, `setQuestCounter` or `addQuestCounter`, so `nearDeathAll`, `defendersClearedAll`, `countersAtLeast` and unarmed `countersZero` wins cannot resolve; an assault quest also still trusts the client's report that an element died. This is in-repo work, not an external blocker | Either add commands carrying the missing near-death / defenders-cleared / counter events, or build a server map roster and a positional simulator from the decompiled client and drive quest events from server-simulated outcomes. Which to build needs a scope decision; until then the G4 quest item stays open |
 
 ---
 
@@ -2213,6 +2215,26 @@ reviewed without reconstructing the conversation that led to it.*
   "the active assault quest" blocks (27 tests), `migrate.test.ts`'s empty-default test, and a
   green gate — `pnpm test` 1463 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
   `check-roadmap.mjs`, `check-report-sync.mjs`, `verify-command-catalogue.mjs` (94/94/94)
+- **2026-11-20 — whole-branch review corrections (Group G4).** Reopened the G4
+  "Quests, goals, … are functional" item and narrowed the first-chapter item's
+  claim. The final review found that `end_quest` paid a `countersZero` win on
+  the eight hardcore quests with **zero** server events (`loadQuestMap` seeds
+  `enemiesAlive = 0` from an empty roster), and that the applier populates only
+  `script.destroyed`: no path exists for `nearDeathQuestElement`,
+  `defendersClearedQuestElement`, `setQuestCounter` or `addQuestCounter`, so
+  four win-condition kinds were unreachable while the item claimed quests were
+  functional. *Rationale:* an open item with a precise dependency is honest; a
+  closed item overstating what the code resolves is not, and the two chapter
+  items depend on `set_quest_var` / `collect_mission`, not on the vacuous quest
+  win, so they stay closed with a corrected claim. *Evidence:* `end_quest` now
+  refuses empty-roster and recorded-loss wins, rounds fractional XP, replays
+  only on-roster refs from the shared chapter kill list, and still ignores
+  client claims; four new tests in `apply.test.ts`'s "the active assault quest"
+  block reproduced the exploit (RED) and verify the guards (GREEN), 141 pass /
+  0 fail on that file. The residual dependency is recorded in *Unimplemented
+  layers*. Full gate green — `pnpm test` 1467 pass / 0 fail, `pnpm typecheck`,
+  `pnpm lint`, `check-roadmap.mjs`, `check-report-sync.mjs`,
+  `verify-command-catalogue.mjs` (94/94/94) all with exit 0
 
 ---
 

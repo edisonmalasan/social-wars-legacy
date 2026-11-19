@@ -6,6 +6,7 @@ import {
   DART_COST_CASH,
   QUEST_ID_01_BAZOOKA,
   QUEST_ID_02_CENTRAL_NUCLEAR,
+  QUEST_ID_15_HARDCORE1,
   applyCommandCost,
   buildDartsBoard,
   createGoalState,
@@ -2366,5 +2367,70 @@ describe('the active assault quest', () => {
     assert.equal(outcome.applied, true);
     assert.equal(outcome.world.resources['g'], 4000);
     assert.equal(outcome.world.resources['o'], 1400);
+  });
+
+  it('refuses an empty-roster hardcore quest with no server kills', () => {
+    const applier = createApplier(questDeps());
+    // The hardcore quests have no scripted elements: loadQuestMap seeds
+    // enemiesAlive = 0, so isQuestVictory would be true with zero events and
+    // end_quest would mint 10k gold plus steel. A win needs a server kill.
+    const world = questWorld({ questId: QUEST_ID_15_HARDCORE1 });
+    const before = structuredClone(world);
+    const outcome = applier(world, {
+      name: 'end_quest',
+      args: [QUEST_ID_15_HARDCORE1, 1],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+    assert.deepEqual(outcome.world, before);
+  });
+
+  it('grants whole XP when a reward row is fractional', () => {
+    // 301 / 3 is fractional, so the gold row's extra XP (min(gold / 4, 301/3))
+    // is 100.333…; a whole-resource wallet must not persist that fraction.
+    const applier = createApplier(questDeps({ questExpRequired: 301 }));
+    const killed = applier(questWorld(), killedWrite(['commandCenter']));
+    assert.equal(killed.applied, true);
+    const outcome = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+    assert.equal(outcome.applied, true);
+    assert.ok(
+      Number.isInteger(outcome.world.resources['x']),
+      `fractional XP persisted: ${outcome.world.resources['x']}`,
+    );
+  });
+
+  it('pays a legacy quest with stale chapter refs mixed into the kill list', () => {
+    const applier = createApplier(questDeps());
+    // A half-finished chapter leaves chapter refs beside quest refs in
+    // currentQuestVars.killed; the fallback replays only on-roster refs.
+    const world = questWorld({ vars: { killed: ['chapter-3-boss', 'commandCenter'] } });
+    delete world.save.privateState[ACTIVE_QUEST_KEY];
+    const outcome = applier(world, {
+      name: 'end_quest',
+      args: [JSON.stringify({ quest_id: QUEST_ID_02_CENTRAL_NUCLEAR })],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 4000);
+    assert.equal(outcome.world.resources['o'], 1400);
+  });
+
+  it('refuses to pay a quest already recorded as a loss', () => {
+    const applier = createApplier(questDeps());
+    const killed = applier(questWorld(), killedWrite(['commandCenter']));
+    assert.equal(killed.applied, true);
+    // A genuine victory state, but the server recorded a loss before payout.
+    const world = killed.world;
+    world.save.privateState[ACTIVE_QUEST_KEY] = { ...activeState(world), result: 'loss' };
+    const before = structuredClone(world);
+    const outcome = applier(world, {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+    assert.deepEqual(outcome.world, before);
   });
 });
