@@ -183,6 +183,18 @@ export interface WorldSnapshot {
     increasedPopulation?: number;
     /** The rank each quest was reached at, by the quest's index. */
     questsRank?: Record<string, number>;
+    /** How many market trades this period has used. */
+    numTradesDone?: number;
+    /** What was traded at the market, by resource key. */
+    resourcesTraded?: Record<string, unknown>;
+    /** When the last market trade happened. */
+    timestampLastTrade?: number;
+    /** The timestamps the server recorded for each quest, by quest id. */
+    questTimes?: Record<string, number>;
+    /** The id of the current mission. */
+    idCurrentMission?: number;
+    /** The current mission's variables. */
+    currentQuestVars?: Record<string, unknown> | null;
   }[];
   privateState: Record<string, unknown>;
   resources: Resources;

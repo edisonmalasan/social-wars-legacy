@@ -9,19 +9,28 @@ import {
   buy,
   buyMagic,
   buyMana,
+  buyOfferPack,
+  buyPremium,
+  buyResources,
   claimDailyBonus,
+  claimFreeDarts,
   claimWeeklyBonus,
   collect,
+  collectMission,
   completeGoal,
   completeTutorial,
   endAttack,
   endQuest,
+  exchangeCash,
   expand,
   finishBuilding,
   levelUp,
   move,
   placeStoredItem,
+  premiumUpgrade,
   resetCollect,
+  resetDarts,
+  shootBalloon,
   takeTrainedUnit,
   tradeResource,
   train,
@@ -53,7 +62,29 @@ const BUILDERS: { name: string; command: ReturnType<typeof buy> }[] = [
   { name: 'buy_magic', command: buyMagic(1, 'g') },
   { name: 'buy_mana_new', command: buyMana(5, 'c') },
   { name: 'use_magic', command: useMagic(1) },
+  { name: 'darts_new_free', command: claimFreeDarts() },
+  { name: 'darts_reset', command: resetDarts(1234) },
+  { name: 'darts_shoot_balloon', command: shootBalloon(3, true) },
+  { name: 'buy_offer_pack', command: buyOfferPack(7, [1001, 1002]) },
+  { name: 'buy_premium_account', command: buyPremium(2) },
+  { name: 'premium_upgrade', command: premiumUpgrade(7, 8, 3001, 2) },
+  { name: 'collect_mission', command: collectMission(12) },
+  { name: 'buy_resources', command: buyResources('w', 100, 'c') },
+  { name: 'exchange_cash', command: exchangeCash() },
 ];
+
+/** The Group G4 builders, whose argument shapes the table must also confirm. */
+const NEW_COMMAND_NAMES = new Set([
+  'darts_new_free',
+  'darts_reset',
+  'darts_shoot_balloon',
+  'buy_offer_pack',
+  'buy_premium_account',
+  'premium_upgrade',
+  'collect_mission',
+  'buy_resources',
+  'exchange_cash',
+]);
 
 describe('the client requests', () => {
   it('are all for the player own town', () => {
@@ -83,6 +114,46 @@ describe('the client requests', () => {
         `${builder.name} sends ${count} arguments; the table wants ` +
           `${minArgs(spec)}..${maxArgs(spec)}`,
       );
+    }
+  });
+
+  it('the new builders match the table argument types and values', () => {
+    for (const builder of BUILDERS) {
+      if (!NEW_COMMAND_NAMES.has(builder.name)) continue;
+      const spec = COMMAND_TABLE[builder.command.name]!;
+      assert.equal(
+        builder.command.args.length,
+        spec.args.length,
+        `${builder.name} has the wrong number of arguments`,
+      );
+      builder.command.args.forEach((arg, index) => {
+        const argSpec = spec.args[index]!;
+        const where = `${builder.name} argument ${index} (${argSpec.name})`;
+        switch (argSpec.type) {
+          case 'int':
+          case 'uint':
+          case 'number':
+            assert.equal(typeof arg, 'number', `${where} must be a number`);
+            break;
+          case 'string':
+          case 'json':
+            assert.equal(typeof arg, 'string', `${where} must be a string`);
+            if (argSpec.type === 'json') JSON.parse(arg as string);
+            break;
+          case 'boolean':
+            assert.equal(typeof arg, 'boolean', `${where} must be a boolean`);
+            break;
+          case 'array':
+            assert.ok(Array.isArray(arg), `${where} must be an array`);
+            break;
+        }
+        if (argSpec.values) {
+          assert.ok(
+            argSpec.values.includes(arg as never),
+            `${where} is not one of ${argSpec.values.join(', ')}`,
+          );
+        }
+      });
     }
   });
 
@@ -174,5 +245,38 @@ describe('the individual requests', () => {
     // The **reward** is the server's, and the item id is a placeholder
     // on a gold day.
     assert.deepEqual(claimWeeklyBonus().args, []);
+  });
+
+  it('the darts builders carry only the board inputs, never a claimed prize', () => {
+    assert.deepEqual(claimFreeDarts().args, []);
+    assert.deepEqual(resetDarts(1234).args, [1234]);
+    assert.deepEqual(shootBalloon(3, true).args, [3, 1]);
+    assert.deepEqual(shootBalloon(24, false).args, [24, 0]);
+  });
+
+  it('buy_offer_pack names the pack and JSON-encodes the chosen item ids', () => {
+    assert.deepEqual(buyOfferPack(7, [1001, 1002]).args, [7, '[1001,1002]']);
+    assert.deepEqual(buyOfferPack(7, []).args, [7, '[]']);
+  });
+
+  it('buy_premium_account names only the package index', () => {
+    assert.deepEqual(buyPremium(2).args, [2]);
+  });
+
+  it('premium_upgrade carries the old iso, the new iso, the item and the clicks', () => {
+    assert.deepEqual(premiumUpgrade(7, 8, 3001, 2).args, [7, 8, 3001, 2]);
+  });
+
+  it('collect_mission names the NEXT chapter, not the one that was finished', () => {
+    assert.deepEqual(collectMission(12).args, [12]);
+  });
+
+  it('buy_resources names the resource, the amount and the payment, never a price', () => {
+    assert.deepEqual(buyResources('w', 100, 'c').args, ['w', 100, 'c']);
+    assert.deepEqual(buyResources('g', 2500, 'g').args, ['g', 2500, 'g']);
+  });
+
+  it('exchange_cash carries no claimed rate or amount', () => {
+    assert.deepEqual(exchangeCash().args, []);
   });
 });
