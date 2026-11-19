@@ -11,11 +11,14 @@
   modern client (web/desktop/mobile) and an authoritative, authenticated server.
 - **Primary users / use cases:** Players who want the game to keep working; preservation
   archivists; anyone studying the original client's game rules.
-- **Current focus:** **The investigation is complete and the build has started.** The
-  production roadmap is in [`ROADMAP.md`](ROADMAP.md) and **autonomous execution is
-  active**. Groups A, B and C are done: the upstream project is vendored and verified, the
-  evidence sweep is complete, and the workspace with its content pipeline and rules core
-  exists. The client, server and desktop shells are next (Groups D–H).
+- **Current focus:** **The investigation is complete and the implementation is under
+  way.** The production roadmap is in [`ROADMAP.md`](ROADMAP.md); its *Status Summary*
+  gives the current per-group counts, which are also available from
+  `node scripts/check-roadmap.mjs`. The vendored upstream, the evidence sweep, the content
+  pipeline, the deterministic rules engine, the authoritative server, the web client and
+  the desktop shell all exist. What remains is the mobile shell (G5), the unbuilt platform
+  artefacts (installers, signing, auto-update), a few live captures and the first
+  production release.
 
 ## Where to Look
 
@@ -33,13 +36,13 @@
 | What is still unknown | [`../re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md`](../re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md) |
 | Raw evidence (traffic, digests, screenshots) | [`../re/evidence/`](../re/evidence/) |
 | How to work in this repository | [`../AGENTS.md`](../AGENTS.md) |
-| The upstream project under analysis | `C:\Users\Edison\Desktop\socialwarriors` (external, unmodified, to be vendored in Group A) |
+| The upstream project under analysis | [`../upstream/socialwarriors/`](../upstream/socialwarriors/) — vendored verbatim in Group A, byte-for-byte verified, read-only |
 
 ## The Upstream Project Under Investigation
 
 | | |
 |---|---|
-| Location | `C:\Users\Edison\Desktop\socialwarriors` — a separate checkout, **not** part of this repository yet |
+| Location | [`../upstream/socialwarriors/`](../upstream/socialwarriors/) — vendored verbatim in this repository, with [`../upstream/PROVENANCE.md`](../upstream/PROVENANCE.md) and a SHA-256 manifest; the original checkout is a read-only reference, never edited |
 | Upstream commit | `c3fceeb1f8e93734a293b9bc25ae6025656f6822` ("Minimal server support", 2026-10-01), tags `0.01a` / `0.02a` |
 | Stack | Python 3.9 + Flask 2.2.5 server; Adobe Flash (AS3) client; JSON game config; 3 199 asset files (716.8 MB) |
 | Client | `Basesec_1.5.4.swf` — SWF v10, 1 387 AS3 classes in one 2 MB AVM2 block, loaded by `SWLoader.swf` |

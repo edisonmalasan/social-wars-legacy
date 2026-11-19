@@ -8,11 +8,15 @@ Python server that trusts the client for almost everything. This project rebuild
 properly: a modern client, an authoritative server, and a standalone desktop executable —
 with the original game's behaviour reproduced from the original client's own code.
 
-> **Status: investigation complete, build started.** Everything needed to rebuild the game
-> is documented and evidenced in [`re/`](re/README.md). The upstream project is vendored
-> and byte-for-byte verified, the pnpm workspace exists, and the content pipeline builds a
-> validated, hashed content bundle from the original 2012 config. The client, server and
-> desktop shells are next.
+> **Status: investigation complete, implementation well under way.** Everything needed to
+> rebuild the game is documented and evidenced in [`re/`](re/README.md). The upstream
+> project is vendored and byte-for-byte verified, the pnpm workspace builds a validated,
+> hashed content bundle from the original 2012 config, and the deterministic rules engine,
+> the authoritative server, the web client and the desktop shell all exist. The remaining
+> work is the mobile shell, the unbuilt platform artefacts (installers, signing, updater),
+> a few live captures and the first production release. See
+> [`docs/ROADMAP.md`](docs/ROADMAP.md) § *Status Summary* for the current per-group counts,
+> or run `node scripts/check-roadmap.mjs`.
 
 ---
 
@@ -153,12 +157,12 @@ A ──► B ──► C ──► D ──┐
 | **A** | Vendor the upstream project with provenance and Git LFS — ✅ complete |
 | **B** | Complete the evidence sweep: 58-build diff, full SWF corpus, 229 unit delegates, 28 quests, 134 goals, 403 UI screens, social contracts — ✅ complete except the live PvP capture |
 | **C** | Monorepo, typed content pipeline, protocol types — ✅ complete |
-| **D** | Asset pipeline: 1 116 SWF → frame atlases, audio, fonts |
-| **E** | Rules engine: combat, economy, quests, goals — deterministic and golden-master verified |
-| **F** | Authoritative server: real auth, server-side economy and combat, Postgres, protocol shim |
-| **G** | Modern client: renderer, interaction, the rebuilt UI, feature parity, three platforms |
-| **H** | Desktop shell, installers, code signing, auto-update, offline play |
-| **I** | Production readiness: tests, CI/CD, security, observability, operations, licensing, docs |
+| **D** | Asset pipeline: 1 116 SWF → frame atlases, audio, fonts — ✅ complete |
+| **E** | Rules engine: combat, economy, quests, goals — deterministic and golden-master verified; in progress (differential test vs the Flash client remains) |
+| **F** | Authoritative server: real auth, server-side economy and combat, Postgres, protocol shim, server-rolled offer packs — ✅ complete |
+| **G** | Modern client: renderer, interaction, the rebuilt UI, feature parity, three platforms; in progress (mobile shell and remaining platforms) |
+| **H** | Desktop shell, installers, code signing and auto-update; the shell is built, the platform artefacts remain. Offline single-player was deliberately dropped (ADR 19) |
+| **I** | Production readiness: tests, CI/CD, security, observability, operations, licensing, docs; in progress (first production release) |
 
 Full detail, exit criteria and checkboxes in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
