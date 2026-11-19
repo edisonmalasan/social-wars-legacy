@@ -157,8 +157,10 @@ export interface GoalEntry {
   /**
    * The claim a click on this goal sends, or null when there is none.
    *
-   * Only a goal the server has recorded as complete can be claimed: the
-   * client sends the command and the server decides whether to grant it.
+   * Every drawn goal carries a claim, complete or not: the client asks and
+   * the server decides what its own goal state allows. Only an invalid id
+   * or a locally recorded award suppresses it, because re-claiming a paid
+   * goal would only earn a refusal.
    */
   command: NativeCommand | null;
 }
@@ -182,15 +184,22 @@ export function goalList(bundle: ContentBundle, world: WorldSnapshot): GoalEntry
   const state = recordOrNull(world.privateState?.['goalState']);
   const visited = recordOrNull(state?.['visited']);
   const completed = recordOrNull(state?.['completed']);
+  const awarded = recordOrNull(state?.['awarded']);
   return (bundle.goals ?? []).map((goal, index) => {
     const done = completed?.[String(goal.id)] === true;
+    // The server owns completion (awardGoal reads its own progress), so
+    // the client must send the claim for an incomplete goal too — that is
+    // the gesture the panel draws. Only a goal it cannot name, or one it
+    // has already been paid for, has nothing worth sending.
+    const canClaim =
+      Number.isFinite(goal.id) && awarded?.[String(goal.id)] !== true;
     return {
       index,
       id: goal.id,
       title: goal.title,
       visited: visited?.[String(goal.id)] === true,
       completed: done,
-      command: done ? completeGoal(goal.id) : null,
+      command: canClaim ? completeGoal(goal.id) : null,
     };
   });
 }

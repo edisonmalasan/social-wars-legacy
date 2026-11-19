@@ -70,8 +70,8 @@ export function Goals({
                   type="button"
                   className="swl-goal-title"
                   onClick={() => {
-                    // A goal the server has not completed has no claim to
-                    // send; the server still decides what a claim grants.
+                    // Every drawn goal carries a claim; the server checks
+                    // its own progress and decides what a claim grants.
                     const command = commands.get(goal.index);
                     if (command) onCommand?.(command);
                     // The client's quirk: the first badge suppresses
