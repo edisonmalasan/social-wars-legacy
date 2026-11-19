@@ -1246,7 +1246,7 @@ assault against the new server, and the cheat battery is fully rejected.
       chapters with the client's own titles and the model's slots — the quest the
       player is on is open, the ones they have not reached are locked, and the ones
       they have finished carry the rank they finished at. The ranks are the
-      **server's** (the map's own `questsRank` field, the way the original keeps them)
+      **server's** — the player's `privateState.questsRank`, the field the upstream writes —
       and the unlock levels are the content's
 - [x] The player can **build from the interface**: picking an entry in the build menu
       **begins a placement** — the locked entries cannot be picked, so the menu says

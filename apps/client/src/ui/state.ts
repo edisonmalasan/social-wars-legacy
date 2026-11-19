@@ -186,12 +186,12 @@ export function goalList(bundle: ContentBundle, world: WorldSnapshot): GoalEntry
 /**
  * The player's quest ranks.
  *
- * The ranks are the **server's** — they are the map's own field, the
- * way the original keeps them — and they are keyed by the quest's
+ * The ranks are the **server's** — the player's `privateState.questsRank`,
+ * the field the upstream writes — and they are keyed by the quest's
  * index, which is its position in the quest list.
  */
 export function questRanks(world: WorldSnapshot): Record<number, number> {
-  const ranks = world.maps[0]?.questsRank;
+  const ranks = world.privateState['questsRank'];
   if (typeof ranks !== 'object' || ranks === null) return {};
   const out: Record<number, number> = {};
   for (const [index, rank] of Object.entries(ranks)) {

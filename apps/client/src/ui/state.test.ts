@@ -276,16 +276,25 @@ describe('the unit panel', () => {
 });
 
 describe('the quest progress', () => {
-  it('is the map\'s own field', () => {
+  it('is the player\'s privateState.questsRank field', () => {
+    const ranks = questRanks({
+      maps: [{ id: 0, items: {} }],
+      resources: {},
+      privateState: { questsRank: { '1': 3, '2': 1 } },
+    });
+    assert.deepEqual(ranks, { 1: 3, 2: 1 });
+  });
+
+  it('does not read a map-level questsRank, which the server never writes', () => {
     const ranks = questRanks({
       maps: [{ id: 0, items: {}, questsRank: { '1': 3, '2': 1 } }],
       resources: {},
       privateState: {},
     });
-    assert.deepEqual(ranks, { 1: 3, 2: 1 });
+    assert.deepEqual(ranks, {});
   });
 
-  it('is empty when the map has no ranks', () => {
+  it('is empty when the server has no ranks', () => {
     assert.deepEqual(questRanks({ maps: [], resources: {}, privateState: {} }), {});
   });
 
