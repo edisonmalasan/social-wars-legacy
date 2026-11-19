@@ -26,6 +26,13 @@ import {
   type MagicPayment,
   type MagicSpellDefinition,
 } from './magic.ts';
+import {
+  offerPackPrice,
+  offerPackShape,
+  offerPackTierForCount,
+  parseOfferPackSelection,
+  type OfferPackData,
+} from './offerpacks.ts';
 
 /** The player's resources, by resource key: `g`, `w`, `o`, `s`, `c`, `e`, `x`, `m`. */
 export type Resources = Record<string, number>;
@@ -53,19 +60,14 @@ export interface CostItem {
   premiumUpgradeCosts: Resources;
 }
 
-/** An offer pack. */
-export interface CostOfferPack {
-  id: number;
-  name: string;
-  cost_cash: number;
-  gold: number;
-  wood: number;
-  oil: number;
-  steel: number;
-  mana: number;
-  xp: number;
-  items: number[];
-}
+/**
+ * An offer pack.
+ *
+ * The shape is defined with the pack rules so the cost table and the
+ * applier cannot drift. This alias is kept because the cost table's public
+ * type used it first.
+ */
+export type CostOfferPack = OfferPackData;
 
 /** A resource pack from the store. */
 export interface CostResourcePack {
@@ -260,9 +262,26 @@ export function computeCommandCost(
     }
 
     case 'buy_offer_pack': {
-      // args: offer pack id, JSON array of item ids
+      // args: offer pack id, JSON array of item ids.
+      //
+      // The selected list is only a tier selector for a super pack. The
+      // price comes from the pack's content shape, never from the client's
+      // list or from the declared delta.
       const pack = content.offerPacks.get(Number(args[0]));
       if (!pack) return null;
+      if (offerPackShape(pack) === 'premium') return null;
+
+      const selection = parseOfferPackSelection(args[1]);
+      if (selection === null) return null;
+      const tier =
+        offerPackShape(pack) === 'super'
+          ? offerPackTierForCount(pack, selection.length)
+          : null;
+      if (offerPackShape(pack) === 'super' && tier === null) return null;
+
+      const price = offerPackPrice(pack, tier);
+      if (price === null) return null;
+
       const gain: Resources = {};
       if (pack.gold) gain['g'] = pack.gold;
       if (pack.wood) gain['w'] = pack.wood;
@@ -270,7 +289,7 @@ export function computeCommandCost(
       if (pack.steel) gain['s'] = pack.steel;
       if (pack.mana) gain['m'] = pack.mana;
       if (pack.xp) gain['x'] = pack.xp;
-      return { cost: { c: pack.cost_cash }, gain };
+      return { cost: { c: price }, gain };
     }
 
     case 'buy_premium_account': {

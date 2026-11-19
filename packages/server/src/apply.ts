@@ -72,8 +72,18 @@ import {
   manaPack,
   manaRewardPerLevel,
   spellUseCap,
+  isOfferPackAvailable,
+  offerPackCandidates,
+  offerPackPrice,
+  offerPackRewardItems,
+  offerPackSeed,
+  offerPackShape,
+  offerPackTierForCount,
+  parseOfferPackSelection,
+  type CostOfferPack,
 } from '@swl/rules';
 
+import { addStoreItem, removeStoreItem, storeQuantity } from './mapstore.ts';
 import type { CommandApplier, CommandOutcome, ShimWorld } from './shim.ts';
 
 export type { CommandApplier, CommandOutcome, ShimWorld } from './shim.ts';
@@ -141,6 +151,8 @@ export const DEFAULT_COLLECT_PERIOD = 2;
 export const GOAL_STATE_KEY = 'goalState';
 /** The private-state key the quest progress uses. */
 export const QUEST_PROGRESS_KEY = 'questProgress';
+/** The private-state counter that keeps two offer-pack rolls distinct. */
+export const OFFER_PACK_ROLLS_KEY = 'offerPackRolls';
 
 /**
  * What the server's own simulation of an attack says.
@@ -237,6 +249,8 @@ export interface ApplierDeps {
   goalRewardGold?: number;
   /** The content items, by id, for the costs and the placement rules. */
   items?: Map<number, ApplierItem>;
+  /** The offer packs, by id, for `buy_offer_pack`. */
+  offerPacks?: Map<number, CostOfferPack>;
   /** The population rules, for the population check. */
   populationRules?: {
     startMaxPopulation: number;
@@ -343,6 +357,8 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return upgradeCommand(world, command.args, deps);
       case 'buy':
         return buyCommand(world, command.args, deps);
+      case 'buy_offer_pack':
+        return buyOfferPackCommand(world, command.args, deps);
       case 'collect':
         return collectCommand(world, command.args, deps);
       case 'complete_goal':
@@ -854,6 +870,14 @@ function placeCommand(
   const itemId = Number(args[1]);
   const item = deps.items?.get(itemId);
   if (!item) return { applied: false, refused: 'unknown-item', world };
+  if (item.type !== 'b') return { applied: false, refused: 'not-a-building', world };
+
+  const map = ownMap(world);
+  if (!map) return { applied: false, refused: 'no-map', world };
+  if (storeQuantity(map, itemId) <= 0) {
+    return { applied: false, refused: 'not-stored', world };
+  }
+
   const tx = Number(args[2]);
   const ty = Number(args[3]);
   if (!Number.isFinite(tx) || !Number.isFinite(ty)) {
@@ -862,6 +886,13 @@ function placeCommand(
   const orientation = Number(args[6] ?? 0);
   const placed = placeBuilding(world, item, tx, ty, orientation, deps);
   if (!placed.ok) return { applied: false, refused: placed.reason, world };
+
+  // The placement succeeds before the store entry is spent, so a refused
+  // placement (a taken tile, a level, the population) costs the player
+  // nothing. The reverse order would let a failed placement eat the item.
+  if (!removeStoreItem(map, itemId, 1)) {
+    return { applied: false, refused: 'not-stored', world };
+  }
   return { applied: true, world };
 }
 
@@ -882,6 +913,101 @@ function buyCommand(
   const orientation = Number(args[5] ?? 0);
   const placed = placeBuilding(world, item, tx, ty, orientation, deps);
   if (!placed.ok) return { applied: false, refused: placed.reason, world };
+  return { applied: true, world };
+}
+
+/**
+ * `buy_offer_pack` - buy a store pack and put its items in the store.
+ *
+ * The client's selected-item list is **not** a grant list. It is only a
+ * super pack's tier selector: one, two or four items choose the tier, and
+ * the server rolls the reward from the pack's own content. A flat pack
+ * grants its whole list, a random pack rolls against the list's thresholds,
+ * and a super pack rolls from its three rarity rows.
+ *
+ * Every possible reward is checked against the content items before anything
+ * is written, so a malformed pack id such as `1072.1224` is refused rather
+ * than becoming an unplaceable store entry.
+ *
+ * The resources the pack carries are granted by the cost table, which has
+ * already settled them. This step owns only the items. If it refuses, the
+ * shim or the native endpoint restores the wallet, so a refused purchase
+ * spends nothing.
+ */
+function buyOfferPackCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const packs = deps.offerPacks;
+  if (!packs || !deps.items) {
+    return { applied: false, refused: 'not-implemented', world };
+  }
+
+  const packId = Number(args[0]);
+  if (!Number.isInteger(packId)) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+  const pack = packs.get(packId);
+  if (!pack) return { applied: false, refused: 'unknown-pack', world };
+
+  const shape = offerPackShape(pack);
+  if (shape === 'premium') {
+    return { applied: false, refused: 'premium-not-a-pack', world };
+  }
+  if (!isOfferPackAvailable(pack)) {
+    return { applied: false, refused: 'pack-unavailable', world };
+  }
+
+  const selection = parseOfferPackSelection(args[1]);
+  if (selection === null) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+  const tier =
+    shape === 'super' ? offerPackTierForCount(pack, selection.length) : null;
+  if (shape === 'super' && tier === null) {
+    return { applied: false, refused: 'bad-tier', world };
+  }
+  // A pack with no server price must never be granted for free. The cost
+  // table returns null for the same case, so refusing here keeps the two
+  // paths aligned.
+  if (offerPackPrice(pack, tier) === null) {
+    return { applied: false, refused: 'bad-pack-price', world };
+  }
+
+  const candidates = offerPackCandidates(pack);
+  if (candidates === null) {
+    return { applied: false, refused: 'bad-pack-item', world };
+  }
+  for (const itemId of candidates) {
+    if (!deps.items.has(itemId)) {
+      return { applied: false, refused: 'unknown-pack-item', world };
+    }
+  }
+
+  const map = ownMap(world);
+  if (!map) return { applied: false, refused: 'no-map', world };
+
+  let reward: number[];
+  if (shape === 'flat') {
+    reward = candidates;
+  } else {
+    const privateState = world.save.privateState;
+    const remembered = Number(privateState[OFFER_PACK_ROLLS_KEY] ?? 0);
+    const rollNumber =
+      Number.isFinite(remembered) && remembered >= 0 ? Math.trunc(remembered) : 0;
+    const random = new Random(
+      hashSeed(offerPackSeed(pack.id, tier, world.nextCommandNumber, rollNumber)),
+    );
+    const rolled = offerPackRewardItems(pack, tier, random);
+    if (rolled === null) {
+      return { applied: false, refused: 'bad-pack-item', world };
+    }
+    reward = rolled;
+    privateState[OFFER_PACK_ROLLS_KEY] = rollNumber + 1;
+  }
+
+  for (const itemId of reward) addStoreItem(map, itemId, 1);
   return { applied: true, world };
 }
 

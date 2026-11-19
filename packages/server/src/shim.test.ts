@@ -10,7 +10,8 @@ import { framePayload, SERVER_KEYS } from '@swl/protocol/commandphp';
 import { COUNTERS } from '@swl/rules';
 
 import { LegacyIdentityBridge, SessionStore } from './session.ts';
-import { createApplier } from './apply.ts';
+import { createApplier, type ApplierItem } from './apply.ts';
+import { mapStore } from './mapstore.ts';
 import {
   applyBatch,
   handleCommandPhp,
@@ -422,6 +423,82 @@ describe('the legacy magic commands', () => {
     assert.equal(outcome.refused[0]!.reason, 'deliberately-refused');
     assert.equal(outcome.world.resources['g'], 1000);
     assert.equal(outcome.world.resources['s'], 1000);
+  });
+});
+
+describe('the legacy offer packs', () => {
+  function offerItem(id: number, type: string): ApplierItem {
+    return {
+      id,
+      name: `Item ${id}`,
+      costs: {},
+      costUnitCash: 0,
+      buildTime: 0,
+      trainingTime: 0,
+      clicksToBuild: 0,
+      minLevel: 1,
+      unitCapacity: 0,
+      population: 0,
+      buildingLimitSameId: -1,
+      buildingLimitSameScf: -1,
+      subcategoryId: 1,
+      width: 1,
+      height: 1,
+      trainsIds: [],
+      upgradesTo: null,
+      premiumUpgradeCosts: {},
+      type,
+      grantsPopulation: false,
+    };
+  }
+
+  async function offerContext(over: Partial<ShimContext> = {}): Promise<ShimContext> {
+    const content = await costContent();
+    return context({
+      content,
+      applyCommand: createApplier({
+        now: () => 1_700_000_000,
+        tzOffsetHours: 0,
+        collectPeriods: { minutes: [5, 60, 240, 480], multiplier: [0.25, 1, 2, 3] },
+        dailyBonus: { goldRewards: [100, 250, 500, 1000, 0], heroItemId: 1001 },
+        items: new Map([
+          [1042, offerItem(1042, 'u')],
+          [84, offerItem(84, 'b')],
+        ]),
+        offerPacks: content.offerPacks,
+      }),
+      ...over,
+    });
+  }
+
+  it('refunds a hidden pack the cost table charged before the applier refused it', async () => {
+    // Pack 4 is the hidden Mystery Box. The cost table can price it, but the
+    // applier refuses it because the store does not sell it. The refusal must
+    // put the cash back.
+    const ctx = await offerContext();
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'buy_offer_pack', [4, '[]'], [0, 0, 0, 0, 0, 0, -20, 0]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.equal(outcome.refused.length, 1);
+    assert.equal(outcome.refused[0]!.reason, 'pack-unavailable');
+    assert.equal(outcome.world.resources['c'], 1000);
+  });
+
+  it('buys a flat pack and stores every item it grants', async () => {
+    const ctx = await offerContext();
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'buy_offer_pack', [1, '[]'], [0, 0, 0, 0, 0, 0, -25, 0]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.deepEqual(outcome.refused, []);
+    assert.equal(outcome.world.resources['c'], 975);
+    assert.deepEqual(
+      mapStore(outcome.world.save.maps[0] as Record<string, unknown>),
+      { '84': 1, '1042': 1 },
+    );
   });
 });
 

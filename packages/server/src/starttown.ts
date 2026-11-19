@@ -117,6 +117,9 @@ export function initialWorld(playerId: string): ShimWorld {
         {
           id: 0,
           items: startingTown(),
+          // The store is the map's own field. It starts empty, and the
+          // offer packs and the daily bonus fill it.
+          store: {},
           // The level and the XP are the **map's** own fields, the way
           // the original keeps them, so the client reads the level from
           // the map and the server's own rules read it from there too.
