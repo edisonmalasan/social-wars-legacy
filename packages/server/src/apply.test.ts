@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   GOALS,
+  DART_COST_CASH,
   applyCommandCost,
   buildDartsBoard,
   createGoalState,
@@ -1559,6 +1560,33 @@ describe('the darts appliers', () => {
     assert.equal(storeQuantity(outcome.world.save.maps[0], LIVE_GAME.extra_item), 0);
   });
 
+  it('refunds the cost table charge for the free first shot, but not a paid shot', () => {
+    const applier = createApplier(featureDeps());
+    // The cost table charges every shot; simulate that settlement first.
+    const start = wallet(100);
+    const settled = applyCommandCost(start, { cost: { c: DART_COST_CASH }, gain: {} })
+      .resources;
+    const free = applier(dartsWorld({}, settled), {
+      name: 'darts_shoot_balloon',
+      args: [0, 0],
+    });
+    assert.equal(free.applied, true);
+    assert.equal(free.world.save.privateState['dartsHasFree'], false);
+    assert.equal(free.world.resources['c'], start['c'], 'the free shot costs nothing');
+
+    const paidStart = dartsWorld({ dartsHasFree: false }, wallet(100));
+    const paidSettled = applyCommandCost(paidStart.resources, {
+      cost: { c: DART_COST_CASH },
+      gain: {},
+    }).resources;
+    const paid = applier(dartsWorld({ dartsHasFree: false }, paidSettled), {
+      name: 'darts_shoot_balloon',
+      args: [1, 0],
+    });
+    assert.equal(paid.applied, true);
+    assert.equal(paid.world.resources['c'], start['c']! - DART_COST_CASH);
+  });
+
   it('refuses a target already shot without changing the save or spending cash', () => {
     const applier = createApplier(featureDeps());
     const first = applier(dartsWorld(), {
@@ -1725,6 +1753,22 @@ describe('the trade applier', () => {
       assert.equal(map['numTradesDone'], 0);
       assert.equal(map['timestampLastTrade'], 0);
       assert.deepEqual(map['resourcesTraded'], {});
+    }
+  });
+
+  it('refuses prototype-key resources without producing NaN gold', () => {
+    const applier = createApplier(featureDeps());
+    for (const resource of ['__proto__', 'constructor', 'toString']) {
+      const world = marketWorld(settledPurse({ g: 1000 }));
+      const before = { ...world.resources };
+      const outcome = applier(world, {
+        name: 'trade_resource',
+        args: [resource, 0, 100],
+      });
+      assert.equal(outcome.applied, false, resource);
+      assert.equal(outcome.refused, 'unknown-resource', resource);
+      assert.deepEqual(outcome.world.resources, before, resource);
+      assert.equal(Number.isNaN(outcome.world.resources['g']), false, resource);
     }
   });
 

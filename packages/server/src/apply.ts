@@ -35,6 +35,7 @@
 import { Random, hashSeed } from '@swl/rules';
 import {
   NUM_PRIZES,
+  DART_COST_CASH,
   allDiscovered,
   buildDartsBoard,
   currentDartsGame,
@@ -1724,8 +1725,8 @@ function dartsStateOf(privateState: Record<string, unknown>): DartsState {
  *
  * The client's `wonExtra` argument is a claim and is ignored: the extra prize
  * exists only when the server's own state says every prize has been found.
- * The free-shot price is settled by the cost table; this step owns the board,
- * the flags and the items.
+ * The cost table charges every shot, so this step refunds the first one of the
+ * day; it owns the board, the flags and the items.
  */
 function dartsShootCommand(
   world: ShimWorld,
@@ -1757,6 +1758,14 @@ function dartsShootCommand(
 
   // Every check is done. Nothing below can refuse, so a rejected shot leaves
   // the save and the wallet exactly as they arrived.
+  if (shot.free) {
+    // The cost table charges the cash price of every shot; the first shot of
+    // the day is the one the rules model says is free, so put its price back.
+    world.resources = {
+      ...world.resources,
+      c: (world.resources['c'] ?? 0) + DART_COST_CASH,
+    };
+  }
   privateState['dartsBalloonsShot'] = [...shot.state.shot];
   privateState['dartsHasFree'] = shot.state.hasFree;
   privateState['dartsGotExtra'] = shot.state.gotExtra;
@@ -1856,6 +1865,15 @@ function tradeResourceCommand(
   if ((sellingValue !== 0 && sellingValue !== 1) || !Number.isInteger(amount)) {
     return { applied: false, refused: 'bad-argument', world };
   }
+  // A prototype key is an inherited object or function, not a price: looking
+  // it up would make marketPrice compute NaN and pay it out as gold.
+  const base = rules.baseCosts[resource];
+  if (
+    typeof base !== 'number' ||
+    !Object.prototype.hasOwnProperty.call(rules.baseCosts, resource)
+  ) {
+    return { applied: false, refused: 'unknown-resource', world };
+  }
   const selling = sellingValue === 1;
   const map = ownMap(world);
   if (!map) return { applied: false, refused: 'no-map', world };
@@ -1873,7 +1891,6 @@ function tradeResourceCommand(
   const result = trade(rules, period, resource, amount, selling);
   if (!result.ok) return { applied: false, refused: result.reason, world };
 
-  const base = rules.baseCosts[resource] ?? 0;
   const beforeGold = goldOf(world) + base;
   if ((!selling && beforeGold < result.cost) ||
       (selling && (world.resources[resource] ?? 0) < amount)) {
