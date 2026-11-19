@@ -34,6 +34,20 @@
  */
 import { Random, hashSeed } from '@swl/rules';
 import {
+  NUM_PRIZES,
+  allDiscovered,
+  buildDartsBoard,
+  currentDartsGame,
+  extraPrizeItemId,
+  newDartsState,
+  shootDarts,
+  type DartsGame,
+  type DartsState,
+  canTrade,
+  marketPeriod,
+  trade,
+  type MarketPeriod,
+  type MarketRules,
   awardGoal,
   allianceDailyBonus,
   createGoalState,
@@ -251,6 +265,10 @@ export interface ApplierDeps {
   items?: Map<number, ApplierItem>;
   /** The offer packs, by id, for `buy_offer_pack`. */
   offerPacks?: Map<number, CostOfferPack>;
+  /** The darts schedule, for the board's prize items and the extra prize. */
+  dartsItems?: readonly DartsGame[];
+  /** The market rules, for `trade_resource`. */
+  market?: MarketRules;
   /** The population rules, for the population check. */
   populationRules?: {
     startMaxPopulation: number;
@@ -383,6 +401,14 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return useMagicCommand(world, command.args, deps);
       case 'finish_building':
         return finishBuildingCommand(world, command.args, deps);
+      case 'darts_shoot_balloon':
+        return dartsShootCommand(world, command.args, deps);
+      case 'darts_new_free':
+        return dartsNewFreeCommand(world, command.args, deps);
+      case 'darts_reset':
+        return dartsResetCommand(world, command.args, deps);
+      case 'trade_resource':
+        return tradeResourceCommand(world, command.args, deps);
       case 'end_attack':
         return endAttackCommand(world, command.args, deps);
       case 'end_quest':
@@ -1643,6 +1669,233 @@ function allianceBonusCommand(
   } else if (reward.type === 'c' && typeof reward.value === 'number') {
     world.resources = { ...world.resources, c: (world.resources['c'] ?? 0) + reward.value };
   }
+
+  return { applied: true, world };
+}
+
+/** The darts game the server says is live, rotated from the content's dates. */
+function liveDartsGame(deps: ApplierDeps): DartsGame | null {
+  if (!deps.dartsItems || deps.dartsItems.length === 0) return null;
+  return currentDartsGame(deps.dartsItems, new Date(deps.now() * 1000));
+}
+
+/**
+ * Rebuild the darts state from the server's own save.
+ *
+ * The board is not stored: it is derived from the seed, just as the client
+ * derives it from the seed the server sends. Only the shots, the flags and
+ * the seed are authoritative; the client never supplies a board or a prize.
+ */
+function dartsStateOf(privateState: Record<string, unknown>): DartsState {
+  const rawSeed = Number(privateState['dartsRandomSeed'] ?? 0);
+  const seed = Number.isFinite(rawSeed) ? rawSeed >>> 0 : 0;
+  const board = buildDartsBoard(seed);
+  const rawShot = privateState['dartsBalloonsShot'];
+  const shot = Array.isArray(rawShot)
+    ? [
+        ...new Set(
+          rawShot.filter(
+            (value): value is number =>
+              typeof value === 'number' &&
+              Number.isInteger(value) &&
+              value >= 0 &&
+              value < board.length,
+          ),
+        ),
+      ]
+    : [];
+  const discovered = new Array<boolean>(NUM_PRIZES).fill(false);
+  for (const index of shot) {
+    const prize = board[index];
+    if (prize !== undefined && prize < NUM_PRIZES) discovered[prize] = true;
+  }
+  return {
+    seed,
+    board,
+    shot,
+    discovered,
+    hasFree: privateState['dartsHasFree'] === true,
+    gotExtra: privateState['dartsGotExtra'] === true,
+  };
+}
+
+/**
+ * `darts_shoot_balloon` - record a shot and grant what the server's board says.
+ *
+ * The client's `wonExtra` argument is a claim and is ignored: the extra prize
+ * exists only when the server's own state says every prize has been found.
+ * The free-shot price is settled by the cost table; this step owns the board,
+ * the flags and the items.
+ */
+function dartsShootCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const game = liveDartsGame(deps);
+  if (!game) return { applied: false, refused: 'not-implemented', world };
+
+  const privateState = world.save.privateState;
+  const state = dartsStateOf(privateState);
+  const target = Number(args[0]);
+  if (!Number.isInteger(target) || target < 0 || target >= state.board.length) {
+    return { applied: false, refused: 'bad-target', world };
+  }
+  if (state.shot.includes(target)) {
+    return { applied: false, refused: 'already-shot', world };
+  }
+  if (game.items.length !== NUM_PRIZES || !Number.isInteger(game.extra_item)) {
+    return { applied: false, refused: 'bad-board', world };
+  }
+
+  const shot = shootDarts(state, target, game.items, game.extra_item);
+  if (shot.prizeItemId === null) {
+    return { applied: false, refused: 'bad-target', world };
+  }
+  const map = ownMap(world);
+  if (!map) return { applied: false, refused: 'no-map', world };
+
+  // Every check is done. Nothing below can refuse, so a rejected shot leaves
+  // the save and the wallet exactly as they arrived.
+  privateState['dartsBalloonsShot'] = [...shot.state.shot];
+  privateState['dartsHasFree'] = shot.state.hasFree;
+  privateState['dartsGotExtra'] = shot.state.gotExtra;
+  privateState['timeStampDartsNewFree'] = deps.now();
+  addStoreItem(map, shot.prizeItemId, 1);
+
+  const extra = extraPrizeItemId(
+    shot.wonExtra && allDiscovered(shot.state),
+    game.extra_item,
+  );
+  if (extra !== null) addStoreItem(map, extra, 1);
+
+  return { applied: true, world };
+}
+
+/**
+ * `darts_new_free` - the client may ask for one free shot a day.
+ *
+ * The day comes from the server's clock and the player's time zone. The
+ * timestamp is also written by every shot, so a second request on the same
+ * day cannot hand out another free shot.
+ */
+function dartsNewFreeCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  void args;
+  const privateState = world.save.privateState;
+  const now = deps.now();
+  const last = Number(privateState['timeStampDartsNewFree'] ?? 0);
+  const lastDay =
+    Number.isFinite(last) && last > 0
+      ? localDayNumber(last, deps.tzOffsetHours)
+      : null;
+  if (lastDay === localDayNumber(now, deps.tzOffsetHours)) {
+    return { applied: false, refused: 'already-free', world };
+  }
+
+  privateState['dartsHasFree'] = true;
+  privateState['timeStampDartsNewFree'] = now;
+  return { applied: true, world };
+}
+
+/**
+ * `darts_reset` - start a fresh board from a seed the server chooses.
+ *
+ * The command's arguments are ignored: neither the board nor its seed is a
+ * client decision. Deriving both from the server's clock and command index
+ * keeps the reset reproducible and stops a player picking a favourable board.
+ */
+function dartsResetCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  void args;
+  const privateState = world.save.privateState;
+  const now = deps.now();
+  const seed = hashSeed(`darts:${now}:${world.nextCommandNumber}`);
+  const fresh = newDartsState(seed, true);
+
+  privateState['dartsRandomSeed'] = fresh.seed;
+  privateState['dartsBalloonsShot'] = [...fresh.shot];
+  privateState['dartsHasFree'] = fresh.hasFree;
+  privateState['dartsGotExtra'] = fresh.gotExtra;
+  privateState['timeStampDartsReset'] = now;
+  privateState['timeStampDartsNewFree'] = now;
+  return { applied: true, world };
+}
+
+/** The gold in the server's wallet, with a missing value as zero. */
+function goldOf(world: ShimWorld): number {
+  const gold = world.resources['g'];
+  return typeof gold === 'number' && Number.isFinite(gold) ? gold : 0;
+}
+
+/**
+ * `trade_resource` - buy or sell a resource at the server-computed price.
+ *
+ * The cost table charges the standard 100-unit base price before this runs
+ * (it cannot know the amount on the legacy path). Here the server prices the
+ * actual trade from the content and the map's own counter, undoes that fixed
+ * charge and settles the real one. A sell reverses the direction as well.
+ */
+function tradeResourceCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const rules = deps.market;
+  if (!rules) return { applied: false, refused: 'not-implemented', world };
+
+  const resource = String(args[0] ?? '');
+  const sellingValue = Number(args[1]);
+  const amount = Number(args[2]);
+  if ((sellingValue !== 0 && sellingValue !== 1) || !Number.isInteger(amount)) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+  const selling = sellingValue === 1;
+  const map = ownMap(world);
+  if (!map) return { applied: false, refused: 'no-map', world };
+
+  const done = Number(map['numTradesDone'] ?? 0);
+  const lastTradeAt = Number(map['timestampLastTrade'] ?? 0);
+  const current: MarketPeriod = {
+    trades: Number.isFinite(done) && done > 0 ? Math.trunc(done) : 0,
+    lastTradeAt: Number.isFinite(lastTradeAt) && lastTradeAt > 0 ? lastTradeAt : 0,
+  };
+  const period = marketPeriod(rules, current, deps.now());
+  if (!canTrade(rules, period)) {
+    return { applied: false, refused: 'too-many-trades', world };
+  }
+  const result = trade(rules, period, resource, amount, selling);
+  if (!result.ok) return { applied: false, refused: result.reason, world };
+
+  const base = rules.baseCosts[resource] ?? 0;
+  const beforeGold = goldOf(world) + base;
+  if ((!selling && beforeGold < result.cost) ||
+      (selling && (world.resources[resource] ?? 0) < amount)) {
+    return { applied: false, refused: 'insufficient-resources', world };
+  }
+
+  // Every check is done; the wallet and the counters move together.
+  const nextGold = selling ? beforeGold + result.cost : beforeGold - result.cost;
+  const resources: ShimWorld['resources'] = { ...world.resources, g: nextGold };
+  resources[resource] = (resources[resource] ?? 0) + (selling ? -amount : amount);
+  world.resources = resources;
+
+  map['numTradesDone'] = result.trades;
+  map['timestampLastTrade'] = deps.now();
+  const rawTraded = map['resourcesTraded'];
+  const traded: Record<string, unknown> =
+    rawTraded && typeof rawTraded === 'object' && !Array.isArray(rawTraded)
+      ? { ...(rawTraded as Record<string, unknown>) }
+      : {};
+  const previous = Number(traded[resource] ?? 0);
+  traded[resource] = (Number.isFinite(previous) ? previous : 0) + amount;
+  map['resourcesTraded'] = traded;
 
   return { applied: true, world };
 }

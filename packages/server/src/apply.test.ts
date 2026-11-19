@@ -1,7 +1,15 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { GOALS, getGoalDefinition, createGoalState } from '@swl/rules';
+import {
+  GOALS,
+  applyCommandCost,
+  buildDartsBoard,
+  createGoalState,
+  currentDartsGame,
+  getGoalDefinition,
+  hashSeed,
+} from '@swl/rules';
 
 import {
   type ApplierItem,
@@ -13,6 +21,7 @@ import {
   type ApplierDeps,
   type MapItemTuple,
 } from './apply.ts';
+import { storeQuantity } from './mapstore.ts';
 import type { ShimWorld } from './shim.ts';
 
 const NOW = 1_700_000_000;
@@ -1438,5 +1447,310 @@ describe('the claims the server does not honour', () => {
     assert.equal(outcome.applied, false);
     assert.equal(outcome.refused, 'not-implemented');
     assert.equal(outcome.world.resources['g'], 0);
+  });
+});
+
+/** A darts schedule; the rules engine picks the game live at NOW. */
+const DARTS_GAMES = [
+  {
+    id: 1,
+    start_date: '2012-03-02 23:00:00',
+    items: [101, 102, 103, 104, 105, 106],
+    extra_item: 997,
+  },
+  {
+    id: 2,
+    start_date: '2012-03-09 23:00:00',
+    items: [201, 202, 203, 204, 205, 206],
+    extra_item: 998,
+  },
+];
+
+/** The market rules the content ships. */
+const MARKET = {
+  baseCosts: { w: 100, o: 100, s: 150 },
+  amounts: [100, 200, 300],
+  increment: 0.02,
+  sellPercentage: 0.75,
+  maxTrades: 20,
+  periodHours: 20,
+};
+
+/** The game the server's rules make live at NOW. */
+const LIVE_GAME = currentDartsGame(DARTS_GAMES, new Date(NOW * 1000))!;
+
+const featureDeps = (over: Partial<ApplierDeps> = {}): ApplierDeps =>
+  deps({ dartsItems: DARTS_GAMES, market: MARKET, ...over });
+
+/** A save with a darts board in progress. */
+function dartsWorld(
+  privateState: Record<string, unknown> = {},
+  resources = wallet(1000),
+): ShimWorld {
+  return {
+    save: {
+      playerInfo: {},
+      maps: [{ id: 0, items: {}, store: {} }],
+      privateState: {
+        dartsRandomSeed: 1234,
+        dartsBalloonsShot: [],
+        dartsHasFree: true,
+        dartsGotExtra: false,
+        timeStampDartsReset: NOW,
+        timeStampDartsNewFree: 0,
+        ...privateState,
+      },
+    },
+    resources,
+    nextCommandNumber: 1,
+  };
+}
+
+/** A save with a market counter. */
+function marketWorld(
+  resources: ShimWorld['resources'],
+  map: Record<string, unknown> = {},
+): ShimWorld {
+  return {
+    save: {
+      playerInfo: {},
+      maps: [
+        {
+          id: 0,
+          items: {},
+          store: {},
+          numTradesDone: 0,
+          resourcesTraded: {},
+          timestampLastTrade: 0,
+          ...map,
+        },
+      ],
+      privateState: {},
+    },
+    resources,
+    nextCommandNumber: 1,
+  };
+}
+
+/** The wallet after the cost table has charged the traded resource's base price. */
+function settledPurse(
+  resources: Partial<ShimWorld['resources']>,
+  resource: keyof typeof MARKET.baseCosts = 'w',
+): ShimWorld['resources'] {
+  const before = purse(resources);
+  const charge = MARKET.baseCosts[resource] ?? 100;
+  return applyCommandCost(before, { cost: { g: charge }, gain: {} }).resources;
+}
+
+describe('the darts appliers', () => {
+  it('records a valid shot and stores the prize from the live schedule', () => {
+    const applier = createApplier(featureDeps());
+    const world = dartsWorld();
+    const outcome = applier(world, { name: 'darts_shoot_balloon', args: [0, 0] });
+
+    assert.equal(outcome.applied, true);
+    const state = outcome.world.save.privateState;
+    assert.deepEqual(state['dartsBalloonsShot'], [0]);
+    assert.equal(state['dartsHasFree'], false);
+    assert.equal(state['dartsGotExtra'], false);
+    // The prize comes from the board and the rotated schedule, not the client.
+    const prize = LIVE_GAME.items[buildDartsBoard(1234)[0]!]!;
+    assert.equal(storeQuantity(outcome.world.save.maps[0], prize), 1);
+    assert.equal(storeQuantity(outcome.world.save.maps[0], LIVE_GAME.extra_item), 0);
+  });
+
+  it('refuses a target already shot without changing the save or spending cash', () => {
+    const applier = createApplier(featureDeps());
+    const first = applier(dartsWorld(), {
+      name: 'darts_shoot_balloon',
+      args: [0, 0],
+    });
+    const before = first.world.save.privateState;
+    const resources = { ...first.world.resources };
+    const again = applier(first.world, { name: 'darts_shoot_balloon', args: [0, 0] });
+
+    assert.equal(again.applied, false);
+    assert.equal(again.refused, 'already-shot');
+    assert.deepEqual(again.world.save.privateState, before);
+    assert.deepEqual(again.world.resources, resources);
+  });
+
+  it('refuses a target outside the board without spending anything', () => {
+    const applier = createApplier(featureDeps());
+    for (const index of [-1, 25, 1.5, Number.NaN]) {
+      const world = dartsWorld();
+      const before = { ...world.save.privateState };
+      const outcome = applier(world, { name: 'darts_shoot_balloon', args: [index, 0] });
+      assert.equal(outcome.applied, false, `index ${index}`);
+      assert.equal(outcome.refused, 'bad-target', `index ${index}`);
+      assert.deepEqual(outcome.world.save.privateState, before);
+      assert.deepEqual(outcome.world.resources, world.resources);
+    }
+  });
+
+  it('does not grant the extra prize just because the client claims it', () => {
+    const applier = createApplier(featureDeps());
+    const outcome = applier(dartsWorld(), {
+      name: 'darts_shoot_balloon',
+      args: [0, 1],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.save.privateState['dartsGotExtra'], false);
+    assert.equal(storeQuantity(outcome.world.save.maps[0], LIVE_GAME.extra_item), 0);
+  });
+
+  it('grants the extra prize when the server sees every prize discovered', () => {
+    const applier = createApplier(featureDeps());
+    const board = buildDartsBoard(1234);
+    let world = dartsWorld();
+    // One target for each prize, with the client claiming NO extra prize.
+    for (let prize = 0; prize < 6; prize++) {
+      const target = board.indexOf(prize);
+      const outcome = applier(world, {
+        name: 'darts_shoot_balloon',
+        args: [target, 0],
+      });
+      assert.equal(outcome.applied, true, `prize ${prize}`);
+      world = outcome.world;
+    }
+
+    assert.equal(world.save.privateState['dartsGotExtra'], true);
+    assert.equal((world.save.privateState['dartsBalloonsShot'] as number[]).length, 6);
+    assert.equal(storeQuantity(world.save.maps[0], LIVE_GAME.extra_item), 1);
+    // A further shot must not grant a second extra prize.
+    const alreadyShot = new Set(world.save.privateState['dartsBalloonsShot'] as number[]);
+    const unshot = board.findIndex((_prize, index) => !alreadyShot.has(index));
+    const next = applier(world, { name: 'darts_shoot_balloon', args: [unshot, 1] });
+    assert.equal(next.applied, true, `unshot target ${unshot}`);
+    assert.equal(storeQuantity(next.world.save.maps[0], LIVE_GAME.extra_item), 1);
+  });
+
+  it('resets the free-shot flag and timestamp, once per day', () => {
+    const applier = createApplier(featureDeps());
+    const world = dartsWorld({
+      dartsHasFree: false,
+      timeStampDartsNewFree: NOW - 86400,
+    });
+    const outcome = applier(world, { name: 'darts_new_free', args: [] });
+
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.save.privateState['dartsHasFree'], true);
+    assert.equal(outcome.world.save.privateState['timeStampDartsNewFree'], NOW);
+
+    const again = applier(outcome.world, { name: 'darts_new_free', args: [] });
+    assert.equal(again.applied, false);
+    assert.equal(again.refused, 'already-free');
+    assert.deepEqual(again.world.save.privateState, outcome.world.save.privateState);
+  });
+
+  it('rebuilds a fresh board from the server seed, not a client-supplied one', () => {
+    const applier = createApplier(featureDeps());
+    const world = dartsWorld({
+      dartsBalloonsShot: [3, 7],
+      dartsHasFree: false,
+      dartsGotExtra: true,
+      timeStampDartsReset: 0,
+    });
+    const outcome = applier(world, { name: 'darts_reset', args: [99999, [1, 1, 1, 1, 1, 1]] });
+
+    assert.equal(outcome.applied, true);
+    const state = outcome.world.save.privateState;
+    assert.equal(state['dartsRandomSeed'], hashSeed(`darts:${NOW}:1`));
+    assert.notEqual(state['dartsRandomSeed'], 99999);
+    assert.deepEqual(state['dartsBalloonsShot'], []);
+    assert.equal(state['dartsHasFree'], true);
+    assert.equal(state['dartsGotExtra'], false);
+    assert.equal(state['timeStampDartsReset'], NOW);
+    assert.equal(state['timeStampDartsNewFree'], NOW);
+    assert.equal(buildDartsBoard(state['dartsRandomSeed'] as number).length, 25);
+  });
+});
+
+describe('the trade applier', () => {
+  it('buys at the server-computed price and advances the trade counter', () => {
+    const applier = createApplier(featureDeps());
+    const before = purse({ g: 1000 });
+    // The cost table has already charged the standard 100-unit price.
+    const world = marketWorld(settledPurse({ g: 1000 }));
+
+    const outcome = applier(world, { name: 'trade_resource', args: ['w', 0, 200] });
+    assert.equal(outcome.applied, true);
+    // 100 * (200/100) * (1 + 0*0.02) = 200 gold, net of the settled price.
+    assert.equal(outcome.world.resources['g'], before['g']! - 200);
+    assert.equal(outcome.world.resources['w'], 200);
+    const map = outcome.world.save.maps[0]!;
+    assert.equal(map['numTradesDone'], 1);
+    assert.equal(map['timestampLastTrade'], NOW);
+    assert.deepEqual(map['resourcesTraded'], { w: 200 });
+  });
+
+  it('sells at the server-computed price and debits the resource', () => {
+    const applier = createApplier(featureDeps());
+    const before = purse({ g: 1000, w: 100 });
+    const world = marketWorld(settledPurse({ g: 1000, w: 100 }));
+
+    const outcome = applier(world, { name: 'trade_resource', args: ['w', 1, 100] });
+    assert.equal(outcome.applied, true);
+    // round(100 * 1 * 1) * 0.75 = 75 gold received, net of the settled price.
+    assert.equal(outcome.world.resources['g'], before['g']! + 75);
+    assert.equal(outcome.world.resources['w'], 0);
+  });
+
+  it('uses the price after the trades already made this period', () => {
+    const applier = createApplier(featureDeps());
+    const world = marketWorld(settledPurse({ g: 1000 }, 's'), {
+      numTradesDone: 5,
+      timestampLastTrade: NOW - 3600,
+    });
+    const outcome = applier(world, { name: 'trade_resource', args: ['s', 0, 100] });
+    assert.equal(outcome.applied, true);
+    // round(150 * 1 * (1 + 5*0.02)) = 165 gold.
+    assert.equal(outcome.world.resources['g'], 1000 - 165);
+    assert.equal((outcome.world.save.maps[0]!['numTradesDone'] as number), 6);
+  });
+
+  it('refuses an amount or resource the content does not allow, spending nothing', () => {
+    const applier = createApplier(featureDeps());
+    for (const [args, reason] of [
+      [['w', 0, 150], 'unknown-amount'],
+      [['x', 0, 100], 'unknown-resource'],
+    ] as const) {
+      const world = marketWorld(settledPurse({ g: 1000 }));
+      const resources = { ...world.resources };
+      const outcome = applier(world, { name: 'trade_resource', args: [...args] });
+      assert.equal(outcome.applied, false);
+      assert.equal(outcome.refused, reason);
+      assert.deepEqual(outcome.world.resources, resources);
+      const map = outcome.world.save.maps[0]!;
+      assert.equal(map['numTradesDone'], 0);
+      assert.equal(map['timestampLastTrade'], 0);
+      assert.deepEqual(map['resourcesTraded'], {});
+    }
+  });
+
+  it('enforces the 20-trade limit from the server counter', () => {
+    const applier = createApplier(featureDeps());
+    const world = marketWorld(settledPurse({ g: 1000 }), {
+      numTradesDone: 20,
+      timestampLastTrade: NOW - 3600,
+    });
+    const resources = { ...world.resources };
+    const outcome = applier(world, { name: 'trade_resource', args: ['w', 0, 100] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'too-many-trades');
+    assert.deepEqual(outcome.world.resources, resources);
+    assert.equal(outcome.world.save.maps[0]!['numTradesDone'], 20);
+  });
+
+  it('reopens the market after the content period has passed', () => {
+    const applier = createApplier(featureDeps());
+    const world = marketWorld(settledPurse({ g: 1000 }), {
+      numTradesDone: 20,
+      timestampLastTrade: NOW - 25 * 3600,
+    });
+    const outcome = applier(world, { name: 'trade_resource', args: ['w', 0, 100] });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.save.maps[0]!['numTradesDone'], 1);
+    assert.equal(outcome.world.resources['g'], 1000 - 100);
   });
 });

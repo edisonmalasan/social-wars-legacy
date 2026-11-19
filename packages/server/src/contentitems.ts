@@ -9,6 +9,8 @@
  * The content bundle is the authority, and this is the mapping from it
  * to the applier's own shape.
  */
+import type { MarketRules } from '@swl/rules';
+
 import type { ApplierItem } from './apply.ts';
 
 /** A number, or the fallback. */
@@ -102,5 +104,29 @@ export function populationRules(globals: Record<string, unknown>): {
     startMaxPopulation: numberOr(globals['START_MAX_POPULATION'], 20),
     maxPopulationCap: numberOr(globals['MAX_POPULATION_CAP'], 175),
     maxPopulationPerLevel: numberOr(globals['MAX_POPULATION_PER_LEVEL'], 3),
+  };
+}
+
+/**
+ * The market rules, from the content's globals.
+ *
+ * The price, the increment, the sell percentage and the trade limit all come
+ * from the shipped config. The fallbacks are the game's own numbers, so a
+ * bundle that has lost a global still uses the game's market.
+ */
+export function marketRules(globals: Record<string, unknown>): MarketRules {
+  const rawAmounts = globals['MARKET_AMOUNT_TRADE'];
+  const amounts = Array.isArray(rawAmounts)
+    ? rawAmounts.filter(
+        (value): value is number => typeof value === 'number' && Number.isFinite(value),
+      )
+    : [];
+  return {
+    baseCosts: costsOr(globals['MARKET_BASE_COSTS']),
+    amounts: amounts.length > 0 ? amounts : [100, 200, 300],
+    increment: numberOr(globals['MARKET_INCREMENT'], 0.02),
+    sellPercentage: numberOr(globals['MARKET_SELL_PERCENTAGE'], 0.75),
+    maxTrades: numberOr(globals['MARKET_MAX_NUM_TRADES'], 20),
+    periodHours: numberOr(globals['MARKET_PERIOD_HOURS'], 20),
   };
 }
