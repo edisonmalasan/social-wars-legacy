@@ -18,6 +18,7 @@ import type { CommandName, NativeCommand } from '@swl/protocol';
 import type { MagicPayment } from '@swl/rules';
 import type { Neighbour } from './neighbours.ts';
 import { authorizationHeader, type ClientSession } from './session.ts';
+import { requestId } from './transport.ts';
 
 export type { CommandName, NativeCommand };
 
@@ -193,8 +194,183 @@ export function endAttack(attackId: string, voluntaryEnd: boolean): NativeComman
  * and the difficulty it *was* playing, and the server checks both
  * against its own state.
  */
-export function endQuest(questId: number, difficulty: number): NativeCommand {
-  return command('end_quest', [questId, difficulty]);
+export function endQuest(questId: string | number, difficulty: number): NativeCommand {
+  // The native argument is STR. A number is refused with a 400 by the
+  // protocol's validation before the server reads its own quest state.
+  return command('end_quest', [String(questId), difficulty]);
+}
+
+/**
+ * Report one kill to the active quest.
+ *
+ * The native form is strictly **two** arguments: the `killed` key and a
+ * JSON-encoded list of refs. There is no third argument — no client-declared
+ * quest id, counter, amount or difficulty — because the server reads the quest
+ * from its own active state and accepts a ref only once its own engagement
+ * ledger marks the element dead. A forged or early ref is refused.
+ */
+export function reportQuestKill(ref: string): NativeCommand {
+  return command('set_quest_var', ['killed', JSON.stringify([ref])]);
+}
+
+/* -------------------------------------------------------------------------
+ * The native quest workflow
+ *
+ * Starting a quest and applying an authoritative event are not commands: they
+ * are their own endpoints, because only the server may create an active quest
+ * or move its ledger. The helpers below use the same authorization header as
+ * every other request and carry an idempotency key, but they name neither a
+ * reward nor a counter: the answer is the server's own ledger summary.
+ * ---------------------------------------------------------------------- */
+
+/** The authoritative actions a client may ask the server to apply. */
+export type QuestActionRequest =
+  | { type: 'strike'; ref: string }
+  | { type: 'truck-arrival'; ref: string }
+  | { type: 'eligible-enemy'; ref: string }
+  | { type: 'civilian-evacuation'; ref: string };
+
+/** The server's answer to a quest start. */
+export interface QuestStartBody {
+  readonly questId: string;
+  readonly started: boolean;
+}
+
+/** One element of the server's engagement ledger, as it answers. */
+export interface QuestLedgerElement {
+  readonly hp: number;
+  readonly alive: boolean;
+}
+
+/** The server's authoritative ledger summary. */
+export interface QuestLedgerSummary {
+  readonly questId: string;
+  readonly phase: string;
+  readonly counters: Record<string, number>;
+  readonly elements: Record<string, QuestLedgerElement>;
+  readonly events: string[];
+}
+
+/** A typed native result: an answer, or the reason there was none. */
+export interface QuestResult<T> {
+  /** Whether the server accepted the request. */
+  readonly ok: boolean;
+  /** The HTTP status, or 0 when the request never reached the server. */
+  readonly status: number;
+  /** The parsed answer, never invented when the server refused or lied. */
+  readonly body: T | null;
+  /** A transport-level or malformed-answer failure. */
+  readonly error?: 'network' | 'bad-answer';
+}
+
+/** Read a plain record only when it really is one. */
+function questRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  return value as Record<string, unknown>;
+}
+
+/** Copy only the own, finite numeric counters out of the server's answer. */
+function questCounters(value: unknown): Record<string, number> | null {
+  const source = questRecord(value);
+  if (!source) return null;
+  const out: Record<string, number> = {};
+  for (const [key, entry] of Object.entries(source)) {
+    if (typeof entry === 'number' && Number.isFinite(entry)) out[key] = entry;
+  }
+  return out;
+}
+
+/** Parse a ledger summary, returning null rather than fabricating one. */
+function questSummaryBody(value: unknown): QuestLedgerSummary | null {
+  const source = questRecord(value);
+  const elements = questRecord(source?.['elements']);
+  const counters = questCounters(source?.['counters']);
+  if (!source || typeof source['questId'] !== 'string' || typeof source['phase'] !== 'string') {
+    return null;
+  }
+  if (!elements || !counters || !Array.isArray(source['events'])) return null;
+  const parsedElements: Record<string, QuestLedgerElement> = {};
+  for (const [ref, entry] of Object.entries(elements)) {
+    const element = questRecord(entry);
+    if (!element || typeof element['hp'] !== 'number' || typeof element['alive'] !== 'boolean') {
+      return null;
+    }
+    parsedElements[ref] = { hp: element['hp'], alive: element['alive'] };
+  }
+  return {
+    questId: source['questId'],
+    phase: source['phase'],
+    counters,
+    elements: parsedElements,
+    events: source['events'].filter((event): event is string => typeof event === 'string'),
+  };
+}
+
+/** POST a JSON body to a native quest endpoint. */
+async function postQuest<T>(
+  url: string,
+  session: ClientSession,
+  body: Record<string, unknown>,
+  parse: (value: unknown) => T | null,
+  fetchImpl: typeof fetch,
+): Promise<QuestResult<T>> {
+  let response: Response;
+  try {
+    response = await fetchImpl(url, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: authorizationHeader(session),
+      },
+      body: JSON.stringify({ id: requestId(), ...body }),
+    });
+  } catch {
+    return { ok: false, status: 0, body: null, error: 'network' };
+  }
+  if (!response.ok) return { ok: false, status: response.status, body: null };
+  try {
+    const parsed = parse(await response.json());
+    if (!parsed) return { ok: false, status: response.status, body: null, error: 'bad-answer' };
+    return { ok: true, status: response.status, body: parsed };
+  } catch {
+    return { ok: false, status: response.status, body: null, error: 'bad-answer' };
+  }
+}
+
+/** Start a quest in the server's own state. */
+export async function startQuestOnServer(
+  session: ClientSession,
+  questId: string,
+  difficulty?: number,
+  fetchImpl: typeof fetch = fetch,
+): Promise<QuestResult<QuestStartBody>> {
+  return postQuest(
+    '/api/quest/start',
+    session,
+    { questId, ...(difficulty === undefined ? {} : { difficulty }) },
+    (value): QuestStartBody | null => {
+      const source = questRecord(value);
+      if (!source || typeof source['questId'] !== 'string' || source['started'] !== true) return null;
+      return { questId: source['questId'], started: true };
+    },
+    fetchImpl,
+  );
+}
+
+/** Apply one authoritative quest action on the server. */
+export async function questActionOnServer(
+  session: ClientSession,
+  questId: string,
+  action: QuestActionRequest,
+  fetchImpl: typeof fetch = fetch,
+): Promise<QuestResult<QuestLedgerSummary>> {
+  return postQuest(
+    '/api/quest/action',
+    session,
+    { questId, action },
+    questSummaryBody,
+    fetchImpl,
+  );
 }
 
 /** Trade a resource at the market. */

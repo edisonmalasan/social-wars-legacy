@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  activeQuestState,
   bonusState,
   dartsState,
   marketState,
@@ -228,5 +229,76 @@ describe('questState', () => {
     assert.equal(state.currentMissionId, null);
     assert.equal(state.unlockedIndex, null);
     assert.equal(state.currentQuestVars, null);
+  });
+});
+
+describe('activeQuestState', () => {
+  const ACTIVE = {
+    questId: '100000002',
+    phase: 'started',
+    // The counters live under `script` in the save; the endpoint's summary
+    // flattens them. The selector reads where the save actually writes them.
+    script: {
+      counters: { enemiesAlive: 3, trucksArrived: 0 },
+      destroyed: ['commandCenter'],
+    },
+    ledger: {
+      elements: {
+        commandCenter: { hp: 0, alive: false },
+        goodBoy: { hp: 4, alive: true },
+      },
+      events: ['strike:commandCenter:3'],
+      strikes: { commandCenter: 3 },
+    },
+  };
+
+  it('reads the quest id, the server-owned counters and the ledger verbatim', () => {
+    assert.deepEqual(activeQuestState(world({ activeQuest: ACTIVE })), {
+      questId: '100000002',
+      counters: { enemiesAlive: 3, trucksArrived: 0 },
+      elements: {
+        commandCenter: { hp: 0, alive: false },
+        goodBoy: { hp: 4, alive: true },
+      },
+      events: ['strike:commandCenter:3'],
+    });
+  });
+
+  it('is null when the save has no active quest', () => {
+    assert.equal(activeQuestState(world()), null);
+  });
+
+  it('does not fabricate a counter, an element or an event', () => {
+    const state = activeQuestState(world({ activeQuest: { questId: '100000002' } }))!;
+    assert.equal(state.questId, '100000002');
+    assert.deepEqual(state.counters, {});
+    assert.deepEqual(state.elements, {});
+    assert.deepEqual(state.events, []);
+  });
+
+  it('ignores malformed values rather than guessing a ledger', () => {
+    const state = activeQuestState(world({ activeQuest: {
+      questId: 42,
+      script: { counters: { good: 1, bad: 'x' } },
+      ledger: {
+        elements: {
+          ok: { hp: 2, alive: true },
+          noHp: { alive: false },
+          noRecord: 'x',
+        },
+        events: ['one', 2, null],
+      },
+    } }))!;
+    assert.equal(state.questId, null);
+    assert.deepEqual(state.counters, { good: 1 });
+    assert.deepEqual(state.elements, { ok: { hp: 2, alive: true } });
+    assert.deepEqual(state.events, ['one']);
+  });
+
+  it('treats a bare { questId } seed as an incomplete, non-authoritative quest', () => {
+    // A legacy seed carries no ledger, so there are no elements to act on.
+    const state = activeQuestState(world({ activeQuest: { questId: '100000002' } }));
+    assert.ok(state);
+    assert.equal(Object.keys(state!.elements).length, 0);
   });
 });

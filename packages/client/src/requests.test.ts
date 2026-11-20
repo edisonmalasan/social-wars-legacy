@@ -22,15 +22,18 @@ import {
   endAttack,
   endQuest,
   exchangeCash,
+  questActionOnServer,
   expand,
   finishBuilding,
   levelUp,
   move,
   placeStoredItem,
   premiumUpgrade,
+  reportQuestKill,
   resetCollect,
   resetDarts,
   shootBalloon,
+  startQuestOnServer,
   takeTrainedUnit,
   tradeResource,
   train,
@@ -53,6 +56,7 @@ const BUILDERS: { name: string; command: ReturnType<typeof buy> }[] = [
   { name: 'reset_collect', command: resetCollect(7) },
   { name: 'complete_goal', command: completeGoal(30) },
   { name: 'complete_tutorial', command: completeTutorial(101) },
+  { name: 'set_quest_var', command: reportQuestKill('commandCenter') },
   { name: 'win_daily_bonus', command: claimDailyBonus() },
   { name: 'weekly_reward', command: claimWeeklyBonus() },
   { name: 'end_attack', command: endAttack('attack-1', false) },
@@ -254,6 +258,13 @@ describe('the individual requests', () => {
     assert.deepEqual(shootBalloon(24, false).args, [24, 0]);
   });
 
+  it('end_quest names the quest as a string, as the command table requires', () => {
+    // The native `end_quest` argument is STR: a number is refused with a 400
+    // before the server ever reads its own quest state.
+    assert.deepEqual(endQuest('100000003', 1).args, ['100000003', 1]);
+    assert.deepEqual(endQuest(100000003, 2).args, ['100000003', 2]);
+  });
+
   it('buy_offer_pack names the pack and JSON-encodes the chosen item ids', () => {
     assert.deepEqual(buyOfferPack(7, [1001, 1002]).args, [7, '[1001,1002]']);
     assert.deepEqual(buyOfferPack(7, []).args, [7, '[]']);
@@ -278,5 +289,137 @@ describe('the individual requests', () => {
 
   it('exchange_cash carries no claimed rate or amount', () => {
     assert.deepEqual(exchangeCash().args, []);
+  });
+});
+
+/** The session the native quest helpers travel with. */
+const SESSION = { token: 'tok', playerId: 'p1', expiresAt: 1_700_000_000 };
+
+/**
+ * A fetch double: it records the request and returns the given answer, so the
+ * tests can see exactly what the client sent without a server.
+ */
+function capture(status: number, body: unknown) {
+  const calls: { url: string; init: RequestInit }[] = [];
+  const fetchImpl: typeof fetch = async (input, init) => {
+    calls.push({ url: String(input), init: init ?? {} });
+    return new Response(JSON.stringify(body), {
+      status,
+      headers: { 'content-type': 'application/json' },
+    });
+  };
+  return { calls, fetchImpl };
+}
+
+describe('the authoritative quest requests', () => {
+  it('reportQuestKill builds the strictly two-argument killed write', () => {
+    // The table allows exactly two arguments. A third one — a client-declared
+    // quest id, counter or amount — would be refused by the server.
+    const request = reportQuestKill('commandCenter');
+    assert.equal(request.name, 'set_quest_var');
+    assert.equal(request.map, OWN_TOWN);
+    assert.deepEqual(request.args, ['killed', '["commandCenter"]']);
+    assert.equal(request.args.length, 2);
+  });
+
+  it('startQuestOnServer posts an authenticated, keyed start request', async () => {
+    const { calls, fetchImpl } = capture(200, { questId: '100000002', started: true });
+    const result = await startQuestOnServer(SESSION, '100000002', 2, fetchImpl);
+    assert.equal(result.ok, true);
+    assert.equal(result.status, 200);
+    assert.deepEqual(result.body, { questId: '100000002', started: true });
+
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0]!.url, '/api/quest/start');
+    assert.equal(calls[0]!.init.method, 'POST');
+    const headers = calls[0]!.init.headers as Record<string, string>;
+    assert.equal(headers['authorization'], 'Bearer tok');
+    const body = JSON.parse(calls[0]!.init.body as string) as Record<string, unknown>;
+    assert.equal(body['questId'], '100000002');
+    assert.equal(body['difficulty'], 2);
+    assert.equal(typeof body['id'], 'string');
+    assert.ok((body['id'] as string).length > 0, 'the start carries an idempotency key');
+  });
+
+  it('startQuestOnServer omits the difficulty when none is given', async () => {
+    const { calls, fetchImpl } = capture(200, { questId: '100000002', started: true });
+    await startQuestOnServer(SESSION, '100000002', undefined, fetchImpl);
+    const body = JSON.parse(calls[0]!.init.body as string) as Record<string, unknown>;
+    assert.equal('difficulty' in body, false);
+  });
+
+  it('startQuestOnServer reports a typed refusal without a body', async () => {
+    const { fetchImpl } = capture(409, { error: 'quest-already-active' });
+    const result = await startQuestOnServer(SESSION, '100000002', 1, fetchImpl);
+    assert.equal(result.ok, false);
+    assert.equal(result.status, 409);
+    assert.equal(result.body, null);
+  });
+
+  it('questActionOnServer posts the action and ref, and reads the ledger summary', async () => {
+    const summary = {
+      questId: '100000002',
+      phase: 'started',
+      counters: { enemiesAlive: 3 },
+      elements: { commandCenter: { hp: 0, alive: false } },
+      events: ['strike:commandCenter:3'],
+    };
+    const { calls, fetchImpl } = capture(200, summary);
+    const result = await questActionOnServer(SESSION, '100000002', {
+      type: 'strike',
+      ref: 'commandCenter',
+    }, fetchImpl);
+    assert.equal(result.ok, true);
+    assert.equal(result.status, 200);
+    assert.deepEqual(result.body, summary);
+
+    assert.equal(calls[0]!.url, '/api/quest/action');
+    const headers = calls[0]!.init.headers as Record<string, string>;
+    assert.equal(headers['authorization'], 'Bearer tok');
+    const body = JSON.parse(calls[0]!.init.body as string) as Record<string, unknown>;
+    assert.equal(body['questId'], '100000002');
+    assert.deepEqual(body['action'], { type: 'strike', ref: 'commandCenter' });
+    assert.equal(typeof body['id'], 'string');
+  });
+
+  it('questActionOnServer reports a refused off-roster action', async () => {
+    const { fetchImpl } = capture(409, { error: 'quest-refused' });
+    const result = await questActionOnServer(SESSION, '100000002', {
+      type: 'strike',
+      ref: 'not-on-the-roster',
+    }, fetchImpl);
+    assert.equal(result.ok, false);
+    assert.equal(result.status, 409);
+    assert.equal(result.body, null);
+  });
+
+  it('questActionOnServer does not invent a ledger from a malformed answer', async () => {
+    const { fetchImpl } = capture(200, { questId: '100000002' });
+    const result = await questActionOnServer(SESSION, '100000002', {
+      type: 'strike',
+      ref: 'commandCenter',
+    }, fetchImpl);
+    assert.equal(result.ok, false);
+    assert.equal(result.error, 'bad-answer');
+    assert.equal(result.body, null);
+  });
+
+  it('both native helpers report a network failure without a body', async () => {
+    const offline: typeof fetch = async () => {
+      throw new Error('offline');
+    };
+    const started = await startQuestOnServer(SESSION, '100000002', 1, offline);
+    assert.deepEqual(
+      { ok: started.ok, status: started.status, body: started.body, error: started.error },
+      { ok: false, status: 0, body: null, error: 'network' },
+    );
+    const action = await questActionOnServer(SESSION, '100000002', {
+      type: 'strike',
+      ref: 'commandCenter',
+    }, offline);
+    assert.deepEqual(
+      { ok: action.ok, status: action.status, body: action.body, error: action.error },
+      { ok: false, status: 0, body: null, error: 'network' },
+    );
   });
 });

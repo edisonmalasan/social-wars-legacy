@@ -34,6 +34,18 @@ import {
 import type { NativeCommand, NativeResponse } from '@swl/protocol';
 import type { ContentBundle, ContentItem } from '@swl/content';
 import { buy, claimDailyBonus, completeTutorial } from '@swl/client';
+import {
+  activeQuestState,
+  endQuest,
+  questActionOnServer,
+  reportQuestKill,
+  startQuestOnServer,
+  type ActiveQuestStateView,
+  type QuestActionRequest,
+  type QuestLedgerSummary,
+  type QuestResult,
+  type QuestStartBody,
+} from '@swl/client';
 
 import { mountUi } from './ui/mount.tsx';
 import { uiCss } from './ui/css.ts';
@@ -231,6 +243,29 @@ export interface ClientHandle {
   advanceTutorial: () => Promise<{ ok: boolean; step: number | null }>;
   /** Skip the tutorial, recording it as finished. */
   skipTutorial: () => Promise<{ ok: boolean }>;
+  /**
+   * Start a quest in the server's own state. The difficulty is the one the
+   * player chose to play; the server decides whether to accept it and owns
+   * the resulting active quest.
+   */
+  startQuest: (
+    questId: string,
+    difficulty?: number,
+  ) => Promise<QuestResult<QuestStartBody>>;
+  /**
+   * Apply one authoritative quest action (a strike, an arrival, an eligible
+   * enemy or an evacuation) on the server, which owns the ledger it moves.
+   */
+  questAction: (
+    questId: string,
+    action: QuestActionRequest,
+  ) => Promise<QuestResult<QuestLedgerSummary>>;
+  /** The strictly two-argument `killed` write the client reports. */
+  reportQuestKill: typeof reportQuestKill;
+  /** The `end_quest` request, whose reward the server computes. */
+  endQuest: typeof endQuest;
+  /** The active quest read from the server's answer, never fabricated. */
+  activeQuest: () => ActiveQuestStateView | null;
 }
 
 /** The browser's storage, or null when it refuses to be used. */
@@ -552,6 +587,36 @@ async function main(): Promise<void> {
     };
   }
 
+  /**
+   * Start a quest on the server, then redraw from the server's answer.
+   *
+   * A start is not a command: only the server may create an active quest and
+   * seed its ledger. The client asks, then reads the state back.
+   */
+  async function startQuest(
+    questId: string,
+    difficulty?: number,
+  ): Promise<QuestResult<QuestStartBody>> {
+    const result = await startQuestOnServer(signedIn, questId, difficulty);
+    world = await fetchWorld();
+    drawInterface();
+    return result;
+  }
+
+  /**
+   * Apply one authoritative quest action.
+   *
+   * The answer already carries the server's ledger summary — its counters and
+   * its elements' HP — so the client does not need a second world request to
+   * know what the server decided.
+   */
+  function questAction(
+    questId: string,
+    action: QuestActionRequest,
+  ): Promise<QuestResult<QuestLedgerSummary>> {
+    return questActionOnServer(signedIn, questId, action);
+  }
+
   // The debug handle. The end-to-end test drives the client through it,
   // and a developer can look at the client's own state in the console.
   const handle: ClientHandle = {
@@ -565,6 +630,11 @@ async function main(): Promise<void> {
     tutorialStep: () => (tutorialRunning ? tutorial.current?.step ?? null : null),
     advanceTutorial,
     skipTutorial,
+    startQuest,
+    questAction,
+    reportQuestKill,
+    endQuest,
+    activeQuest: () => activeQuestState(world),
     visibleSprites: () =>
       scene.filter(
         (sprite) =>

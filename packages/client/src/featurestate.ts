@@ -256,3 +256,61 @@ export function questState(world: WorldSnapshot): QuestState | null {
     ranks: numbers(state['questsRank']),
   };
 }
+
+/* -------------------------------------------------------------------------
+ * The active (authoritative) quest
+ * ---------------------------------------------------------------------- */
+
+/** One ledger element of the active quest, as the server stores it. */
+export interface ActiveQuestElement {
+  /** Remaining hit points, seeded from the content by the server. */
+  readonly hp: number;
+  /** Whether the server still considers the element alive. */
+  readonly alive: boolean;
+}
+
+/**
+ * The active quest, as the server owns it.
+ *
+ * A bare `{ questId }` seed has no ledger and reads as an empty one: it can
+ * never prove a kill or a counter, so nothing here can be mistaken for the
+ * server's authoritative state.
+ */
+export interface ActiveQuestStateView {
+  /** The quest id, when the server wrote a string one. */
+  readonly questId: string | null;
+  /** The server-owned counters, read from where the save keeps them. */
+  readonly counters: Readonly<Record<string, number>>;
+  /** The engagement ledger's elements, by ref. */
+  readonly elements: Readonly<Record<string, ActiveQuestElement>>;
+  /** The dedupe keys of the events the server has accepted. */
+  readonly events: readonly string[];
+}
+
+/**
+ * Read the active quest, or `null` when the save has none.
+ *
+ * This is a selector only: it copies the server's values and invents nothing.
+ */
+export function activeQuestState(world: WorldSnapshot): ActiveQuestStateView | null {
+  const stored = record(world.privateState['activeQuest']);
+  if (!stored) return null;
+  const script = record(stored['script']);
+  const ledger = record(stored['ledger']);
+  const elements = record(ledger?.['elements']);
+  const view: Record<string, ActiveQuestElement> = {};
+  if (elements) {
+    for (const [ref, value] of Object.entries(elements)) {
+      const element = record(value);
+      const hp = element ? number(element['hp']) : null;
+      if (hp === null || !element) continue;
+      view[ref] = { hp, alive: flag(element['alive']) };
+    }
+  }
+  return {
+    questId: typeof stored['questId'] === 'string' ? stored['questId'] : null,
+    counters: script ? numbers(script['counters']) : {},
+    elements: view,
+    events: ledger ? strings(ledger['events']) : [],
+  };
+}
