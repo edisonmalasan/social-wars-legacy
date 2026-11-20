@@ -27,6 +27,7 @@ import {
   type QuestActionChoice,
   type QuestChoice,
   type QuestDifficulty,
+  type StoredItemView,
   type WorldSnapshot,
 } from '@swl/client';
 import type { ContentBundle } from '@swl/content';
@@ -38,6 +39,7 @@ import { Feedback } from './feedback.tsx';
 import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
 import { InfoPanel } from './info.tsx';
+import { Inventory } from './inventory.tsx';
 import { Neighbours } from './neighbours.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
 import { RecruitPanel } from './recruit.tsx';
@@ -49,6 +51,7 @@ import {
   goalList,
   hudInput,
   infoPanel,
+  inventoryItems,
   questMinLevels,
   questRanks,
   recruitView,
@@ -89,6 +92,10 @@ export interface RootProps {
   onQuestAction?: (questId: string, action: QuestActionChoice) => void;
   /** The player asked to collect the selected building's production. */
   onCollect?: () => void;
+  /** The player picked a stored item to place on the map. */
+  onPlaceStored?: (entry: StoredItemView) => void;
+  /** The player asked for the daily bonus; the server decides the reward. */
+  onClaimBonus?: () => void;
   /** The player picked something to build, with its real wire type. */
   onPick?: (itemId: number, type: ItemType) => void;
   /** The player claimed a goal; send it through the client's transport. */
@@ -127,6 +134,8 @@ export function Root({
   onQuestStart,
   onQuestAction,
   onCollect,
+  onPlaceStored,
+  onClaimBonus,
   onPick,
   onCommand,
   onUpgrade,
@@ -142,6 +151,7 @@ export function Root({
     return items.find((item) => item.id === placing)?.name ?? null;
   }, [items, placing]);
   const goals = useMemo(() => goalList(bundle, world), [bundle, world]);
+  const stored = useMemo(() => inventoryItems(bundle, world), [bundle, world]);
   const ranks = useMemo(() => questRanks(world), [world]);
   const minLevels = useMemo(() => questMinLevels(bundle), [bundle]);
   // The chapter slots are gestures: a slot the server has opened can be
@@ -164,8 +174,9 @@ export function Root({
 
   return (
     <div className="swl-ui">
-      <Hud state={state} placing={placingName} />
+      <Hud state={state} placing={placingName} onClaimBonus={onClaimBonus} />
       <Goals goals={goals} onCommand={onCommand} />
+      <Inventory items={stored} onPlace={onPlaceStored} />
       <Chapters
         ranks={ranks}
         minLevels={minLevels}

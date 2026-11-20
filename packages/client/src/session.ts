@@ -129,10 +129,41 @@ export function authorizationHeader(session: ClientSession): string {
   return `Bearer ${session.token}`;
 }
 
-/** The result of a sign-in. */
+/** The result of a sign-in or a registration. */
 export type SignInResult =
   | { ok: true; session: ClientSession }
-  | { ok: false; reason: 'invalid-credentials' | 'unknown-player' | 'network' };
+  | {
+      ok: false;
+      reason: 'invalid-credentials' | 'unknown-player' | 'player-exists' | 'network';
+    };
+
+/** The two forms the account screen can show. */
+export type AuthMode = 'sign-in' | 'register';
+
+/**
+ * The endpoint a mode uses.
+ *
+ * Registration creates the account and signs the player in; sign-in only
+ * signs in. Both answer with the same session shape, so the client keeps one
+ * session flow and chooses only the endpoint.
+ */
+export function authEndpoint(mode: AuthMode): string {
+  return mode === 'register' ? '/api/account' : '/api/session';
+}
+
+/**
+ * Authenticate in the chosen mode.
+ *
+ * The form never decides a credential's validity: the server's answer does.
+ */
+export async function authenticate(
+  mode: AuthMode,
+  playerId: string,
+  password: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<SignInResult> {
+  return signIn(authEndpoint(mode), playerId, password, fetchImpl);
+}
 
 /**
  * Sign in.
@@ -158,6 +189,9 @@ export async function signIn(
   }
   if (response.status === 404) return { ok: false, reason: 'unknown-player' };
   if (response.status === 401) return { ok: false, reason: 'invalid-credentials' };
+  // The account endpoint answers 409 when the name is taken. Sign-in never
+  // does, so this is harmless for it and tells a would-be registrant why.
+  if (response.status === 409) return { ok: false, reason: 'player-exists' };
   if (!response.ok) return { ok: false, reason: 'network' };
   try {
     const body = (await response.json()) as ServerSession;
@@ -175,6 +209,12 @@ export interface WorldSnapshot {
   maps: {
     id: number;
     items: Record<string, number[]>;
+    /**
+     * The bought-but-unplaced items, keyed by content id. The save keeps it
+     * on the map and the world endpoint sends the map verbatim; older saves
+     * have no store at all.
+     */
+    store?: Record<string, number>;
     /** The player's level. The original keeps it on the map. */
     level?: number;
     /** The XP the player has. */

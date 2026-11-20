@@ -21,6 +21,7 @@ import type {
   ItemPopulation,
   NativeCommand,
   QuestViewOptions,
+  StoredItemView,
   RecruitView,
   ResourcePanel,
   UnitCard,
@@ -33,6 +34,7 @@ import {
   itemType,
   levelOf,
   resourcePanel,
+  storedItems,
   trainingView,
   unitPanel,
 } from '@swl/client';
@@ -103,6 +105,17 @@ export function expRequiredByLevel(bundle: ContentBundle): Map<number, number> {
   const out = new Map<number, number>();
   for (const level of bundle.levels) out.set(level.index, level.exp_required);
   return out;
+}
+
+/**
+ * The stored items the inventory draws.
+ *
+ * The bridge is thin: the model reads the server's `maps[0].store`, and the
+ * content supplies the names and the wire types. Nothing about ownership or
+ * quantity is decided here.
+ */
+export function inventoryItems(bundle: ContentBundle, world: WorldSnapshot): StoredItemView[] {
+  return storedItems(world, bundle.items ?? []);
 }
 
 /** What the HUD needs to draw itself. */

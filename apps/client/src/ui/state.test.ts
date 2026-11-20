@@ -13,6 +13,7 @@ import {
   hudInput,
   hudRules,
   infoPanel,
+  inventoryItems,
   populationItems,
   questMinLevels,
   questRanks,
@@ -437,5 +438,28 @@ describe('building management views', () => {
     assert.deepEqual(view?.units, [{ itemId: 1008, name: 'Rifleman' }]);
     assert.equal(view?.queue.remainingSeconds, 5);
     assert.equal(view?.queue.readyToTake, false);
+  });
+});
+
+describe('the inventory panel', () => {
+  it('lists the server\'s stored items, named by the content', () => {
+    const b = bundle({ items: [item({ id: 1, name: 'House I' })] });
+    const w = {
+      maps: [{ id: 0, items: {}, store: { '1': 2 } }],
+      resources: {},
+      privateState: {},
+    } as WorldSnapshot;
+    assert.deepEqual(inventoryItems(b, w), [
+      { itemId: 1, quantity: 2, name: 'House I', type: 'b' },
+    ]);
+  });
+
+  it('is empty when the save has no store', () => {
+    const w = {
+      maps: [{ id: 0, items: {} }],
+      resources: {},
+      privateState: {},
+    } as WorldSnapshot;
+    assert.deepEqual(inventoryItems(bundle(), w), []);
   });
 });

@@ -136,6 +136,21 @@ export function additionalPopulation(world: WorldSnapshot): number {
 }
 
 /**
+ * The mana the HUD shows.
+ *
+ * The original displays `privateState.mana`, which the server keeps in step
+ * with the wallet's `m` (see `packages/server/src/apply.ts`). A save from
+ * before that mirror was written falls back to the wallet, so the readout
+ * never shows a number the server did not send.
+ */
+export function manaOf(world: WorldSnapshot): number {
+  const mirror = Number(world.privateState?.['mana']);
+  if (Number.isFinite(mirror) && mirror >= 0) return mirror;
+  const wallet = Number(world.resources?.['m']);
+  return Number.isFinite(wallet) && wallet >= 0 ? wallet : 0;
+}
+
+/**
  * The XP the player's next level needs.
  *
  * The server's own rule is the authority: to reach level *n* the player
@@ -180,5 +195,6 @@ export function hudState(input: HudInput): HudState {
     expRequired: expRequired(input, level),
     energy: resources['e'] ?? 0,
     maxEnergy: rules.maxEnergy,
+    mana: manaOf(world),
   };
 }

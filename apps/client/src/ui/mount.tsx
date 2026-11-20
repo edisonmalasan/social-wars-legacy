@@ -16,6 +16,7 @@ import type {
   QuestActionChoice,
   QuestChoice,
   QuestDifficulty,
+  StoredItemView,
   WorldSnapshot,
 } from '@swl/client';
 import type { ContentBundle } from '@swl/content';
@@ -44,6 +45,10 @@ export interface UiOverlayState {
   readonly selectedIso?: number | null;
   /** The client's unix second, for on-screen countdowns. */
   readonly now?: number;
+  /** The player picked a stored item to place on the map. */
+  readonly onPlaceStored?: (entry: StoredItemView) => void;
+  /** The player asked for the daily bonus. */
+  readonly onClaimBonus?: () => void;
   /** The player asked to upgrade the selected building. */
   readonly onUpgrade?: () => void;
   /** The player asked to hurry the selected building's construction. */
@@ -105,6 +110,8 @@ export function mountUi(
           onPick={onPick}
           onCollect={onCollect}
           onCommand={onCommand}
+          onPlaceStored={overlays.onPlaceStored}
+          onClaimBonus={overlays.onClaimBonus}
           onUpgrade={overlays.onUpgrade}
           onFinish={overlays.onFinish}
           onTrain={overlays.onTrain}

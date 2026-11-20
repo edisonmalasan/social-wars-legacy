@@ -49,6 +49,28 @@ export function uiCss(): string {
   pointer-events: auto;
 }
 
+/* --- The account form -------------------------------------------------- */
+
+.swl-auth-modes {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.swl-auth-modes button {
+  padding: 6px 12px;
+  border: 1px solid #38445a;
+  border-radius: 3px;
+  color: #8d97a8;
+}
+
+.swl-auth-modes .swl-auth-mode-active {
+  border-color: #f5c542;
+  color: #f5c542;
+}
+
+#signin-error { margin: 0; color: #e07a5f; }
+
 /* --- The top bar ------------------------------------------------------- */
 
 .swl-hud {
@@ -56,7 +78,7 @@ export function uiCss(): string {
   left: 0;
   right: 0;
   top: 0;
-  height: 34px;
+  height: 48px;
   display: flex;
   align-items: stretch;
   justify-content: space-between;
@@ -118,6 +140,62 @@ export function uiCss(): string {
 .swl-resource-oil .swl-readout-value { color: #7fb3d5; }
 .swl-resource-steel .swl-readout-value { color: #cfd6e0; }
 .swl-resource-cash .swl-readout-value { color: #86d38a; }
+.swl-resource-mana .swl-readout-value { color: #b48ef0; }
+
+/*
+ * The XP bar is a narrow track with a fill whose width is the fraction the
+ * model derived. The number beside it is the server's XP over the content's
+ * requirement; the bar is only a picture of that pair.
+ */
+.swl-xp {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+}
+
+.swl-xp-label {
+  color: #8d97a8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.swl-xp-track {
+  display: block;
+  width: 72px;
+  height: 7px;
+  overflow: hidden;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: #10151d;
+}
+
+.swl-xp-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #7fb3d5, #f5c542);
+}
+
+.swl-xp-value {
+  color: #f2e6c8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  font-variant-numeric: tabular-nums;
+}
+
+/* The bonus is a gesture: the client asks, and the server names the reward. */
+/* The button qualifier beats the generic .swl-ui button reset above. */
+.swl-ui button.swl-bonus {
+  padding: 4px 8px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  background: #f5c542;
+  color: #10151d;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-ui button.swl-bonus:hover { background: #ffd75e; }
 
 .swl-army {
   padding: 4px 8px;
@@ -164,7 +242,7 @@ export function uiCss(): string {
 .swl-chapters {
   position: absolute;
   right: 8px;
-  top: 44px;
+  top: 58px;
   display: flex;
   gap: 6px;
   padding: 6px;
@@ -229,12 +307,79 @@ export function uiCss(): string {
   outline-offset: 1px;
 }
 
+/* --- The inventory panel ---------------------------------------------- */
+
+.swl-inventory {
+  position: absolute;
+  right: 8px;
+  top: 104px;
+  width: 220px;
+  max-height: 240px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 8px 10px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: #131a24;
+  pointer-events: auto;
+}
+
+.swl-inventory-title {
+  color: #f2e6c8;
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(13px * var(--swl-font-scale-display, 1));
+  font-weight: 700;
+}
+
+.swl-inventory-empty {
+  margin: 6px 0 0;
+  color: #8d97a8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-inventory-list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swl-inventory-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+.swl-inventory-name {
+  flex: 1;
+  color: #e8e3d8;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+}
+
+.swl-inventory-qty {
+  color: #f5c542;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-ui button.swl-inventory-place {
+  padding: 3px 8px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  background: #f5c542;
+  color: #10151d;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-ui button.swl-inventory-place:hover { background: #ffd75e; }
+
 /* --- The goal panel --------------------------------------------------- */
 
 .swl-goals {
   position: absolute;
   left: 8px;
-  top: 44px;
+  top: 58px;
   width: 300px;
   display: flex;
   flex-direction: column;
@@ -845,7 +990,7 @@ export function uiCss(): string {
 
 .swl-feedback {
   position: absolute;
-  top: 40px;
+  top: 54px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 30;

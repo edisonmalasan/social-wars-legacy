@@ -6,8 +6,10 @@ import {
   energyDisplay,
   experiencePopover,
   formatNumber,
+  manaPopover,
   populationPopover,
   resourcePopover,
+  xpProgress,
   type HudState,
 } from './hud.ts';
 
@@ -29,6 +31,7 @@ const STATE: HudState = {
   expRequired: 100,
   energy: 10,
   maxEnergy: 50,
+  mana: 7,
 };
 
 describe('the number formatting', () => {
@@ -123,5 +126,36 @@ describe('the energy display', () => {
   it('never goes below zero or above one', () => {
     assert.equal(energyDisplay({ ...STATE, energy: -5, maxEnergy: 50 }).fraction, 0);
     assert.equal(energyDisplay({ ...STATE, energy: 500, maxEnergy: 50 }).fraction, 1);
+  });
+});
+
+describe('the mana readout', () => {
+  it('says how much mana the player has', () => {
+    const popover = manaPopover(STATE);
+    assert.equal(popover.firstLine, 'You have 7 mana');
+    assert.equal(popover.warningLine, null);
+  });
+});
+
+describe('the experience progress bar', () => {
+  it('is the current XP over what the next level needs', () => {
+    assert.deepEqual(xpProgress(STATE), {
+      current: 40,
+      needed: 100,
+      remaining: 60,
+      fraction: 0.4,
+    });
+  });
+
+  it('clamps the fraction when the server has more XP than the content expects', () => {
+    const done = xpProgress({ ...STATE, experience: 140 });
+    assert.equal(done.fraction, 1);
+    assert.equal(done.remaining, 0);
+  });
+
+  it('never divides by zero', () => {
+    const bare = xpProgress({ ...STATE, experience: 0, expRequired: 0 });
+    assert.equal(bare.fraction, 0);
+    assert.equal(bare.needed, 0);
   });
 });

@@ -8,6 +8,7 @@ export * from './assets.ts';
 export * from './interaction.ts';
 export * from './hud.ts';
 export * from './hudstate.ts';
+export * from './inventory.ts';
 export * from './featurestate.ts';
 export * from './buildmenu.ts';
 export * from './management.ts';

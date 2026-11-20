@@ -22,13 +22,14 @@ import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH } from './renderer.ts';
 import { applyFontScales, clientCss, type FontScaleFile } from './fonts.ts';
 import {
+  authenticate,
   authorizationHeader,
   forgetSession,
   isExpired,
   readSession,
   rememberSession,
-  signIn,
   sendCommands,
+  type AuthMode,
   type ClientSession,
 } from '@swl/client';
 import type { CommandOutcome, NativeCommand, NativeResponse } from '@swl/protocol';
@@ -39,8 +40,10 @@ import {
   completeTutorial,
   finishBuilding,
   finishView,
+  storedPlacement,
   takeTrainedUnit,
   type ItemType,
+  type StoredItemView,
 } from '@swl/client';
 import {
   activeQuestFromWorld,
@@ -321,33 +324,57 @@ function safeStorage(): Storage | null {
 }
 
 /**
- * Ask the player to sign in.
+ * Ask the player to sign in, or to create an account.
  *
- * The client signs in with a **credential** and the server issues a
- * **session token**, so there is a name and a password and nothing else.
- * The form is the plainest one that works, because the interface is not
- * built yet.
+ * The client sends a **credential** and the server issues a **session
+ * token**. The two modes choose only the endpoint: sign-in uses
+ * `POST /api/session`, registration uses `POST /api/account`, and both
+ * answer with the same session the flow below remembers. The mode is the
+ * form's own UI state — it never decides whether the credential is valid.
  */
 function askForSignIn(): Promise<ClientSession | null> {
   return new Promise((resolve) => {
     const form = document.createElement('form');
     form.id = 'signin';
     form.innerHTML = [
+      '<div class="swl-auth-modes">',
+      '<button type="button" data-mode="sign-in" class="swl-auth-mode-active">Sign in</button>',
+      '<button type="button" data-mode="register">Register</button>',
+      '</div>',
       '<label>Name <input name="playerId" autocomplete="username" required></label>',
       '<label>Password <input name="password" type="password" autocomplete="current-password" required></label>',
-      '<button type="submit">Play</button>',
+      '<button type="submit" id="signin-submit">Play</button>',
       '<p id="signin-error"></p>',
     ].join('');
     form.style.cssText = 'position:absolute;inset:0;display:grid;gap:8px;place-content:center;font:16px sans-serif;color:#eee;background:#10131a';
     STAGE?.appendChild(form);
 
+    let mode: AuthMode = 'sign-in';
+    const password = form.querySelector<HTMLInputElement>('input[name="password"]');
+    const submit = form.querySelector<HTMLButtonElement>('#signin-submit');
+    const error = form.querySelector('#signin-error');
+    const modeButtons = form.querySelectorAll<HTMLButtonElement>('button[data-mode]');
+    for (const button of modeButtons) {
+      button.addEventListener('click', () => {
+        mode = button.dataset.mode === 'register' ? 'register' : 'sign-in';
+        for (const other of modeButtons) {
+          other.classList.toggle('swl-auth-mode-active', other === button);
+        }
+        if (password) {
+          password.autocomplete = mode === 'register' ? 'new-password' : 'current-password';
+        }
+        if (submit) submit.textContent = mode === 'register' ? 'Create account' : 'Play';
+        if (error) error.textContent = '';
+      });
+    }
+
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       const data = new FormData(form);
       const playerId = String(data.get('playerId') ?? '');
-      const password = String(data.get('password') ?? '');
-      const error = form.querySelector('#signin-error');
-      void signIn('/api/session', playerId, password).then((result) => {
+      const secret = String(data.get('password') ?? '');
+      if (error) error.textContent = '';
+      void authenticate(mode, playerId, secret).then((result) => {
         if (result.ok) {
           form.remove();
           resolve(result.session);
@@ -359,9 +386,11 @@ function askForSignIn(): Promise<ClientSession | null> {
               ? 'There is no player with that name.'
               : result.reason === 'invalid-credentials'
                 ? 'That password is not right.'
-                : 'The server could not be reached.';
+                : result.reason === 'player-exists'
+                  ? 'That name is already taken.'
+                  : 'The server could not be reached.';
         }
-        resolve(null);
+        // The form stays up: a wrong name or password is retryable.
       });
     });
   });
@@ -461,6 +490,8 @@ async function main(): Promise<void> {
    */
   const interaction = new Interaction();
   let placing: number | null = null;
+  /** The stored item being placed, when the placement came from the inventory. */
+  let placingStored: StoredItemView | null = null;
   let selected: number | null = null;
   /** The map id of the selected element, for its server attribute bag. */
   let selectedIso: number | null = null;
@@ -491,6 +522,11 @@ async function main(): Promise<void> {
         dialogState = closeDialog(dialogState);
         questPanel = null;
         drawInterface();
+      },
+      onPlaceStored,
+      onClaimBonus: () => {
+        // The client asks; the server computes the day and the reward.
+        void run([claimDailyBonus()]);
       },
       onQuestPick: openQuestSlot,
       onQuestStart: (questId, difficulty) => {
@@ -630,6 +666,23 @@ async function main(): Promise<void> {
     // a unit, not as the building the old code hardcoded here.
     interaction.beginPlacement(itemId, type);
     placing = itemId;
+    placingStored = null;
+    selected = null;
+    selectedIso = null;
+    drawInterface();
+  }
+
+  /**
+   * Pick a stored item from the inventory.
+   *
+   * It begins the same placement gesture as the build menu, but the command
+   * the next tile click sends is `place_stored_item` rather than a purchase:
+   * the item is already the server's, and only its position is chosen here.
+   */
+  function onPlaceStored(entry: StoredItemView): void {
+    interaction.beginPlacement(entry.itemId, entry.type);
+    placing = entry.itemId;
+    placingStored = entry;
     selected = null;
     selectedIso = null;
     drawInterface();
@@ -733,11 +786,22 @@ async function main(): Promise<void> {
     const tile = pixelToTile(x, y, renderer.viewport);
 
     if (interaction.selection.kind === 'placement') {
-      const gesture = interaction.placeTo(tile.tx, tile.ty);
-      if (!gesture.ok) return;
+      let command: NativeCommand | null;
+      if (placingStored) {
+        command = storedPlacement(placingStored, tile.tx, tile.ty);
+        if (!command) {
+          gestureRefusal('that stored item cannot be placed');
+          return;
+        }
+      } else {
+        const gesture = interaction.placeTo(tile.tx, tile.ty);
+        if (!gesture.ok) return;
+        command = gesture.command;
+      }
       interaction.clear();
       placing = null;
-      void run([gesture.command]);
+      placingStored = null;
+      void run([command]);
       return;
     }
 
