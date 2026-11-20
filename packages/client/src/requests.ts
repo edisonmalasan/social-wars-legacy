@@ -94,11 +94,23 @@ export function move(isoId: number, tx: number, ty: number, frame = 0): NativeCo
 }
 
 /**
+ * Choose a resource building's collection period.
+ *
+ * The client names the building and one of the content's 1-based periods; it
+ * never names a duration or a multiplier. The server checks the building's
+ * eligibility and stamps the countdown from its own clock.
+ */
+export function activate(isoId: number, period: number): NativeCommand {
+  return command('activate', [isoId, period]);
+}
+
+/**
  * Collect a building's production.
  *
  * The collect period is the **server's**: the native form carries only the
  * element's id, so the client cannot choose which period's multiplier it
- * gets.
+ * gets. `activate` only picks which of the content's periods the server
+ * should time.
  */
 export function collect(isoId: number): NativeCommand {
   return command('collect', [isoId]);

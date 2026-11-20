@@ -132,7 +132,7 @@ const REFUSED_AS_PLAYER: Readonly<Record<string, string>> = {
 /** A valid argument list for every command in the vocabulary. */
 const VALID_ARGS: Readonly<Record<CommandName, readonly unknown[]>> = {
   accept_collect_help: [1, 'x'],
-  activate: [1, 0],
+  activate: [1, 2],
   activate_item_click: [1, '{}'],
   add_click: [1],
   add_inventory_item: [1, 1],
@@ -857,5 +857,21 @@ describe('the response envelope', () => {
       assert.equal(HTTP_STATUS[code] >= 400, true, code);
       assert.equal(HTTP_STATUS[code] < 500, true, code);
     }
+  });
+});
+
+/* -------------------------------------------------------------------------
+ * The activate period index
+ * ---------------------------------------------------------------------- */
+
+describe('the activate period index', () => {
+  it('is the 1-based period index the rules engine reads', () => {
+    // production.ts:47 indexes minutes/period with `period - 1`. Wire value 3
+    // has to select the 480-minute x3 tier, not the 240-minute x2 one.
+    assert.deepEqual(getCommandSpec('activate')!.args[1]!.values, [1, 2, 3, 4]);
+  });
+
+  it('the sample request names a real period', () => {
+    assert.deepEqual(validateCommandArguments('activate', VALID_ARGS['activate']), []);
   });
 });

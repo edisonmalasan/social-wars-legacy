@@ -22,6 +22,7 @@ import type {
 import type { ContentBundle } from '@swl/content';
 
 import type { QuestPanelView } from './quests.tsx';
+import type { ProductionPanelView } from './state.ts';
 import { Root } from './root.tsx';
 import type { TutorialOverlayProps } from './tutorial.tsx';
 
@@ -63,6 +64,12 @@ export interface UiOverlayState {
   readonly onTrain?: (unitItemId: number) => void;
   /** The player asked to take the finished unit out of the queue. */
   readonly onTake?: () => void;
+  /** The selected building's production cycle, when it can choose one. */
+  readonly production?: ProductionPanelView | null;
+  /** The player asked to open the collection-period selector. */
+  readonly onOpenProduction?: () => void;
+  /** The player picked one of the content's collection periods. */
+  readonly onActivate?: (period: number) => void;
 }
 
 /** The mounted interface. */
@@ -123,6 +130,9 @@ export function mountUi(
           onFinish={overlays.onFinish}
           onTrain={overlays.onTrain}
           onTake={overlays.onTake}
+          production={overlays.production}
+          onOpenProduction={overlays.onOpenProduction}
+          onActivate={overlays.onActivate}
         />,
       ),
   };

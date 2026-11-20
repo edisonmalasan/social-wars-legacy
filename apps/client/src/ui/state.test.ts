@@ -15,6 +15,7 @@ import {
   infoPanel,
   inventoryItems,
   populationItems,
+  productionPanel,
   questMinLevels,
   questRanks,
   recruitView,
@@ -438,6 +439,103 @@ describe('building management views', () => {
     assert.deepEqual(view?.units, [{ itemId: 1008, name: 'Rifleman' }]);
     assert.equal(view?.queue.remainingSeconds, 5);
     assert.equal(view?.queue.readyToTake, false);
+  });
+});
+
+describe('the production selector', () => {
+  const producer = item({
+    id: 2,
+    name: 'Wood Factory I',
+    collect: 100,
+    collect_type: 'w',
+    properties: { multiCollectable: 1 },
+  });
+  const bundleWithPeriods = (items: ContentItem[] = [producer]): ContentBundle =>
+    bundle({
+      items,
+      globals: {
+        COLLECT_MINUTES: [5, 60, 240, 480],
+        COLLECT_MULTIPLIER: [0.25, 1, 2, 3],
+      },
+    });
+  const worldFor = (
+    attrs: unknown,
+    itemId = 2,
+  ): WorldSnapshot =>
+    ({
+      maps: [{ id: 0, items: { '7': [itemId, 0, 0, 0, 0, [], attrs, 1] } }],
+      resources: {},
+      privateState: {},
+    }) as unknown as WorldSnapshot;
+
+  it('offers the four content periods with their content multipliers', () => {
+    const view = productionPanel(
+      bundleWithPeriods(),
+      worldFor({ cp: 4, lastAccruedAt: 1000 }),
+      7,
+      1000,
+    )!;
+    assert.deepEqual(
+      view.options.map((option) => [
+        option.period,
+        option.minutes,
+        option.multiplier,
+        option.amount,
+      ]),
+      [
+        [1, 5, 0.25, 25],
+        [2, 60, 1, 100],
+        [3, 240, 2, 200],
+        [4, 480, 3, 300],
+      ],
+    );
+    assert.equal(view.period, 4);
+    assert.equal(view.options.find((option) => option.active)?.period, 4);
+    assert.equal(view.resource, 'w');
+  });
+
+  it('counts down from the server timestamp and treats a fresh cycle as due', () => {
+    const started = worldFor({ cp: 3, lastAccruedAt: 1000 });
+    const early = productionPanel(bundleWithPeriods(), started, 7, 1060)!;
+    assert.equal(early.secondsRemaining, 240 * 60 - 60);
+    assert.equal(early.due, false);
+    const due = productionPanel(bundleWithPeriods(), started, 7, 1000 + 240 * 60)!;
+    assert.equal(due.secondsRemaining, 0);
+    assert.equal(due.due, true);
+    const fresh = productionPanel(bundleWithPeriods(), worldFor({}), 7, 1060)!;
+    assert.equal(fresh.startedAt, 0);
+    assert.equal(fresh.due, true);
+  });
+
+  it('shows the one-hour default until a period has been chosen', () => {
+    const view = productionPanel(
+      bundleWithPeriods(),
+      worldFor({ cp: 0, lastAccruedAt: 0 }),
+      7,
+      1000,
+    )!;
+    assert.equal(view.period, 2);
+    assert.equal(view.options.find((option) => option.active)?.period, 2);
+  });
+
+  it('is null for a building that cannot choose a period', () => {
+    const plain = item({ id: 3, name: 'House', collect: 10, collect_type: 'w' });
+    const unit = item({
+      id: 4,
+      type: 'u',
+      collect: 10,
+      collect_type: 'w',
+      properties: { multiCollectable: 1 },
+    });
+    assert.equal(
+      productionPanel(bundleWithPeriods([plain]), worldFor({}, 3), 7, 1000),
+      null,
+    );
+    assert.equal(
+      productionPanel(bundleWithPeriods([unit]), worldFor({}, 4), 7, 1000),
+      null,
+    );
+    assert.equal(productionPanel(bundleWithPeriods(), worldFor({}, 2), 99, 1000), null);
   });
 });
 

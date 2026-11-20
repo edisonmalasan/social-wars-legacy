@@ -9,7 +9,7 @@
  * The content bundle is the authority, and this is the mapping from it
  * to the applier's own shape.
  */
-import type { MarketRules } from '@swl/rules';
+import type { CollectPeriods, MarketRules } from '@swl/rules';
 
 import type { ApplierItem } from './apply.ts';
 
@@ -32,6 +32,12 @@ function costsOr(value: unknown): Record<string, number> {
 function hasFlag(properties: unknown, flag: string): boolean {
   if (typeof properties !== 'object' || properties === null) return false;
   return flag in (properties as Record<string, unknown>);
+}
+
+/** A numeric value in an item's properties, or the fallback. */
+function propertyNumber(properties: unknown, flag: string, fallback: number): number {
+  if (typeof properties !== 'object' || properties === null) return fallback;
+  return numberOr((properties as Record<string, unknown>)[flag], fallback);
 }
 
 /**
@@ -84,6 +90,9 @@ export function contentItems(bundle: { items?: unknown[] }): Map<number, Applier
       // population rule needs it, because a unit **uses** population
       // and a building **grants** it.
       type: typeof item['type'] === 'string' ? item['type'] : 'b',
+      // Only the content says which buildings offer the four periods. A
+      // missing or malformed flag fails closed: that building cannot choose.
+      multiCollectable: propertyNumber(item['properties'], 'multiCollectable', 0) === 1,
       // Whether the building grants population. The flag is the
       // content's own, and it is what says which buildings count
       // towards the ceiling.
@@ -91,6 +100,44 @@ export function contentItems(bundle: { items?: unknown[] }): Map<number, Applier
     });
   }
   return items;
+}
+
+/** The game's own four collection periods, used when a global is malformed. */
+const DEFAULT_COLLECT_MINUTES = [5, 60, 240, 480] as const;
+const DEFAULT_COLLECT_MULTIPLIER = [0.25, 1, 2, 3] as const;
+
+/**
+ * A whole tuple of positive numbers, or the game's own tuple.
+ *
+ * The minutes and the multipliers are paired by index, so a partial or
+ * malformed global must not be padded: a mismatch would price a period with
+ * another period's multiplier. The whole pair falls back together.
+ */
+function numberTuple(value: unknown, fallback: readonly number[]): number[] {
+  if (!Array.isArray(value) || value.length < fallback.length) return [...fallback];
+  const tuple = value.slice(0, fallback.length);
+  const valid = tuple.every(
+    (entry) => typeof entry === 'number' && Number.isFinite(entry) && entry > 0,
+  );
+  return valid ? (tuple as number[]) : [...fallback];
+}
+
+/** The collection periods, from the content's globals. */
+export function collectPeriods(globals: Record<string, unknown>): CollectPeriods {
+  return {
+    minutes: numberTuple(globals['COLLECT_MINUTES'], DEFAULT_COLLECT_MINUTES),
+    multiplier: numberTuple(globals['COLLECT_MULTIPLIER'], DEFAULT_COLLECT_MULTIPLIER),
+  };
+}
+
+/**
+ * The wonder reactivation discount, from the content's globals.
+ *
+ * The applier's own fallback is the same number; the running server passes
+ * the content value so the two cannot drift apart.
+ */
+export function reactivateWonderDiscount(globals: Record<string, unknown>): number {
+  return numberOr(globals['REACTIVATE_WONDER_DISCOUNT'], 0.5);
 }
 
 /**

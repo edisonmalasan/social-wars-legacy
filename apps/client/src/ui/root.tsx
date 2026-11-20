@@ -38,7 +38,7 @@ import { Dialog } from './dialog.tsx';
 import { Feedback } from './feedback.tsx';
 import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
-import { InfoPanel } from './info.tsx';
+import { InfoPanel, ProductionSelector, PRODUCTION_DIALOG_ID } from './info.tsx';
 import { Inventory } from './inventory.tsx';
 import { Neighbours } from './neighbours.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
@@ -52,6 +52,7 @@ import {
   hudInput,
   infoPanel,
   inventoryItems,
+  type ProductionPanelView,
   questMinLevels,
   questRanks,
   recruitView,
@@ -114,6 +115,12 @@ export interface RootProps {
   onTrain?: (unitItemId: number) => void;
   /** The player asked to take the finished unit out of the queue. */
   onTake?: () => void;
+  /** The selected building's production cycle, when it can choose one. */
+  production?: ProductionPanelView | null;
+  /** The player asked to open the collection-period selector. */
+  onOpenProduction?: () => void;
+  /** The player picked one of the content's collection periods. */
+  onActivate?: (period: number) => void;
 }
 
 /**
@@ -151,6 +158,9 @@ export function Root({
   onFinish,
   onTrain,
   onTake,
+  production = null,
+  onOpenProduction,
+  onActivate,
 }: RootProps): React.JSX.Element {
   const state = hudState(hudInput(bundle, world));
   const items = useMemo(() => buildItems(bundle), [bundle]);
@@ -199,6 +209,8 @@ export function Root({
         onCollect={onCollect}
         onUpgrade={onUpgrade}
         onFinish={onFinish}
+        production={production}
+        onOpenProduction={onOpenProduction}
       />
       <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
       <Neighbours neighbours={neighbours} />
@@ -225,6 +237,9 @@ export function Root({
             onNext={onQuestNext}
             onCancel={onDialogDismiss ?? (() => {})}
           />
+        ) : null}
+        {dialog?.dialog?.id === PRODUCTION_DIALOG_ID && production && onActivate ? (
+          <ProductionSelector view={production} onActivate={onActivate} />
         ) : null}
       </Dialog>
       <BuildMenu

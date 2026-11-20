@@ -38,6 +38,7 @@ function item(id: number, over: Partial<ApplierItem> = {}): ApplierItem {
     upgradesTo: null,
     premiumUpgradeCosts: {},
     type: 'b',
+    multiCollectable: false,
     grantsPopulation: false,
     ...over,
   };

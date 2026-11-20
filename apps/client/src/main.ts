@@ -35,6 +35,7 @@ import {
 import type { CommandOutcome, NativeCommand, NativeResponse } from '@swl/protocol';
 import type { ContentBundle, ContentItem } from '@swl/content';
 import {
+  activate,
   buy,
   claimDailyBonus,
   completeTutorial,
@@ -78,7 +79,13 @@ import { mountUi } from './ui/mount.tsx';
 import { uiCss } from './ui/css.ts';
 import type { TutorialOverlayProps } from './ui/tutorial.tsx';
 import type { QuestPanelView } from './ui/quests.tsx';
-import { questMinLevels, questRanks, questViewOptions } from './ui/state.ts';
+import {
+  productionPanel,
+  questMinLevels,
+  questRanks,
+  questViewOptions,
+} from './ui/state.ts';
+import { PRODUCTION_DIALOG_ID } from './ui/info.tsx';
 import {
   CLOSED_DIALOG,
   closeDialog,
@@ -325,6 +332,8 @@ export interface ClientHandle {
   reportQuestKill: typeof reportQuestKill;
   /** The `end_quest` request, whose reward the server computes. */
   endQuest: typeof endQuest;
+  /** The `activate` request, whose period the server validates and times. */
+  activate: typeof activate;
   /** The active quest read from the server's answer, never fabricated. */
   activeQuest: () => ActiveQuestStateView | null;
 }
@@ -540,8 +549,16 @@ async function main(): Promise<void> {
   /** One quest request at a time; a rapid double-click must not send two. */
   let questBusy = false;
 
+  /** Close a period dialog that is about to lose its selected building. */
+  function closeProductionDialog(): void {
+    if (dialogState.dialog?.id === PRODUCTION_DIALOG_ID) {
+      dialogState = closeDialog(dialogState);
+    }
+  }
+
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
+    const now = Math.floor(Date.now() / 1000);
     ui?.draw(world, placing, selected, neighbours, tutorialProps(), {
       dialog: dialogState,
       feedback,
@@ -568,11 +585,32 @@ async function main(): Promise<void> {
       onQuestRetry: (questId) => openResultQuest(questId, 'retry'),
       onQuestNext: (questId) => openResultQuest(questId, 'next'),
       selectedIso,
-      now: Math.floor(Date.now() / 1000),
+      now,
       onUpgrade,
       onFinish,
       onTrain,
       onTake,
+      // The periods are the content's and the cycle is the server's; the
+      // selector only sends a request and reads the answer as feedback.
+      production: productionPanel(content, world, selectedIso, now),
+      onOpenProduction: () => {
+        if (selectedIso === null) {
+          gestureRefusal('no building selected');
+          return;
+        }
+        dialogState = openDialog(
+          dialogState,
+          PRODUCTION_DIALOG_ID,
+          'confirm',
+          'Collection period',
+        );
+        drawInterface();
+      },
+      onActivate: (period) => {
+        if (selectedIso === null) return;
+        closeProductionDialog();
+        void run([activate(selectedIso, period)]);
+      },
     });
   }
 
@@ -732,6 +770,7 @@ async function main(): Promise<void> {
   function onPick(itemId: number, type: ItemType): void {
     // The menu entry carries its own wire type: a unit must be requested as
     // a unit, not as the building the old code hardcoded here.
+    closeProductionDialog();
     interaction.beginPlacement(itemId, type);
     placing = itemId;
     placingStored = null;
@@ -748,6 +787,7 @@ async function main(): Promise<void> {
    * the item is already the server's, and only its position is chosen here.
    */
   function onPlaceStored(entry: StoredItemView): void {
+    closeProductionDialog();
     interaction.beginPlacement(entry.itemId, entry.type);
     placing = entry.itemId;
     placingStored = entry;
@@ -873,7 +913,9 @@ async function main(): Promise<void> {
       return;
     }
 
-    // Otherwise the click selects what is under it.
+    // Otherwise the click selects what is under it. A period dialog belongs
+    // to the building that was selected when it opened, not to the next one.
+    closeProductionDialog();
     const found = itemsByTile(world).get(`${tile.tx},${tile.ty}`);
     if (!found) {
       interaction.clear();
@@ -1093,6 +1135,7 @@ async function main(): Promise<void> {
     questAction,
     reportQuestKill,
     endQuest,
+    activate,
     activeQuest: () => activeQuestState(world),
     visibleSprites: () =>
       scene.filter(

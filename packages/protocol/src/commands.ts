@@ -331,14 +331,14 @@ export const COMMAND_TABLE: Readonly<Record<CommandName, CommandSpec>> = Object.
     family: 'production',
     args: [
       INT('isoID', 'the building reference id'),
-      INT_ENUM('collectPeriod', [0, 1, 2, 3], 'the collect-period index `cp`; the server stores it in item.attr.cp and treats > 0 as activated'),
+      INT_ENUM('collectPeriod', [1, 2, 3, 4], 'the 1-based collect-period index `cp`; the server stores it in item.attr.cp and reads minutes/multipliers at `cp - 1`'),
     ],
     result: 'state',
     costsResources: false,
     mutatesWorld: false,
     idempotent: true,
     shapeKnown: true,
-    notes: 'The client pushes the iso id and the stored collect-period index (commands/CmdActivate.as:13). The four periods are 5/60/240/480 minutes at x0.25/x1/x2/x3 (re/docs/03 §2.3).',
+    notes: 'The client pushes the iso id and the stored collect-period index (commands/CmdActivate.as:13). The four 1-based periods are 5/60/240/480 minutes at x0.25/x1/x2/x3 (re/docs/03 §2.3).',
   },
 
   activate_item_click: {

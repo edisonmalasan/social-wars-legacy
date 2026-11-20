@@ -357,3 +357,54 @@ export function lastQuestReward(world: WorldSnapshot): LastQuestRewardView | nul
   }
   return { questId, rank, rewards };
 }
+
+/* -------------------------------------------------------------------------
+ * Production
+ * ---------------------------------------------------------------------- */
+
+/**
+ * A building's production state, as the server keeps it in the map item's
+ * attribute bag.
+ *
+ * Every value is the server's own. A missing or malformed one reads as null —
+ * the client never fills in a period, a multiplier or a countdown of its own.
+ */
+export interface ProductionStateView {
+  /** The chosen 1-based period, or null before one has been chosen. */
+  readonly period: number | null;
+  /** When the server started the current cycle, or null if it never did. */
+  readonly startedAt: number | null;
+  /** The uncollected base amount, or null when absent. */
+  readonly collect: number | null;
+  /** How many units fit inside, or null when absent. */
+  readonly unitCapacity: number | null;
+  /** How many units are inside, or null when absent. */
+  readonly unitsInside: number | null;
+  /** The resource produced, or null when absent. */
+  readonly collectType: string | null;
+}
+
+/**
+ * Read a building's production state, or null when there is no such item.
+ *
+ * An empty attribute bag is a fresh building, not an invented cycle: its
+ * fields read as null and the selector decides what, if anything, to show.
+ */
+export function productionState(
+  world: WorldSnapshot,
+  isoId: number | null,
+): ProductionStateView | null {
+  if (isoId === null) return null;
+  const tuple = world.maps[0]?.items?.[String(isoId)];
+  if (!tuple) return null;
+  const attrs = record(tuple[6]);
+  return {
+    period: attrs ? number(attrs['cp']) : null,
+    startedAt: attrs ? number(attrs['lastAccruedAt']) : null,
+    collect: attrs ? number(attrs['collect']) : null,
+    unitCapacity: attrs ? number(attrs['unitCapacity']) : null,
+    unitsInside: attrs ? number(attrs['unitsInside']) : null,
+    collectType:
+      attrs && typeof attrs['collectType'] === 'string' ? attrs['collectType'] : null,
+  };
+}

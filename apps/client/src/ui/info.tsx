@@ -17,6 +17,84 @@
  */
 import type { BuildingInfoView, ResourcePanel, UnitPanel } from '@swl/client';
 
+import type { ProductionPanelView } from './state.ts';
+
+/** The shared dialog's id for the collection-period selector. */
+export const PRODUCTION_DIALOG_ID = 'production';
+
+/** A broken-down server-timestamp countdown, for display only. */
+function countdown(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const rest = seconds % 60;
+  return hours > 0
+    ? `${hours}h ${minutes}m ${rest}s`
+    : `${minutes}m ${rest}s`;
+}
+
+/** A period's wait, in the game's own units. */
+function wait(minutes: number): string {
+  return minutes % 60 === 0 ? `${minutes / 60} h` : `${minutes} min`;
+}
+
+/** The collection-period selector hosted by the shared dialog. */
+export interface ProductionSelectorProps {
+  /** The server-and-content reading the buttons draw. */
+  readonly view: ProductionPanelView;
+  /** The player picked one of the content's periods; the server decides. */
+  readonly onActivate: (period: number) => void;
+}
+
+/**
+ * The four collection periods and the active cycle's countdown.
+ *
+ * Every duration and multiplier comes from the content through
+ * `ProductionPanelView`, and the countdown from the server's timestamp. The
+ * buttons only send the `activate` request; they never start a cycle locally
+ * and never promise a payout — the server's answer is drawn as feedback.
+ */
+export function ProductionSelector({
+  view,
+  onActivate,
+}: ProductionSelectorProps): React.JSX.Element {
+  return (
+    <div className="swl-production">
+      <div className="swl-production-head">
+        {view.name} · {view.resource.toUpperCase()}
+      </div>
+      <div className="swl-production-cycle" role="status">
+        {view.due
+          ? 'Ready to collect'
+          : `Ready in ${countdown(view.secondsRemaining)}`}
+      </div>
+      <div className="swl-production-options">
+        {view.options.map((option) => (
+          <button
+            key={option.period}
+            type="button"
+            className={
+              option.active
+                ? 'swl-production-option swl-production-option-active'
+                : 'swl-production-option'
+            }
+            aria-pressed={option.active}
+            onClick={() => onActivate(option.period)}
+          >
+            <span className="swl-production-wait">{wait(option.minutes)}</span>
+            <span className="swl-production-mult">×{option.multiplier}</span>
+            <span className="swl-production-amount">
+              +{option.amount} {view.resource}
+            </span>
+          </button>
+        ))}
+      </div>
+      <p className="swl-production-note">
+        The server starts the countdown when a period is chosen.
+      </p>
+    </div>
+  );
+}
+
 /** The info panel's props. */
 export interface InfoPanelProps {
   /** The resource building's panel, or null. */
@@ -31,6 +109,10 @@ export interface InfoPanelProps {
   onUpgrade?: () => void;
   /** The player asked to hurry the building's construction. */
   onFinish?: () => void;
+  /** The selected building's production cycle, when it can choose one. */
+  production?: ProductionPanelView | null;
+  /** The player asked to open the collection-period selector. */
+  onOpenProduction?: () => void;
 }
 
 /**
@@ -47,6 +129,8 @@ export function InfoPanel({
   onCollect,
   onUpgrade,
   onFinish,
+  production = null,
+  onOpenProduction,
 }: InfoPanelProps): React.JSX.Element | null {
   if (!resource && !unit && !building) return null;
   const name = building?.name ?? resource?.name ?? unit?.name ?? '';
@@ -59,9 +143,25 @@ export function InfoPanel({
             {resource.earnsLabel} {resource.earns} {resource.resource}
           </div>
           <div className="swl-info-hint">{resource.hint}</div>
+          {production ? (
+            <div className="swl-info-production">
+              {production.due
+                ? 'Ready to collect'
+                : `Next in ${countdown(production.secondsRemaining)}`}
+            </div>
+          ) : null}
           {onCollect ? (
             <button type="button" className="swl-info-collect" onClick={onCollect}>
               Collect
+            </button>
+          ) : null}
+          {production && onOpenProduction ? (
+            <button
+              type="button"
+              className="swl-info-period-button"
+              onClick={onOpenProduction}
+            >
+              Choose collection period
             </button>
           ) : null}
         </>

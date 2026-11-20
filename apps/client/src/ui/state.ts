@@ -33,6 +33,7 @@ import {
   completeGoal,
   itemType,
   levelOf,
+  productionState,
   resourcePanel,
   storedItems,
   trainingView,
@@ -436,6 +437,111 @@ export function buildingInfo(
     clicksToBuild: item.clicks_to_build,
     now,
   });
+}
+
+/** One of the content's four collection periods, as a button. */
+export interface ProductionOption {
+  /** The 1-based wire value the `activate` command carries. */
+  readonly period: number;
+  /** The wait, from the content's `COLLECT_MINUTES`. */
+  readonly minutes: number;
+  /** The payout factor, from the content's `COLLECT_MULTIPLIER`. */
+  readonly multiplier: number;
+  /** `floor(collect x multiplier)`, shown as a prediction, never paid here. */
+  readonly amount: number;
+  /** Whether the server's current `cp` is this period. */
+  readonly active: boolean;
+}
+
+/** The production selector, read from the server's save and the content. */
+export interface ProductionPanelView {
+  /** The selected building's id, used by the request. */
+  readonly isoId: number;
+  /** The content's name of the building. */
+  readonly name: string;
+  /** The resource the building produces. */
+  readonly resource: string;
+  /** The active period, 1-based; the one-hour period until one is chosen. */
+  readonly period: number;
+  /** The server's cycle start, zero when the building has never accrued. */
+  readonly startedAt: number;
+  /** Seconds left by the server's timestamp; presentation only. */
+  readonly secondsRemaining: number;
+  /** Whether the server already considers this cycle complete. */
+  readonly due: boolean;
+  /** The four periods the content offers, in their content order. */
+  readonly options: readonly ProductionOption[];
+}
+
+const FALLBACK_MINUTES = [5, 60, 240, 480];
+const FALLBACK_MULTIPLIER = [0.25, 1, 2, 3];
+
+/** A tuple of positive numbers from a global, or the game's own tuple. */
+function positiveTuple(value: unknown, fallback: readonly number[]): number[] {
+  if (!Array.isArray(value) || value.length < fallback.length) return [...fallback];
+  const tuple = value.slice(0, fallback.length);
+  const valid = tuple.every(
+    (entry) => typeof entry === 'number' && Number.isFinite(entry) && entry > 0,
+  );
+  return valid ? (tuple as number[]) : [...fallback];
+}
+
+/**
+ * A multi-collectable building's production panel.
+ *
+ * The **choices** are the content's (their durations and multipliers) and the
+ * **cycle** is the server's (`cp` and `lastAccruedAt` in the item's attribute
+ * bag). The countdown is a reading of the server's timestamp against the
+ * client's clock; it is presentation only, because the server decides when a
+ * collection is due. Nothing here can grant a resource or choose a multiplier.
+ */
+export function productionPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  isoId: number | null,
+  now: number,
+): ProductionPanelView | null {
+  if (isoId === null) return null;
+  const tuple = selectedItem(world, isoId);
+  if (!tuple) return null;
+  const item = (bundle.items ?? []).find((entry) => entry.id === Number(tuple[0]));
+  if (!item || item.type !== 'b') return null;
+  if (!item.collect_type || !(item.collect > 0)) return null;
+  if ((item.properties as Record<string, unknown> | undefined)?.multiCollectable !== 1) {
+    return null;
+  }
+
+  const minutes = positiveTuple(bundle.globals?.['COLLECT_MINUTES'], FALLBACK_MINUTES);
+  const multipliers = positiveTuple(
+    bundle.globals?.['COLLECT_MULTIPLIER'],
+    FALLBACK_MULTIPLIER,
+  );
+  const state = productionState(world, isoId);
+  if (!state) return null;
+  const period = state.period !== null && minutes[state.period - 1] !== undefined
+    ? state.period
+    : 2;
+  const startedAt = state.startedAt !== null && state.startedAt > 0 ? state.startedAt : 0;
+  const secondsRemaining = startedAt > 0
+    ? Math.max(0, startedAt + minutes[period - 1]! * 60 - now)
+    : 0;
+
+  return {
+    isoId,
+    name: item.name,
+    resource: item.collect_type,
+    period,
+    startedAt,
+    secondsRemaining,
+    due: secondsRemaining === 0,
+    options: minutes.map((value, index) => ({
+      period: index + 1,
+      minutes: value,
+      multiplier: multipliers[index]!,
+      amount: Math.floor(item.collect! * multipliers[index]!),
+      active: index + 1 === period,
+    })),
+  };
 }
 
 /**

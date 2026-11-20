@@ -1,7 +1,13 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { contentItems, marketRules, populationRules } from './contentitems.ts';
+import {
+  collectPeriods,
+  contentItems,
+  marketRules,
+  populationRules,
+  reactivateWonderDiscount,
+} from './contentitems.ts';
 
 const BUNDLE = {
   items: [
@@ -72,6 +78,21 @@ describe('the content items', () => {
     assert.equal(items.get(1001)!.population, 1);
   });
 
+  it('know which buildings offer the four collection periods', () => {
+    const items = contentItems({
+      items: [
+        { id: 2, type: 'b', properties: { multiCollectable: 1 } },
+        { id: 3, type: 'b', properties: { multiCollectable: 0 } },
+        { id: 4, type: 'b', properties: {} },
+        { id: 5, type: 'b', properties: { multiCollectable: '1' } },
+      ],
+    });
+    assert.equal(items.get(2)!.multiCollectable, true);
+    assert.equal(items.get(3)!.multiCollectable, false);
+    assert.equal(items.get(4)!.multiCollectable, false);
+    assert.equal(items.get(5)!.multiCollectable, false);
+  });
+
   it('skip an item that has no id', () => {
     const items = contentItems({ items: [{ name: 'Nameless' }, { id: 7, name: 'Seven' }] });
     assert.equal(items.size, 1);
@@ -101,6 +122,40 @@ describe('the population rules', () => {
     assert.equal(rules.startMaxPopulation, 20);
     assert.equal(rules.maxPopulationCap, 175);
     assert.equal(rules.maxPopulationPerLevel, 3);
+  });
+});
+
+describe('the collect periods', () => {
+  it('are the content\'s own minutes and multipliers', () => {
+    assert.deepEqual(
+      collectPeriods({
+        COLLECT_MINUTES: [5, 60, 240, 480],
+        COLLECT_MULTIPLIER: [0.25, 1, 2, 3],
+      }),
+      { minutes: [5, 60, 240, 480], multiplier: [0.25, 1, 2, 3] },
+    );
+  });
+
+  it('fall back to the game\'s own numbers on a malformed global', () => {
+    assert.deepEqual(collectPeriods({}), {
+      minutes: [5, 60, 240, 480],
+      multiplier: [0.25, 1, 2, 3],
+    });
+    assert.deepEqual(collectPeriods({ COLLECT_MINUTES: [5, 'x', 240, 480] }), {
+      minutes: [5, 60, 240, 480],
+      multiplier: [0.25, 1, 2, 3],
+    });
+  });
+});
+
+describe('the wonder reactivation discount', () => {
+  it('is the content\'s own number', () => {
+    assert.equal(reactivateWonderDiscount({ REACTIVATE_WONDER_DISCOUNT: 0.25 }), 0.25);
+  });
+
+  it('falls back to the game\'s own number', () => {
+    assert.equal(reactivateWonderDiscount({}), 0.5);
+    assert.equal(reactivateWonderDiscount({ REACTIVATE_WONDER_DISCOUNT: 'x' }), 0.5);
   });
 });
 

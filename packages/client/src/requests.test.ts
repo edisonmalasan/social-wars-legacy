@@ -6,6 +6,7 @@ import { COMMAND_TABLE, minArgs, maxArgs } from '@swl/protocol';
 import {
   FORBIDDEN_COMMANDS,
   OWN_TOWN,
+  activate,
   buy,
   buyMagic,
   buyMana,
@@ -43,6 +44,7 @@ import {
 
 /** Every builder, with arguments that satisfy its specification. */
 const BUILDERS: { name: string; command: ReturnType<typeof buy> }[] = [
+  { name: 'activate', command: activate(7, 4) },
   { name: 'buy', command: buy(30, 1, 2, 'b') },
   { name: 'place_stored_item', command: placeStoredItem(30, 1, 2) },
   { name: 'move', command: move(7, 1, 2) },
@@ -79,6 +81,7 @@ const BUILDERS: { name: string; command: ReturnType<typeof buy> }[] = [
 
 /** The Group G4 builders, whose argument shapes the table must also confirm. */
 const NEW_COMMAND_NAMES = new Set([
+  'activate',
   'darts_new_free',
   'darts_reset',
   'darts_shoot_balloon',

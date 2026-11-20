@@ -363,6 +363,14 @@ export interface ApplierItem {
   /** The sub-category, for the per-sub-category limit. */
   subcategoryId: number;
   /**
+   * Whether the content marks this building as offering the four collection
+   * periods (`properties.multiCollectable === 1`).
+   *
+   * A building without the flag collects on the server's default period and
+   * may not choose one. The flag comes from the content, never the command.
+   */
+  multiCollectable: boolean;
+  /**
    * The item's `subcat_functional`; 221 is a wall.
    *
    * The quest roster uses it to decide whether a kill earns the minimum XP.
@@ -590,6 +598,8 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return buyOfferPackCommand(world, command.args, deps);
       case 'collect':
         return collectCommand(world, command.args, deps);
+      case 'activate':
+        return activateCommand(world, command.args, deps);
       case 'complete_goal':
         return completeGoalCommand(world, command.args, deps);
       case 'complete_tutorial':
@@ -1536,6 +1546,86 @@ function upgradeCommand(
   attrs['unitCapacity'] = newBuilding.unitCapacity;
 
   world.resources = settled.resources;
+  return { applied: true, world };
+}
+
+/**
+ * `activate` — let the player choose a collection period.
+ *
+ * This is the only client choice in the production cycle, and even here the
+ * client chooses **which** of the content's periods to wait, never **what**
+ * the wait is worth. Every eligibility rule is checked here from the server's
+ * map item, the content item and the server clock:
+ *
+ * - the period must be one the content actually defines (1..4);
+ * - the map item must exist, be a building, and be multi-collectable;
+ * - the building may not be over its unit capacity or still under
+ *   construction;
+ * - a repeat of the same, already-started cycle is a no-op, so a duplicate
+ *   request cannot push the countdown out.
+ *
+ * Only `cp` and `lastAccruedAt` are written. The wallet and the item's
+ * `tuple[3]` build timestamp belong to other commands and are left alone.
+ */
+function activateCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const period = args[1];
+  if (
+    typeof period !== 'number' ||
+    !Number.isInteger(period) ||
+    period < 1 ||
+    period > deps.collectPeriods.minutes.length
+  ) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+
+  const isoId = String(args[0] ?? '');
+  const tuple = mapItems(ownMap(world))[isoId];
+  if (!tuple) return { applied: false, refused: 'unknown-building', world };
+  const itemId = tuple[0];
+  if (typeof itemId !== 'number') {
+    return { applied: false, refused: 'unknown-building', world };
+  }
+  const item = deps.items?.get(itemId);
+  if (!item) return { applied: false, refused: 'unknown-item', world };
+  if (item.type !== 'b') return { applied: false, refused: 'not-a-building', world };
+  if (!item.multiCollectable) {
+    return { applied: false, refused: 'not-multi-collectable', world };
+  }
+
+  // Read the bag without creating one: a refused request must leave the map
+  // item exactly as it was, including a legacy item with no attribute bag.
+  const existing = tuple[6];
+  const attrs: Record<string, unknown> =
+    existing && typeof existing === 'object'
+      ? (existing as Record<string, unknown>)
+      : {};
+  const state = buildingState(attrs);
+  if (state.unitsInside > state.unitCapacity) {
+    return { applied: false, refused: 'over-capacity', world };
+  }
+  const now = deps.now();
+  const startedAt = tuple[3];
+  if (
+    typeof startedAt === 'number' &&
+    item.buildTime > 0 &&
+    now - startedAt < item.buildTime
+  ) {
+    return { applied: false, refused: 'under-construction', world };
+  }
+
+  // Idempotent by the server's clock: a replay with the same period does not
+  // restamp a countdown that is already running. A fresh building (no
+  // accrual yet) still needs its first stamp, and a different period restarts
+  // the cycle by design.
+  if (state.cp === period && state.lastAccruedAt > 0) {
+    return { applied: true, world };
+  }
+  tuple[6] = attrs;
+  writeBuildingState(attrs, { ...state, cp: period, lastAccruedAt: now });
   return { applied: true, world };
 }
 

@@ -448,6 +448,7 @@ describe('the legacy offer packs', () => {
       upgradesTo: null,
       premiumUpgradeCosts: {},
       type,
+      multiCollectable: false,
       grantsPopulation: false,
     };
   }
