@@ -1624,8 +1624,12 @@ function activateCommand(
   if (state.cp === period && state.lastAccruedAt > 0) {
     return { applied: true, world };
   }
+  // Literal write fidelity: choosing a period owns exactly these two keys.
+  // The other four production fields, and any unknown bag keys, are left as
+  // they were rather than being rewritten from a reconstructed state object.
   tuple[6] = attrs;
-  writeBuildingState(attrs, { ...state, cp: period, lastAccruedAt: now });
+  attrs['cp'] = period;
+  attrs['lastAccruedAt'] = now;
   return { applied: true, world };
 }
 

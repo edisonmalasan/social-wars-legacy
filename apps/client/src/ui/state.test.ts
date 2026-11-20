@@ -494,6 +494,33 @@ describe('the production selector', () => {
     assert.equal(view.resource, 'w');
   });
 
+  it('predicts the server payout from stored production state, including the peasant bonus', () => {
+    const withPeasants = productionPanel(
+      bundleWithPeriods(),
+      worldFor({ cp: 4, collect: 100, unitsInside: 3, unitCapacity: 5 }),
+      7,
+      1000,
+    )!;
+    // 100 + 2 * 100 * 0.2 = 140; floor(140 * 3) = 420.
+    assert.equal(withPeasants.options[3]!.amount, 420);
+
+    const stored = productionPanel(
+      bundleWithPeriods(),
+      worldFor({ cp: 4, collect: 150, unitsInside: 1, unitCapacity: 5 }),
+      7,
+      1000,
+    )!;
+    assert.equal(stored.options[3]!.amount, 450);
+
+    const capacityOne = productionPanel(
+      bundleWithPeriods(),
+      worldFor({ cp: 4, collect: 100, unitsInside: 3, unitCapacity: 1 }),
+      7,
+      1000,
+    )!;
+    assert.equal(capacityOne.options[3]!.amount, 300);
+  });
+
   it('counts down from the server timestamp and treats a fresh cycle as due', () => {
     const started = worldFor({ cp: 3, lastAccruedAt: 1000 });
     const early = productionPanel(bundleWithPeriods(), started, 7, 1060)!;

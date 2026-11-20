@@ -40,7 +40,7 @@ import {
   unitPanel,
 } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
-import { QUEST_IDS, getQuestSpec } from '@swl/rules';
+import { MULTIPLIER_PEASANTS, QUEST_IDS, getQuestSpec } from '@swl/rules';
 
 /** The categories, as the build menu's tabs read them. */
 export type Categories = Record<
@@ -447,7 +447,10 @@ export interface ProductionOption {
   readonly minutes: number;
   /** The payout factor, from the content's `COLLECT_MULTIPLIER`. */
   readonly multiplier: number;
-  /** `floor(collect x multiplier)`, shown as a prediction, never paid here. */
+  /**
+   * The payout the server's own formula predicts from its stored production
+   * state (including any peasant bonus), shown only — never paid here.
+   */
   readonly amount: number;
   /** Whether the server's current `cp` is this period. */
   readonly active: boolean;
@@ -484,6 +487,28 @@ function positiveTuple(value: unknown, fallback: readonly number[]): number[] {
     (entry) => typeof entry === 'number' && Number.isFinite(entry) && entry > 0,
   );
   return valid ? (tuple as number[]) : [...fallback];
+}
+
+/**
+ * The server's payout formula (`packages/rules/src/economy.ts:collect`), for
+ * display only. The stored `collect` and `unitsInside` are the server's; the
+ * content base is used only when a fresh building has no stored amount yet.
+ * A building that cannot hold extra units gets no peasant bonus.
+ */
+function predictedAmount(
+  collect: number | null,
+  unitsInside: number | null,
+  unitCapacity: number | null,
+  contentCollect: number,
+  multiplier: number,
+): number {
+  const base = Math.floor(collect ?? contentCollect);
+  const extra =
+    unitCapacity !== null && unitCapacity > 1
+      ? Math.max(0, (unitsInside ?? 0) - 1)
+      : 0;
+  const raw = extra > 0 ? base + extra * base * MULTIPLIER_PEASANTS : base;
+  return Math.floor(Math.floor(raw) * multiplier);
 }
 
 /**
@@ -538,7 +563,13 @@ export function productionPanel(
       period: index + 1,
       minutes: value,
       multiplier: multipliers[index]!,
-      amount: Math.floor(item.collect! * multipliers[index]!),
+      amount: predictedAmount(
+        state.collect,
+        state.unitsInside,
+        state.unitCapacity,
+        item.collect ?? 0,
+        multipliers[index]!,
+      ),
       active: index + 1 === period,
     })),
   };
