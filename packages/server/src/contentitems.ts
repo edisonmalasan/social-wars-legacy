@@ -62,6 +62,8 @@ export function contentItems(bundle: { items?: unknown[] }): Map<number, Applier
       minLevel: numberOr(item['min_level'], 1),
       unitCapacity: numberOr(item['unit_capacity'], 0),
       population: numberOr(item['population'], 0),
+      // The quest ledger seeds an element's HP from its `life`.
+      life: numberOr(item['life'], 0),
       buildingLimitSameId: numberOr(item['building_limit_same_id'], -1),
       buildingLimitSameScf: numberOr(item['building_limit_same_scf'], -1),
       subcategoryId: numberOr(item['subcategory_id'], 0),

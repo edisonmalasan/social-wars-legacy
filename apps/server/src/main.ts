@@ -29,6 +29,7 @@ import {
   SessionStore,
   WebhookAlertSender,
   runMigrations,
+  type ContentQuestEvent,
   type ContentQuestRoster,
   type CredentialStore,
   type PlayerStore,
@@ -40,7 +41,7 @@ import { createApp, type AppRequest } from './app.ts';
 import { DEFAULT_LIMITS } from './limits.ts';
 import { MemoryPlayerStore } from '@swl/server';
 import { contentItems, marketRules, populationRules } from '@swl/server';
-import { createApplier, initialWorld, tracedDatabase } from '@swl/server';
+import { createApplier, createQuestHelpers, initialWorld, tracedDatabase } from '@swl/server';
 
 /** The port to listen on. */
 const PORT = Number(process.env['PORT'] ?? 8080);
@@ -134,6 +135,8 @@ async function main(): Promise<void> {
     // Built by `pnpm build:content` from the vendored quest maps. Older bundles
     // do not carry it, so the applier's safe empty default still applies.
     questRosters?: readonly ContentQuestRoster[];
+    // Event channels seeded by the build, never supplied by a client.
+    questEvents?: Readonly<Record<string, ContentQuestEvent>>;
   };
   const content = costContentFrom(bundle);
 
@@ -214,6 +217,41 @@ async function main(): Promise<void> {
   // Where the alerts go, when there is somewhere to send them.
   const webhookUrl = process.env['SWL_ALERT_WEBHOOK'];
 
+  // One set of content deps for both the command applier and the authoritative
+  // quest helpers: the server seed and the quest events are the server's own,
+  // never supplied by a client request.
+  const applierDeps = {
+    now: () => Math.floor(Date.now() / 1000),
+    tzOffsetHours: 0,
+    collectPeriods: { minutes: [5, 60, 240, 480], multiplier: [0.25, 1, 2, 3] },
+    dailyBonus: { goldRewards: [100, 250, 500, 1000, 0], heroItemId: 1001 },
+    // The content, so the applier can check the **rules**: the level,
+    // the population and the limits are all the game's own.
+    items: contentItems(bundle),
+    // The hardcore rosters are read from the bundle only — never from upstream.
+    questRosters: bundle.questRosters ?? [],
+    // The event channels (refs and counts) are server-owned too.
+    questEvents: bundle.questEvents ?? {},
+    // Deterministic strike damage, from the server's own seed.
+    serverSeed: process.env['SWL_SERVER_SEED'] ?? 'swl-server-v1',
+    offerPacks: content.offerPacks,
+    populationRules: populationRules(globalsOf(bundle)),
+    // The darts schedule and the market prices are the content's own.
+    dartsItems: bundle.dartsItems,
+    market: marketRules(globalsOf(bundle)),
+    // Chapters and assault quests are paid from the content's own tables.
+    // The chapter reward rows come straight from REWARDS_CHAPTERS; the XP
+    // context for a quest's static reward row is derived from the level table.
+    chapterRewards: globalsOf(bundle)['REWARDS_CHAPTERS'],
+    questExpRequired: questExpRequiredOf(bundle),
+    // Magic and tech: the ten spells and the globals their economy reads.
+    magic: {
+      spells: magicCatalogFrom(Array.isArray(bundle.magics) ? bundle.magics : []),
+      globals: globalsOf(bundle),
+    },
+  };
+  const questHelpers = createQuestHelpers(applierDeps);
+
   const handle = createApp({
     store,
     sessions,
@@ -236,32 +274,9 @@ async function main(): Promise<void> {
     now: () => Math.floor(Date.now() / 1000),
     nowMs: () => Date.now(),
     credentials,
-    applyCommand: createApplier({
-      now: () => Math.floor(Date.now() / 1000),
-      tzOffsetHours: 0,
-      collectPeriods: { minutes: [5, 60, 240, 480], multiplier: [0.25, 1, 2, 3] },
-      dailyBonus: { goldRewards: [100, 250, 500, 1000, 0], heroItemId: 1001 },
-      // The content, so the applier can check the **rules**: the level,
-      // the population and the limits are all the game's own.
-      items: contentItems(bundle),
-      // The hardcore rosters are read from the bundle only — never from upstream.
-      questRosters: bundle.questRosters ?? [],
-      offerPacks: content.offerPacks,
-      populationRules: populationRules(globalsOf(bundle)),
-      // The darts schedule and the market prices are the content's own.
-      dartsItems: bundle.dartsItems,
-      market: marketRules(globalsOf(bundle)),
-      // Chapters and assault quests are paid from the content's own tables.
-      // The chapter reward rows come straight from REWARDS_CHAPTERS; the XP
-      // context for a quest's static reward row is derived from the level table.
-      chapterRewards: globalsOf(bundle)['REWARDS_CHAPTERS'],
-      questExpRequired: questExpRequiredOf(bundle),
-      // Magic and tech: the ten spells and the globals their economy reads.
-      magic: {
-        spells: magicCatalogFrom(Array.isArray(bundle.magics) ? bundle.magics : []),
-        globals: globalsOf(bundle),
-      },
-    }),
+    applyCommand: createApplier(applierDeps),
+    beginQuest: questHelpers.beginQuest,
+    applyQuestAction: questHelpers.applyQuestAction,
   });
 
   const server = createServer((request: IncomingMessage, response: ServerResponse) => {

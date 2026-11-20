@@ -24,11 +24,13 @@ import {
 
 import {
   ACTIVE_QUEST_KEY,
+  type ActiveQuestState,
   type ApplierItem,
   BUILDING_STATE_KEYS,
   GOAL_STATE_KEY,
   QUEST_PROGRESS_KEY,
   createApplier,
+  createQuestHelpers,
   hasActivePremium,
   mapItems,
   questRoster,
@@ -1459,8 +1461,8 @@ describe('the claims the server does not honour', () => {
     const world = worldWithBuilding({});
     const outcome = applier(world, { name: 'end_quest', args: [100000001, true] });
     assert.equal(outcome.applied, false);
-    // The claimed win is never read: there is no server quest state to resolve.
-    assert.equal(outcome.refused, 'no-victory');
+    // The claimed win is never read: there is no active server quest to resolve.
+    assert.equal(outcome.refused, 'no-active-quest');
     assert.equal(outcome.world.resources['g'], 0);
   });
 });
@@ -1988,7 +1990,22 @@ describe('set_quest_var', () => {
 
   it('stores a valid write in currentQuestVars', () => {
     const applier = createApplier(chapterDeps());
-    const spawned = applier(chapterWorld({ id: 1 }), {
+    const world = chapterWorld({ id: 1 });
+    // A `killed` write is only honoured for refs the ledger marks dead.
+    world.save.privateState[ACTIVE_QUEST_KEY] = {
+      questId: QUEST_ID_02_CENTRAL_NUCLEAR,
+      phase: 'map-loaded',
+      script: { destroyed: [], nearDeath: [], defendersCleared: [], keyElementsLost: [], counters: {}, suppressed: false },
+      ledger: {
+        elements: {
+          centralNuclear: { hp: 0, alive: false },
+          commandCenter: { hp: 0, alive: false },
+        },
+        events: [],
+        strikes: {},
+      },
+    };
+    const spawned = applier(world, {
       name: 'set_quest_var',
       args: ['spawned', 'true'],
     });
@@ -1996,10 +2013,10 @@ describe('set_quest_var', () => {
     assert.equal(chapterVars(spawned.world)['spawned'], true);
     const killed = applier(spawned.world, {
       name: 'set_quest_var',
-      args: ['killed', JSON.stringify(['e1', 't2'])],
+      args: ['killed', JSON.stringify(['centralNuclear', 'commandCenter'])],
     });
     assert.equal(killed.applied, true);
-    assert.deepEqual(chapterVars(killed.world)['killed'], ['e1', 't2']);
+    assert.deepEqual(chapterVars(killed.world)['killed'], ['centralNuclear', 'commandCenter']);
     const ended = applier(killed.world, { name: 'set_quest_var', args: ['ended', 'true'] });
     assert.equal(ended.applied, true);
     assert.equal(chapterVars(ended.world)['ended'], true);
@@ -2143,16 +2160,24 @@ const QUEST_ITEMS = new Map<number, ApplierItem>([
 const questDeps = (over: Partial<ApplierDeps> = {}): ApplierDeps =>
   chapterDeps({ items: QUEST_ITEMS, questExpRequired: 300, ...over });
 
-/** A player's own map with a seed naming the quest being played. */
+/**
+ * A player's own map with a fully started quest.
+ *
+ * The quest is started through the authoritative helper, and the ledger is
+ * then marked dead for every roster element. These tests are about the
+ * command semantics (triggers, rewards, dedupe) — the strike/authority path
+ * itself is covered in `quest-authority.test.ts`.
+ */
 function questWorld(
   over: {
     questId?: string;
     vars?: Record<string, unknown>;
     privateState?: Record<string, unknown>;
     resources?: ShimWorld['resources'];
+    deps?: ApplierDeps;
   } = {},
 ): ShimWorld {
-  return {
+  const world: ShimWorld = {
     save: {
       playerInfo: {},
       maps: [
@@ -2162,29 +2187,39 @@ function questWorld(
           currentQuestVars: { ...(over.vars ?? {}) },
         },
       ],
-      privateState: {
-        // A seed carries only the identifier. The first validated kill grows
-        // it into a full server-owned QuestState.
-        [ACTIVE_QUEST_KEY]: { questId: over.questId ?? QUEST_ID_02_CENTRAL_NUCLEAR },
-        ...(over.privateState ?? {}),
-      },
+      privateState: { ...(over.privateState ?? {}) },
     },
     resources: over.resources ?? purse({}),
     nextCommandNumber: 1,
   };
+  if (!(ACTIVE_QUEST_KEY in world.save.privateState)) {
+    const questId = over.questId ?? QUEST_ID_02_CENTRAL_NUCLEAR;
+    const started = createQuestHelpers(over.deps ?? questDeps()).beginQuest(world, questId);
+    if (started.ok) {
+      const state = started.world.save.privateState[ACTIVE_QUEST_KEY] as ActiveQuestState;
+      // Simulate the server's strikes having already killed each element.
+      for (const element of Object.values(state.ledger.elements)) {
+        element.hp = 0;
+        element.alive = false;
+      }
+      world.save.privateState[ACTIVE_QUEST_KEY] = state;
+    }
+  }
+  return world;
 }
 
-const activeState = (world: ShimWorld): QuestState =>
-  world.save.privateState[ACTIVE_QUEST_KEY] as QuestState;
+const activeState = (world: ShimWorld): ActiveQuestState =>
+  world.save.privateState[ACTIVE_QUEST_KEY] as ActiveQuestState;
 
-/** A `set_quest_var` killed write, with the quest id as its third argument. */
-const killedWrite = (refs: string[], questId?: string) => ({
+/**
+ * A two-argument `set_quest_var` killed write.
+ *
+ * The optional second parameter is accepted only so older call sites still
+ * type-check; it is deliberately ignored — there is no third wire argument.
+ */
+const killedWrite = (refs: string[], _ignoredQuestId?: string) => ({
   name: 'set_quest_var',
-  args: [
-    'killed',
-    JSON.stringify(refs),
-    ...(questId === undefined ? [] : [questId]),
-  ] as unknown[],
+  args: ['killed', JSON.stringify(refs)] as unknown[],
 });
 
 describe('the active assault quest', () => {
@@ -2222,43 +2257,44 @@ describe('the active assault quest', () => {
     assert.deepEqual(chapterVars(outcome.world)['killed'], ['commandCenter']);
   });
 
-  it('accepts a quest id argument when no quest is seeded', () => {
+  it('refuses a killed write with no active quest, whatever the third argument', () => {
     const applier = createApplier(questDeps());
     const world = questWorld();
     delete world.save.privateState[ACTIVE_QUEST_KEY];
-    const outcome = applier(world, killedWrite(['centralNuclear'], QUEST_ID_02_CENTRAL_NUCLEAR));
-    assert.equal(outcome.applied, true);
-    assert.deepEqual(activeState(outcome.world).script.destroyed, ['centralNuclear']);
+    const before = structuredClone(world);
+    const outcome = applier(world, {
+      name: 'set_quest_var',
+      args: ['killed', JSON.stringify(['centralNuclear']), QUEST_ID_02_CENTRAL_NUCLEAR],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-active-quest');
+    assert.deepEqual(outcome.world, before);
   });
 
-  it('refuses a killed ref outside the roster without mutating any state', () => {
+  it('refuses a killed ref that the ledger does not mark dead', () => {
     const applier = createApplier(questDeps());
     const world = questWorld();
     const before = structuredClone(world);
     const outcome = applier(world, killedWrite(['notAnElement']));
     assert.equal(outcome.applied, false);
-    assert.equal(outcome.refused, 'unknown-quest-element');
+    assert.equal(outcome.refused, 'element-not-killed');
     assert.deepEqual(outcome.world, before);
   });
 
-  it('refuses to switch to another quest mid-stream', () => {
+  it('ignores a third argument but keeps end_quest scoped to the active quest', () => {
     const applier = createApplier(questDeps());
+    // A third argument is no longer read. The killed write applies to the
+    // active quest's own state, never to the named quest.
+    const forged = applier(questWorld(), {
+      name: 'set_quest_var',
+      args: ['killed', JSON.stringify(['commandCenter']), QUEST_ID_01_BAZOOKA],
+    });
+    assert.equal(forged.applied, true);
+    assert.deepEqual(activeState(forged.world).script.destroyed, ['commandCenter']);
 
-    // QUEST_02 is active; a killed write naming another known quest is
-    // refused before any of the save is written.
-    const seeded = questWorld();
-    const beforeKill = structuredClone(seeded);
-    const switchedKill = applier(seeded, killedWrite(['commandCenter'], QUEST_ID_01_BAZOOKA));
-    assert.equal(switchedKill.applied, false);
-    assert.equal(switchedKill.refused, 'quest-mismatch');
-    assert.deepEqual(switchedKill.world, beforeKill);
-
-    // The same guard holds once the state is fully initialised: end_quest
-    // naming a different quest cannot pay out the active quest's reward.
-    const killed = applier(questWorld(), killedWrite(['commandCenter']));
-    assert.equal(killed.applied, true);
-    const beforeEnd = structuredClone(killed.world);
-    const switchedEnd = applier(killed.world, {
+    // A different quest cannot pay out the active quest's reward.
+    const beforeEnd = structuredClone(forged.world);
+    const switchedEnd = applier(forged.world, {
       name: 'end_quest',
       args: [QUEST_ID_01_BAZOOKA, 1],
     });
@@ -2326,7 +2362,9 @@ describe('the active assault quest', () => {
       args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
     });
     assert.equal(replay.applied, false);
-    assert.equal(replay.refused, 'already-awarded');
+    // The win cleared the active state, so a replay has no quest to resolve —
+    // and the award log still guarantees the reward cannot be paid twice.
+    assert.equal(replay.refused, 'no-active-quest');
     assert.deepEqual(replay.world.resources, first.world.resources);
   });
 
@@ -2362,17 +2400,18 @@ describe('the active assault quest', () => {
     assert.deepEqual(outcome.world.save.privateState['questsRank'], { '6': 1 });
   });
 
-  it('resolves the legacy client\'s kills from the chapter status', () => {
+  it('does not implicitly start a quest from the legacy chapter status', () => {
     const applier = createApplier(questDeps());
     const world = questWorld({ vars: { killed: ['commandCenter'] } });
     delete world.save.privateState[ACTIVE_QUEST_KEY];
+    const before = structuredClone(world);
     const outcome = applier(world, {
       name: 'end_quest',
       args: [JSON.stringify({ quest_id: QUEST_ID_02_CENTRAL_NUCLEAR })],
     });
-    assert.equal(outcome.applied, true);
-    assert.equal(outcome.world.resources['g'], 4000);
-    assert.equal(outcome.world.resources['o'], 1400);
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-active-quest');
+    assert.deepEqual(outcome.world, before);
   });
 
   it('refuses an empty-roster hardcore quest with no server kills', () => {
@@ -2408,19 +2447,20 @@ describe('the active assault quest', () => {
     );
   });
 
-  it('pays a legacy quest with stale chapter refs mixed into the kill list', () => {
+  it('never pays from stale chapter refs without an active quest', () => {
     const applier = createApplier(questDeps());
     // A half-finished chapter leaves chapter refs beside quest refs in
-    // currentQuestVars.killed; the fallback replays only on-roster refs.
+    // currentQuestVars.killed. Those are chapter state, not proof of a kill.
     const world = questWorld({ vars: { killed: ['chapter-3-boss', 'commandCenter'] } });
     delete world.save.privateState[ACTIVE_QUEST_KEY];
+    const before = structuredClone(world);
     const outcome = applier(world, {
       name: 'end_quest',
       args: [JSON.stringify({ quest_id: QUEST_ID_02_CENTRAL_NUCLEAR })],
     });
-    assert.equal(outcome.applied, true);
-    assert.equal(outcome.world.resources['g'], 4000);
-    assert.equal(outcome.world.resources['o'], 1400);
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-active-quest');
+    assert.deepEqual(outcome.world, before);
   });
 
   it('refuses to pay a quest already recorded as a loss', () => {
@@ -2492,17 +2532,18 @@ describe('the active assault quest', () => {
     assert.equal(outcome.refused, 'no-victory');
   });
 
-  it('resolves a legacy end_quest replay of a nearDeath quest', () => {
+  it('does not pay a nearDeath quest replayed from the chapter status', () => {
     const applier = createApplier(questDeps());
     const world = questWorld({ vars: { killed: ['boss1', 'jeep'] } });
     delete world.save.privateState[ACTIVE_QUEST_KEY];
+    const before = structuredClone(world);
     const outcome = applier(world, {
       name: 'end_quest',
       args: [JSON.stringify({ quest_id: QUEST_ID_01_BAZOOKA })],
     });
-    assert.equal(outcome.applied, true);
-    assert.equal(outcome.world.resources['g'], 1500);
-    assert.equal(outcome.world.resources['w'], 400);
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-active-quest');
+    assert.deepEqual(outcome.world, before);
   });
 
   it('resolves a quest that mixes defendersCleared and destroy events', () => {
@@ -2577,7 +2618,7 @@ describe('hardcore quests with extracted rosters', () => {
 
   it('pays exactly once after the whole roster is killed', () => {
     const applier = createApplier(hardcoreDeps());
-    const killed = applier(questWorld({ questId: HC }), killedWrite(REFS));
+    const killed = applier(questWorld({ questId: HC, deps: hardcoreDeps() }), killedWrite(REFS));
     assert.equal(killed.applied, true);
     const state = activeState(killed.world);
     assert.equal(state.script.counters['enemiesAlive'], 0);
@@ -2589,14 +2630,14 @@ describe('hardcore quests with extracted rosters', () => {
     assert.equal(end.world.resources['s'], 3200);
     const replay = applier(end.world, { name: 'end_quest', args: [HC, 1] });
     assert.equal(replay.applied, false);
-    assert.equal(replay.refused, 'already-awarded');
+    assert.equal(replay.refused, 'no-active-quest');
     assert.deepEqual(replay.world.resources, end.world.resources);
   });
 
   it('refuses a partial roster', () => {
     const applier = createApplier(hardcoreDeps());
-    const before = structuredClone(questWorld({ questId: HC }));
-    const killed = applier(questWorld({ questId: HC }), killedWrite(REFS.slice(0, 2)));
+    const before = structuredClone(questWorld({ questId: HC, deps: hardcoreDeps() }));
+    const killed = applier(questWorld({ questId: HC, deps: hardcoreDeps() }), killedWrite(REFS.slice(0, 2)));
     assert.equal(killed.applied, true);
     assert.equal(activeState(killed.world).script.counters['enemiesAlive'], 1);
     const end = applier(killed.world, { name: 'end_quest', args: [HC, 1] });
@@ -2607,17 +2648,17 @@ describe('hardcore quests with extracted rosters', () => {
 
   it('refuses an off-roster ref without mutating the save', () => {
     const applier = createApplier(hardcoreDeps());
-    const world = questWorld({ questId: HC });
+    const world = questWorld({ questId: HC, deps: hardcoreDeps() });
     const before = structuredClone(world);
     const outcome = applier(world, killedWrite(['item:999']));
     assert.equal(outcome.applied, false);
-    assert.equal(outcome.refused, 'unknown-quest-element');
+    assert.equal(outcome.refused, 'element-not-killed');
     assert.deepEqual(outcome.world, before);
   });
 
   it('refuses a zero-event hardcore end_quest even with a full roster available', () => {
     const applier = createApplier(hardcoreDeps());
-    const world = questWorld({ questId: HC });
+    const world = questWorld({ questId: HC, deps: hardcoreDeps() });
     const before = structuredClone(world);
     const outcome = applier(world, { name: 'end_quest', args: [HC, 1] });
     assert.equal(outcome.applied, false);
@@ -2627,7 +2668,7 @@ describe('hardcore quests with extracted rosters', () => {
 
   it('refuses a hardcore quest recorded as a loss', () => {
     const applier = createApplier(hardcoreDeps());
-    const killed = applier(questWorld({ questId: HC }), killedWrite(REFS));
+    const killed = applier(questWorld({ questId: HC, deps: hardcoreDeps() }), killedWrite(REFS));
     assert.equal(killed.applied, true);
     const world = killed.world;
     world.save.privateState[ACTIVE_QUEST_KEY] = { ...activeState(world), result: 'loss' };
@@ -2701,11 +2742,11 @@ describe('the weekly quest', () => {
     assert.equal(outcome.applied, true);
     assert.equal(outcome.world.resources['c'], 5 * WEEKLY_CASH_PER_BOT);
 
-    // The active state is cleared on award, so a second claim is refused by
-    // the zero-event guard before the once-only award guard is even reached.
+    // The active state is cleared on award, so a second claim has no quest to
+    // resolve (and the award log still forbids a second payment).
     const second = endWeekly(outcome.world);
     assert.equal(second.applied, false);
-    assert.equal(second.refused, 'no-victory');
+    assert.equal(second.refused, 'no-active-quest');
     assert.equal(second.world.resources['c'], 5 * WEEKLY_CASH_PER_BOT);
   });
 
@@ -2715,7 +2756,7 @@ describe('the weekly quest', () => {
     const before = structuredClone(world);
     const outcome = applier(world, killedWrite(['item:1063'], QUEST_ID_WEEKLY_01));
     assert.equal(outcome.applied, false);
-    assert.equal(outcome.refused, 'unknown-quest-element');
+    assert.equal(outcome.refused, 'element-not-killed');
     assert.deepEqual(outcome.world, before);
   });
 
@@ -2728,12 +2769,14 @@ describe('the weekly quest', () => {
     assert.deepEqual(outcome.world, before);
   });
 
-  it('resolves the legacy client\'s chapter-status kills too', () => {
+  it('does not pay the weekly quest from chapter status alone', () => {
     const world = questWorld({ vars: { killed: [...WEEKLY_BOT_REFS] } });
     delete world.save.privateState[ACTIVE_QUEST_KEY];
+    const before = structuredClone(world);
     const outcome = endWeekly(world);
-    assert.equal(outcome.applied, true);
-    assert.equal(outcome.world.resources['c'], 5 * WEEKLY_CASH_PER_BOT);
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-active-quest');
+    assert.deepEqual(outcome.world, before);
   });
 
   it('never moves another quest\'s counter from a kill', () => {
