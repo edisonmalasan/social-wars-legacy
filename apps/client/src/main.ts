@@ -54,10 +54,11 @@ import {
   combatDialog,
   endQuest,
   questActionOnServer,
-  questChoices,
   questDifficulty,
   levelOf,
   lastQuestReward,
+  questResultActionChoice,
+  type QuestResultAction,
   questResultFromReceipt,
   questResultView,
   reportQuestKill,
@@ -562,10 +563,10 @@ async function main(): Promise<void> {
       onQuestAction: (questId, action) => {
         void applyQuestGesture(questId, action);
       },
-      // Both gestures go back through the authoritative chapter-slot path:
-      // the server's ranks and unlock levels decide what may open.
-      onQuestRetry: (questId) => openResultQuest(questId),
-      onQuestNext: (questId) => openResultQuest(questId),
+      // Both gestures are gated on the server's ranks and unlock levels, the
+      // same authoritative reading that rendered their buttons.
+      onQuestRetry: (questId) => openResultQuest(questId, 'retry'),
+      onQuestNext: (questId) => openResultQuest(questId, 'next'),
       selectedIso,
       now: Math.floor(Date.now() / 1000),
       onUpgrade,
@@ -639,18 +640,18 @@ async function main(): Promise<void> {
   /**
    * Open a result action's mission through the same authoritative slot path.
    *
-   * Re-checking the choice at action time (rather than trusting the label on
-   * the button) means a stale panel cannot open a mission the server has not
-   * actually made available.
+   * The gate and the choice both come from the server's rank keyed by play
+   * index — never from `questChoices`/`chapterMap`, whose one-based slots see
+   * a freshly unlocked mission as locked. A null choice fails closed.
    */
-  function openResultQuest(questId: string): void {
-    const choice = questChoices(
-      questRanks(world),
-      questMinLevels(content),
-      levelOf(world),
-      activeQuestState(world)?.questId ?? null,
-    ).find((entry) => entry.questId === questId);
-    if (!choice || !choice.unlocked) {
+  function openResultQuest(questId: string, action: QuestResultAction): void {
+    const panel = questPanel;
+    if (!panel || panel.kind !== 'result') {
+      gestureRefusal('that mission is not available');
+      return;
+    }
+    const choice = questResultActionChoice(panel.result, questId, action, resultQuestOptions());
+    if (!choice) {
       gestureRefusal('that mission is not available');
       return;
     }

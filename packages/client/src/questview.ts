@@ -448,6 +448,60 @@ export function questResultView(
   };
 }
 
+/** Which action of a result dialog the player pressed. */
+export type QuestResultAction = 'retry' | 'next';
+
+/**
+ * The choice a result action opens, or `null` when the action must be refused.
+ *
+ * The server keys ranks by the quest's **zero-based playIndex**, while the
+ * chapter map indexes one-based slots and maps slot `i` to `QUEST_IDS[i-1]`.
+ * Looking the freshly unlocked mission up through `questChoices`/`chapterMap`
+ * therefore sees the wrong slot and reads it as locked — the Next button
+ * renders, but the gesture is refused. Synthesise the choice from the very
+ * same authoritative reading that rendered the button instead:
+ *
+ * - `next` is allowed only when `nextQuestResult` still reports that exact
+ *   mission as available from the server's ranks and unlock levels;
+ * - `retry` is allowed only for a won quest the server actually ranked;
+ * - the returned choice carries `index = playIndex + 1` and the rank at
+ *   `ranks[playIndex]`, and is explicitly unlocked.
+ *
+ * A `null` result is fail-closed: the host refuses the gesture.
+ */
+export function questResultActionChoice(
+  result: QuestResultView,
+  questId: string,
+  action: QuestResultAction,
+  options: QuestResultOptions,
+): QuestChoice | null {
+  const spec = getQuestSpec(questId);
+  if (!spec) return null;
+  const playIndex = spec.playIndex;
+  const ranks = options.ranks ?? {};
+
+  if (action === 'next') {
+    // Recompute from the server's ranks at action time — the exact same gate
+    // the renderer used — rather than trusting a possibly stale label.
+    const next = nextQuestResult(result.questId, options);
+    if (!next || next.questId !== questId || !next.available) return null;
+  } else {
+    // Retry/replay is a gesture for a quest the server really completed.
+    if (!result.won || result.questId !== questId || ranks[playIndex] === undefined) return null;
+  }
+
+  return {
+    index: playIndex + 1,
+    questId,
+    title: questTitle(questId) ?? questId,
+    rank: ranks[playIndex] ?? 0,
+    levelUnlock: options.minLevels?.[playIndex] ?? 0,
+    locked: false,
+    unlocked: true,
+    active: false,
+  };
+}
+
 /**
  * Rebuild a result screen from the server's persisted receipt.
  *

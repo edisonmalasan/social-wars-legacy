@@ -15,6 +15,7 @@ import {
   questChoices,
   questDialogId,
   questDifficulty,
+  questResultActionChoice,
   questResultFromReceipt,
   questResultView,
   resultDialog,
@@ -343,6 +344,76 @@ describe('result view', () => {
     assert.equal(view.rank, 2);
     assert.equal(view.missionComplete, true);
     assert.deepEqual(view.rewards, receipt.rewards);
+  });
+
+  // Host-level: the exact gate the dialog's Next button goes through before
+  // it calls openQuestSlot. A first-time unlock must open QUEST_IDS[p+1],
+  // not be refused by the one-based chapter-slot lookup.
+  it('opens the freshly unlocked next mission from the server play index', () => {
+    const playIndex = getQuestSpec(Q02)!.playIndex;
+    const ranks = { [playIndex]: 1 };
+    const options = {
+      ranks,
+      minLevels: {},
+      playerLevel: 1,
+      numQuests: QUEST_IDS.length - 1,
+    };
+    const won = questResultView(
+      Q02,
+      { index: 0, ok: true, result: { kind: 'rewards', rewards } },
+      undefined,
+      options,
+    );
+    const nextId = QUEST_IDS[playIndex + 1]!;
+    assert.equal(won.next?.questId, nextId);
+    assert.equal(won.next?.available, true);
+
+    const choice = questResultActionChoice(won, nextId, 'next', options);
+    assert.ok(choice, 'the Next gesture must not be refused');
+    assert.equal(choice.questId, nextId);
+    assert.equal(choice.index, playIndex + 2);
+    assert.equal(choice.rank, 0, 'the first-time unlock is not ranked yet');
+    assert.equal(choice.unlocked, true);
+    assert.equal(choice.locked, false);
+    assert.equal(choice.active, false);
+  });
+
+  it('fails closed when the server has not unlocked the next mission', () => {
+    const playIndex = getQuestSpec(Q02)!.playIndex;
+    const nextIndex = playIndex + 1;
+    const options = {
+      ranks: { [playIndex]: 1 },
+      minLevels: { [nextIndex]: 99 },
+      playerLevel: 1,
+      numQuests: QUEST_IDS.length - 1,
+    };
+    const won = questResultView(
+      Q02,
+      { index: 0, ok: true, result: { kind: 'rewards', rewards } },
+      undefined,
+      options,
+    );
+    assert.equal(won.next?.available, false);
+    assert.equal(
+      questResultActionChoice(won, QUEST_IDS[nextIndex]!, 'next', options),
+      null,
+    );
+  });
+
+  it('still allows a retry of the ranked mission the server completed', () => {
+    const playIndex = getQuestSpec(Q02)!.playIndex;
+    const options = { ranks: { [playIndex]: 1 }, minLevels: {}, playerLevel: 1 };
+    const won = questResultView(
+      Q02,
+      { index: 0, ok: true, result: { kind: 'rewards', rewards } },
+      undefined,
+      options,
+    );
+    const choice = questResultActionChoice(won, Q02, 'retry', options);
+    assert.ok(choice);
+    assert.equal(choice.questId, Q02);
+    assert.equal(choice.rank, 1);
+    assert.equal(choice.unlocked, true);
   });
 });
 
