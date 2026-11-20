@@ -50,6 +50,16 @@ import {
 import { mountUi } from './ui/mount.tsx';
 import { uiCss } from './ui/css.ts';
 import type { TutorialOverlayProps } from './ui/tutorial.tsx';
+import {
+  CLOSED_DIALOG,
+  closeDialog,
+  feedbackFrom,
+  openDialog,
+  type DialogId,
+  type DialogKind,
+  type DialogState,
+  type FeedbackMessage,
+} from '@swl/client';
 
 const STAGE = document.getElementById('stage');
 const GAME = document.getElementById('game');
@@ -203,6 +213,13 @@ export interface ClientHandle {
   run: (
     commands: readonly NativeCommand[],
   ) => Promise<{ ok: boolean; latencyMs: number; sprites: number }>;
+  /**
+   * Open the shared dialog. The G5.1 panels use this one primitive; a host
+   * supplies the panel's id, kind and heading, never its game outcome.
+   */
+  showDialog?: (id: DialogId, kind: DialogKind, title: string) => void;
+  /** Close the shared dialog. */
+  dismissDialog?: () => void;
   /**
    * The client's own request builders.
    *
@@ -420,10 +437,24 @@ async function main(): Promise<void> {
   let placing: number | null = null;
   let selected: number | null = null;
   let neighbours: Neighbour[] = [];
+  /**
+   * The one open dialog and the feedback channel. Neither is a reading of
+   * the world: they are the client's own UI state, kept here so every
+   * redraw shows the same panel and the same last answer's messages.
+   */
+  let dialogState: DialogState = CLOSED_DIALOG;
+  let feedback: readonly FeedbackMessage[] = [];
 
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
-    ui?.draw(world, placing, selected, neighbours, tutorialProps());
+    ui?.draw(world, placing, selected, neighbours, tutorialProps(), {
+      dialog: dialogState,
+      feedback,
+      onDialogDismiss: () => {
+        dialogState = closeDialog(dialogState);
+        drawInterface();
+      },
+    });
   }
 
   /** The tutorial's drawing, or null when it is not running. */
@@ -570,6 +601,12 @@ async function main(): Promise<void> {
   async function run(commands: readonly NativeCommand[]) {
     const started = performance.now();
     const result = await sendCommands(signedIn.token, commands);
+    // The answer's outcomes used to be discarded, so a refusal was silent.
+    // Read them into the feedback channel before the redraw below; the
+    // server stays the authority — these are only sentences, not state.
+    feedback = result.ok
+      ? feedbackFrom(result.response.outcomes, result.response.ok)
+      : [{ tone: 'error', text: `The request failed (${result.reason}).` }];
     world = await fetchWorld();
     scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
     renderer.draw(scene);
@@ -623,6 +660,14 @@ async function main(): Promise<void> {
     session,
     send: (commands) => sendCommands(session.token, commands),
     run,
+    showDialog: (id, kind, title) => {
+      dialogState = openDialog(dialogState, id, kind, title);
+      drawInterface();
+    },
+    dismissDialog: () => {
+      dialogState = closeDialog(dialogState);
+      drawInterface();
+    },
     claimDailyBonus,
     buy,
     framesPerSecond: () => framesPerSecond,

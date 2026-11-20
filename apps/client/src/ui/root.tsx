@@ -14,7 +14,10 @@
 import { useMemo } from 'react';
 
 import {
+  CLOSED_DIALOG,
   hudState,
+  type DialogState,
+  type FeedbackMessage,
   type NativeCommand,
   type Neighbour,
   type WorldSnapshot,
@@ -23,6 +26,8 @@ import type { ContentBundle } from '@swl/content';
 
 import { BuildMenu } from './buildmenu.tsx';
 import { Chapters } from './chapters.tsx';
+import { Dialog } from './dialog.tsx';
+import { Feedback } from './feedback.tsx';
 import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
 import { InfoPanel } from './info.tsx';
@@ -53,6 +58,12 @@ export interface RootProps {
   neighbours?: readonly Neighbour[];
   /** The tutorial step to draw, or null when the tutorial is not running. */
   tutorial?: TutorialOverlayProps | null;
+  /** The one open dialog, or null when none is open. */
+  dialog?: DialogState | null;
+  /** The feedback messages read from the server's last answer. */
+  feedback?: readonly FeedbackMessage[];
+  /** The player asked the dialog to close. */
+  onDialogDismiss?: () => void;
   /** The player asked to collect the selected building's production. */
   onCollect?: () => void;
   /** The player picked something to build. */
@@ -75,6 +86,9 @@ export function Root({
   selected,
   neighbours = [],
   tutorial = null,
+  dialog = null,
+  feedback = [],
+  onDialogDismiss,
   onCollect,
   onPick,
   onCommand,
@@ -100,6 +114,11 @@ export function Root({
       <InfoPanel resource={panel} unit={unit} onCollect={onCollect} />
       <Neighbours neighbours={neighbours} />
       {tutorial ? <TutorialOverlay {...tutorial} /> : null}
+      <Feedback messages={feedback} />
+      <Dialog
+        state={dialog ?? CLOSED_DIALOG}
+        onDismiss={onDialogDismiss ?? (() => {})}
+      />
       <BuildMenu
         items={items}
         categories={tabs}

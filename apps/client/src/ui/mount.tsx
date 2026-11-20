@@ -7,11 +7,27 @@
  * map are one answer, drawn twice.
  */
 import { createRoot } from 'react-dom/client';
-import type { NativeCommand, Neighbour, WorldSnapshot } from '@swl/client';
+import type {
+  DialogState,
+  FeedbackMessage,
+  NativeCommand,
+  Neighbour,
+  WorldSnapshot,
+} from '@swl/client';
 import type { ContentBundle } from '@swl/content';
 
 import { Root } from './root.tsx';
 import type { TutorialOverlayProps } from './tutorial.tsx';
+
+/** The parts of the interface that are not a reading of the world. */
+export interface UiOverlayState {
+  /** The one open dialog, or null when none is open. */
+  readonly dialog?: DialogState | null;
+  /** The feedback messages read from the server's last answer. */
+  readonly feedback?: readonly FeedbackMessage[];
+  /** The player asked the dialog to close. */
+  readonly onDialogDismiss?: () => void;
+}
 
 /** The mounted interface. */
 export interface UiHandle {
@@ -22,6 +38,7 @@ export interface UiHandle {
     selected?: number | null,
     neighbours?: readonly Neighbour[],
     tutorial?: TutorialOverlayProps | null,
+    overlays?: UiOverlayState,
   ) => void;
 }
 
@@ -35,7 +52,14 @@ export function mountUi(
 ): UiHandle {
   const root = createRoot(element);
   return {
-    draw: (world, placing = null, selected = null, neighbours = [], tutorial = null) =>
+    draw: (
+      world,
+      placing = null,
+      selected = null,
+      neighbours = [],
+      tutorial = null,
+      overlays = {},
+    ) =>
       root.render(
         <Root
           world={world}
@@ -44,6 +68,9 @@ export function mountUi(
           selected={selected}
           neighbours={neighbours}
           tutorial={tutorial}
+          dialog={overlays.dialog}
+          feedback={overlays.feedback}
+          onDialogDismiss={overlays.onDialogDismiss}
           onPick={onPick}
           onCollect={onCollect}
           onCommand={onCommand}

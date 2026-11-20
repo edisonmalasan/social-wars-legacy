@@ -11,6 +11,25 @@
  */
 export function uiCss(): string {
   return `
+/*
+ * The dialog and feedback tokens. They are the same slate, gold and muted
+ * grey as the rest of the interface; naming them here keeps the new blocks
+ * from growing another set of scattered literals.
+ */
+:root {
+  --swl-surface: #131a24;
+  --swl-surface-raised: #1d2430;
+  --swl-border: #38445a;
+  --swl-ink: #e8e3d8;
+  --swl-ink-muted: #8d97a8;
+  --swl-accent: #f5c542;
+  --swl-danger: #e07a5f;
+  --swl-success: #86d38a;
+  --swl-scrim: #000a;
+  --swl-gap: 8px;
+  --swl-gap-lg: 12px;
+}
+
 .swl-ui {
   position: absolute;
   inset: 0;
@@ -514,5 +533,132 @@ export function uiCss(): string {
 .swl-tutorial-next:hover {
   background: #ffd75e;
 }
+
+/* --- The dialog -------------------------------------------------------- */
+
+.swl-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: var(--swl-scrim);
+  pointer-events: auto;
+}
+
+.swl-dialog {
+  width: min(420px, calc(100% - 32px));
+  max-height: calc(100% - 48px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: var(--swl-gap-lg);
+  border: 1px solid var(--swl-border);
+  border-top: 3px solid var(--swl-accent);
+  border-radius: 6px;
+  background: linear-gradient(var(--swl-surface-raised), var(--swl-surface));
+  box-shadow: 0 10px 32px #000c, inset 0 1px 0 #ffffff14;
+  pointer-events: auto;
+  outline: none;
+}
+
+.swl-dialog:focus-visible {
+  outline: 2px solid var(--swl-accent);
+  outline-offset: 2px;
+}
+
+.swl-dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--swl-gap);
+}
+
+.swl-dialog-title {
+  margin: 0;
+  color: var(--swl-accent);
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(16px * var(--swl-font-scale-display, 1));
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.swl-dialog-close {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  color: var(--swl-ink-muted);
+  font-size: calc(18px * var(--swl-font-scale-body, 1));
+  line-height: 1;
+}
+
+.swl-dialog-close:hover {
+  background: #263043;
+  color: var(--swl-ink);
+}
+
+.swl-dialog-close:focus-visible {
+  outline: 2px solid var(--swl-accent);
+  outline-offset: 1px;
+}
+
+.swl-dialog-body {
+  margin-top: var(--swl-gap);
+  overflow-y: auto;
+  color: var(--swl-ink);
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  line-height: 1.4;
+}
+
+.swl-dialog-combat { border-top-color: var(--swl-danger); }
+.swl-dialog-result,
+.swl-dialog-reward { border-top-color: var(--swl-success); }
+
+/* --- The feedback channel ---------------------------------------------- */
+
+.swl-feedback {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: var(--swl-gap);
+  width: min(360px, calc(100% - 32px));
+  pointer-events: none;
+}
+
+.swl-feedback-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--swl-gap);
+  padding: var(--swl-gap) var(--swl-gap-lg);
+  border: 1px solid var(--swl-border);
+  border-left-width: 3px;
+  border-radius: 4px;
+  background: var(--swl-surface);
+  box-shadow: 0 4px 14px #000a;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  line-height: 1.3;
+}
+
+.swl-feedback-success {
+  border-left-color: var(--swl-success);
+  color: var(--swl-ink);
+}
+
+.swl-feedback-error {
+  border-left-color: var(--swl-danger);
+  color: var(--swl-ink);
+}
+
+.swl-feedback-mark { flex: none; font-weight: 700; }
+.swl-feedback-success .swl-feedback-mark { color: var(--swl-success); }
+.swl-feedback-error .swl-feedback-mark { color: var(--swl-danger); }
+.swl-feedback-text { white-space: pre-line; }
 `.trim();
 }

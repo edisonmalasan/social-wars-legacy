@@ -22,5 +22,6 @@ export * from './stage.ts';
 export * from './constants.ts';
 export * from './session.ts';
 export * from './transport.ts';
+export * from './dialogmodel.ts';
 export * from './trace.ts';
 export * from './projectile.ts';
