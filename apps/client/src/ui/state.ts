@@ -20,6 +20,7 @@ import type {
   HudRules,
   ItemPopulation,
   NativeCommand,
+  QuestViewOptions,
   RecruitView,
   ResourcePanel,
   UnitCard,
@@ -36,7 +37,7 @@ import {
   unitPanel,
 } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
-import { QUEST_IDS } from '@swl/rules';
+import { QUEST_IDS, getQuestSpec } from '@swl/rules';
 
 /** The categories, as the build menu's tabs read them. */
 export type Categories = Record<
@@ -254,6 +255,37 @@ export function questMinLevels(bundle: ContentBundle): Record<number, number> {
     if (typeof level === 'number' && Number.isFinite(level)) out[index] = level;
   }
   return out;
+}
+
+/**
+ * The rules and content a quest's combat panel reads.
+ *
+ * The losing refs and the event channel are the rules' and the bundle's —
+ * neither is a client guess. The labels are the content's item names, used
+ * only to name a button; the HP, counters and kills still come from the
+ * server's world.
+ */
+export function questViewOptions(bundle: ContentBundle, questId: string): QuestViewOptions {
+  const spec = getQuestSpec(questId);
+  const event = bundle.questEvents?.[questId];
+  const labels: Record<string, string> = {};
+  for (const element of spec?.elements ?? []) {
+    const item = (bundle.items ?? []).find((entry) => entry.id === element.itemId);
+    if (item) labels[element.ref] = item.name;
+  }
+  if (event) {
+    for (const ref of event.refs) {
+      if (labels[ref]) continue;
+      const itemId = Number(ref.replace(/^item:/, ''));
+      const item = (bundle.items ?? []).find((entry) => entry.id === itemId);
+      if (item) labels[ref] = item.name;
+    }
+  }
+  return {
+    keyRefs: spec?.keyElementRefs ?? [],
+    labels,
+    ...(event ? { event } : {}),
+  };
 }
 
 /**

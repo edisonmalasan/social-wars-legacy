@@ -207,6 +207,28 @@ export function uiCss(): string {
   color: #5c6678;
 }
 
+/* An opened slot is a button. The generic button rule above would otherwise
+   strip the slot's background, so these win with one more class. */
+.swl-ui button.swl-quest-slot {
+  padding: 0;
+}
+
+.swl-ui .swl-quest-open {
+  background: #f5c542;
+  color: #10151d;
+  font-weight: 700;
+}
+
+.swl-ui .swl-quest-locked {
+  background: #1d2430;
+  color: #5c6678;
+}
+
+.swl-quest-active {
+  outline: 1px solid var(--swl-accent);
+  outline-offset: 1px;
+}
+
 /* --- The goal panel --------------------------------------------------- */
 
 .swl-goals {
@@ -718,6 +740,106 @@ export function uiCss(): string {
 .swl-dialog-combat { border-top-color: var(--swl-danger); }
 .swl-dialog-result,
 .swl-dialog-reward { border-top-color: var(--swl-success); }
+
+/* --- The quest panels --------------------------------------------------- */
+
+.swl-quest-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--swl-gap-lg);
+}
+
+.swl-quest-subtitle,
+.swl-quest-won,
+.swl-quest-lost {
+  margin: 0;
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-won { color: var(--swl-success); }
+.swl-quest-lost { color: var(--swl-danger); }
+
+.swl-quest-difficulty {
+  display: flex;
+  align-items: center;
+  gap: var(--swl-gap);
+  margin: 0;
+  padding: var(--swl-gap);
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+}
+
+.swl-quest-difficulty legend {
+  padding: 0 4px;
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-star {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--swl-accent);
+}
+
+.swl-quest-counters,
+.swl-quest-roster,
+.swl-quest-rewards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swl-quest-counters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--swl-gap);
+}
+
+.swl-quest-counter {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--swl-gap);
+  padding: 4px 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface);
+}
+
+.swl-quest-counter dt { color: var(--swl-ink-muted); }
+.swl-quest-counter dd { margin: 0; color: var(--swl-accent); font-weight: 700; }
+
+.swl-quest-roster {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.swl-quest-unit {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--swl-gap);
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-unit .swl-quest-dead { color: var(--swl-danger); }
+
+.swl-quest-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--swl-gap);
+}
+
+.swl-quest-buttons button {
+  padding: 5px 10px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+
+.swl-quest-buttons button:hover:not(:disabled) { border-color: var(--swl-accent); }
+.swl-quest-buttons button:disabled { color: var(--swl-ink-muted); cursor: not-allowed; }
+.swl-quest-buttons .swl-quest-primary { border-color: var(--swl-accent); color: var(--swl-accent); }
+.swl-quest-buttons button:focus-visible { outline: 2px solid var(--swl-accent); outline-offset: 1px; }
 
 /* --- The feedback channel ---------------------------------------------- */
 

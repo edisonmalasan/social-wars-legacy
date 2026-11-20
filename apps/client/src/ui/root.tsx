@@ -15,12 +15,18 @@ import { useMemo } from 'react';
 
 import {
   CLOSED_DIALOG,
+  activeQuestState,
   hudState,
+  levelOf,
+  questChoices,
   type DialogState,
   type FeedbackMessage,
   type ItemType,
   type NativeCommand,
   type Neighbour,
+  type QuestActionChoice,
+  type QuestChoice,
+  type QuestDifficulty,
   type WorldSnapshot,
 } from '@swl/client';
 import type { ContentBundle } from '@swl/content';
@@ -33,6 +39,7 @@ import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
 import { InfoPanel } from './info.tsx';
 import { Neighbours } from './neighbours.tsx';
+import { QuestPanel, type QuestPanelView } from './quests.tsx';
 import { RecruitPanel } from './recruit.tsx';
 import { TutorialOverlay, type TutorialOverlayProps } from './tutorial.tsx';
 import {
@@ -70,8 +77,16 @@ export interface RootProps {
   dialog?: DialogState | null;
   /** The feedback messages read from the server's last answer. */
   feedback?: readonly FeedbackMessage[];
+  /** The quest panel hosted by the shared dialog, or null. */
+  questPanel?: QuestPanelView | null;
   /** The player asked the dialog to close. */
   onDialogDismiss?: () => void;
+  /** The player picked an opened chapter slot. */
+  onQuestPick?: (choice: QuestChoice) => void;
+  /** The player asked to start a quest at a difficulty. */
+  onQuestStart?: (questId: string, difficulty: QuestDifficulty) => void;
+  /** The player pressed one of the quest's allowed actions. */
+  onQuestAction?: (questId: string, action: QuestActionChoice) => void;
   /** The player asked to collect the selected building's production. */
   onCollect?: () => void;
   /** The player picked something to build, with its real wire type. */
@@ -106,7 +121,11 @@ export function Root({
   tutorial = null,
   dialog = null,
   feedback = [],
+  questPanel = null,
   onDialogDismiss,
+  onQuestPick,
+  onQuestStart,
+  onQuestAction,
   onCollect,
   onPick,
   onCommand,
@@ -125,6 +144,13 @@ export function Root({
   const goals = useMemo(() => goalList(bundle, world), [bundle, world]);
   const ranks = useMemo(() => questRanks(world), [world]);
   const minLevels = useMemo(() => questMinLevels(bundle), [bundle]);
+  // The chapter slots are gestures: a slot the server has opened can be
+  // picked, and the active one can resume its authoritative panel.
+  const activeQuestId = activeQuestState(world)?.questId ?? null;
+  const choices = useMemo(
+    () => questChoices(ranks, minLevels, levelOf(world), activeQuestId),
+    [ranks, minLevels, world, activeQuestId],
+  );
   const panel = useMemo(() => infoPanel(bundle, selected ?? null), [bundle, selected]);
   const unit = useMemo(() => unitInfoPanel(bundle, selected ?? null), [bundle, selected]);
   const building = useMemo(
@@ -140,7 +166,12 @@ export function Root({
     <div className="swl-ui">
       <Hud state={state} placing={placingName} />
       <Goals goals={goals} onCommand={onCommand} />
-      <Chapters ranks={ranks} minLevels={minLevels} />
+      <Chapters
+        ranks={ranks}
+        minLevels={minLevels}
+        choices={choices}
+        onQuestPick={onQuestPick}
+      />
       <InfoPanel
         resource={panel}
         unit={unit}
@@ -156,7 +187,23 @@ export function Root({
       <Dialog
         state={dialog ?? CLOSED_DIALOG}
         onDismiss={onDialogDismiss ?? (() => {})}
-      />
+      >
+        {questPanel && onQuestStart && onQuestAction ? (
+          <QuestPanel
+            key={
+              questPanel.kind === 'briefing'
+                ? `briefing:${questPanel.briefing.questId}`
+                : questPanel.kind === 'combat'
+                  ? `combat:${questPanel.active.questId}`
+                  : `result:${questPanel.result.kind}`
+            }
+            view={questPanel}
+            onStart={onQuestStart}
+            onAction={onQuestAction}
+            onCancel={onDialogDismiss ?? (() => {})}
+          />
+        ) : null}
+      </Dialog>
       <BuildMenu
         items={items}
         categories={tabs}

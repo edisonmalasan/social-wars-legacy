@@ -13,10 +13,14 @@ import type {
   ItemType,
   NativeCommand,
   Neighbour,
+  QuestActionChoice,
+  QuestChoice,
+  QuestDifficulty,
   WorldSnapshot,
 } from '@swl/client';
 import type { ContentBundle } from '@swl/content';
 
+import type { QuestPanelView } from './quests.tsx';
 import { Root } from './root.tsx';
 import type { TutorialOverlayProps } from './tutorial.tsx';
 
@@ -28,6 +32,14 @@ export interface UiOverlayState {
   readonly feedback?: readonly FeedbackMessage[];
   /** The player asked the dialog to close. */
   readonly onDialogDismiss?: () => void;
+  /** The quest panel hosted by the shared dialog, or null. */
+  readonly questPanel?: QuestPanelView | null;
+  /** The player picked an opened chapter slot. */
+  readonly onQuestPick?: (choice: QuestChoice) => void;
+  /** The player asked to start a quest. */
+  readonly onQuestStart?: (questId: string, difficulty: QuestDifficulty) => void;
+  /** The player pressed a quest action. */
+  readonly onQuestAction?: (questId: string, action: QuestActionChoice) => void;
   /** The selected element's map id, for its server attribute bag. */
   readonly selectedIso?: number | null;
   /** The client's unix second, for on-screen countdowns. */
@@ -85,7 +97,11 @@ export function mountUi(
           tutorial={tutorial}
           dialog={overlays.dialog}
           feedback={overlays.feedback}
+          questPanel={overlays.questPanel}
           onDialogDismiss={overlays.onDialogDismiss}
+          onQuestPick={overlays.onQuestPick}
+          onQuestStart={overlays.onQuestStart}
+          onQuestAction={overlays.onQuestAction}
           onPick={onPick}
           onCollect={onCollect}
           onCommand={onCommand}

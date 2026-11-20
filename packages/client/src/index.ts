@@ -19,6 +19,7 @@ export * from './guidance.ts';
 export * from './roadmap.ts';
 export * from './neighbours.ts';
 export * from './chapters.ts';
+export * from './questview.ts';
 export * from './stage.ts';
 export * from './constants.ts';
 export * from './session.ts';

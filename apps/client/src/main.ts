@@ -31,7 +31,7 @@ import {
   sendCommands,
   type ClientSession,
 } from '@swl/client';
-import type { NativeCommand, NativeResponse } from '@swl/protocol';
+import type { CommandOutcome, NativeCommand, NativeResponse } from '@swl/protocol';
 import type { ContentBundle, ContentItem } from '@swl/content';
 import {
   buy,
@@ -43,13 +43,23 @@ import {
   type ItemType,
 } from '@swl/client';
 import {
+  activeQuestFromWorld,
   activeQuestState,
+  activeQuestView,
+  briefingDialog,
+  briefingView,
+  combatDialog,
   endQuest,
   questActionOnServer,
+  questDifficulty,
+  questResultView,
   reportQuestKill,
+  resultDialog,
   startQuestOnServer,
   type ActiveQuestStateView,
+  type QuestActionChoice,
   type QuestActionRequest,
+  type QuestChoice,
   type QuestLedgerSummary,
   type QuestResult,
   type QuestStartBody,
@@ -58,6 +68,8 @@ import {
 import { mountUi } from './ui/mount.tsx';
 import { uiCss } from './ui/css.ts';
 import type { TutorialOverlayProps } from './ui/tutorial.tsx';
+import type { QuestPanelView } from './ui/quests.tsx';
+import { questViewOptions } from './ui/state.ts';
 import {
   CLOSED_DIALOG,
   closeDialog,
@@ -220,7 +232,13 @@ export interface ClientHandle {
    */
   run: (
     commands: readonly NativeCommand[],
-  ) => Promise<{ ok: boolean; latencyMs: number; sprites: number }>;
+  ) => Promise<{
+    ok: boolean;
+    latencyMs: number;
+    sprites: number;
+    /** The server's own outcome of the first command, when it answered. */
+    outcome?: CommandOutcome | null;
+  }>;
   /**
    * Open the shared dialog. The G5.1 panels use this one primitive; a host
    * supplies the panel's id, kind and heading, never its game outcome.
@@ -454,15 +472,32 @@ async function main(): Promise<void> {
    */
   let dialogState: DialogState = CLOSED_DIALOG;
   let feedback: readonly FeedbackMessage[] = [];
+  /**
+   * The quest panel in the one dialog, and the difficulty the player chose.
+   * Neither is a game outcome: the first is a reading of the server's active
+   * quest or answer, the second is only sent to the server with the start and
+   * finish requests.
+   */
+  let questPanel: QuestPanelView | null = null;
+  let chosenDifficulty: 1 | 2 | 3 = 1;
 
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
     ui?.draw(world, placing, selected, neighbours, tutorialProps(), {
       dialog: dialogState,
       feedback,
+      questPanel,
       onDialogDismiss: () => {
         dialogState = closeDialog(dialogState);
+        questPanel = null;
         drawInterface();
+      },
+      onQuestPick: openQuestSlot,
+      onQuestStart: (questId, difficulty) => {
+        void beginQuest(questId, difficulty);
+      },
+      onQuestAction: (questId, action) => {
+        void applyQuestGesture(questId, action);
       },
       selectedIso,
       now: Math.floor(Date.now() / 1000),
@@ -471,6 +506,52 @@ async function main(): Promise<void> {
       onTrain,
       onTake,
     });
+  }
+
+  /** Read the server's current active quest into the panel that is open. */
+  function refreshQuestPanel(): void {
+    if (questPanel?.kind !== 'combat') return;
+    const view = activeQuestFromWorld(
+      world,
+      questViewOptions(content, questPanel.active.questId),
+    );
+    if (view) {
+      questPanel = { kind: 'combat', active: view };
+      return;
+    }
+    // The server cleared the active quest: close a panel that has no subject.
+    questPanel = null;
+    dialogState = closeDialog(dialogState);
+  }
+
+  /** Open the shared dialog on the server's authoritative active quest. */
+  function openCombat(questId: string): void {
+    const view = activeQuestFromWorld(world, questViewOptions(content, questId));
+    if (!view) {
+      gestureRefusal('the server has no active quest');
+      return;
+    }
+    questPanel = { kind: 'combat', active: view };
+    const panel = combatDialog(questId);
+    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    drawInterface();
+  }
+
+  /** A chapter slot is a gesture: brief an unplayed quest or resume an active one. */
+  function openQuestSlot(choice: QuestChoice): void {
+    if (choice.active) {
+      openCombat(choice.questId);
+      return;
+    }
+    if (!choice.unlocked) {
+      gestureRefusal('that quest is still locked');
+      return;
+    }
+    const briefing = briefingView(choice, chosenDifficulty);
+    questPanel = { kind: 'briefing', briefing };
+    const panel = briefingDialog(briefing);
+    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    drawInterface();
   }
 
   /** The tutorial's drawing, or null when it is not running. */
@@ -622,6 +703,19 @@ async function main(): Promise<void> {
    * It is drawn from the **same** world the scene is: one answer, one
    * drawing. The interface asks the server for nothing of its own.
    */
+  // Reload recovery. The server's saved active quest is the only source for
+  // the restored panel: the client reads it back after the world request and
+  // hosts it in the same dialog the player was using before the restart.
+  const restored = activeQuestState(world);
+  if (restored?.questId) {
+    const view = activeQuestFromWorld(world, questViewOptions(content, restored.questId));
+    if (view) {
+      questPanel = { kind: 'combat', active: view };
+      const panel = combatDialog(restored.questId);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    }
+  }
+
   const ui = UI ? mountUi(UI, content, onPick, onCollect, onCommand) : null;
   drawInterface();
   void refreshNeighbours();
@@ -692,6 +786,8 @@ async function main(): Promise<void> {
     world = await fetchWorld();
     scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
     renderer.draw(scene);
+    // The world the interface draws is the same one the quest panel reads.
+    refreshQuestPanel();
     // The interface is redrawn from the same answer, so the numbers in
     // the top bar and the buildings on the map never disagree.
     drawInterface();
@@ -703,6 +799,7 @@ async function main(): Promise<void> {
       ok: result.ok,
       latencyMs,
       sprites: scene.length,
+      outcome: result.ok ? (result.response.outcomes[0] ?? null) : null,
     };
   }
 
@@ -727,13 +824,84 @@ async function main(): Promise<void> {
    *
    * The answer already carries the server's ledger summary — its counters and
    * its elements' HP — so the client does not need a second world request to
-   * know what the server decided.
+   * know what the server decided. The panel is redrawn from that summary: no
+   * extra request, and no local counter or HP value of the client's own.
    */
-  function questAction(
+  async function questAction(
     questId: string,
     action: QuestActionRequest,
   ): Promise<QuestResult<QuestLedgerSummary>> {
-    return questActionOnServer(signedIn, questId, action);
+    const result = await questActionOnServer(signedIn, questId, action);
+    if (result.ok && result.body && questPanel?.kind === 'combat') {
+      const view = activeQuestView(
+        {
+          questId: result.body.questId,
+          counters: result.body.counters,
+          elements: result.body.elements,
+          events: result.body.events,
+        },
+        questViewOptions(content, questId),
+      );
+      if (view) questPanel = { kind: 'combat', active: view };
+    }
+    drawInterface();
+    return result;
+  }
+
+  /** The briefing's Start button: ask the server, then host the live panel. */
+  async function beginQuest(questId: string, difficulty: 1 | 2 | 3): Promise<void> {
+    const result = await startQuest(questId, difficulty);
+    if (!result.ok || !result.body) {
+      feedback = [
+        { tone: 'error', text: `The server refused the quest start (${result.status}).` },
+      ];
+      drawInterface();
+      return;
+    }
+    chosenDifficulty = questDifficulty(difficulty);
+    feedback = [{ tone: 'success', text: `The server started ${result.body.questId}.` }];
+    openCombat(questId);
+  }
+
+  /**
+   * One button of the combat panel.
+   *
+   * Strikes, events and the two-argument kill report are requests the player
+   * makes; the Finish button sends `end_quest` and its result is read from the
+   * answer. No branch here decides that the quest was won.
+   */
+  async function applyQuestGesture(questId: string, action: QuestActionChoice): Promise<void> {
+    if (action.kind === 'strike' || action.kind === 'event') {
+      const request: QuestActionRequest =
+        action.kind === 'strike'
+          ? { type: 'strike', ref: action.ref }
+          : { type: action.action, ref: action.ref };
+      const result = await questAction(questId, request);
+      feedback = result.ok
+        ? [{ tone: 'success', text: 'The server applied the quest action.' }]
+        : [
+            {
+              tone: 'error',
+              text: `The server refused the quest action (${result.status}).`,
+            },
+          ];
+      drawInterface();
+      return;
+    }
+    if (action.kind === 'kill-report') {
+      // The native, strictly two-argument write. The server accepts it only
+      // when its own ledger already marks the element dead.
+      await run([reportQuestKill(action.ref)]);
+      return;
+    }
+    // A player's gesture. The server's outcome — never a client condition —
+    // becomes the result dialog, including its rewards when it answered any.
+    const result = await run([endQuest(questId, chosenDifficulty)]);
+    const view = questResultView(questId, result.outcome ?? null);
+    questPanel = { kind: 'result', result: view };
+    const panel = resultDialog(questId, view);
+    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    drawInterface();
   }
 
   // The debug handle. The end-to-end test drives the client through it,
