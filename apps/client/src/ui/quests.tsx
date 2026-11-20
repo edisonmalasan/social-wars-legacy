@@ -26,6 +26,8 @@ export type QuestPanelView =
 /** The quest panel's props. */
 export interface QuestPanelProps {
   readonly view: QuestPanelView;
+  /** True while a quest request is pending; request buttons are disabled. */
+  readonly busy: boolean;
   /** The player asked to start. The host decides which request to send. */
   readonly onStart: (questId: string, difficulty: QuestDifficulty) => void;
   /** The player pressed one of the server's allowed actions. */
@@ -37,10 +39,12 @@ export interface QuestPanelProps {
 /** The brief, before the player asks the server to start. */
 function Briefing({
   briefing,
+  busy,
   onStart,
   onCancel,
 }: {
   briefing: QuestBriefing;
+  busy: boolean;
   onStart: QuestPanelProps['onStart'];
   onCancel: QuestPanelProps['onCancel'];
 }): React.JSX.Element {
@@ -69,7 +73,7 @@ function Briefing({
         <button
           type="button"
           className="swl-quest-primary"
-          disabled={!briefing.canStart}
+          disabled={!briefing.canStart || busy}
           onClick={() => onStart(briefing.questId, difficulty)}
         >
           Start mission
@@ -85,9 +89,11 @@ function Briefing({
 /** The authoritative ledger, as the server last answered it. */
 function Combat({
   active,
+  busy,
   onAction,
 }: {
   active: ActiveQuestView;
+  busy: boolean;
   onAction: QuestPanelProps['onAction'];
 }): React.JSX.Element {
   return (
@@ -122,7 +128,7 @@ function Combat({
             key={`${action.kind}:${'ref' in action ? action.ref : index}`}
             type="button"
             data-swl-action={action.kind}
-            disabled={!action.enabled}
+            disabled={!action.enabled || busy}
             onClick={() => onAction(active.questId, action)}
           >
             {action.label}
@@ -168,13 +174,14 @@ export function QuestPanel(props: QuestPanelProps): React.JSX.Element {
     return (
       <Briefing
         briefing={props.view.briefing}
+        busy={props.busy}
         onStart={props.onStart}
         onCancel={props.onCancel}
       />
     );
   }
   if (props.view.kind === 'combat') {
-    return <Combat active={props.view.active} onAction={props.onAction} />;
+    return <Combat active={props.view.active} busy={props.busy} onAction={props.onAction} />;
   }
   return <Result result={props.view.result} onCancel={props.onCancel} />;
 }

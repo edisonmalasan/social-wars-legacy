@@ -522,6 +522,8 @@ async function main(): Promise<void> {
    */
   let questPanel: QuestPanelView | null = null;
   let chosenDifficulty: 1 | 2 | 3 = 1;
+  /** One quest request at a time; a rapid double-click must not send two. */
+  let questBusy = false;
 
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
@@ -529,6 +531,7 @@ async function main(): Promise<void> {
       dialog: dialogState,
       feedback,
       questPanel,
+      questBusy,
       onDialogDismiss: () => {
         dialogState = closeDialog(dialogState);
         questPanel = null;
@@ -924,17 +927,25 @@ async function main(): Promise<void> {
 
   /** The briefing's Start button: ask the server, then host the live panel. */
   async function beginQuest(questId: string, difficulty: 1 | 2 | 3): Promise<void> {
-    const result = await startQuest(questId, difficulty);
-    if (!result.ok || !result.body) {
-      feedback = [
-        { tone: 'error', text: `The server refused the quest start (${result.status}).` },
-      ];
+    if (questBusy) return;
+    questBusy = true;
+    drawInterface();
+    try {
+      const result = await startQuest(questId, difficulty);
+      if (!result.ok || !result.body) {
+        feedback = [
+          { tone: 'error', text: `The server refused the quest start (${result.status}).` },
+        ];
+        drawInterface();
+        return;
+      }
+      chosenDifficulty = questDifficulty(difficulty);
+      feedback = [{ tone: 'success', text: `The server started ${result.body.questId}.` }];
+      openCombat(questId);
+    } finally {
+      questBusy = false;
       drawInterface();
-      return;
     }
-    chosenDifficulty = questDifficulty(difficulty);
-    feedback = [{ tone: 'success', text: `The server started ${result.body.questId}.` }];
-    openCombat(questId);
   }
 
   /**
@@ -945,37 +956,45 @@ async function main(): Promise<void> {
    * answer. No branch here decides that the quest was won.
    */
   async function applyQuestGesture(questId: string, action: QuestActionChoice): Promise<void> {
-    if (action.kind === 'strike' || action.kind === 'event') {
-      const request: QuestActionRequest =
-        action.kind === 'strike'
-          ? { type: 'strike', ref: action.ref }
-          : { type: action.action, ref: action.ref };
-      const result = await questAction(questId, request);
-      feedback = result.ok
-        ? [{ tone: 'success', text: 'The server applied the quest action.' }]
-        : [
-            {
-              tone: 'error',
-              text: `The server refused the quest action (${result.status}).`,
-            },
-          ];
-      drawInterface();
-      return;
-    }
-    if (action.kind === 'kill-report') {
-      // The native, strictly two-argument write. The server accepts it only
-      // when its own ledger already marks the element dead.
-      await run([reportQuestKill(action.ref)]);
-      return;
-    }
-    // A player's gesture. The server's outcome — never a client condition —
-    // becomes the result dialog, including its rewards when it answered any.
-    const result = await run([endQuest(questId, chosenDifficulty)]);
-    const view = questResultView(questId, result.outcome ?? null);
-    questPanel = { kind: 'result', result: view };
-    const panel = resultDialog(questId, view);
-    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    if (questBusy) return;
+    questBusy = true;
     drawInterface();
+    try {
+      if (action.kind === 'strike' || action.kind === 'event') {
+        const request: QuestActionRequest =
+          action.kind === 'strike'
+            ? { type: 'strike', ref: action.ref }
+            : { type: action.action, ref: action.ref };
+        const result = await questAction(questId, request);
+        feedback = result.ok
+          ? [{ tone: 'success', text: 'The server applied the quest action.' }]
+          : [
+              {
+                tone: 'error',
+                text: `The server refused the quest action (${result.status}).`,
+              },
+            ];
+        drawInterface();
+        return;
+      }
+      if (action.kind === 'kill-report') {
+        // The native, strictly two-argument write. The server accepts it only
+        // when its own ledger already marks the element dead.
+        await run([reportQuestKill(action.ref)]);
+        return;
+      }
+      // A player's gesture. The server's outcome — never a client condition —
+      // becomes the result dialog, including its rewards when it answered any.
+      const result = await run([endQuest(questId, chosenDifficulty)]);
+      const view = questResultView(questId, result.outcome ?? null);
+      questPanel = { kind: 'result', result: view };
+      const panel = resultDialog(questId, view);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+      drawInterface();
+    } finally {
+      questBusy = false;
+      drawInterface();
+    }
   }
 
   // The debug handle. The end-to-end test drives the client through it,

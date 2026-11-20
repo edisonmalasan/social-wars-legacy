@@ -35,6 +35,8 @@ export interface UiOverlayState {
   readonly onDialogDismiss?: () => void;
   /** The quest panel hosted by the shared dialog, or null. */
   readonly questPanel?: QuestPanelView | null;
+  /** True while a quest request is pending; the request buttons are disabled. */
+  readonly questBusy?: boolean;
   /** The player picked an opened chapter slot. */
   readonly onQuestPick?: (choice: QuestChoice) => void;
   /** The player asked to start a quest. */
@@ -103,6 +105,7 @@ export function mountUi(
           dialog={overlays.dialog}
           feedback={overlays.feedback}
           questPanel={overlays.questPanel}
+          questBusy={overlays.questBusy}
           onDialogDismiss={overlays.onDialogDismiss}
           onQuestPick={overlays.onQuestPick}
           onQuestStart={overlays.onQuestStart}

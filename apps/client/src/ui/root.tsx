@@ -82,6 +82,8 @@ export interface RootProps {
   feedback?: readonly FeedbackMessage[];
   /** The quest panel hosted by the shared dialog, or null. */
   questPanel?: QuestPanelView | null;
+  /** True while a quest request is pending. */
+  questBusy?: boolean;
   /** The player asked the dialog to close. */
   onDialogDismiss?: () => void;
   /** The player picked an opened chapter slot. */
@@ -129,6 +131,7 @@ export function Root({
   dialog = null,
   feedback = [],
   questPanel = null,
+  questBusy = false,
   onDialogDismiss,
   onQuestPick,
   onQuestStart,
@@ -209,6 +212,7 @@ export function Root({
                   : `result:${questPanel.result.kind}`
             }
             view={questPanel}
+            busy={questBusy}
             onStart={onQuestStart}
             onAction={onQuestAction}
             onCancel={onDialogDismiss ?? (() => {})}
