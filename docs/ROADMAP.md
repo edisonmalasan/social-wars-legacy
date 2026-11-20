@@ -2339,9 +2339,9 @@ reviewed without reconstructing the conversation that led to it.*
   `check-roadmap.mjs` (401 items), `check-report-sync.mjs` (4 claims), `golden-master.mjs`
   (50 scenarios, 0 differences), `run-cheat-battery.mjs` (11/11 attacks caught),
   `check-coverage.mjs` (line 97.52 / funcs 95.22 / branch 85.32, above floors) and `e2e-test.mjs`
-  (Chrome + Edge + restart). `verify-upstream.mjs` also passed. Note: the `verify:provenance`
-  npm script is dangling (`scripts/verify-provenance.mjs` does not exist) in the repository
-  baseline; it is not a G4 gate and is unrelated to this change
+  (Chrome + Edge + restart). `verify-upstream.mjs` also passed. The dangling
+  `verify:provenance` npm script was removed afterwards: `verify:upstream` is the single
+  provenance check, and nothing referenced the alias
 
 ---
 
