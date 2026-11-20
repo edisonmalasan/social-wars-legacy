@@ -2593,7 +2593,7 @@ describe('the weekly quest', () => {
     assert.equal(outcome.world.resources['c'], 0);
   });
 
-  it('does not pay again when a validated ref is replayed after the win', () => {
+  it('a replayed kill does not double-count and pays exactly once', () => {
     const won = killBots(WEEKLY_BOT_REFS);
     const replayed = createApplier(questDeps())(
       won,
