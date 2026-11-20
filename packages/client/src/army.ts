@@ -7,6 +7,8 @@
  * start timestamp has elapsed. The names, group types and training times come
  * from the content. Nothing here can create a unit the server does not have.
  */
+import { MAX_TEAM_SIZE } from '@swl/rules';
+
 import { trainingView } from './management.ts';
 import type { WorldSnapshot } from './session.ts';
 
@@ -97,4 +99,51 @@ export function armyView(
     });
   }
   return out;
+}
+
+/**
+ * The default team: every allowed unit up to the shared cap, in army order.
+ *
+ * The counts are only a gesture the selector sends; the server re-checks them
+ * against its own save and its own cap before accepting a team.
+ */
+export function initialArmySelection(
+  army: readonly ArmyUnitView[],
+): Record<number, number> {
+  const counts: Record<number, number> = {};
+  let total = 0;
+  for (const unit of army) {
+    if (!unit.allowed) continue;
+    const count = Math.max(0, Math.min(unit.available, MAX_TEAM_SIZE - total));
+    if (count > 0) {
+      counts[unit.itemId] = count;
+      total += count;
+    }
+  }
+  return counts;
+}
+
+/**
+ * Change one unit's count while keeping the whole team within the cap.
+ *
+ * `available` is the server-owned quantity for that unit; the other entries
+ * are the selector's current counts. The new value is clamped first by the
+ * unit's own availability, then by the budget left by every other unit.
+ */
+export function chooseArmyCount(
+  counts: Readonly<Record<number, number>>,
+  unitId: number,
+  requested: number,
+  available: number,
+): Record<number, number> {
+  const whole = Number.isFinite(requested) ? Math.trunc(requested) : 0;
+  let otherTotal = 0;
+  for (const [id, count] of Object.entries(counts)) {
+    if (Number(id) === unitId) continue;
+    if (typeof count === 'number' && Number.isFinite(count) && count > 0) {
+      otherTotal += Math.trunc(count);
+    }
+  }
+  const capped = Math.max(0, Math.min(whole, available, MAX_TEAM_SIZE - otherTotal));
+  return { ...counts, [unitId]: capped };
 }

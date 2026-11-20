@@ -9,8 +9,8 @@
  */
 import { useState } from 'react';
 
-import { MAX_TEAM_SIZE, type Army } from '@swl/rules';
-import type { ArmyUnitView } from '@swl/client';
+import { type Army } from '@swl/rules';
+import { chooseArmyCount, initialArmySelection, type ArmyUnitView } from '@swl/client';
 
 import type {
   ActiveQuestView,
@@ -62,30 +62,22 @@ function Briefing({
   // only for the length of this panel. They are sent with the start request;
   // the server owns the quest and checks every unit before accepting a team.
   const [difficulty, setDifficulty] = useState<QuestDifficulty>(briefing.difficulty);
-  const [counts, setCounts] = useState<Record<number, number>>(() => {
-    const initial: Record<number, number> = {};
-    let total = 0;
-    for (const unit of briefing.army) {
-      if (!unit.allowed) continue;
-      const count = Math.min(unit.available, MAX_TEAM_SIZE - total);
-      if (count > 0) {
-        initial[unit.itemId] = count;
-        total += count;
-      }
-    }
-    return initial;
-  });
+  const [counts, setCounts] = useState<Record<number, number>>(() =>
+    initialArmySelection(briefing.army),
+  );
   const team: Army = briefing.army
     .filter((unit) => unit.allowed && (counts[unit.itemId] ?? 0) > 0)
     .map((unit) => ({ unitId: unit.itemId, count: counts[unit.itemId]! }));
 
-  /** Change one count, never above what the server's save accounts for. */
+  /**
+   * Change one count within both the unit's availability and the total team
+   * budget, so the selector cannot send an army the server must refuse for
+   * being too large. The server still checks everything on receipt.
+   */
   function choose(unit: ArmyUnitView, count: number): void {
-    const whole = Number.isFinite(count) ? Math.trunc(count) : 0;
-    setCounts((previous) => ({
-      ...previous,
-      [unit.itemId]: Math.max(0, Math.min(unit.available, whole)),
-    }));
+    setCounts((previous) =>
+      chooseArmyCount(previous, unit.itemId, count, unit.available),
+    );
   }
 
   return (

@@ -399,21 +399,30 @@ async function postQuest<T>(
   }
 }
 
-/** Start a quest in the server's own state. */
+/**
+ * Start a quest in the server's own state.
+ *
+ * The optional team was added after the fetch double. The fourth argument is
+ * therefore ambiguous: a function there is the legacy `(session, questId,
+ * difficulty, fetchImpl)` form and is used as the fetcher, with no team. The
+ * five-argument form keeps `team` and `fetchImpl` separate.
+ */
 export async function startQuestOnServer(
   session: ClientSession,
   questId: string,
   difficulty?: number,
-  team?: Army,
+  team?: Army | typeof fetch,
   fetchImpl: typeof fetch = fetch,
 ): Promise<QuestResult<QuestStartBody>> {
+  const chosenTeam: Army | undefined = typeof team === 'function' ? undefined : team;
+  const fetcher: typeof fetch = typeof team === 'function' ? team : fetchImpl;
   return postQuest(
     '/api/quest/start',
     session,
     {
       questId,
       ...(difficulty === undefined ? {} : { difficulty }),
-      ...(team === undefined ? {} : { team }),
+      ...(chosenTeam === undefined ? {} : { team: chosenTeam }),
     },
     (value): QuestStartBody | null => {
       const source = questRecord(value);
@@ -422,7 +431,7 @@ export async function startQuestOnServer(
       if (echoed === null) return null;
       return { questId: source['questId'], started: true, ...echoed };
     },
-    fetchImpl,
+    fetcher,
   );
 }
 

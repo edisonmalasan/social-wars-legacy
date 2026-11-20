@@ -448,6 +448,18 @@ describe('the authoritative quest requests', () => {
     assert.equal('team' in body, false);
   });
 
+  it('startQuestOnServer still accepts the legacy 4-argument fetch double', async () => {
+    // Callers that predate the optional team pass a fetch implementation as
+    // the fourth argument. It must be used as the fetcher, not as a team.
+    const { calls, fetchImpl } = capture(200, { questId: '100000002', started: true });
+    const result = await startQuestOnServer(SESSION, '100000002', 1, fetchImpl);
+    assert.equal(result.ok, true);
+    assert.equal(calls.length, 1);
+    const body = JSON.parse(calls[0]!.init.body as string) as Record<string, unknown>;
+    assert.equal(body['difficulty'], 1);
+    assert.equal('team' in body, false);
+  });
+
   it('reports the server typed team refusal for the feedback channel', async () => {
     const { fetchImpl } = capture(400, {
       result: 'error',
