@@ -581,9 +581,11 @@ export function productionPanel(
   );
   const state = productionState(world, isoId);
   if (!state) return null;
+  // buildingState() defaults cp to 1 on the server, so an unchosen period is
+  // the 5-minute cycle there. The display must mark that same option active.
   const period = state.period !== null && minutes[state.period - 1] !== undefined
     ? state.period
-    : 2;
+    : 1;
   const startedAt = state.startedAt !== null && state.startedAt > 0 ? state.startedAt : 0;
   const secondsRemaining = startedAt > 0
     ? Math.max(0, startedAt + minutes[period - 1]! * 60 - now)

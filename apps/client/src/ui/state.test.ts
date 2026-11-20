@@ -535,15 +535,17 @@ describe('the production selector', () => {
     assert.equal(fresh.due, true);
   });
 
-  it('shows the one-hour default until a period has been chosen', () => {
+  it('matches the server default until a period has been chosen', () => {
     const view = productionPanel(
       bundleWithPeriods(),
       worldFor({ cp: 0, lastAccruedAt: 0 }),
       7,
       1000,
     )!;
-    assert.equal(view.period, 2);
-    assert.equal(view.options.find((option) => option.active)?.period, 2);
+    // buildingState() defaults cp to 1, so the server collects on the 5-minute
+    // cycle until the player explicitly chooses a period.
+    assert.equal(view.period, 1);
+    assert.equal(view.options.find((option) => option.active)?.period, 1);
   });
 
   it('is null for a building that cannot choose a period', () => {
