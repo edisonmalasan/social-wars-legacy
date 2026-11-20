@@ -14,6 +14,8 @@
  * vendored `villages/initial.json` and the protocol's `GameMap` /
  * `PrivateState` interfaces).
  */
+import { RESOURCE_ORDER, type Reward } from '@swl/protocol';
+
 import type { WorldSnapshot } from './session.ts';
 
 /* -------------------------------------------------------------------------
@@ -313,4 +315,45 @@ export function activeQuestState(world: WorldSnapshot): ActiveQuestStateView | n
     elements: view,
     events: ledger ? strings(ledger['events']) : [],
   };
+}
+
+/**
+ * The last quest reward the server granted, as a view of the save.
+ *
+ * This is a reading of a past grant, not a reward authority: nothing pays
+ * from it. A reconnecting client uses it to rebuild the result screen
+ * without replaying `end_quest`. An absent or malformed receipt reads as
+ * `null` — the client never fabricates a row the server did not write.
+ */
+export interface LastQuestRewardView {
+  /** The authoritative quest id that was completed. */
+  readonly questId: string;
+  /** The rank the server recorded for the win. */
+  readonly rank: number;
+  /** The exact rows the wallet received. */
+  readonly rewards: readonly Reward[];
+}
+
+/** Read the persisted reward receipt, or `null` when there is none. */
+export function lastQuestReward(world: WorldSnapshot): LastQuestRewardView | null {
+  const stored = record(world.privateState['lastQuestReward']);
+  if (!stored) return null;
+  const questId = stored['questId'];
+  const rank = number(stored['rank']);
+  const rawRewards = stored['rewards'];
+  if (typeof questId !== 'string' || questId === '' || rank === null || !Array.isArray(rawRewards)) {
+    return null;
+  }
+  const allowed = new Set<string>(RESOURCE_ORDER);
+  const rewards: Reward[] = [];
+  for (const entry of rawRewards) {
+    const row = record(entry);
+    const resource = row?.['resource'];
+    const amount = row ? number(row['amount']) : null;
+    if (!row || typeof resource !== 'string' || !allowed.has(resource) || amount === null) {
+      return null;
+    }
+    rewards.push({ resource: resource as Reward['resource'], amount });
+  }
+  return { questId, rank, rewards };
 }

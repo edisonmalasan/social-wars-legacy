@@ -911,6 +911,13 @@ export function uiCss(): string {
 .swl-quest-won { color: var(--swl-success); }
 .swl-quest-lost { color: var(--swl-danger); }
 
+.swl-quest-result-heading,
+.swl-quest-rank,
+.swl-quest-reward-title {
+  margin: 0;
+  color: var(--swl-ink-muted);
+}
+
 .swl-quest-difficulty {
   display: flex;
   align-items: center;

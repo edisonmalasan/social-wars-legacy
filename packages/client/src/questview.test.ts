@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import type { CommandOutcome, Reward } from '@swl/protocol';
-import { QUEST_IDS } from '@swl/rules';
+import { QUEST_IDS, getQuestSpec } from '@swl/rules';
 
 import {
   activeQuestFromWorld,
@@ -15,9 +15,11 @@ import {
   questChoices,
   questDialogId,
   questDifficulty,
+  questResultFromReceipt,
   questResultView,
   resultDialog,
 } from './questview.ts';
+import { lastQuestReward } from './featurestate.ts';
 import type { ActiveQuestStateView } from './featurestate.ts';
 import type { WorldSnapshot } from './session.ts';
 
@@ -231,11 +233,15 @@ describe('result view', () => {
       result: { kind: 'rewards', rewards },
     };
     assert.deepEqual(questResultView(Q02, outcome), {
+      questId: Q02,
       won: true,
       title: 'Quest complete',
       message: 'The server completed BLOW THE POWER PLANT.',
       kind: 'reward',
       rewards,
+      missionComplete: true,
+      rank: null,
+      next: null,
     });
   });
 
@@ -246,11 +252,15 @@ describe('result view', () => {
       error: { code: 'command-failed', message: 'no-victory', status: 409 },
     };
     assert.deepEqual(questResultView(Q02, outcome), {
+      questId: Q02,
       won: false,
       title: 'Quest not finished',
       message: 'command-failed: no-victory',
       kind: 'result',
       rewards: [],
+      missionComplete: false,
+      rank: null,
+      next: null,
     });
   });
 
@@ -259,6 +269,80 @@ describe('result view', () => {
     assert.equal(view.won, false);
     assert.equal(view.message, 'The request failed (network).');
     assert.deepEqual(view.rewards, []);
+  });
+
+  it('reads the rank the server recorded for the completed mission', () => {
+    const outcome: CommandOutcome = {
+      index: 0,
+      ok: true,
+      result: { kind: 'rewards', rewards },
+    };
+    const view = questResultView(Q02, outcome, undefined, {
+      ranks: { [getQuestSpec(Q02)!.playIndex]: 2 },
+    });
+    assert.equal(view.missionComplete, true);
+    assert.equal(view.rank, 2);
+  });
+
+  it('offers the next mission only where the server rank and unlock allow it', () => {
+    const outcome: CommandOutcome = {
+      index: 0,
+      ok: true,
+      result: { kind: 'rewards', rewards },
+    };
+    const playIndex = getQuestSpec(Q02)!.playIndex;
+    const nextIndex = playIndex + 1;
+    const nextId = QUEST_IDS[nextIndex]!;
+    const options = {
+      ranks: { [playIndex]: 1 },
+      playerLevel: 1,
+      numQuests: QUEST_IDS.length - 1,
+    };
+    const open = questResultView(Q02, outcome, undefined, options);
+    assert.equal(open.next?.questId, nextId);
+    assert.equal(open.next?.index, nextIndex);
+    assert.equal(open.next?.available, true);
+
+    const locked = questResultView(Q02, outcome, undefined, {
+      ...options,
+      minLevels: { [nextIndex]: 10 },
+    });
+    assert.equal(locked.next?.available, false);
+  });
+
+  it('offers no next mission and no rewards on a defeat', () => {
+    const outcome: CommandOutcome = {
+      index: 0,
+      ok: false,
+      error: { code: 'command-failed', message: 'no-victory', status: 409 },
+    };
+    const view = questResultView(Q02, outcome, undefined, {
+      ranks: { [getQuestSpec(Q02)!.playIndex]: 1 },
+      playerLevel: 1,
+    });
+    assert.equal(view.next, null);
+    assert.deepEqual(view.rewards, []);
+    assert.equal(view.missionComplete, false);
+  });
+
+  it('rebuilds a result from the persisted server receipt, never a replay', () => {
+    const receipt = {
+      questId: Q02,
+      rank: 2,
+      rewards: [
+        { resource: 'gold' as const, amount: 4000 },
+        { resource: 'xp' as const, amount: 100 },
+      ],
+    };
+    assert.deepEqual(lastQuestReward(world({ lastQuestReward: receipt })), receipt);
+    assert.equal(lastQuestReward(world()), null);
+    const view = questResultFromReceipt(receipt, {
+      ranks: { [getQuestSpec(Q02)!.playIndex]: 2 },
+    });
+    assert.equal(view.won, true);
+    assert.equal(view.rank, 2);
+    assert.equal(view.missionComplete, true);
+    assert.deepEqual(view.rewards, receipt.rewards);
   });
 });
 

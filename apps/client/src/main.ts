@@ -54,7 +54,11 @@ import {
   combatDialog,
   endQuest,
   questActionOnServer,
+  questChoices,
   questDifficulty,
+  levelOf,
+  lastQuestReward,
+  questResultFromReceipt,
   questResultView,
   reportQuestKill,
   resultDialog,
@@ -65,6 +69,7 @@ import {
   type QuestChoice,
   type QuestLedgerSummary,
   type QuestResult,
+  type QuestResultView,
   type QuestStartBody,
 } from '@swl/client';
 
@@ -72,7 +77,7 @@ import { mountUi } from './ui/mount.tsx';
 import { uiCss } from './ui/css.ts';
 import type { TutorialOverlayProps } from './ui/tutorial.tsx';
 import type { QuestPanelView } from './ui/quests.tsx';
-import { questViewOptions } from './ui/state.ts';
+import { questMinLevels, questRanks, questViewOptions } from './ui/state.ts';
 import {
   CLOSED_DIALOG,
   closeDialog,
@@ -249,6 +254,15 @@ export interface ClientHandle {
   showDialog?: (id: DialogId, kind: DialogKind, title: string) => void;
   /** Close the shared dialog. */
   dismissDialog?: () => void;
+  /**
+   * The last reward the server persisted, rebuilt as a result view.
+   *
+   * This reads the save's receipt — it never replays `end_quest` — so a
+   * reconnecting client can show the same rows the server already paid.
+   */
+  lastReward?: () => QuestResultView | null;
+  /** Open that persisted reward in the one shared dialog. */
+  showLastReward?: () => boolean;
   /**
    * The client's own request builders.
    *
@@ -548,6 +562,10 @@ async function main(): Promise<void> {
       onQuestAction: (questId, action) => {
         void applyQuestGesture(questId, action);
       },
+      // Both gestures go back through the authoritative chapter-slot path:
+      // the server's ranks and unlock levels decide what may open.
+      onQuestRetry: (questId) => openResultQuest(questId),
+      onQuestNext: (questId) => openResultQuest(questId),
       selectedIso,
       now: Math.floor(Date.now() / 1000),
       onUpgrade,
@@ -601,6 +619,42 @@ async function main(): Promise<void> {
     const panel = briefingDialog(briefing);
     dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
     drawInterface();
+  }
+
+  /**
+   * The server readings the result screen needs for its next-step actions.
+   *
+   * The ranks come from the world the server just answered with; the unlock
+   * levels come from the content. Neither is a client guess about progression.
+   */
+  function resultQuestOptions() {
+    return {
+      ranks: questRanks(world),
+      minLevels: questMinLevels(content),
+      playerLevel: levelOf(world),
+      activeQuestId: activeQuestState(world)?.questId ?? null,
+    };
+  }
+
+  /**
+   * Open a result action's mission through the same authoritative slot path.
+   *
+   * Re-checking the choice at action time (rather than trusting the label on
+   * the button) means a stale panel cannot open a mission the server has not
+   * actually made available.
+   */
+  function openResultQuest(questId: string): void {
+    const choice = questChoices(
+      questRanks(world),
+      questMinLevels(content),
+      levelOf(world),
+      activeQuestState(world)?.questId ?? null,
+    ).find((entry) => entry.questId === questId);
+    if (!choice || !choice.unlocked) {
+      gestureRefusal('that mission is not available');
+      return;
+    }
+    openQuestSlot(choice);
   }
 
   /** The tutorial's drawing, or null when it is not running. */
@@ -986,7 +1040,9 @@ async function main(): Promise<void> {
       // A player's gesture. The server's outcome — never a client condition —
       // becomes the result dialog, including its rewards when it answered any.
       const result = await run([endQuest(questId, chosenDifficulty)]);
-      const view = questResultView(questId, result.outcome ?? null);
+      // The world has been refreshed by `run`, so the ranks here are the
+      // server's post-quest ones — the base for the next-mission action.
+      const view = questResultView(questId, result.outcome ?? null, undefined, resultQuestOptions());
       questPanel = { kind: 'result', result: view };
       const panel = resultDialog(questId, view);
       dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
@@ -1010,6 +1066,20 @@ async function main(): Promise<void> {
     dismissDialog: () => {
       dialogState = closeDialog(dialogState);
       drawInterface();
+    },
+    lastReward: () => {
+      const receipt = lastQuestReward(world);
+      return receipt ? questResultFromReceipt(receipt, resultQuestOptions()) : null;
+    },
+    showLastReward: () => {
+      const receipt = lastQuestReward(world);
+      if (!receipt) return false;
+      const view = questResultFromReceipt(receipt, resultQuestOptions());
+      questPanel = { kind: 'result', result: view };
+      const panel = resultDialog(view.questId, view);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+      drawInterface();
+      return true;
     },
     claimDailyBonus,
     buy,

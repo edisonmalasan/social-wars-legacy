@@ -32,8 +32,12 @@ export interface QuestPanelProps {
   readonly onStart: (questId: string, difficulty: QuestDifficulty) => void;
   /** The player pressed one of the server's allowed actions. */
   readonly onAction: (questId: string, action: QuestActionChoice) => void;
-  /** The player cancelled a briefing. */
+  /** The player cancelled a briefing, or left a result for the base. */
   readonly onCancel: () => void;
+  /** The player asked to retry (or replay) the finished mission. */
+  readonly onRetry?: (questId: string) => void;
+  /** The player asked to open the next mission the server made available. */
+  readonly onNext?: (questId: string) => void;
 }
 
 /** The brief, before the player asks the server to start. */
@@ -142,26 +146,61 @@ function Combat({
 /** The server's answer to the Finish gesture. */
 function Result({
   result,
+  busy,
+  onRetry,
+  onNext,
   onCancel,
 }: {
   result: QuestResultView;
+  busy: boolean;
+  onRetry: QuestPanelProps['onRetry'];
+  onNext: QuestPanelProps['onNext'];
   onCancel: QuestPanelProps['onCancel'];
 }): React.JSX.Element {
+  const next = result.next;
   return (
     <div className="swl-quest-panel">
+      <h3 className="swl-quest-result-heading">
+        {result.won ? 'Mission complete' : 'Mission failed'}
+      </h3>
       <p className={result.won ? 'swl-quest-won' : 'swl-quest-lost'}>{result.message}</p>
+      {result.missionComplete && result.rank !== null ? (
+        <p className="swl-quest-rank">Rank {result.rank}</p>
+      ) : null}
       {result.rewards.length > 0 ? (
-        <ul className="swl-quest-rewards">
-          {result.rewards.map((reward, index) => (
-            <li key={`${reward.resource}:${index}`}>
-              {reward.resource} +{reward.amount}
-            </li>
-          ))}
-        </ul>
+        <>
+          <p className="swl-quest-reward-title">Rewards granted by the server</p>
+          <ul className="swl-quest-rewards" data-swl-rewards="">
+            {result.rewards.map((reward, index) => (
+              <li key={`${reward.resource}:${index}`} data-swl-reward={reward.resource}>
+                {reward.resource} +{reward.amount}
+              </li>
+            ))}
+          </ul>
+        </>
       ) : null}
       <div className="swl-quest-buttons">
+        {next?.available ? (
+          <button
+            type="button"
+            className="swl-quest-primary"
+            data-swl-action="next"
+            disabled={busy}
+            onClick={() => next && onNext?.(next.questId)}
+          >
+            Next mission: {next.title}
+          </button>
+        ) : null}
+        <button
+          type="button"
+          data-swl-action="retry"
+          disabled={busy}
+          onClick={() => onRetry?.(result.questId)}
+        >
+          {result.won ? 'Replay mission' : 'Retry mission'}
+        </button>
         <button type="button" onClick={onCancel}>
-          Close
+          Return to base
         </button>
       </div>
     </div>
@@ -183,5 +222,13 @@ export function QuestPanel(props: QuestPanelProps): React.JSX.Element {
   if (props.view.kind === 'combat') {
     return <Combat active={props.view.active} busy={props.busy} onAction={props.onAction} />;
   }
-  return <Result result={props.view.result} onCancel={props.onCancel} />;
+  return (
+    <Result
+      result={props.view.result}
+      busy={props.busy}
+      onRetry={props.onRetry}
+      onNext={props.onNext}
+      onCancel={props.onCancel}
+    />
+  );
 }

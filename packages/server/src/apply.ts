@@ -98,6 +98,7 @@ import {
   type DailyBonusRules,
   type GoalRuntimeState,
   type QuestProgress,
+  type QuestRewardKey,
   type MagicSpellDefinition,
   isMagicLearned,
   magicUses,
@@ -116,6 +117,8 @@ import {
   parseOfferPackSelection,
   type CostOfferPack,
 } from '@swl/rules';
+
+import type { CommandResult, ResourceName, Reward } from '@swl/protocol';
 
 import { addStoreItem, removeStoreItem, storeQuantity } from './mapstore.ts';
 import type { CommandApplier, CommandOutcome, ShimWorld } from './shim.ts';
@@ -192,6 +195,43 @@ export const QUEST_PROGRESS_KEY = 'questProgress';
  * explicit, authoritative `beginQuest` and carries the server's ledger.
  */
 export const ACTIVE_QUEST_KEY = 'activeQuest';
+
+/**
+ * The private-state key for the last quest reward the server granted.
+ *
+ * A minimal receipt — quest id, the exact rows that were paid, and the rank
+ * the server recorded — so a reconnecting client can rebuild the result
+ * screen from the save. It is a *reading* of a past grant, never a second
+ * reward authority: nothing pays from it, and replaying `end_quest` cannot
+ * rebuild it (the award is once-only).
+ */
+export const LAST_QUEST_REWARD_KEY = 'lastQuestReward';
+
+/** The persisted reward receipt, in the wire's resource vocabulary. */
+export interface LastQuestReward {
+  /** The authoritative quest id that was completed. */
+  readonly questId: string;
+  /** The rank the server recorded for the win. */
+  readonly rank: number;
+  /** The exact rows the wallet received. */
+  readonly rewards: readonly Reward[];
+}
+
+/**
+ * The quest engine's short reward keys, in the protocol's resource names.
+ *
+ * The wallet mutates with these same short keys; the wire result uses the
+ * protocol's `ResourceName` vocabulary. Keeping the map here (and nowhere in
+ * the client) makes the row the server reports the row it actually paid.
+ */
+const QUEST_REWARD_RESOURCE: Readonly<Record<QuestRewardKey, ResourceName>> = {
+  g: 'gold',
+  x: 'xp',
+  w: 'wood',
+  o: 'oil',
+  s: 'steel',
+  c: 'cash',
+};
 
 /** One element in a quest's server-owned engagement ledger. */
 export interface QuestLedgerElement {
@@ -2874,13 +2914,23 @@ function endQuestCommand(
   if (!awarded.award.awarded) return { applied: false, refused: 'already-awarded', world };
 
   // Every check has passed; the wallet, the progress, the client-visible rank
-  // and the active-state clear move together.
-  const resources = { ...world.resources };
-  for (const reward of awarded.award.rewards) {
+  // and the active-state clear move together. Build the wire rows from the
+  // exact amounts paid — including the same XP rounding — so the native
+  // result can report nothing the wallet did not actually receive.
+  const paid = awarded.award.rewards.map((reward) => ({
+    key: reward.key,
     // A gold row's extra XP is capped at a third of expRequired, which can be
     // fractional; the wallet holds whole resources only.
-    const amount = reward.key === 'x' ? Math.round(reward.amount) : reward.amount;
-    resources[reward.key] = (resources[reward.key] ?? 0) + amount;
+    amount: reward.key === 'x' ? Math.round(reward.amount) : reward.amount,
+  }));
+  const rewards: Reward[] = paid.map((row) => ({
+    resource: QUEST_REWARD_RESOURCE[row.key],
+    amount: row.amount,
+  }));
+
+  const resources = { ...world.resources };
+  for (const row of paid) {
+    resources[row.key] = (resources[row.key] ?? 0) + row.amount;
   }
   world.resources = resources;
   privateState[QUEST_PROGRESS_KEY] = awarded.progress;
@@ -2888,6 +2938,15 @@ function endQuestCommand(
     ...questRanks(privateState),
     [String(spec.playIndex)]: awarded.award.rank,
   };
+  // A reconnecting client reads this receipt instead of replaying end_quest.
+  // It records a past grant only — it never pays anything.
+  const receipt: LastQuestReward = {
+    questId,
+    rank: awarded.award.rank,
+    rewards,
+  };
+  privateState[LAST_QUEST_REWARD_KEY] = receipt;
   delete privateState[ACTIVE_QUEST_KEY];
-  return { applied: true, world };
+  const result: CommandResult = { kind: 'rewards', rewards };
+  return { applied: true, world, result };
 }

@@ -588,7 +588,11 @@ export function createApp(
         if (outcome.applied) {
           current = outcome.world;
           applied.push(command.name);
-          outcomes.push({ index, ok: true, result: { kind: 'none' } });
+          // The single forwarding point: whatever the authoritative applier
+          // reports is what the client is told it was granted. A command with
+          // no result keeps the old `{kind:'none'}` answer. The legacy shim
+          // never reads this field, so its body stays `{result:'success'}`.
+          outcomes.push({ index, ok: true, result: outcome.result ?? { kind: 'none' } });
         } else {
           // A refused command spends nothing. The applier validates before
           // it mutates, so the settled price is the only change to undo.

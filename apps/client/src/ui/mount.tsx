@@ -43,6 +43,10 @@ export interface UiOverlayState {
   readonly onQuestStart?: (questId: string, difficulty: QuestDifficulty) => void;
   /** The player pressed a quest action. */
   readonly onQuestAction?: (questId: string, action: QuestActionChoice) => void;
+  /** The player asked to retry (or replay) a finished mission. */
+  readonly onQuestRetry?: (questId: string) => void;
+  /** The player asked to open the next mission the server made available. */
+  readonly onQuestNext?: (questId: string) => void;
   /** The selected element's map id, for its server attribute bag. */
   readonly selectedIso?: number | null;
   /** The client's unix second, for on-screen countdowns. */

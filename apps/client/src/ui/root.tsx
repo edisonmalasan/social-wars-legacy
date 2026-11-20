@@ -92,6 +92,10 @@ export interface RootProps {
   onQuestStart?: (questId: string, difficulty: QuestDifficulty) => void;
   /** The player pressed one of the quest's allowed actions. */
   onQuestAction?: (questId: string, action: QuestActionChoice) => void;
+  /** The player asked to retry (or replay) a finished mission. */
+  onQuestRetry?: (questId: string) => void;
+  /** The player asked to open the next mission the server made available. */
+  onQuestNext?: (questId: string) => void;
   /** The player asked to collect the selected building's production. */
   onCollect?: () => void;
   /** The player picked a stored item to place on the map. */
@@ -136,6 +140,8 @@ export function Root({
   onQuestPick,
   onQuestStart,
   onQuestAction,
+  onQuestRetry,
+  onQuestNext,
   onCollect,
   onPlaceStored,
   onClaimBonus,
@@ -215,6 +221,8 @@ export function Root({
             busy={questBusy}
             onStart={onQuestStart}
             onAction={onQuestAction}
+            onRetry={onQuestRetry}
+            onNext={onQuestNext}
             onCancel={onDialogDismiss ?? (() => {})}
           />
         ) : null}

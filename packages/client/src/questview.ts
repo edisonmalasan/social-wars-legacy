@@ -18,7 +18,11 @@ import type { CommandOutcome, Reward } from '@swl/protocol';
 import { QUEST_IDS, getQuestSpec, questTitle } from '@swl/rules';
 
 import { chapterMap, type QuestSlot } from './chapters.ts';
-import { activeQuestState, type ActiveQuestStateView } from './featurestate.ts';
+import {
+  activeQuestState,
+  type ActiveQuestStateView,
+  type LastQuestRewardView,
+} from './featurestate.ts';
 import type { WorldSnapshot } from './session.ts';
 import { REFUSED_WITHOUT_OUTCOME, type DialogContent } from './dialogmodel.ts';
 
@@ -315,14 +319,85 @@ export function activeQuestFromWorld(
   return active ? activeQuestView(active, options) : null;
 }
 
+/** The next mission, read from the server's ranks and unlock rules. */
+export interface QuestResultNext {
+  /** The server's one-based play index (the key ranks are stored under). */
+  readonly index: number;
+  /** The authoritative next quest id. */
+  readonly questId: string;
+  /** The rules' display title. */
+  readonly title: string;
+  /** Whether the server says the mission can be started now. */
+  readonly available: boolean;
+}
+
+/** The server readings the result screen uses for its next-step actions. */
+export interface QuestResultOptions {
+  /** The player's quest ranks, keyed by the server's play index. */
+  readonly ranks?: Readonly<Record<number, number>>;
+  /** The content's per-quest unlock levels, keyed by play index. */
+  readonly minLevels?: Readonly<Record<number, number>>;
+  /** The player's level, for the unlock restriction. */
+  readonly playerLevel?: number;
+  /** Any quest the server still has active. */
+  readonly activeQuestId?: string | null;
+  /** How many quests the content has. */
+  readonly numQuests?: number;
+}
+
 /** The result of `end_quest`, read only from the server's own answer. */
 export interface QuestResultView {
+  /** The quest the server answered for. */
+  readonly questId: string;
   readonly won: boolean;
   readonly title: string;
   readonly message: string;
   readonly kind: 'result' | 'reward';
   /** Rewards the server answered with, never a client-computed row. */
   readonly rewards: readonly Reward[];
+  /** Whether the server confirmed the mission was completed. */
+  readonly missionComplete: boolean;
+  /** The rank the server recorded, when it answered a win. */
+  readonly rank: number | null;
+  /** The next mission the server's progress makes available, if any. */
+  readonly next: QuestResultNext | null;
+}
+
+/** The rank the server recorded for a quest, keyed by its play index. */
+function questRankOf(questId: string, options: QuestResultOptions): number | null {
+  const playIndex = getQuestSpec(questId)?.playIndex;
+  if (playIndex === undefined) return null;
+  return options.ranks?.[playIndex] ?? null;
+}
+
+/**
+ * The next mission, from the server's ranks — never a client guess.
+ *
+ * The server keys ranks by the quest's play index, and the first unranked
+ * quest is the one in progress (`chapters.ts`). A mission is offered only
+ * when the server has ranked it or made it the one in progress, the content's
+ * level gate is met, and no quest is currently active.
+ */
+function nextQuestResult(questId: string, options: QuestResultOptions): QuestResultNext | null {
+  // Without the server's ranks there is no authoritative progression to read;
+  // a client that guessed a next mission here would be inventing one.
+  if (!options.ranks) return null;
+  const playIndex = getQuestSpec(questId)?.playIndex;
+  if (playIndex === undefined) return null;
+  const index = playIndex + 1;
+  const nextId = QUEST_IDS[index];
+  if (!nextId) return null;
+  const ranks = options.ranks ?? {};
+  let firstUnranked = 1;
+  for (let at = 1; at <= QUEST_IDS.length; at += 1) {
+    if (ranks[at] !== undefined) firstUnranked = at + 1;
+  }
+  const maxQuests = options.numQuests ?? QUEST_IDS.length - 1;
+  const unlockedByServer = ranks[index] !== undefined || firstUnranked === index;
+  const levelOk = (options.playerLevel ?? 0) >= (options.minLevels?.[index] ?? 0);
+  const available =
+    index <= maxQuests && unlockedByServer && levelOk && options.activeQuestId !== nextId;
+  return { index, questId: nextId, title: questTitle(nextId) ?? nextId, available };
 }
 
 /** Build the result model from one command outcome. */
@@ -330,33 +405,69 @@ export function questResultView(
   questId: string,
   outcome: CommandOutcome | null,
   fallback: string = REFUSED_WITHOUT_OUTCOME,
+  options: QuestResultOptions = {},
 ): QuestResultView {
   if (!outcome) {
     return {
+      questId,
       won: false,
       title: 'Quest not finished',
       message: fallback,
       kind: 'result',
       rewards: [],
+      missionComplete: false,
+      rank: null,
+      next: null,
     };
   }
   if (outcome.ok) {
     return {
+      questId,
       won: true,
       title: 'Quest complete',
       message: `The server completed ${questTitle(questId) ?? questId}.`,
       kind: 'reward',
       rewards: outcome.result.kind === 'rewards' ? outcome.result.rewards : [],
+      missionComplete: true,
+      rank: questRankOf(questId, options),
+      next: nextQuestResult(questId, options),
     };
   }
   const code = outcome.error.code;
   const message = outcome.error.message || code || REFUSED_WITHOUT_OUTCOME;
   return {
+    questId,
     won: false,
     title: 'Quest not finished',
     message: code ? `${code}: ${message}` : message,
     kind: 'result',
     rewards: [],
+    missionComplete: false,
+    rank: null,
+    next: null,
+  };
+}
+
+/**
+ * Rebuild a result screen from the server's persisted receipt.
+ *
+ * The rows are the ones the server already paid; this never replays the
+ * reward transaction. It is the reconnect counterpart of `questResultView`.
+ */
+export function questResultFromReceipt(
+  receipt: LastQuestRewardView,
+  options: QuestResultOptions = {},
+): QuestResultView {
+  return {
+    questId: receipt.questId,
+    won: true,
+    title: 'Quest reward',
+    message: `The server paid the reward for ${questTitle(receipt.questId) ?? receipt.questId}.`,
+    kind: 'reward',
+    rewards: receipt.rewards,
+    missionComplete: true,
+    rank: receipt.rank,
+    next: nextQuestResult(receipt.questId, options),
   };
 }
 

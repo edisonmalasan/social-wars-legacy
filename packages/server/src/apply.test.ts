@@ -28,6 +28,7 @@ import {
   type ApplierItem,
   BUILDING_STATE_KEYS,
   GOAL_STATE_KEY,
+  LAST_QUEST_REWARD_KEY,
   QUEST_PROGRESS_KEY,
   createApplier,
   createQuestHelpers,
@@ -2579,6 +2580,82 @@ describe('the active assault quest', () => {
     });
     assert.equal(outcome.applied, false);
     assert.equal(outcome.refused, 'no-victory');
+  });
+});
+
+describe('the authoritative quest reward result', () => {
+  // REWARDS_QUESTS[6] = { g: 4000, o: 1400 }; expRequired 300 gives 100 XP
+  // for the gold row. The exact rows the applier reports must equal what it
+  // writes into the wallet, including the rounding of the fractional XP.
+  const exactRows = [
+    { resource: 'gold', amount: 0 },
+    { resource: 'xp', amount: 0 },
+    { resource: 'xp', amount: 100 },
+    { resource: 'gold', amount: 4000 },
+    { resource: 'oil', amount: 1400 },
+  ];
+
+  function winningOutcome() {
+    const applier = createApplier(questDeps());
+    const killed = applier(questWorld(), killedWrite(['commandCenter']));
+    return applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+  }
+
+  it('returns the exact awarded rows, mapped to resource names', () => {
+    const outcome = winningOutcome();
+    assert.equal(outcome.applied, true);
+    assert.deepEqual(outcome.result, { kind: 'rewards', rewards: exactRows });
+  });
+
+  it('reports the same amounts it actually paid into the wallet', () => {
+    const outcome = winningOutcome();
+    const paid: Record<string, number> = {};
+    for (const row of exactRows) {
+      paid[row.resource] = (paid[row.resource] ?? 0) + row.amount;
+    }
+    assert.equal(outcome.world.resources['g'], paid['gold']);
+    assert.equal(outcome.world.resources['x'], paid['xp']);
+    assert.equal(outcome.world.resources['o'], paid['oil']);
+  });
+
+  it('returns no result when the server refuses the quest', () => {
+    const applier = createApplier(questDeps());
+    const outcome = applier(questWorld(), {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+    assert.equal(outcome.result, undefined);
+    assert.equal(LAST_QUEST_REWARD_KEY in outcome.world.save.privateState, false);
+  });
+
+  it('returns no result on an already-awarded replay', () => {
+    const applier = createApplier(questDeps());
+    const killed = applier(questWorld(), killedWrite(['commandCenter']));
+    killed.world.save.privateState[QUEST_PROGRESS_KEY] = {
+      ranks: {},
+      awarded: [QUEST_ID_02_CENTRAL_NUCLEAR],
+    };
+    const outcome = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'already-awarded');
+    assert.equal(outcome.result, undefined);
+  });
+
+  it('persists a minimal reward receipt with the quest id, rows and rank', () => {
+    const outcome = winningOutcome();
+    assert.deepEqual(outcome.world.save.privateState[LAST_QUEST_REWARD_KEY], {
+      questId: QUEST_ID_02_CENTRAL_NUCLEAR,
+      rank: 1,
+      rewards: exactRows,
+    });
   });
 });
 
