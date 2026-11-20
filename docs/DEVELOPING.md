@@ -87,6 +87,15 @@ node scripts/build-client-manifest.mjs    # the client's own manifest
 All of them are in the CI, and all of them are in the command table in
 [`../AGENTS.md`](../AGENTS.md).
 
+**The e2e clock fixture.** `node scripts/e2e-test.mjs` injects a deterministic
+clock into its **server child only** (`NODE_OPTIONS=--import=scripts/e2e-clock.mjs`,
+a test fixture the shipped server never loads). The harness advances that
+clock to cross a production cycle instead of sleeping for five minutes; the
+browser keeps its own clock, so the on-screen countdown stays presentation
+only and the server's acceptance of the rendered Collect button is the
+readiness evidence. The server's rules, database and wire protocol are the
+real ones throughout.
+
 ## The two pipelines
 
 ### The content pipeline

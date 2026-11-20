@@ -23,12 +23,20 @@
  *   node scripts/e2e-test.mjs --browser chrome
  */
 import { spawn } from 'node:child_process';
-import { createReadStream, existsSync, mkdtempSync, readFileSync, statSync } from 'node:fs';
+import {
+  createReadStream,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+import { pathToFileURL } from 'node:url';
 
 import { brokenBudgets } from '../packages/server/src/budgets.ts';
 import { COMMAND_CENTER_TILE } from '../packages/server/src/starttown.ts';
@@ -42,6 +50,21 @@ const ROOT = process.cwd();
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
+ * The deterministic clock's control file. Created in `main()` before the
+ * server starts and read by the server child through `scripts/e2e-clock.mjs`.
+ * Nothing in the shipped server knows this file exists.
+ */
+let clockFile = null;
+let clockOffset = 0;
+
+/** Advance the server's authoritative clock, without waiting in real time. */
+function advanceClock(seconds) {
+  if (!clockFile) throw new Error('the e2e clock fixture was not started');
+  clockOffset += seconds;
+  writeFileSync(clockFile, `${clockOffset}\n`);
+}
+
+/**
  * The weekly quest, from the rules the server uses.
  *
  * A fresh save has slot 1 open, and this is the quest in it. Reading the spec
@@ -50,6 +73,43 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  */
 const WEEKLY = QUESTS.find((quest) => quest.constantName === 'QUEST_WEEKLY_01');
 if (!WEEKLY) throw new Error('the rules have no weekly quest');
+
+/**
+ * The four collection periods and their multipliers, from the same content
+ * bundle the server reads. The DOM assertions compare the selector's buttons
+ * with these numbers instead of hard-coding the game's own configuration.
+ */
+function collectRules() {
+  const bundlePath = path.join(ROOT, 'packages/content/dist/content-bundle.json');
+  if (!existsSync(bundlePath)) {
+    throw new Error('the content bundle has not been built. Run: pnpm build:content');
+  }
+  const globals = JSON.parse(readFileSync(bundlePath, 'utf8')).globals ?? {};
+  const minutes = globals.COLLECT_MINUTES;
+  const multipliers = globals.COLLECT_MULTIPLIER;
+  if (
+    !Array.isArray(minutes) || minutes.length < 4 ||
+    !Array.isArray(multipliers) || multipliers.length < 4 ||
+    [...minutes.slice(0, 4), ...multipliers.slice(0, 4)].some(
+      (value) => !Number.isFinite(value) || value <= 0,
+    )
+  ) {
+    throw new Error('the content bundle has no usable collection periods');
+  }
+  return { minutes: minutes.slice(0, 4), multipliers: multipliers.slice(0, 4) };
+}
+const COLLECT = collectRules();
+
+/**
+ * The wallet keys behind the protocol's resource names, from the server's
+ * `QUEST_REWARD_RESOURCE` map. The result rows use the protocol vocabulary;
+ * the wallet uses the short keys. This is a test-side mirror, never a client
+ * or server authority.
+ */
+const WALLET_KEY = {
+  energy: 'e', xp: 'x', gold: 'g', wood: 'w',
+  oil: 'o', steel: 's', cash: 'c', mana: 'm',
+};
 
 /** The viewport a fresh player's camera opens with, for tile clicks. */
 const CAMERA = cameraCentredOn(COMMAND_CENTER_TILE.x, COMMAND_CENTER_TILE.y);
@@ -370,12 +430,20 @@ class Page {
 
 /** Start the real server and wait for it to answer. */
 async function startServer(dataDir, port) {
+  const env = { ...process.env, SWL_DATA_DIR: dataDir, PORT: String(port) };
+  if (clockFile) {
+    // The clock is injected into the **server child only**; the harness's
+    // own timers stay real, so its timeouts remain genuine.
+    const preload = pathToFileURL(path.join(ROOT, 'scripts/e2e-clock.mjs')).href;
+    env.NODE_OPTIONS = [env.NODE_OPTIONS, `--import=${preload}`].filter(Boolean).join(' ');
+    env.SWL_E2E_CLOCK_FILE = clockFile;
+  }
   const child = spawn(
     process.execPath,
     ['apps/server/src/main.ts'],
     {
       cwd: ROOT,
-      env: { ...process.env, SWL_DATA_DIR: dataDir, PORT: String(port) },
+      env,
       stdio: ['ignore', 'pipe', 'pipe'],
     },
   );
@@ -722,6 +790,159 @@ async function playThroughDom(page, serverPort, browserName) {
       `an undue cycle ("${String(collectAnswer).trim()}") and granted no wood`,
   );
 
+  // --- G5.2: choose a collection period through the rendered selector -----
+  // The old refusal above stays intact. Here the player opens the factory's
+  // period dialog, checks the four content-derived choices, picks the
+  // five-minute one, waits for the **server's** clock via the deterministic
+  // fixture, and collects. No assertion is weakened and no real time is slept
+  // away: the server's own rules still decide readiness and the amount.
+  const factoryOf = (world) =>
+    Object.values(world?.maps?.[0]?.items ?? {}).find(
+      (tuple) => Number(tuple[0]) === 2 && Number(tuple[1]) === 46 && Number(tuple[2]) === 46,
+    );
+
+  await domClickPlain(
+    page,
+    '#ui .swl-info button.swl-info-period-button',
+    'Choose collection period button',
+  );
+  await domWait(
+    page,
+    "document.querySelector('#ui .swl-dialog .swl-production-head')?.textContent ?? ''",
+    (v) => typeof v === 'string' && /wood/i.test(v),
+    'the collection-period selector',
+  );
+  const periodButtons = await domValue(
+    page,
+    `Array.from(document.querySelectorAll('#ui .swl-dialog .swl-production-option')).map((b) => ({
+       wait: b.querySelector('.swl-production-wait')?.textContent ?? '',
+       mult: b.querySelector('.swl-production-mult')?.textContent ?? '',
+       amount: b.querySelector('.swl-production-amount')?.textContent ?? '',
+       pressed: b.getAttribute('aria-pressed'),
+     }))`,
+  );
+  if (!Array.isArray(periodButtons) || periodButtons.length !== 4) {
+    throw new Error(`the selector drew ${periodButtons?.length ?? 0} periods, not four`);
+  }
+  const waitLabel = (minutes) =>
+    minutes % 60 === 0 ? `${minutes / 60} h` : `${minutes} min`;
+  for (let index = 0; index < 4; index++) {
+    const button = periodButtons[index];
+    if (button.wait !== waitLabel(COLLECT.minutes[index])) {
+      throw new Error(`period ${index + 1} says ${button.wait}, not ${waitLabel(COLLECT.minutes[index])}`);
+    }
+    if (button.mult !== `×${COLLECT.multipliers[index]}`) {
+      throw new Error(`period ${index + 1} says ${button.mult}, not ×${COLLECT.multipliers[index]}`);
+    }
+  }
+  const predicted = /^\s*\+(\d+)/.exec(String(periodButtons[0].amount));
+  if (!predicted) {
+    throw new Error(`the five-minute option shows no server-derived amount ("${periodButtons[0].amount}")`);
+  }
+  const expectedWood = Number(predicted[1]);
+
+  const woodBeforeCycle = Number((await worldOf(serverPort, session.token))?.resources?.w ?? 0);
+  await domClick(
+    page,
+    '#ui .swl-dialog .swl-production-option:first-child',
+    "!!document.querySelector('#ui .swl-dialog .swl-production')",
+    'the five-minute collection period',
+  );
+  const cycleWorld = await worldWait(
+    serverPort,
+    session.token,
+    (world) => {
+      const factory = factoryOf(world);
+      return Number(factory?.[6]?.['cp']) === 1 && Number(factory?.[6]?.['lastAccruedAt'] ?? 0) > 0;
+    },
+    'the server to record the chosen collection period',
+  );
+  const cycleStart = Number(factoryOf(cycleWorld)[6]['lastAccruedAt']);
+
+  // Advance the server's clock by one second past the chosen five minutes.
+  // This is a deterministic fixture, not a sleep: the browser keeps its own
+  // clock, but the server's `deps.now()` is what decides `isDue`.
+  advanceClock(COLLECT.minutes[0] * 60 + 1);
+  await domClickPlain(
+    page,
+    '#ui .swl-info button.swl-info-period-button',
+    'Choose collection period button after the clock advanced',
+  );
+  // The countdown is presentation only: it reads the **browser's** clock,
+  // which the fixture deliberately leaves alone. Reading the server's clock
+  // here would let a modified client pretend a cycle was due. Read the text
+  // instead, and let the server's acceptance of the rendered Collect button
+  // be the proof of readiness.
+  const cycleText = await domValue(
+    page,
+    "document.querySelector('#ui .swl-dialog .swl-production-cycle')?.textContent ?? ''",
+  );
+  if (!/ready in|ready to collect/i.test(String(cycleText))) {
+    throw new Error(`the production dialog drew no cycle status ("${cycleText}")`);
+  }
+  const pressed = await domValue(
+    page,
+    `Array.from(document.querySelectorAll('#ui .swl-dialog .swl-production-option'))
+       .map((b) => b.getAttribute('aria-pressed'))`,
+  );
+  if (!Array.isArray(pressed) || pressed[0] !== 'true' || pressed.slice(1).some((v) => v !== 'false')) {
+    throw new Error(`the active-period marker is wrong: ${JSON.stringify(pressed)}`);
+  }
+  await domClick(
+    page,
+    '#ui .swl-dialog button.swl-dialog-close',
+    "!!document.querySelector('#ui .swl-dialog')",
+    'production dialog Close button',
+  );
+  const feedbackBeforeCollect = await domValue(
+    page,
+    "document.querySelector('#ui .swl-feedback')?.textContent ?? ''",
+  );
+  await domClickPlain(page, '#ui .swl-info button.swl-info-collect', 'Collect button when due');
+  await domWait(
+    page,
+    "document.querySelector('#ui .swl-feedback')?.textContent ?? ''",
+    (v) => typeof v === 'string' && v !== feedbackBeforeCollect && !/not-due|refused/i.test(v),
+    'the server to accept the due collection',
+  );
+  // The rewritten cycle timestamp, not a wallet guess, is the proof that the
+  // command was applied: a freshly built producer stores a base amount of
+  // zero, so the correct payment here can legitimately be zero. The exact
+  // period multipliers are proved with a non-zero fixture by the unit tests.
+  await worldWait(
+    serverPort,
+    session.token,
+    (world) => {
+      const factory = factoryOf(world);
+      return Number(factory?.[6]?.['lastAccruedAt'] ?? 0) > cycleStart &&
+        Number(factory?.[6]?.['collect']) === 0;
+    },
+    'the server to apply the due collection and restart the cycle',
+  );
+  const paidWorld = await worldOf(serverPort, session.token);
+  const paidWood = Number(paidWorld?.resources?.w ?? 0) - woodBeforeCycle;
+  if (paidWood !== expectedWood) {
+    throw new Error(`the server paid ${paidWood} wood, but its own selector predicted ${expectedWood}`);
+  }
+  const nextCycle = factoryOf(paidWorld)[6];
+  if (Number(nextCycle['lastAccruedAt']) <= cycleStart) {
+    throw new Error('the server did not restart the cycle after collection');
+  }
+  if (Number(nextCycle['cp']) !== 1 || Number(nextCycle['collect']) !== 0) {
+    throw new Error(`the next production state is wrong: ${JSON.stringify(nextCycle)}`);
+  }
+  const production = {
+    cp: Number(nextCycle['cp']),
+    lastAccruedAt: Number(nextCycle['lastAccruedAt']),
+    collect: Number(nextCycle['collect']),
+    amount: expectedWood,
+  };
+  console.log(
+    `  UI: picked the ${COLLECT.minutes[0]}-minute period (${periodButtons[0].amount}), ` +
+      `the server accepted the due Collect and paid its own ${paidWood} wood; ` +
+      `the cycle restarted at ${production.lastAccruedAt}`,
+  );
+
   // Select the Command Center, which is the training building on a fresh save.
   await domTileClick(page, COMMAND_CENTER_TILE.x, COMMAND_CENTER_TILE.y);
   await domWait(
@@ -752,6 +973,82 @@ async function playThroughDom(page, serverPort, browserName) {
   }
   console.log(`  UI: trained a unit (${countdown})`);
 
+  // --- G5.2: the army panel shows units the server really owns ------------
+  // The training queue above is not yet a unit the player can field. Buy a
+  // Worker I from the rendered build menu and place it on a free tile; the
+  // server's save then owns it, and the army list must name that same unit.
+  const workerPick = await page.evaluate(
+    `(() => {
+       const items = Array.from(document.querySelectorAll(
+         '#ui .swl-build-menu .swl-build-item:not(.swl-build-locked) button'));
+       const item = items.find((b) =>
+         b.querySelector('.swl-build-name')?.textContent === 'Worker I');
+       if (!item) return {error: 'the build menu has no Worker I'};
+       item.click();
+       return {ok: true};
+     })()`,
+  );
+  if (!workerPick || workerPick.error) {
+    throw new Error(workerPick?.error ?? 'the Worker I could not be picked');
+  }
+  await domWait(
+    page,
+    "document.querySelector('#ui .swl-placing')?.textContent ?? ''",
+    (v) => typeof v === 'string' && v.includes('Worker I'),
+    'the Worker I placement',
+  );
+  // 48,46 is a free 1x1 tile above the Command Center: the clear middle of
+  // the canvas, not under the goals, chapters, inventory, build or info panels.
+  await domTileClick(page, 48, 46);
+  await domWait(
+    page,
+    "!document.querySelector('#ui .swl-placing')",
+    (v) => v === true,
+    'the Worker I to be placed',
+  );
+  const armyWorld = await worldOf(serverPort, session.token);
+  if (
+    !Object.values(armyWorld?.maps?.[0]?.items ?? {}).some(
+      (tuple) => Number(tuple[0]) === 1001,
+    )
+  ) {
+    throw new Error('the rendered Worker I was not placed on the server\'s map');
+  }
+  const armyRows = await domValue(
+    page,
+    `Array.from(document.querySelectorAll('#ui .swl-inventory [data-swl-army] .swl-inventory-item'))
+       .map((li) => ({
+         name: li.querySelector('.swl-inventory-name')?.textContent ?? '',
+         qty: li.querySelector('.swl-inventory-qty')?.textContent ?? '',
+       }))`,
+  );
+  const workerRow = Array.isArray(armyRows)
+    ? armyRows.find((row) => row.name === 'Worker I')
+    : null;
+  if (!workerRow || workerRow.qty !== '×1') {
+    throw new Error(`the army panel did not show the owned unit: ${JSON.stringify(armyRows)}`);
+  }
+  console.log(`  UI: the army panel shows the placed Worker I (${workerRow.qty}) from the server's map`);
+
+  // A team is only accepted on the four level-40 quests. a fresh e2e player
+  // cannot reach them legitimately, so the rendered briefing is checked to
+  // have no team picker, and the server is checked to refuse a forged team on
+  // this non-team quest. The team-selection happy path is proved by the
+  // HTTP/unit suite, not by fabricating a player level here.
+  const forgedTeam = await page.evaluate(
+    `(async () => {
+       const handle = window.__swl;
+       if (!handle) return {error: 'the client has no handle'};
+       const result = await handle.startQuest(${JSON.stringify(WEEKLY.id)}, 1,
+         [{unitId: 1001, count: 1}]);
+       return {ok: result.ok, status: result.status};
+     })()`,
+  );
+  if (!forgedTeam || forgedTeam.error || forgedTeam.ok) {
+    throw new Error(`the server accepted a forged team on a non-team quest: ${JSON.stringify(forgedTeam)}`);
+  }
+  console.log(`  UI: a forged team was refused on the non-team quest (HTTP ${forgedTeam.status})`);
+
   // Open the weekly quest from the chapter map, through the rendered slot.
   const slotSelector = '#ui .swl-chapter:first-child .swl-chapter-quests > button:first-child';
   const slot = await page.evaluate(
@@ -772,6 +1069,15 @@ async function playThroughDom(page, serverPort, browserName) {
     "document.querySelectorAll('#ui .swl-dialog .swl-quest-difficulty input[type=radio]').length",
   );
   if (radios !== 3) throw new Error(`the briefing drew ${radios} difficulty choices, not 3`);
+  // The weekly quest is not one of the four level-40 team quests, so the
+  // rendered briefing must not offer a team picker for it.
+  const teamPicker = await domValue(
+    page,
+    "!!document.querySelector('#ui .swl-dialog [data-swl-team-picker]')",
+  );
+  if (teamPicker !== false) {
+    throw new Error('a non-team quest drew a team picker');
+  }
   await domClick(
     page,
     '#ui .swl-dialog button.swl-quest-primary',
@@ -843,6 +1149,9 @@ async function playThroughDom(page, serverPort, browserName) {
   console.log(`  UI: strikes on ${rosterSize} rendered roster rows moved botsKilled to five`);
 
   // Finish is a request. The server decides the win and pays the reward.
+  // The wallet is read immediately before the click so every row in the
+  // result can be checked against the exact delta that followed it.
+  const walletBeforeFinish = await worldOf(serverPort, session.token);
   await domClick(
     page,
     '#ui .swl-dialog button[data-swl-action="end"]',
@@ -872,7 +1181,54 @@ async function playThroughDom(page, serverPort, browserName) {
   if (!(cashOf(awardedWorld) > cashBeforeQuest)) {
     throw new Error('the server paid no cash for the weekly quest');
   }
-  console.log('  UI: the reward dialog is the server\'s result, and the server paid the cash');
+  // Every rendered reward row must be exactly what the wallet received, and
+  // the persisted receipt must hold the same rows. The client computes no
+  // amount; it only formats the server's result.
+  const rewardRows = await domValue(
+    page,
+    `Array.from(document.querySelectorAll('#ui .swl-dialog [data-swl-rewards] [data-swl-reward]'))
+       .map((li) => ({
+         resource: li.getAttribute('data-swl-reward'),
+         text: li.textContent ?? '',
+         amount: Number((li.textContent ?? '').split('+').pop().trim()),
+       }))`,
+  );
+  if (!Array.isArray(rewardRows) || rewardRows.length === 0) {
+    throw new Error('the result dialog drew no authoritative reward rows');
+  }
+  const walletBefore = walletBeforeFinish?.resources ?? {};
+  const walletAfter = awardedWorld?.resources ?? {};
+  for (const row of rewardRows) {
+    const key = WALLET_KEY[row.resource];
+    if (!key) throw new Error(`the result named an unknown resource: ${row.resource}`);
+    if (!Number.isFinite(row.amount)) {
+      throw new Error(`the ${row.resource} row has no amount: "${row.text}"`);
+    }
+    const delta = Number(walletAfter[key] ?? 0) - Number(walletBefore[key] ?? 0);
+    if (delta !== row.amount) {
+      throw new Error(
+        `the ${row.resource} row says +${row.amount} but the server paid ${delta}`,
+      );
+    }
+  }
+  const receipt = awardedWorld?.privateState?.lastQuestReward;
+  if (!receipt || receipt.questId !== WEEKLY.id || !Array.isArray(receipt.rewards)) {
+    throw new Error(`the server kept no reward receipt: ${JSON.stringify(receipt)}`);
+  }
+  if (receipt.rewards.length !== rewardRows.length) {
+    throw new Error('the receipt and the rendered rows disagree on their length');
+  }
+  for (let index = 0; index < rewardRows.length; index++) {
+    const row = rewardRows[index];
+    const stored = receipt.rewards[index];
+    if (stored?.resource !== row.resource || Number(stored?.amount) !== row.amount) {
+      throw new Error(`receipt row ${index} disagrees with the rendered row`);
+    }
+  }
+  console.log(
+    `  UI: ${rewardRows.length} reward row(s) match the wallet delta and the persisted receipt ` +
+      `(${rewardRows.map((row) => `${row.resource} +${row.amount}`).join(', ')})`,
+  );
 
   // A replay of the same quest must not pay twice. Drive it through the same
   // rendered controls, then check both the dialog and the server's wallet.
@@ -952,7 +1308,50 @@ async function playThroughDom(page, serverPort, browserName) {
   }
   console.log('  UI: after a client reload the active quest and the server award are still there');
 
-  return { playerId, password: 'correct horse' };
+  // --- G5.2: the receipt and the production cycle survive a reload --------
+  const reloadedReceipt = persisted?.privateState?.lastQuestReward;
+  if (!reloadedReceipt || reloadedReceipt.questId !== receipt.questId ||
+      JSON.stringify(reloadedReceipt.rewards) !== JSON.stringify(receipt.rewards)) {
+    throw new Error('the reward receipt did not survive the client reload');
+  }
+  const reloadedFactory = factoryOf(persisted);
+  if (Number(reloadedFactory?.[6]?.['cp']) !== production.cp ||
+      Number(reloadedFactory?.[6]?.['lastAccruedAt']) !== production.lastAccruedAt) {
+    throw new Error('the chosen production cycle did not survive the client reload');
+  }
+  // The result screen can be rebuilt from the persisted receipt, without
+  // replaying end_quest. The rows must still be the server's original ones.
+  const rebuilt = await page.evaluate('window.__swl ? window.__swl.showLastReward() : false');
+  if (rebuilt !== true) {
+    throw new Error('the client could not rebuild the result from the receipt');
+  }
+  await domWait(
+    page,
+    "document.querySelectorAll('#ui .swl-dialog [data-swl-rewards] [data-swl-reward]').length",
+    (v) => v === rewardRows.length,
+    'the receipt-backed reward rows after reload',
+  );
+  const rebuiltRows = await domValue(
+    page,
+    `Array.from(document.querySelectorAll('#ui .swl-dialog [data-swl-rewards] [data-swl-reward]'))
+       .map((li) => ({resource: li.getAttribute('data-swl-reward'),
+                      amount: Number((li.textContent ?? '').split('+').pop().trim())}))`,
+  );
+  if (JSON.stringify(rebuiltRows) !== JSON.stringify(
+      rewardRows.map((row) => ({resource: row.resource, amount: row.amount})))) {
+    throw new Error('the rebuilt reward dialog differs from the one the server paid');
+  }
+  console.log(
+    `  UI: after reload the receipt rebuilt ${rewardRows.length} reward row(s) and ` +
+      `the ${production.cp === 1 ? 'five-minute' : 'chosen'} cycle is still ${production.lastAccruedAt}`,
+  );
+
+  return {
+    playerId,
+    password: 'correct horse',
+    receipt: { questId: receipt.questId, rank: receipt.rank, rewards: receipt.rewards },
+    production,
+  };
 }
 
 async function main() {
@@ -974,6 +1373,12 @@ async function main() {
   );
 
   const dataDir = await mkdtemp(path.join(os.tmpdir(), 'swl-e2e-'));
+  // The deterministic clock lives outside the database directory, so it
+  // survives the server restart below and both server processes share it.
+  const clockDir = await mkdtemp(path.join(os.tmpdir(), 'swl-e2e-clock-'));
+  clockFile = path.join(clockDir, 'offset.txt');
+  clockOffset = 0;
+  writeFileSync(clockFile, '0\n');
   // **Free** ports: a stray server from an earlier run must not be able
   // to answer this one's requests, or hold the port.
   const base = 8100 + Math.floor(Math.random() * 200);
@@ -1802,12 +2207,45 @@ async function main() {
         } else {
           console.log(`  ${player.playerId} signed in again and ${WEEKLY.id} was still awarded`);
         }
+        // G5.2: the persisted receipt and the chosen production cycle must
+        // also come back from the database, not from a browser that might be
+        // remembering them.
+        const receipt = persisted?.privateState?.lastQuestReward;
+        // JSONB does not preserve property order, so compare the receipt's
+        // values, not its byte layout.
+        const sameReceipt =
+          receipt?.questId === player.receipt.questId &&
+          Number(receipt?.rank) === Number(player.receipt.rank) &&
+          Array.isArray(receipt?.rewards) &&
+          receipt.rewards.length === player.receipt.rewards.length &&
+          receipt.rewards.every((row, index) =>
+            row?.resource === player.receipt.rewards[index].resource &&
+            Number(row?.amount) === Number(player.receipt.rewards[index].amount));
+        if (!sameReceipt) {
+          failures.push(`the reward receipt did not survive the restart for ${player.playerId}`);
+          console.log(`FAILED (the reward receipt did not survive the restart)`);
+        } else {
+          console.log(`  ${player.playerId} signed in again with the same reward receipt`);
+        }
+        const factory = Object.values(persisted?.maps?.[0]?.items ?? {}).find(
+          (tuple) => Number(tuple[0]) === 2 && Number(tuple[1]) === 46 && Number(tuple[2]) === 46,
+        );
+        if (Number(factory?.[6]?.['cp']) !== player.production.cp ||
+            Number(factory?.[6]?.['lastAccruedAt']) !== player.production.lastAccruedAt ||
+            Number(factory?.[6]?.['collect']) !== player.production.collect) {
+          failures.push(`the production cycle did not survive the restart for ${player.playerId}`);
+          console.log(`FAILED (the production cycle did not survive the restart)`);
+        } else {
+          console.log(`  ${player.playerId} signed in again with the same production cycle`);
+        }
       }
     }
   } finally {
     client.close();
     for (const handle of serverHandles) handle.child.kill();
     await rm(dataDir, { recursive: true, force: true });
+    await rm(clockDir, { recursive: true, force: true });
+    clockFile = null;
   }
 
   console.log('');

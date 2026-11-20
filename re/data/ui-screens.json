@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 85,
+   "implemented": 89,
    "dropped": 52,
-   "planned": 123
+   "planned": 119
   }
  },
  "screens": [
@@ -295,8 +295,8 @@
    ],
    "overrides": [],
    "bytes": 993,
-   "decision": "planned",
-   "decisionNote": "Deferred (P1): the HUD shows the server's army count and the recruitment panel runs its queue; a per-unit army cell with its own selection state is outside the P0 slice."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.2: the storage panel draws one row per owned unit from armyView (packages/client/src/army.ts) with the server's own name and available count (apps/client/src/ui/inventory.tsx). The Chrome/Edge e2e checks a placed unit against the server's map. The cell is a presentation of server-owned inventory, not a second authority."
   },
   {
    "class": "AssaultCountdown",
@@ -3751,8 +3751,8 @@
    ],
    "overrides": [],
    "bytes": 3548,
-   "decision": "planned",
-   "decisionNote": "Deferred (P1): the storage panel lists the server's items; the original item-category tabs are not part of the P0 loop."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.2: the storage panel's category tabs filter the server's stored items through inventoryCategories/itemsForCategory (packages/client/src/inventory.ts, apps/client/src/ui/inventory.tsx). The original's separate collections-content popup, with its reloadCollections behaviour, is still planned."
   },
   {
    "class": "MondayBonusPopUp",
@@ -5249,8 +5249,8 @@
    ],
    "overrides": [],
    "bytes": 3240,
-   "decision": "planned",
-   "decisionNote": "Deferred (P1): the result dialog draws reward rows only when the native end_quest outcome carries a rewards result; the live outcome reports kind \"none\", so a dedicated rewards popup would have no authoritative data to show."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.2 as reward rows in the one shared result dialog, not as a second modal: the server's end_quest result and its persisted receipt supply the exact rows (packages/server/src/apply.ts, packages/client/src/featurestate.ts, apps/client/src/ui/quests.tsx). The Chrome/Edge e2e checks every row against the wallet delta and the receipt."
   },
   {
    "class": "PopupSelectResource",
@@ -5347,8 +5347,8 @@
    ],
    "overrides": [],
    "bytes": 19944,
-   "decision": "planned",
-   "decisionNote": "Deferred (P1): the weekly quest seeds its own roster from the rules; a bespoke team-selection window is outside G5.1."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.2 for the four level-40 quests the client marks as team quests: the briefing's team picker draws the owned army from armyView, and the server validates and binds the submitted composition (apps/client/src/ui/quests.tsx, packages/server/src/apply.ts validateQuestArmy). The e2e player cannot legitimately reach level 40, so this screen is proved by the HTTP/unit suite; the positional combat simulator remains out of scope."
   },
   {
    "class": "PopupSocialBuilding",
