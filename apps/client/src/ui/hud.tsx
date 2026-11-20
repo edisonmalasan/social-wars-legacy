@@ -80,8 +80,11 @@ export interface HudProps {
   state: HudState;
   /** The item the player is about to place, or null. */
   placing?: string | null;
-  /** The player asked for the daily bonus. The server decides the reward. */
-  onClaimBonus?: () => void;
+  /**
+   * The player asked for the daily bonus. The server decides the reward;
+   * the promise, when there is one, tells the button when to unlock again.
+   */
+  onClaimBonus?: () => void | Promise<unknown>;
 }
 
 /**
@@ -93,6 +96,22 @@ export interface HudProps {
 export function Hud({ state, placing, onClaimBonus }: HudProps): React.JSX.Element {
   const energy = energyDisplay(state);
   const xp = xpProgress(state);
+  const [bonusBusy, setBonusBusy] = useState(false);
+
+  /** One pending bonus request at a time; the server refuses the rest anyway. */
+  function claimBonus(): void {
+    if (bonusBusy) return;
+    setBonusBusy(true);
+    try {
+      void Promise.resolve(onClaimBonus?.()).then(
+        () => setBonusBusy(false),
+        () => setBonusBusy(false),
+      );
+    } catch {
+      setBonusBusy(false);
+    }
+  }
+
   return (
     <div className="swl-hud">
       <div className="swl-hud-resources">
@@ -142,7 +161,7 @@ export function Hud({ state, placing, onClaimBonus }: HudProps): React.JSX.Eleme
           <span
             className="swl-xp-track"
             role="progressbar"
-            aria-valuenow={xp.current}
+            aria-valuenow={Math.min(xp.current, xp.needed)}
             aria-valuemin={0}
             aria-valuemax={xp.needed}
           >
@@ -153,7 +172,12 @@ export function Hud({ state, placing, onClaimBonus }: HudProps): React.JSX.Eleme
           </span>
         </div>
         {onClaimBonus ? (
-          <button type="button" className="swl-bonus" onClick={() => onClaimBonus()}>
+          <button
+            type="button"
+            className="swl-bonus"
+            disabled={bonusBusy}
+            onClick={claimBonus}
+          >
             Daily bonus
           </button>
         ) : null}

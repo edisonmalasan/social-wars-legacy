@@ -368,30 +368,41 @@ function askForSignIn(): Promise<ClientSession | null> {
       });
     }
 
+    // One credential attempt at a time. The button is disabled while the
+    // request is pending; a refusal clears the flag so the player can retry.
+    let busy = false;
     form.addEventListener('submit', (event) => {
       event.preventDefault();
+      if (busy) return;
+      busy = true;
+      if (submit) submit.disabled = true;
       const data = new FormData(form);
       const playerId = String(data.get('playerId') ?? '');
       const secret = String(data.get('password') ?? '');
       if (error) error.textContent = '';
-      void authenticate(mode, playerId, secret).then((result) => {
-        if (result.ok) {
-          form.remove();
-          resolve(result.session);
-          return;
-        }
-        if (error) {
-          error.textContent =
-            result.reason === 'unknown-player'
-              ? 'There is no player with that name.'
-              : result.reason === 'invalid-credentials'
-                ? 'That password is not right.'
-                : result.reason === 'player-exists'
-                  ? 'That name is already taken.'
-                  : 'The server could not be reached.';
-        }
-        // The form stays up: a wrong name or password is retryable.
-      });
+      void authenticate(mode, playerId, secret)
+        .then((result) => {
+          if (result.ok) {
+            form.remove();
+            resolve(result.session);
+            return;
+          }
+          if (error) {
+            error.textContent =
+              result.reason === 'unknown-player'
+                ? 'There is no player with that name.'
+                : result.reason === 'invalid-credentials'
+                  ? 'That password is not right.'
+                  : result.reason === 'player-exists'
+                    ? 'That name is already taken.'
+                    : 'The server could not be reached.';
+          }
+          // The form stays up: a wrong name or password is retryable.
+        })
+        .finally(() => {
+          busy = false;
+          if (submit) submit.disabled = false;
+        });
     });
   });
 }
@@ -524,10 +535,9 @@ async function main(): Promise<void> {
         drawInterface();
       },
       onPlaceStored,
-      onClaimBonus: () => {
-        // The client asks; the server computes the day and the reward.
-        void run([claimDailyBonus()]);
-      },
+      // The client asks; the server computes the day and the reward. Return
+      // the request so the HUD's button stays disabled until it settles.
+      onClaimBonus: () => run([claimDailyBonus()]),
       onQuestPick: openQuestSlot,
       onQuestStart: (questId, difficulty) => {
         void beginQuest(questId, difficulty);

@@ -48,7 +48,7 @@ export interface UiOverlayState {
   /** The player picked a stored item to place on the map. */
   readonly onPlaceStored?: (entry: StoredItemView) => void;
   /** The player asked for the daily bonus. */
-  readonly onClaimBonus?: () => void;
+  readonly onClaimBonus?: () => void | Promise<unknown>;
   /** The player asked to upgrade the selected building. */
   readonly onUpgrade?: () => void;
   /** The player asked to hurry the selected building's construction. */

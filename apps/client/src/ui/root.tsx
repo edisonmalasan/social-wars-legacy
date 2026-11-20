@@ -95,7 +95,7 @@ export interface RootProps {
   /** The player picked a stored item to place on the map. */
   onPlaceStored?: (entry: StoredItemView) => void;
   /** The player asked for the daily bonus; the server decides the reward. */
-  onClaimBonus?: () => void;
+  onClaimBonus?: () => void | Promise<unknown>;
   /** The player picked something to build, with its real wire type. */
   onPick?: (itemId: number, type: ItemType) => void;
   /** The player claimed a goal; send it through the client's transport. */

@@ -195,7 +195,14 @@ export function uiCss(): string {
   font-weight: 700;
 }
 
-.swl-ui button.swl-bonus:hover { background: #ffd75e; }
+.swl-ui button.swl-bonus:hover:not(:disabled) { background: #ffd75e; }
+
+.swl-ui button.swl-bonus:disabled {
+  border-color: #38445a;
+  background: #1d2430;
+  color: #5c6678;
+  cursor: not-allowed;
+}
 
 .swl-army {
   padding: 4px 8px;
