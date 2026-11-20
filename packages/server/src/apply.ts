@@ -77,6 +77,7 @@ import {
   nearDeathQuestElement,
   defendersClearedQuestElement,
   addQuestCounter,
+  setQuestCounter,
   QUEST_ID_WEEKLY_01,
   WEEKLY_BOT_ITEM_ID,
   isQuestVictory,
@@ -187,11 +188,74 @@ export const QUEST_PROGRESS_KEY = 'questProgress';
 /**
  * The private-state key holding the server-owned assault-quest state.
  *
- * The value is a JSON-safe `QuestState`: a first kill may leave only a
- * `{ questId }` seed, and the first validated kill grows it into the full
- * state derived from the quest spec's roster.
+ * The value is a JSON-safe `ActiveQuestState`: it is created only by an
+ * explicit, authoritative `beginQuest` and carries the server's ledger.
  */
 export const ACTIVE_QUEST_KEY = 'activeQuest';
+
+/** One element in a quest's server-owned engagement ledger. */
+export interface QuestLedgerElement {
+  /** Remaining hit points, seeded from the content item's `life`. */
+  hp: number;
+  /** False once the server's own strikes have brought HP to zero. */
+  alive: boolean;
+}
+
+/**
+ * The server-owned part of an active quest.
+ *
+ * It lives inside the JSON-safe `activeQuest` value alongside the rules engine's
+ * `QuestState`. A `killed` write from the client is honoured only for an element
+ * that this ledger already marks dead, so roster membership alone can never
+ * stand in for a kill.
+ */
+export interface QuestLedger {
+  /** The roster elements, keyed by ref, with their HP and alive flag. */
+  elements: Record<string, QuestLedgerElement>;
+  /** Dedupe keys for accepted arrival / evacuation / eligible-kill events. */
+  events: string[];
+  /** How many server strikes each ref has received (drives damage). */
+  strikes: Record<string, number>;
+}
+
+/** A stored active quest: the rules state plus the server's ledger. */
+export type ActiveQuestState = QuestState & { ledger: QuestLedger };
+
+/** One authoritative action a client asks the server to apply to a quest. */
+export type QuestAction =
+  | { type: 'strike'; ref: string }
+  | { type: 'truck-arrival'; ref: string }
+  | { type: 'eligible-enemy'; ref: string }
+  | { type: 'civilian-evacuation'; ref: string };
+
+/** The server's answer to a quest start or action. */
+export type QuestHelperResult =
+  | { ok: true; world: ShimWorld; summary: QuestLedgerSummary }
+  | { ok: false; reason: string; world: ShimWorld };
+
+/** The authoritative state a quest endpoint returns to the client. */
+export interface QuestLedgerSummary {
+  questId: string;
+  phase: string;
+  counters: Readonly<Record<string, number>>;
+  elements: Readonly<Record<string, QuestLedgerElement>>;
+  events: readonly string[];
+}
+
+/** Start a quest authoritatively. */
+export type QuestStartHelper = (
+  world: ShimWorld,
+  questId: string,
+  difficulty?: number,
+) => QuestHelperResult;
+
+/** Apply one authoritative quest action. */
+export type QuestActionHelper = (
+  world: ShimWorld,
+  questId: string,
+  action: QuestAction,
+) => QuestHelperResult;
+
 /** The private-state log of the chapters whose reward has been paid. */
 export const CHAPTER_AWARDS_KEY = 'chapterAwards';
 /** The private-state counter that keeps two offer-pack rolls distinct. */
@@ -247,6 +311,11 @@ export interface ApplierItem {
   unitCapacity: number;
   /** The population it costs. */
   population: number;
+  /**
+   * The item's `life`, which seeds a quest ledger element's HP. A missing or
+   * non-positive value falls back to 1, so every element starts killable.
+   */
+  life?: number;
   /** The maximum copies of this exact building. -1 means unlimited. */
   buildingLimitSameId: number;
   /** The maximum copies per sub-category. -1 means unlimited. */
@@ -303,6 +372,20 @@ export interface ContentQuestRoster {
   readonly items: readonly ContentQuestRosterEntry[];
 }
 
+/**
+ * One quest's event channel, from the build-time content bundle.
+ *
+ * `refs` are server-owned: a client may only report one of these, and the
+ * `count` seeds the counter the server alone owns. Nothing here is taken from
+ * a client request.
+ */
+export interface ContentQuestEvent {
+  readonly questId: string;
+  readonly kind: 'truckArrivals' | 'eligibleEnemies' | 'civilianEvacuations';
+  readonly refs: readonly string[];
+  readonly count: number;
+}
+
 /** What the applier needs. */
 export interface ApplierDeps {
   /** The clock, in seconds. */
@@ -326,6 +409,17 @@ export interface ApplierDeps {
    * merged roster before it can move the quest state.
    */
   questRosters?: readonly ContentQuestRoster[];
+  /**
+   * Build-time-extracted event channels for the four event-driven quests,
+   * keyed by quest id. Their refs and counts are authoritative and are never
+   * read from a client request.
+   */
+  questEvents?: Readonly<Record<string, ContentQuestEvent>>;
+  /**
+   * The server's own seed for deterministic strike damage. It is never taken
+   * from the client; the fallback keeps older bundles deterministic too.
+   */
+  serverSeed?: string;
   /** The offer packs, by id, for `buy_offer_pack`. */
   offerPacks?: Map<number, CostOfferPack>;
   /** The darts schedule, for the board's prize items and the extra prize. */
@@ -2114,29 +2208,25 @@ function setQuestVarCommand(
     return { applied: false, refused: 'chapter-not-spawned', world };
   }
 
-  // A `killed` write also advances the server's assault-quest state. The
-  // quest id is an identifier, never a win: it comes from the stored seed or
-  // from an optional third argument. Every ref is checked against the
-  // server's roster before anything is written, so a malformed ref is
-  // refused with the wallet and the whole save untouched.
-  let advanced: QuestState | undefined;
+  // A `killed` write advances the server's assault-quest state, but it is
+  // never proof of a kill by itself. It is honoured only for refs that the
+  // server's own engagement ledger already marks dead, and the quest id comes
+  // from the active state — never from a client argument (there is no third
+  // argument). A malformed or forged ref leaves the whole save untouched.
+  let advanced: ActiveQuestState | undefined;
   if (key === 'killed' && Array.isArray(value)) {
-    const stored = readActiveQuest(world.save.privateState);
-    const named = args[2];
-    const questId =
-      typeof named === 'string' || typeof named === 'number' ? String(named) : stored?.questId;
-    if (questId !== undefined) {
-      if (stored && stored.questId !== questId) {
-        return { applied: false, refused: 'quest-mismatch', world };
+    const activeState = readFullActiveQuest(world.save.privateState);
+    if (!activeState) return { applied: false, refused: 'no-active-quest', world };
+    for (const ref of value as string[]) {
+      if (!killEventAccepted(activeState, ref)) {
+        return { applied: false, refused: 'element-not-killed', world };
       }
-      const spec = getQuestSpec(questId);
-      if (!spec) return { applied: false, refused: 'unknown-quest', world };
-      const ensured = ensureActiveQuest(world, questId, deps);
-      if (!ensured.ok) return { applied: false, refused: ensured.reason, world };
-      const kills = applyQuestEvents(ensured.state, value as string[], spec, deps);
-      if (!kills.ok) return { applied: false, refused: kills.reason, world };
-      advanced = kills.state;
     }
+    const spec = getQuestSpec(activeState.questId);
+    if (!spec) return { applied: false, refused: 'unknown-quest', world };
+    const kills = applyQuestEvents(activeState, value as string[], spec, deps);
+    if (!kills.ok) return { applied: false, refused: kills.reason, world };
+    advanced = kills.state as ActiveQuestState;
   }
 
   const applied = applyQuestVar(vars, key, value);
@@ -2317,39 +2407,6 @@ function readActiveQuest(
 type QuestStateResult = { ok: true; state: QuestState } | { ok: false; reason: string };
 
 /**
- * Get the active quest state, building it from the roster on first use.
- *
- * `prepareQuest` → `startQuest` → `loadQuestMap` is the client's own init
- * sequence; the chapter status is passed in so a resumed quest can keep its
- * visited state. This is pure: the caller owns the write.
- */
-function ensureActiveQuest(
-  world: ShimWorld,
-  questId: string,
-  deps: ApplierDeps,
-): QuestStateResult {
-  const privateState = world.save.privateState;
-  const stored = readActiveQuest(privateState);
-  if (stored?.state && stored.questId === questId) {
-    return { ok: true, state: stored.state };
-  }
-  if (stored && stored.questId !== questId) {
-    return { ok: false, reason: 'quest-mismatch' };
-  }
-  const spec = getQuestSpec(questId);
-  if (!spec) return { ok: false, reason: 'unknown-quest' };
-  const ranks = questProgress(privateState).ranks;
-  const prepared = prepareQuest(questId, {
-    questVars: currentQuestVars(ownMap(world)),
-    hasRank: ranks[String(spec.playIndex)] !== undefined,
-  });
-  return {
-    ok: true,
-    state: loadQuestMap(startQuest(prepared), questRoster(spec, deps.items, deps.questRosters)),
-  };
-}
-
-/**
  * The win counter a validated gun-bot kill advances, from the server's spec.
  *
  * Only the weekly quest advances a counter on a kill. The other
@@ -2438,6 +2495,295 @@ function applyQuestEvents(
   return { ok: true, state: next };
 }
 
+/**
+ * Read a *fully initialised* active quest, never a bare `{ questId }` seed.
+ *
+ * A seed carries no ledger, so it cannot prove any kill or event. Only a
+ * state created by `beginQuest` is authoritative.
+ */
+function readFullActiveQuest(privateState: Record<string, unknown>): ActiveQuestState | null {
+  const stored = readActiveQuest(privateState);
+  if (!stored?.state) return null;
+  const state = stored.state as ActiveQuestState;
+  const ledger = state.ledger;
+  if (
+    !ledger ||
+    typeof ledger !== 'object' ||
+    !ledger.elements ||
+    typeof ledger.elements !== 'object' ||
+    !Array.isArray(ledger.events) ||
+    !ledger.strikes ||
+    typeof ledger.strikes !== 'object'
+  ) {
+    return null;
+  }
+  return state;
+}
+
+/**
+ * Whether a client's `killed` write may be honoured for a ref.
+ *
+ * Roster membership is not enough: the ref must already have been killed by
+ * the server's own deterministic strikes, as recorded in the ledger.
+ */
+export function killEventAccepted(active: ActiveQuestState, ref: string): boolean {
+  return active.ledger.elements[ref]?.alive === false;
+}
+
+/** The JSON-safe summary a quest endpoint returns to the client. */
+function questSummary(state: ActiveQuestState): QuestLedgerSummary {
+  return {
+    questId: state.questId,
+    phase: state.phase,
+    counters: { ...state.script.counters },
+    elements: Object.fromEntries(
+      Object.entries(state.ledger.elements).map(([ref, element]) => [ref, { ...element }]),
+    ),
+    events: [...state.ledger.events],
+  };
+}
+
+/**
+ * The authoritative quest helpers, bound to the applier's content deps.
+ *
+ * `beginQuest` is the only way an active quest comes into existence, and
+ * `applyQuestAction` is the only way its ledger or counters move. Both are
+ * pure with respect to time: damage comes from an injected server seed and a
+ * deterministic hash, never from a clock or unseeded randomness.
+ */
+export function createQuestHelpers(deps: ApplierDeps): {
+  beginQuest: QuestStartHelper;
+  applyQuestAction: QuestActionHelper;
+} {
+  // Internally a refusal need not carry the world; the public wrappers below
+  // attach it so every caller can hand the result back to `store.transact`.
+  type LooseQuestResult =
+    | { ok: true; world: ShimWorld; summary: QuestLedgerSummary }
+    | { ok: false; reason: string; world?: ShimWorld };
+  const seed = (): string =>
+    typeof deps.serverSeed === 'string' && deps.serverSeed.length > 0
+      ? deps.serverSeed
+      : 'swl-server';
+  const eventFor = (questId: string): ContentQuestEvent | null =>
+    deps.questEvents?.[questId] ?? null;
+
+  const beginQuest = (world: ShimWorld, questId: string, difficulty?: number): LooseQuestResult => {
+    // Only a full, authoritative state blocks a new start. A legacy
+    // `{ questId }` seed carries no ledger and cannot prove anything.
+    if (readFullActiveQuest(world.save.privateState)) {
+      return { ok: false, reason: 'active-quest-exists', world };
+    }
+    const spec = getQuestSpec(questId);
+    if (!spec) return { ok: false, reason: 'unknown-quest', world };
+
+    const ranks = questProgress(world.save.privateState).ranks;
+    const validDifficulty = difficulty === 1 || difficulty === 2 || difficulty === 3
+      ? difficulty
+      : undefined;
+    const options: Parameters<typeof prepareQuest>[1] = {
+      questVars: currentQuestVars(ownMap(world)),
+      hasRank: ranks[String(spec.playIndex)] !== undefined,
+      ...(validDifficulty !== undefined ? { difficulty: validDifficulty } : {}),
+    };
+
+    const roster = questRoster(spec, deps.items, deps.questRosters);
+    let state: QuestState = loadQuestMap(startQuest(prepareQuest(questId, options)), roster);
+
+    // The ledger is seeded from the content: every element starts alive with
+    // an **abstract encounter HP**, and no event has been seen yet.
+    //
+    // This is NOT the original client's combat HP. The new server has no
+    // positional battle simulator (an explicit non-goal), so the content's
+    // `life` is not a hit-point total that can be shot down one real bullet at
+    // a time. It is only a content-derived weight: scale it into a small,
+    // deterministic strike budget so that a roster element can always be
+    // killed by the server's own strikes in at most four authoritative
+    // actions — few enough for a real client to complete a quest well inside
+    // the API rate limit. Missing or invalid life falls back to one strike.
+    // The value never comes from the client's request.
+    const elements: Record<string, QuestLedgerElement> = {};
+    for (const element of roster) {
+      const life = deps.items?.get(element.itemId)?.life;
+      const hp =
+        typeof life === 'number' && Number.isFinite(life) && life > 0
+          ? Math.min(4, Math.max(1, Math.ceil(life / 400)))
+          : 1;
+      elements[element.ref] = { hp, alive: true };
+    }
+
+    // The four event-driven quests seed counters the spec does not carry. The
+    // values come from the bundle, never from the client's start request.
+    const event = eventFor(questId);
+    const counters = { ...state.script.counters };
+    if (event) {
+      switch (event.kind) {
+        case 'truckArrivals':
+          counters['trucksArrived'] = 0;
+          break;
+        case 'eligibleEnemies':
+          counters['bastardsAlive'] = Math.max(0, Math.floor(event.count));
+          break;
+        case 'civilianEvacuations':
+          counters['workersInVillages'] = Math.max(0, Math.floor(event.count));
+          break;
+      }
+    }
+    state = { ...state, script: { ...state.script, counters } };
+
+    const activeState: ActiveQuestState = {
+      ...state,
+      ledger: { elements, events: [], strikes: {} },
+    };
+    const nextWorld: ShimWorld = {
+      ...world,
+      save: {
+        ...world.save,
+        privateState: { ...world.save.privateState, [ACTIVE_QUEST_KEY]: activeState },
+      },
+    };
+    return { ok: true, world: nextWorld, summary: questSummary(activeState) };
+  };
+
+  const applyQuestAction = (world: ShimWorld, questId: string, action: QuestAction): LooseQuestResult => {
+    const stored = readFullActiveQuest(world.save.privateState);
+    if (!stored) return { ok: false, reason: 'no-active-quest' };
+    if (stored.questId !== questId) return { ok: false, reason: 'quest-mismatch' };
+    if (stored.phase !== 'map-loaded' && stored.phase !== 'started') {
+      return { ok: false, reason: 'invalid-phase' };
+    }
+    if (stored.result !== null) return { ok: false, reason: 'invalid-phase' };
+    if (
+      !action ||
+      typeof action !== 'object' ||
+      typeof action.type !== 'string' ||
+      typeof action.ref !== 'string'
+    ) {
+      return { ok: false, reason: 'bad-action' };
+    }
+
+    const event = eventFor(questId);
+    const spec = getQuestSpec(questId)!;
+    const rosterRefs = new Set(
+      questRoster(spec, deps.items, deps.questRosters).map((element) => element.ref),
+    );
+    let next = stored;
+
+    switch (action.type) {
+      case 'strike': {
+        if (!rosterRefs.has(action.ref) || !next.ledger.elements[action.ref]) {
+          return { ok: false, reason: 'unknown-event-ref' };
+        }
+        const element = next.ledger.elements[action.ref]!;
+        if (!element.alive) return { ok: false, reason: 'element-already-dead' };
+        const strikes = (next.ledger.strikes[action.ref] ?? 0) + 1;
+        const damage = 1 + (hashSeed(`${seed()}:${questId}:${action.ref}:${strikes}`) % 3);
+        const hp = element.hp - damage;
+        const dead = hp <= 0;
+        next = {
+          ...next,
+          ledger: {
+            ...next.ledger,
+            elements: {
+              ...next.ledger.elements,
+              [action.ref]: { hp: dead ? 0 : hp, alive: !dead },
+            },
+            strikes: { ...next.ledger.strikes, [action.ref]: strikes },
+          },
+        };
+        if (dead) {
+          // The killing strike advances the same script channels a validated
+          // `killed` write would, so a client using only the native actions
+          // can still complete a scripted quest. `applyQuestEvents` dedupes.
+          const fed = applyQuestEvents(next, [action.ref], spec, deps);
+          if (!fed.ok) return { ok: false, reason: fed.reason };
+          next = fed.state as ActiveQuestState;
+        }
+        break;
+      }
+      case 'truck-arrival': {
+        if (!event || event.kind !== 'truckArrivals') {
+          return { ok: false, reason: 'wrong-event-kind' };
+        }
+        if (!event.refs.includes(action.ref)) {
+          return { ok: false, reason: 'unknown-event-ref' };
+        }
+        const current = next.script.counters['trucksArrived'] ?? 0;
+        if (current >= event.count) return { ok: false, reason: 'event-limit-reached' };
+        const key = `arrival:${action.ref}:${current + 1}`;
+        // All three channels dedupe the same way: a key already in the ledger
+        // is a replay and must not move the counter. The count cap remains a
+        // second backstop, since every truck shares the one item ref.
+        if (next.ledger.events.includes(key)) {
+          return { ok: false, reason: 'event-already-seen' };
+        }
+        next = addQuestCounter(next, 'trucksArrived', 1) as ActiveQuestState;
+        next = { ...next, ledger: { ...next.ledger, events: [...next.ledger.events, key] } };
+        break;
+      }
+      case 'eligible-enemy': {
+        if (!event || event.kind !== 'eligibleEnemies') {
+          return { ok: false, reason: 'wrong-event-kind' };
+        }
+        if (!event.refs.includes(action.ref)) {
+          return { ok: false, reason: 'unknown-event-ref' };
+        }
+        const key = `eligible:${action.ref}`;
+        if (next.ledger.events.includes(key)) {
+          return { ok: false, reason: 'event-already-seen' };
+        }
+        const current = next.script.counters['bastardsAlive'] ?? 0;
+        next = setQuestCounter(next, 'bastardsAlive', Math.max(0, current - 1)) as ActiveQuestState;
+        next = { ...next, ledger: { ...next.ledger, events: [...next.ledger.events, key] } };
+        break;
+      }
+      case 'civilian-evacuation': {
+        if (!event || event.kind !== 'civilianEvacuations') {
+          return { ok: false, reason: 'wrong-event-kind' };
+        }
+        if (!event.refs.includes(action.ref)) {
+          return { ok: false, reason: 'unknown-event-ref' };
+        }
+        const key = `evac:${action.ref}`;
+        if (next.ledger.events.includes(key)) {
+          return { ok: false, reason: 'event-already-seen' };
+        }
+        const current = next.script.counters['workersInVillages'] ?? 0;
+        next = setQuestCounter(
+          next,
+          'workersInVillages',
+          Math.max(0, current - 1),
+        ) as ActiveQuestState;
+        next = { ...next, ledger: { ...next.ledger, events: [...next.ledger.events, key] } };
+        break;
+      }
+      default:
+        return { ok: false, reason: 'bad-action' };
+    }
+
+    const nextWorld: ShimWorld = {
+      ...world,
+      save: {
+        ...world.save,
+        privateState: { ...world.save.privateState, [ACTIVE_QUEST_KEY]: next },
+      },
+    };
+    return { ok: true, world: nextWorld, summary: questSummary(next) };
+  };
+
+  // Every refusal carries the world back unchanged, so a caller can always
+  // hand it to `store.transact` and be sure no save was written.
+  return {
+    beginQuest: (world: ShimWorld, questId: string, difficulty?: number): QuestHelperResult => {
+      const result = beginQuest(world, questId, difficulty);
+      return result.ok ? result : { ok: false, reason: result.reason, world };
+    },
+    applyQuestAction: (world: ShimWorld, questId: string, action: QuestAction): QuestHelperResult => {
+      const result = applyQuestAction(world, questId, action);
+      return result.ok ? result : { ok: false, reason: result.reason, world };
+    },
+  };
+}
+
 /** The quest id an `end_quest` names — native number, or a legacy JSON blob. */
 function questIdFromEndArgs(args: readonly unknown[]): string | null {
   const raw = args[0];
@@ -2483,6 +2829,10 @@ function questRanks(privateState: Record<string, unknown>): Record<string, numbe
  * `[JSON blob]`). Its claimed win, units, loot and difficulty are never read
  * for the award: the win is `isQuestVictory(state)`, the reward is
  * `finishQuest` → `awardQuest`, and the once-only guard is `awardQuest`.
+ *
+ * There is no implicit start here. The quest must already have been started
+ * authoritatively and must have a full, matching active state; anything else
+ * is refused with `no-active-quest` before any wallet or save change.
  */
 function endQuestCommand(
   world: ShimWorld,
@@ -2495,49 +2845,25 @@ function endQuestCommand(
   if (!spec) return { applied: false, refused: 'unknown-quest', world };
 
   const privateState = world.save.privateState;
-  const stored = readActiveQuest(privateState);
-  let state: QuestState;
-  if (stored?.state && stored.questId === questId) {
-    state = stored.state;
-  } else {
-    // The legacy client has no quest-start command: its kill events only
-    // reach the chapter status. Replay those validated refs into a fresh
-    // server state built from the named quest's roster.
-    const ensured = ensureActiveQuest(world, questId, deps);
-    if (!ensured.ok) return { applied: false, refused: ensured.reason, world };
-    const pending = currentQuestVars(ownMap(world))['killed'];
-    const refs = Array.isArray(pending)
-      ? pending.filter((ref): ref is string => typeof ref === 'string')
-      : [];
-    // The chapter status is shared with the chapter's own machine, so a
-    // half-finished chapter can leave stale chapter refs beside quest refs.
-    // Only this quest's roster is replayed here; direct `set_quest_var` writes
-    // still refuse any off-roster ref outright.
-    const rosterRefs = new Set(
-      questRoster(spec, deps.items, deps.questRosters).map((element) => element.ref),
-    );
-    const kills = applyQuestEvents(
-      ensured.state,
-      refs.filter((ref) => rosterRefs.has(ref)),
-      spec,
-      deps,
-    );
-    if (!kills.ok) return { applied: false, refused: kills.reason, world };
-    state = kills.state;
-  }
+  const stored = readFullActiveQuest(privateState);
+  if (!stored) return { applied: false, refused: 'no-active-quest', world };
+  if (stored.questId !== questId) return { applied: false, refused: 'quest-mismatch', world };
+  const state: QuestState = stored;
 
   // An empty roster would satisfy a `countersZero` win with zero events
   // (loadQuestMap seeds enemiesAlive = 0), minting currency for no work. A
   // recorded loss is never payable either. Both are refused before any award.
-  // A validated event may land in any of the three trigger channels — a
-  // nearDeath or defendersCleared ref is as real an event as a destruction —
-  // so the guard checks all three, but still refuses when none has fired
-  // (including a vacuously satisfied `countersZero`).
+  // A validated event may land in any of the three script channels, or in a
+  // server-owned event channel (the ledger). The guard refuses when none has
+  // fired, including a vacuously satisfied `countersZero` or an event quest
+  // whose seeded counter was never moved by a server action.
+  const ledgerEvents = (stored as ActiveQuestState).ledger.events.length;
   if (
     state.result === 'loss' ||
     (state.script.destroyed.length === 0 &&
       state.script.nearDeath.length === 0 &&
-      state.script.defendersCleared.length === 0)
+      state.script.defendersCleared.length === 0 &&
+      ledgerEvents === 0)
   ) {
     return { applied: false, refused: 'no-victory', world };
   }

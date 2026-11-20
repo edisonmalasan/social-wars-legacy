@@ -50,6 +50,9 @@ import {
   SessionStore,
   type CommandApplier,
   type PlayerStore,
+  type QuestActionHelper,
+  type QuestHelperResult,
+  type QuestStartHelper,
   type Session,
   type ShimRequest,
   type ShimResponse,
@@ -123,6 +126,11 @@ export const ERROR_CODES = {
   'no-credential-store': 'the server has nowhere to keep the credentials',
   'invalid-credentials': 'the player id or the password is wrong',
   'unknown-player': 'no such player',
+  'bad-quest-request': 'the quest id or action is missing or malformed',
+  'quest-unknown': 'there is no such quest',
+  'quest-already-active': 'a quest is already active',
+  'quest-not-active': 'the named quest is not the active quest',
+  'quest-refused': 'the server refused the quest action',
   'internal-error': 'the server failed to handle the request',
 } as const;
 
@@ -146,6 +154,15 @@ export interface AppOptions {
   nowMs?: () => number;
   /** Applies one command's semantics. */
   applyCommand: CommandApplier;
+  /**
+   * Starts a quest authoritatively.
+   *
+   * Optional so the many callers that do not run quests need not provide it;
+   * the quest endpoints answer with a typed refusal when it is absent.
+   */
+  beginQuest?: QuestStartHelper;
+  /** Applies one authoritative quest action. */
+  applyQuestAction?: QuestActionHelper;
   /** The limits. */
   limits?: Limits;
   /**
@@ -609,6 +626,175 @@ export function createApp(
   }
 
   /**
+   * Per-player serialisation for the quest endpoints.
+   *
+   * The idempotency memo is checked before a transaction and claimed after it.
+   * Two concurrent requests with the same id could both pass the check before
+   * either claim, so a replay would be applied twice. Holding one lock across
+   * check → transact → claim makes that window atomic. It also keeps these
+   * endpoints safe with a store whose `transact` does not serialise callbacks.
+   */
+  const questLocks = new Map<string, Promise<void>>();
+
+  async function withQuestLock<T>(playerId: string, work: () => Promise<T>): Promise<T> {
+    const previous = questLocks.get(playerId) ?? Promise.resolve();
+    let release: () => void = () => {};
+    const mine = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const chained = previous.then(() => mine, () => mine);
+    questLocks.set(playerId, chained);
+    await previous.catch(() => undefined);
+    try {
+      return await work();
+    } finally {
+      release();
+      if (questLocks.get(playerId) === chained) questLocks.delete(playerId);
+    }
+  }
+
+  /**
+   * Map an authoritative quest refusal to a typed 4xx.
+   *
+   * The applier's reason is internal; the client gets a code from
+   * `ERROR_CODES` and never the raw reason.
+   */
+  function questRefusal(reason: string | undefined): AppResponse {
+    switch (reason) {
+      case 'unknown-quest':
+        return fail(400, 'quest-unknown');
+      case 'active-quest-exists':
+        return fail(409, 'quest-already-active');
+      case 'no-active-quest':
+      case 'quest-mismatch':
+        return fail(409, 'quest-not-active');
+      default:
+        return fail(409, 'quest-refused');
+    }
+  }
+
+  /** The request id used for a quest endpoint's idempotency memo. */
+  function questRequestId(request: AppRequest, body: { id?: unknown }): string {
+    if (typeof body.id === 'string' && body.id.length > 0) return `quest:${body.id}`;
+    const header = request.headers[REQUEST_ID_HEADER];
+    return header ? `quest:${header}` : '';
+  }
+
+  /** `POST /api/quest/start` — start a quest in the server's own state. */
+  async function handleQuestStart(request: AppRequest): Promise<AppResponse> {
+    const playerId = identify(request);
+    if (!playerId) return fail(401, 'unknown-player');
+    return withQuestLock(playerId, () => questStartLocked(request, playerId));
+  }
+
+  /** The start handler's body, run under the player's quest lock. */
+  async function questStartLocked(request: AppRequest, playerId: string): Promise<AppResponse> {
+    const beginQuest = options.beginQuest;
+    if (!beginQuest) return fail(503, 'internal-error');
+
+    let body: { id?: unknown; questId?: unknown; difficulty?: unknown };
+    try {
+      body = JSON.parse(request.body) as typeof body;
+    } catch {
+      return fail(400, 'malformed-json');
+    }
+    const questId =
+      typeof body.questId === 'string' || typeof body.questId === 'number'
+        ? String(body.questId)
+        : '';
+    if (!questId) return fail(400, 'bad-quest-request');
+    const difficulty =
+      typeof body.difficulty === 'number' && Number.isInteger(body.difficulty) && body.difficulty >= 1
+        ? body.difficulty
+        : undefined;
+
+    // Check, transact and claim all run under the player's quest lock, so a
+    // concurrent retry cannot slip between the check and the claim.
+    const id = questRequestId(request, body);
+    if (id) {
+      const remembered = rememberedAnswer(playerId, id);
+      if (remembered !== undefined) return json(200, remembered);
+    }
+
+    let result: QuestHelperResult | undefined;
+    const stored = await options.store.transact(playerId, (world) => {
+      result = beginQuest(world, questId, difficulty);
+      return result.world;
+    });
+    if (!stored) return fail(401, 'unknown-player');
+    if (!result) return fail(500, 'internal-error');
+    if (!result.ok) return questRefusal(result.reason);
+
+    // Only successful answers are remembered: a refusal mutates nothing, so a
+    // retry is free to be re-evaluated against the current state.
+    const answer = { questId, started: true };
+    if (id) rememberAnswer(playerId, id, answer);
+    requestContext['quest'] = questId;
+    return json(200, answer);
+  }
+
+  /** `POST /api/quest/action` — apply one authoritative quest action. */
+  async function handleQuestAction(request: AppRequest): Promise<AppResponse> {
+    const playerId = identify(request);
+    if (!playerId) return fail(401, 'unknown-player');
+    return withQuestLock(playerId, () => questActionLocked(request, playerId));
+  }
+
+  /** The action handler's body, run under the player's quest lock. */
+  async function questActionLocked(request: AppRequest, playerId: string): Promise<AppResponse> {
+    const applyQuestAction = options.applyQuestAction;
+    if (!applyQuestAction) return fail(503, 'internal-error');
+
+    let body: { id?: unknown; questId?: unknown; action?: unknown };
+    try {
+      body = JSON.parse(request.body) as typeof body;
+    } catch {
+      return fail(400, 'malformed-json');
+    }
+    const questId =
+      typeof body.questId === 'string' || typeof body.questId === 'number'
+        ? String(body.questId)
+        : '';
+    if (!questId || !body.action || typeof body.action !== 'object') {
+      return fail(400, 'bad-quest-request');
+    }
+    const raw = body.action as { type?: unknown; ref?: unknown };
+    const allowed = ['strike', 'truck-arrival', 'eligible-enemy', 'civilian-evacuation'];
+    if (
+      typeof raw.type !== 'string' ||
+      !allowed.includes(raw.type) ||
+      typeof raw.ref !== 'string'
+    ) {
+      return fail(400, 'bad-quest-request');
+    }
+    const action = { type: raw.type, ref: raw.ref } as Parameters<
+      QuestActionHelper
+    >[2];
+
+    // Check, transact and claim all run under the player's quest lock, so a
+    // concurrent retry cannot slip between the check and the claim.
+    const id = questRequestId(request, body);
+    if (id) {
+      const remembered = rememberedAnswer(playerId, id);
+      if (remembered !== undefined) return json(200, remembered);
+    }
+
+    let result: QuestHelperResult | undefined;
+    const stored = await options.store.transact(playerId, (world) => {
+      result = applyQuestAction(world, questId, action);
+      return result.world;
+    });
+    if (!stored) return fail(401, 'unknown-player');
+    if (!result) return fail(500, 'internal-error');
+    if (!result.ok) return questRefusal(result.reason);
+
+    if (id) rememberAnswer(playerId, id, result.summary);
+    requestContext['quest'] = questId;
+    requestContext['questAction'] = action.type;
+    return json(200, result.summary);
+  }
+
+  /**
    * The route.
    *
    * The work: the limits, the routing and the dialects. It is separate
@@ -737,6 +923,16 @@ export function createApp(
       if (path === '/api/command') {
         if (request.method !== 'POST') return fail(405, 'method-not-allowed');
         return await handleNativeCommand(request);
+      }
+
+      // --- the authoritative quest workflow -------------------------------
+      if (path === '/api/quest/start') {
+        if (request.method !== 'POST') return fail(405, 'method-not-allowed');
+        return await handleQuestStart(request);
+      }
+      if (path === '/api/quest/action') {
+        if (request.method !== 'POST') return fail(405, 'method-not-allowed');
+        return await handleQuestAction(request);
       }
 
       // --- the legacy endpoints -----------------------------------------
