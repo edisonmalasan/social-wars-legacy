@@ -545,6 +545,7 @@ export function extractQuestEvents(
       problems.push(
         `quest event snapshot ${source.questId}.json has an unexpected playerInfo.pid: ${String(pid)}`,
       );
+      continue;
     }
 
     let refs: string[];

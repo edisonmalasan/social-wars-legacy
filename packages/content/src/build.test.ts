@@ -278,7 +278,7 @@ describe('quest event extraction validation', () => {
     assert.ok(problems.some((p) => p.includes('999999999')));
   });
 
-  it('rejects an empty selection and a mismatched snapshot pid', () => {
+  it('rejects a snapshot with a mismatched pid without emitting an entry', () => {
     const problems: string[] = [];
     const snapshots = new Map<string, QuestMapSnapshot>([
       ['100000010', { playerInfo: { pid: '999' }, maps: [{ items: {} }] }],
@@ -288,6 +288,5 @@ describe('quest event extraction validation', () => {
     ]);
     assert.deepEqual(events, {});
     assert.ok(problems.some((p) => p.includes('playerInfo.pid')));
-    assert.ok(problems.some((p) => p.includes('has no eligibleEnemies elements')));
   });
 });
