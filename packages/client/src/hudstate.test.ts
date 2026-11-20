@@ -168,6 +168,20 @@ describe('the HUD\'s state', () => {
     assert.equal(state.populationMaxAllowed, 175);
   });
 
+  it('reads the mana the server mirrors into the private state', () => {
+    const withMana = world({ privateState: { mana: 12 } });
+    assert.equal(hudState(input({ world: withMana })).mana, 12);
+  });
+
+  it('falls back to the wallet mana when the mirror is missing', () => {
+    const bare = world({ resources: { ...world().resources, m: 9 } });
+    assert.equal(hudState(input({ world: bare })).mana, 9);
+  });
+
+  it('reads zero mana when the server sends neither a mirror nor a wallet', () => {
+    assert.equal(hudState(input({ world: world({ privateState: {} }) })).mana, 0);
+  });
+
   it('shows 20 of 20 for a player with only a Command Center', () => {
     const bare = world();
     bare.maps[0]!.items = { '1': [26, 48, 48, 0, 0, 0, 0, 1] };

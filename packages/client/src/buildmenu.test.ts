@@ -4,7 +4,14 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { LOCKED_OFFSET, buildMenu, buildTabs, sortKey, type BuildMenuItem } from './buildmenu.ts';
+import {
+  LOCKED_OFFSET,
+  buildMenu,
+  buildTabs,
+  itemType,
+  sortKey,
+  type BuildMenuItem,
+} from './buildmenu.ts';
 
 function repoRoot(): string {
   let dir = process.cwd();
@@ -17,6 +24,7 @@ function repoRoot(): string {
 
 function item(over: Partial<BuildMenuItem> = {}): BuildMenuItem {
   return {
+    type: 'b',
     id: 1,
     name: 'House I',
     categoryId: 1,
@@ -42,6 +50,16 @@ describe('the build menu order', () => {
       buildMenu(items, 10).map((entry) => entry.id),
       [2, 3, 1],
     );
+  });
+
+  it('keeps an item\'s type so a unit is bought as a unit', () => {
+    const entry = buildMenu([
+      item({ id: 1008, name: 'Rifleman', type: itemType('u') }),
+    ], 10)[0]!;
+    assert.equal(entry.type, 'u');
+    // The content uses the same letters as the buy request.
+    assert.equal(itemType('b'), 'b');
+    assert.equal(itemType('n'), 'n');
   });
 
   it('pushes the items the player is too low a level for down the list', () => {
@@ -137,6 +155,7 @@ describe('the real content', () => {
       ),
     ) as {
       items: {
+        type: string;
         id: number;
         name: string;
         category_id: number;
@@ -152,6 +171,7 @@ describe('the real content', () => {
     };
 
     const items: BuildMenuItem[] = bundle.items.map((entry) => ({
+      type: itemType(entry.type),
       id: entry.id,
       name: entry.name,
       categoryId: entry.category_id,

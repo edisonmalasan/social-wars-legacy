@@ -138,6 +138,7 @@ describe('the screens the clone has modelled', () => {
     // has to exist and work.
     const items = [
       {
+        type: 'b' as const,
         id: 1,
         name: 'House I',
         categoryId: 1,

@@ -22,26 +22,47 @@ import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH } from './renderer.ts';
 import { applyFontScales, clientCss, type FontScaleFile } from './fonts.ts';
 import {
+  authenticate,
   authorizationHeader,
   forgetSession,
   isExpired,
   readSession,
   rememberSession,
-  signIn,
   sendCommands,
+  type AuthMode,
   type ClientSession,
 } from '@swl/client';
-import type { NativeCommand, NativeResponse } from '@swl/protocol';
+import type { CommandOutcome, NativeCommand, NativeResponse } from '@swl/protocol';
 import type { ContentBundle, ContentItem } from '@swl/content';
-import { buy, claimDailyBonus, completeTutorial } from '@swl/client';
 import {
+  buy,
+  claimDailyBonus,
+  completeTutorial,
+  finishBuilding,
+  finishView,
+  storedPlacement,
+  takeTrainedUnit,
+  type ItemType,
+  type StoredItemView,
+} from '@swl/client';
+import {
+  activeQuestFromWorld,
   activeQuestState,
+  activeQuestView,
+  briefingDialog,
+  briefingView,
+  combatDialog,
   endQuest,
   questActionOnServer,
+  questDifficulty,
+  questResultView,
   reportQuestKill,
+  resultDialog,
   startQuestOnServer,
   type ActiveQuestStateView,
+  type QuestActionChoice,
   type QuestActionRequest,
+  type QuestChoice,
   type QuestLedgerSummary,
   type QuestResult,
   type QuestStartBody,
@@ -50,6 +71,18 @@ import {
 import { mountUi } from './ui/mount.tsx';
 import { uiCss } from './ui/css.ts';
 import type { TutorialOverlayProps } from './ui/tutorial.tsx';
+import type { QuestPanelView } from './ui/quests.tsx';
+import { questViewOptions } from './ui/state.ts';
+import {
+  CLOSED_DIALOG,
+  closeDialog,
+  feedbackFrom,
+  openDialog,
+  type DialogId,
+  type DialogKind,
+  type DialogState,
+  type FeedbackMessage,
+} from '@swl/client';
 
 const STAGE = document.getElementById('stage');
 const GAME = document.getElementById('game');
@@ -202,7 +235,20 @@ export interface ClientHandle {
    */
   run: (
     commands: readonly NativeCommand[],
-  ) => Promise<{ ok: boolean; latencyMs: number; sprites: number }>;
+  ) => Promise<{
+    ok: boolean;
+    latencyMs: number;
+    sprites: number;
+    /** The server's own outcome of the first command, when it answered. */
+    outcome?: CommandOutcome | null;
+  }>;
+  /**
+   * Open the shared dialog. The G5.1 panels use this one primitive; a host
+   * supplies the panel's id, kind and heading, never its game outcome.
+   */
+  showDialog?: (id: DialogId, kind: DialogKind, title: string) => void;
+  /** Close the shared dialog. */
+  dismissDialog?: () => void;
   /**
    * The client's own request builders.
    *
@@ -278,48 +324,85 @@ function safeStorage(): Storage | null {
 }
 
 /**
- * Ask the player to sign in.
+ * Ask the player to sign in, or to create an account.
  *
- * The client signs in with a **credential** and the server issues a
- * **session token**, so there is a name and a password and nothing else.
- * The form is the plainest one that works, because the interface is not
- * built yet.
+ * The client sends a **credential** and the server issues a **session
+ * token**. The two modes choose only the endpoint: sign-in uses
+ * `POST /api/session`, registration uses `POST /api/account`, and both
+ * answer with the same session the flow below remembers. The mode is the
+ * form's own UI state — it never decides whether the credential is valid.
  */
 function askForSignIn(): Promise<ClientSession | null> {
   return new Promise((resolve) => {
     const form = document.createElement('form');
     form.id = 'signin';
     form.innerHTML = [
+      '<div class="swl-auth-modes">',
+      '<button type="button" data-mode="sign-in" class="swl-auth-mode-active">Sign in</button>',
+      '<button type="button" data-mode="register">Register</button>',
+      '</div>',
       '<label>Name <input name="playerId" autocomplete="username" required></label>',
       '<label>Password <input name="password" type="password" autocomplete="current-password" required></label>',
-      '<button type="submit">Play</button>',
+      '<button type="submit" id="signin-submit">Play</button>',
       '<p id="signin-error"></p>',
     ].join('');
     form.style.cssText = 'position:absolute;inset:0;display:grid;gap:8px;place-content:center;font:16px sans-serif;color:#eee;background:#10131a';
     STAGE?.appendChild(form);
 
+    let mode: AuthMode = 'sign-in';
+    const password = form.querySelector<HTMLInputElement>('input[name="password"]');
+    const submit = form.querySelector<HTMLButtonElement>('#signin-submit');
+    const error = form.querySelector('#signin-error');
+    const modeButtons = form.querySelectorAll<HTMLButtonElement>('button[data-mode]');
+    for (const button of modeButtons) {
+      button.addEventListener('click', () => {
+        mode = button.dataset.mode === 'register' ? 'register' : 'sign-in';
+        for (const other of modeButtons) {
+          other.classList.toggle('swl-auth-mode-active', other === button);
+        }
+        if (password) {
+          password.autocomplete = mode === 'register' ? 'new-password' : 'current-password';
+        }
+        if (submit) submit.textContent = mode === 'register' ? 'Create account' : 'Play';
+        if (error) error.textContent = '';
+      });
+    }
+
+    // One credential attempt at a time. The button is disabled while the
+    // request is pending; a refusal clears the flag so the player can retry.
+    let busy = false;
     form.addEventListener('submit', (event) => {
       event.preventDefault();
+      if (busy) return;
+      busy = true;
+      if (submit) submit.disabled = true;
       const data = new FormData(form);
       const playerId = String(data.get('playerId') ?? '');
-      const password = String(data.get('password') ?? '');
-      const error = form.querySelector('#signin-error');
-      void signIn('/api/session', playerId, password).then((result) => {
-        if (result.ok) {
-          form.remove();
-          resolve(result.session);
-          return;
-        }
-        if (error) {
-          error.textContent =
-            result.reason === 'unknown-player'
-              ? 'There is no player with that name.'
-              : result.reason === 'invalid-credentials'
-                ? 'That password is not right.'
-                : 'The server could not be reached.';
-        }
-        resolve(null);
-      });
+      const secret = String(data.get('password') ?? '');
+      if (error) error.textContent = '';
+      void authenticate(mode, playerId, secret)
+        .then((result) => {
+          if (result.ok) {
+            form.remove();
+            resolve(result.session);
+            return;
+          }
+          if (error) {
+            error.textContent =
+              result.reason === 'unknown-player'
+                ? 'There is no player with that name.'
+                : result.reason === 'invalid-credentials'
+                  ? 'That password is not right.'
+                  : result.reason === 'player-exists'
+                    ? 'That name is already taken.'
+                    : 'The server could not be reached.';
+          }
+          // The form stays up: a wrong name or password is retryable.
+        })
+        .finally(() => {
+          busy = false;
+          if (submit) submit.disabled = false;
+        });
     });
   });
 }
@@ -418,12 +501,106 @@ async function main(): Promise<void> {
    */
   const interaction = new Interaction();
   let placing: number | null = null;
+  /** The stored item being placed, when the placement came from the inventory. */
+  let placingStored: StoredItemView | null = null;
   let selected: number | null = null;
+  /** The map id of the selected element, for its server attribute bag. */
+  let selectedIso: number | null = null;
   let neighbours: Neighbour[] = [];
+  /**
+   * The one open dialog and the feedback channel. Neither is a reading of
+   * the world: they are the client's own UI state, kept here so every
+   * redraw shows the same panel and the same last answer's messages.
+   */
+  let dialogState: DialogState = CLOSED_DIALOG;
+  let feedback: readonly FeedbackMessage[] = [];
+  /**
+   * The quest panel in the one dialog, and the difficulty the player chose.
+   * Neither is a game outcome: the first is a reading of the server's active
+   * quest or answer, the second is only sent to the server with the start and
+   * finish requests.
+   */
+  let questPanel: QuestPanelView | null = null;
+  let chosenDifficulty: 1 | 2 | 3 = 1;
+  /** One quest request at a time; a rapid double-click must not send two. */
+  let questBusy = false;
 
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
-    ui?.draw(world, placing, selected, neighbours, tutorialProps());
+    ui?.draw(world, placing, selected, neighbours, tutorialProps(), {
+      dialog: dialogState,
+      feedback,
+      questPanel,
+      questBusy,
+      onDialogDismiss: () => {
+        dialogState = closeDialog(dialogState);
+        questPanel = null;
+        drawInterface();
+      },
+      onPlaceStored,
+      // The client asks; the server computes the day and the reward. Return
+      // the request so the HUD's button stays disabled until it settles.
+      onClaimBonus: () => run([claimDailyBonus()]),
+      onQuestPick: openQuestSlot,
+      onQuestStart: (questId, difficulty) => {
+        void beginQuest(questId, difficulty);
+      },
+      onQuestAction: (questId, action) => {
+        void applyQuestGesture(questId, action);
+      },
+      selectedIso,
+      now: Math.floor(Date.now() / 1000),
+      onUpgrade,
+      onFinish,
+      onTrain,
+      onTake,
+    });
+  }
+
+  /** Read the server's current active quest into the panel that is open. */
+  function refreshQuestPanel(): void {
+    if (questPanel?.kind !== 'combat') return;
+    const view = activeQuestFromWorld(
+      world,
+      questViewOptions(content, questPanel.active.questId),
+    );
+    if (view) {
+      questPanel = { kind: 'combat', active: view };
+      return;
+    }
+    // The server cleared the active quest: close a panel that has no subject.
+    questPanel = null;
+    dialogState = closeDialog(dialogState);
+  }
+
+  /** Open the shared dialog on the server's authoritative active quest. */
+  function openCombat(questId: string): void {
+    const view = activeQuestFromWorld(world, questViewOptions(content, questId));
+    if (!view) {
+      gestureRefusal('the server has no active quest');
+      return;
+    }
+    questPanel = { kind: 'combat', active: view };
+    const panel = combatDialog(questId);
+    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    drawInterface();
+  }
+
+  /** A chapter slot is a gesture: brief an unplayed quest or resume an active one. */
+  function openQuestSlot(choice: QuestChoice): void {
+    if (choice.active) {
+      openCombat(choice.questId);
+      return;
+    }
+    if (!choice.unlocked) {
+      gestureRefusal('that quest is still locked');
+      return;
+    }
+    const briefing = briefingView(choice, chosenDifficulty);
+    questPanel = { kind: 'briefing', briefing };
+    const panel = briefingDialog(briefing);
+    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    drawInterface();
   }
 
   /** The tutorial's drawing, or null when it is not running. */
@@ -497,11 +674,71 @@ async function main(): Promise<void> {
    *
    * Picking one **begins** a placement; it does not build anything.
    */
-  function onPick(itemId: number): void {
-    interaction.beginPlacement(itemId, 'b');
+  function onPick(itemId: number, type: ItemType): void {
+    // The menu entry carries its own wire type: a unit must be requested as
+    // a unit, not as the building the old code hardcoded here.
+    interaction.beginPlacement(itemId, type);
     placing = itemId;
+    placingStored = null;
     selected = null;
+    selectedIso = null;
     drawInterface();
+  }
+
+  /**
+   * Pick a stored item from the inventory.
+   *
+   * It begins the same placement gesture as the build menu, but the command
+   * the next tile click sends is `place_stored_item` rather than a purchase:
+   * the item is already the server's, and only its position is chosen here.
+   */
+  function onPlaceStored(entry: StoredItemView): void {
+    interaction.beginPlacement(entry.itemId, entry.type);
+    placing = entry.itemId;
+    placingStored = entry;
+    selected = null;
+    selectedIso = null;
+    drawInterface();
+  }
+
+  /** A local gesture refusal, surfaced on the same typed channel as the server's. */
+  function gestureRefusal(refusal: string): void {
+    feedback = [{ tone: 'error', text: `That action is not available (${refusal}).` }];
+    drawInterface();
+  }
+
+  /** Upgrade the selected building. The server checks the level, tiles and cost. */
+  function onUpgrade(): void {
+    const gesture = interaction.upgradeSelected();
+    if (!gesture.ok) {
+      gestureRefusal(gesture.refusal);
+      return;
+    }
+    void run([gesture.command]);
+  }
+
+  /** Hurry the selected building's construction, carrying the content's clicks. */
+  function onFinish(): void {
+    if (selected === null || selectedIso === null) return;
+    const item = content.items.find((entry) => entry.id === selected);
+    if (!item) return;
+    void run([finishBuilding(selectedIso, item.clicks_to_build)]);
+  }
+
+  /** Train a unit in the selected building. The server prices it. */
+  function onTrain(unitItemId: number): void {
+    const gesture = interaction.trainSelected(unitItemId);
+    if (!gesture.ok) {
+      gestureRefusal(gesture.refusal);
+      return;
+    }
+    void run([gesture.command]);
+  }
+
+  /** Take the finished unit out of the selected building's queue. */
+  function onTake(): void {
+    if (selectedIso === null) return;
+    void run([takeTrainedUnit(selectedIso)]);
   }
 
   /**
@@ -532,9 +769,29 @@ async function main(): Promise<void> {
    * It is drawn from the **same** world the scene is: one answer, one
    * drawing. The interface asks the server for nothing of its own.
    */
+  // Reload recovery. The server's saved active quest is the only source for
+  // the restored panel: the client reads it back after the world request and
+  // hosts it in the same dialog the player was using before the restart.
+  const restored = activeQuestState(world);
+  if (restored?.questId) {
+    const view = activeQuestFromWorld(world, questViewOptions(content, restored.questId));
+    if (view) {
+      questPanel = { kind: 'combat', active: view };
+      const panel = combatDialog(restored.questId);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    }
+  }
+
   const ui = UI ? mountUi(UI, content, onPick, onCollect, onCommand) : null;
   drawInterface();
   void refreshNeighbours();
+
+  // Countdowns are a presentation of the server's timestamps. Redraw once a
+  // second while something is selected so they advance; the server still
+  // decides when a unit is really finished or a build is done.
+  window.setInterval(() => {
+    if (selected !== null) drawInterface();
+  }, 1000);
 
   // The map's click. The click is a **gesture**: the client turns it
   // into a command and the server decides the outcome.
@@ -542,11 +799,22 @@ async function main(): Promise<void> {
     const tile = pixelToTile(x, y, renderer.viewport);
 
     if (interaction.selection.kind === 'placement') {
-      const gesture = interaction.placeTo(tile.tx, tile.ty);
-      if (!gesture.ok) return;
+      let command: NativeCommand | null;
+      if (placingStored) {
+        command = storedPlacement(placingStored, tile.tx, tile.ty);
+        if (!command) {
+          gestureRefusal('that stored item cannot be placed');
+          return;
+        }
+      } else {
+        const gesture = interaction.placeTo(tile.tx, tile.ty);
+        if (!gesture.ok) return;
+        command = gesture.command;
+      }
       interaction.clear();
       placing = null;
-      void run([gesture.command]);
+      placingStored = null;
+      void run([command]);
       return;
     }
 
@@ -555,9 +823,25 @@ async function main(): Promise<void> {
     if (!found) {
       interaction.clear();
       selected = null;
+      selectedIso = null;
     } else {
-      interaction.selectElement(found.isoId, found.itemId, 'building');
+      const definition = content.items.find((entry) => entry.id === found.itemId);
+      const tuple = world.maps[0]?.items?.[String(found.isoId)];
+      const build = finishView(
+        Number(tuple?.[3] ?? 0),
+        definition?.build_time ?? 0,
+        definition?.clicks_to_build ?? 0,
+        Math.floor(Date.now() / 1000),
+      );
+      const element = definition?.type === 'u' ? 'unit' : 'building';
+      interaction.selectElement(
+        found.isoId,
+        found.itemId,
+        element,
+        element === 'building' && build !== null,
+      );
       selected = found.itemId;
+      selectedIso = found.isoId;
     }
     drawInterface();
   };
@@ -570,9 +854,17 @@ async function main(): Promise<void> {
   async function run(commands: readonly NativeCommand[]) {
     const started = performance.now();
     const result = await sendCommands(signedIn.token, commands);
+    // The answer's outcomes used to be discarded, so a refusal was silent.
+    // Read them into the feedback channel before the redraw below; the
+    // server stays the authority — these are only sentences, not state.
+    feedback = result.ok
+      ? feedbackFrom(result.response.outcomes, result.response.ok)
+      : [{ tone: 'error', text: `The request failed (${result.reason}).` }];
     world = await fetchWorld();
     scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
     renderer.draw(scene);
+    // The world the interface draws is the same one the quest panel reads.
+    refreshQuestPanel();
     // The interface is redrawn from the same answer, so the numbers in
     // the top bar and the buildings on the map never disagree.
     drawInterface();
@@ -584,6 +876,7 @@ async function main(): Promise<void> {
       ok: result.ok,
       latencyMs,
       sprites: scene.length,
+      outcome: result.ok ? (result.response.outcomes[0] ?? null) : null,
     };
   }
 
@@ -608,13 +901,100 @@ async function main(): Promise<void> {
    *
    * The answer already carries the server's ledger summary — its counters and
    * its elements' HP — so the client does not need a second world request to
-   * know what the server decided.
+   * know what the server decided. The panel is redrawn from that summary: no
+   * extra request, and no local counter or HP value of the client's own.
    */
-  function questAction(
+  async function questAction(
     questId: string,
     action: QuestActionRequest,
   ): Promise<QuestResult<QuestLedgerSummary>> {
-    return questActionOnServer(signedIn, questId, action);
+    const result = await questActionOnServer(signedIn, questId, action);
+    if (result.ok && result.body && questPanel?.kind === 'combat') {
+      const view = activeQuestView(
+        {
+          questId: result.body.questId,
+          counters: result.body.counters,
+          elements: result.body.elements,
+          events: result.body.events,
+        },
+        questViewOptions(content, questId),
+      );
+      if (view) questPanel = { kind: 'combat', active: view };
+    }
+    drawInterface();
+    return result;
+  }
+
+  /** The briefing's Start button: ask the server, then host the live panel. */
+  async function beginQuest(questId: string, difficulty: 1 | 2 | 3): Promise<void> {
+    if (questBusy) return;
+    questBusy = true;
+    drawInterface();
+    try {
+      const result = await startQuest(questId, difficulty);
+      if (!result.ok || !result.body) {
+        feedback = [
+          { tone: 'error', text: `The server refused the quest start (${result.status}).` },
+        ];
+        drawInterface();
+        return;
+      }
+      chosenDifficulty = questDifficulty(difficulty);
+      feedback = [{ tone: 'success', text: `The server started ${result.body.questId}.` }];
+      openCombat(questId);
+    } finally {
+      questBusy = false;
+      drawInterface();
+    }
+  }
+
+  /**
+   * One button of the combat panel.
+   *
+   * Strikes, events and the two-argument kill report are requests the player
+   * makes; the Finish button sends `end_quest` and its result is read from the
+   * answer. No branch here decides that the quest was won.
+   */
+  async function applyQuestGesture(questId: string, action: QuestActionChoice): Promise<void> {
+    if (questBusy) return;
+    questBusy = true;
+    drawInterface();
+    try {
+      if (action.kind === 'strike' || action.kind === 'event') {
+        const request: QuestActionRequest =
+          action.kind === 'strike'
+            ? { type: 'strike', ref: action.ref }
+            : { type: action.action, ref: action.ref };
+        const result = await questAction(questId, request);
+        feedback = result.ok
+          ? [{ tone: 'success', text: 'The server applied the quest action.' }]
+          : [
+              {
+                tone: 'error',
+                text: `The server refused the quest action (${result.status}).`,
+              },
+            ];
+        drawInterface();
+        return;
+      }
+      if (action.kind === 'kill-report') {
+        // The native, strictly two-argument write. The server accepts it only
+        // when its own ledger already marks the element dead.
+        await run([reportQuestKill(action.ref)]);
+        return;
+      }
+      // A player's gesture. The server's outcome — never a client condition —
+      // becomes the result dialog, including its rewards when it answered any.
+      const result = await run([endQuest(questId, chosenDifficulty)]);
+      const view = questResultView(questId, result.outcome ?? null);
+      questPanel = { kind: 'result', result: view };
+      const panel = resultDialog(questId, view);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+      drawInterface();
+    } finally {
+      questBusy = false;
+      drawInterface();
+    }
   }
 
   // The debug handle. The end-to-end test drives the client through it,
@@ -623,6 +1003,14 @@ async function main(): Promise<void> {
     session,
     send: (commands) => sendCommands(session.token, commands),
     run,
+    showDialog: (id, kind, title) => {
+      dialogState = openDialog(dialogState, id, kind, title);
+      drawInterface();
+    },
+    dismissDialog: () => {
+      dialogState = closeDialog(dialogState);
+      drawInterface();
+    },
     claimDailyBonus,
     buy,
     framesPerSecond: () => framesPerSecond,

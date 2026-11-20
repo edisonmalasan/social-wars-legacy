@@ -78,6 +78,8 @@ export interface HudState {
   energy: number;
   /** The most energy the player may hold. */
   maxEnergy: number;
+  /** The mana the server mirrors into `privateState.mana`. */
+  mana: number;
 }
 
 /** A popover's two lines. */
@@ -127,6 +129,41 @@ export function experiencePopover(state: HudState): Popover {
   return {
     firstLine: `You need ${formatNumber(state.expRequired - state.experience)} XP to reach level ${state.level + 1}`,
     warningLine: null,
+  };
+}
+
+/** The mana popover. Mana has no storage cap the client can see. */
+export function manaPopover(state: HudState): Popover {
+  return { firstLine: `You have ${formatNumber(state.mana)} mana`, warningLine: null };
+}
+
+/**
+ * The XP progress bar.
+ *
+ * The current and the needed numbers are the server's and the content's;
+ * the fraction is only the bar's width. It is clamped so a save with more XP
+ * than the next level asks for draws a full bar rather than an impossible one.
+ */
+export interface XpProgress {
+  /** The XP the player has. */
+  readonly current: number;
+  /** The XP the next level needs. */
+  readonly needed: number;
+  /** The XP still to go, never negative. */
+  readonly remaining: number;
+  /** How full the bar is, from 0 to 1. */
+  readonly fraction: number;
+}
+
+/** The XP bar's state. */
+export function xpProgress(state: HudState): XpProgress {
+  const current = Math.max(0, state.experience);
+  const needed = Math.max(0, state.expRequired);
+  return {
+    current,
+    needed,
+    remaining: Math.max(0, needed - current),
+    fraction: needed > 0 ? Math.max(0, Math.min(1, current / needed)) : 0,
   };
 }
 

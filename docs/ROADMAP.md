@@ -1476,6 +1476,108 @@ assault against the new server, and the cheat battery is fully rejected.
 
 ---
 
+## G5.1 — Essential Gameplay UI & Playable Alpha
+
+*Status: **playable alpha verified**. This milestone is recorded here, outside the
+`## Group X` sections above, so the group item counters checked by
+`node scripts/check-roadmap.mjs` are unchanged. The distinction below is between
+what is implemented, what is partial, what is deferred, what is externally
+blocked and what is a non-goal — an unfinished screen is not counted as complete
+to improve a statistic.*
+
+**Verified outcomes (every command was run; the gates passed unless noted):**
+
+- **The full loop runs through the rendered interface**, not through developer
+  tools. `node scripts/e2e-test.mjs` was run against the real server, the built
+  client and **both Chrome and Edge**. A fresh player registers through the
+  rendered form, skips the tutorial with its rendered button, picks a building
+  from the build menu and places it with a canvas click, collects through the
+  info panel, trains a unit in the Command Center, opens the weekly quest from
+  the chapter map, starts it from the briefing, strikes and reports a kill with
+  the strictly two-argument builder through rendered buttons, finishes it,
+  replays it (the server answers `already-awarded` and pays nothing), and
+  survives a client reload and a server restart. The result:
+  `browsers that ran: chrome, edge` and
+  `OK: a player registers, signs in, plays, and signs in again after a restart.`
+- **Layout:** at the client's own 760 × 600 stage the HUD ends above the storage
+  panel in both browsers (Chrome: HUD bottom y=-9, inventory top y=47; Edge:
+  y=-7 and y=48 — the negative offsets are the headless window being smaller
+  than the stage, not an overlap). No HUD/inventory overlap and no panel outside
+  the stage.
+- **Gates:** `pnpm test` (1612 pass), `pnpm test:integration` (63 pass),
+  `pnpm typecheck`, `pnpm lint`, `pnpm build:content`,
+  `node scripts/verify-command-catalogue.mjs`, `node scripts/check-roadmap.mjs`,
+  `node scripts/check-report-sync.mjs`, `node scripts/run-cheat-battery.mjs`
+  (11 attacks had no effect), `node scripts/e2e-test.mjs`, the client build,
+  `node scripts/build-licence-report.mjs --check`,
+  `node scripts/check-coverage.mjs` and `node scripts/golden-master.mjs` all
+  passed. `node --test packages/client/src/screens.test.ts` passed (9 tests).
+  `node scripts/check-licensing.mjs` and `node scripts/check-no-flash.mjs` pass
+  in the CI ordering (before the client is built, so `apps/client/dist` is
+  absent). Run locally **after** building the client they report false positives
+  in generated artefacts: the copied content/manifest JSON contains upstream
+  asset *identifiers* ending in `.swf`, and the open-licensed substitute fonts
+  are named after the faces they replace. Neither is shipped source; both are
+  documented in the task report rather than hidden.
+
+**P0 — implemented in G5.1 (each note in `re/data/ui-screens.json` names a
+model that exists):**
+
+- Account form and session: sign-in/register modes, one request at a time,
+  retryable refusals (`apps/client/src/main.ts`, `packages/client/src/session.ts`).
+- HUD completeness: mana, XP bar, daily-bonus button and readouts from the
+  server's world (`apps/client/src/ui/hud.tsx`, `packages/client/src/hud.ts`).
+- Building management: build menu, placement, selection, collection gesture,
+  upgrade/hurry actions and typed feedback
+  (`apps/client/src/ui/buildmenu.tsx`, `apps/client/src/ui/info.tsx`,
+  `packages/client/src/management.ts`).
+- Recruitment: training cards, the server's queue and countdown, and a Take
+  button that stays locked until the server says the unit is ready
+  (`apps/client/src/ui/recruit.tsx`).
+- Quest interface: clickable chapter slots, briefing with difficulty, combat
+  panel of server-owned counters/HP, two-argument kill report, finish and result
+  dialog, and reload recovery from `/api/world`
+  (`apps/client/src/ui/quests.tsx`, `packages/client/src/questview.ts`).
+- Inventory and player information: stored items from `maps[0].store` with a
+  Place gesture, and the HUD's level/XP/population/army readouts
+  (`apps/client/src/ui/inventory.tsx`, `packages/client/src/inventory.ts`).
+- One accessible dialog and one feedback channel for the whole interface
+  (`apps/client/src/ui/dialog.tsx`, `apps/client/src/ui/feedback.tsx`,
+  `packages/client/src/dialogmodel.ts`).
+- Screen inventory decisions added for eight screens genuinely modelled here
+  (the quest map, inventory panel, recruitment panel, alert and mission-info
+  popups): 260 screens now read **85 implemented, 52 dropped, 123 planned**.
+
+**P1 — partial or deferred, not counted as complete:**
+
+- Base building/placement and production are playable, but the original's
+  collect-period chooser, expansion, full army roster/team selection, dedicated
+  confirm and next-mission popups, and item-category tabs are deferred. A fresh
+  factory's five-minute cycle is correctly refused by the server until it is
+  due; the automated loop verifies that refusal rather than forging time.
+- The result dialog shows the server's `end_quest` message. Reward rows appear
+  only when the native outcome carries a `rewards` result; the live outcome
+  reports `kind: "none"`, so a dedicated rewards popup is deferred. The cash
+  payment is verified from the server's wallet.
+
+**P2 — excluded from this milestone / non-goals:**
+
+- Monetisation (buying energy/gold/mana), Zynga news/intro/media, social
+  cross-promotion and administrative panels remain excluded: no proprietary
+  asset or Flash runtime may enter a distributable build, and the server owns
+  the rules so an admin panel would reopen the `flash_debug` hole.
+- Firefox/Safari, an actual phone and the Capacitor shell are external
+  platform blockers, not G5.1 regressions; they stay open in Groups G/H.
+
+**Remaining gaps:** the mobile shell (G5.1's G5/G5.1 successor Group G5 in the
+plan) is still not implemented; the reward-row payload, period chooser and
+army-management screens above remain deferred; and the two licensing/no-flash
+checks need to be run before the client build or against a cleaned tree, as in
+CI. No change here weakens the server's authority: combat, resources,
+progression and rewards remain server-side.
+
+---
+
 ## Group H — Desktop Shell & Release
 
 *Outcome: a standalone, signed, updatable desktop executable.*
@@ -1646,7 +1748,7 @@ product.*
       is fine if nothing the browser loads reaches it, and the check says so. It follows the
       static imports, the re-exports and the **dynamic** imports, and it resolves the
       workspace's **subpath** exports - `@swl/server/apply` is the applier and not the
-      package's index, which is the whole point of the subpath. It reaches **128** modules
+      package's index, which is the whole point of the subpath. It reaches **137** modules
 - [x] **Every pull request runs the golden-master harness.** The CI runs on every push
       and every pull request, and the golden-master corpus is one of its steps - and
       the harness fails on any difference it cannot explain

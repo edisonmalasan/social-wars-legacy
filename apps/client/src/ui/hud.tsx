@@ -15,8 +15,10 @@ import {
   energyDisplay,
   experiencePopover,
   formatNumber,
+  manaPopover,
   populationPopover,
   resourcePopover,
+  xpProgress,
   type HudResource,
   type HudState,
   type Popover,
@@ -78,6 +80,11 @@ export interface HudProps {
   state: HudState;
   /** The item the player is about to place, or null. */
   placing?: string | null;
+  /**
+   * The player asked for the daily bonus. The server decides the reward;
+   * the promise, when there is one, tells the button when to unlock again.
+   */
+  onClaimBonus?: () => void | Promise<unknown>;
 }
 
 /**
@@ -86,8 +93,25 @@ export interface HudProps {
  * The numbers are the model's, and the popovers are the model's too: the
  * texts are the client's, and they are tested where they live.
  */
-export function Hud({ state, placing }: HudProps): React.JSX.Element {
+export function Hud({ state, placing, onClaimBonus }: HudProps): React.JSX.Element {
   const energy = energyDisplay(state);
+  const xp = xpProgress(state);
+  const [bonusBusy, setBonusBusy] = useState(false);
+
+  /** One pending bonus request at a time; the server refuses the rest anyway. */
+  function claimBonus(): void {
+    if (bonusBusy) return;
+    setBonusBusy(true);
+    try {
+      void Promise.resolve(onClaimBonus?.()).then(
+        () => setBonusBusy(false),
+        () => setBonusBusy(false),
+      );
+    } catch {
+      setBonusBusy(false);
+    }
+  }
+
   return (
     <div className="swl-hud">
       <div className="swl-hud-resources">
@@ -126,6 +150,37 @@ export function Hud({ state, placing }: HudProps): React.JSX.Element {
           }}
           className="swl-energy"
         />
+        <Readout
+          label="Mana"
+          value={formatNumber(state.mana)}
+          popover={manaPopover(state)}
+          className="swl-resource swl-resource-mana"
+        />
+        <div className="swl-xp" role="group" aria-label="Experience progress">
+          <span className="swl-xp-label">XP</span>
+          <span
+            className="swl-xp-track"
+            role="progressbar"
+            aria-valuenow={Math.min(xp.current, xp.needed)}
+            aria-valuemin={0}
+            aria-valuemax={xp.needed}
+          >
+            <span className="swl-xp-fill" style={{ width: `${xp.fraction * 100}%` }} />
+          </span>
+          <span className="swl-xp-value">
+            {formatNumber(xp.current)}/{formatNumber(xp.needed)}
+          </span>
+        </div>
+        {onClaimBonus ? (
+          <button
+            type="button"
+            className="swl-bonus"
+            disabled={bonusBusy}
+            onClick={claimBonus}
+          >
+            Daily bonus
+          </button>
+        ) : null}
         <span className="swl-army">{armyText(state)}</span>
       </div>
     </div>

@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import {
   EXPIRY_MARGIN_SECONDS,
   SESSION_KEY,
+  authenticate,
+  authEndpoint,
   authorizationHeader,
   forgetSession,
   fromServerSession,
@@ -11,6 +13,7 @@ import {
   readSession,
   rememberSession,
   signIn,
+  type AuthMode,
   type ClientSession,
 } from './session.ts';
 
@@ -139,5 +142,44 @@ describe('signing in', () => {
       new Response('not json', { status: 200 }),
     );
     assert.equal(!result.ok && result.reason, 'network');
+  });
+});
+
+describe('the authentication mode', () => {
+  it('selects the endpoint the mode needs', () => {
+    const modes: AuthMode[] = ['sign-in', 'register'];
+    assert.equal(authEndpoint('sign-in'), '/api/session');
+    assert.equal(authEndpoint('register'), '/api/account');
+    assert.deepEqual(modes.map(authEndpoint), ['/api/session', '/api/account']);
+  });
+
+  it('registers through the account endpoint and keeps the session the server issued', async () => {
+    const seen: { url?: string; body?: unknown } = {};
+    const result = await authenticate('register', 'p1', 'correct horse', async (url, init) => {
+      seen.url = String(url);
+      seen.body = JSON.parse(String(init?.body));
+      return new Response(JSON.stringify(SERVER_SESSION), { status: 201 });
+    });
+    assert.equal(seen.url, '/api/account');
+    assert.deepEqual(seen.body, { playerId: 'p1', password: 'correct horse' });
+    assert.equal(result.ok, true);
+    assert.ok(result.ok && result.session.token === 'abc123');
+  });
+
+  it('signs in through the session endpoint', async () => {
+    const seen: string[] = [];
+    const result = await authenticate('sign-in', 'p1', 'x', async (url) => {
+      seen.push(String(url));
+      return new Response(JSON.stringify(SERVER_SESSION), { status: 200 });
+    });
+    assert.deepEqual(seen, ['/api/session']);
+    assert.equal(result.ok, true);
+  });
+
+  it('tells a player who already exists from a network failure', async () => {
+    const result = await authenticate('register', 'p1', 'x', async () =>
+      new Response('{}', { status: 409 }),
+    );
+    assert.equal(!result.ok && result.reason, 'player-exists');
   });
 });

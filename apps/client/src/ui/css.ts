@@ -11,6 +11,25 @@
  */
 export function uiCss(): string {
   return `
+/*
+ * The dialog and feedback tokens. They are the same slate, gold and muted
+ * grey as the rest of the interface; naming them here keeps the new blocks
+ * from growing another set of scattered literals.
+ */
+:root {
+  --swl-surface: #131a24;
+  --swl-surface-raised: #1d2430;
+  --swl-border: #38445a;
+  --swl-ink: #e8e3d8;
+  --swl-ink-muted: #8d97a8;
+  --swl-accent: #f5c542;
+  --swl-danger: #e07a5f;
+  --swl-success: #86d38a;
+  --swl-scrim: #000a;
+  --swl-gap: 8px;
+  --swl-gap-lg: 12px;
+}
+
 .swl-ui {
   position: absolute;
   inset: 0;
@@ -30,6 +49,28 @@ export function uiCss(): string {
   pointer-events: auto;
 }
 
+/* --- The account form -------------------------------------------------- */
+
+.swl-auth-modes {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.swl-auth-modes button {
+  padding: 6px 12px;
+  border: 1px solid #38445a;
+  border-radius: 3px;
+  color: #8d97a8;
+}
+
+.swl-auth-modes .swl-auth-mode-active {
+  border-color: #f5c542;
+  color: #f5c542;
+}
+
+#signin-error { margin: 0; color: #e07a5f; }
+
 /* --- The top bar ------------------------------------------------------- */
 
 .swl-hud {
@@ -37,7 +78,7 @@ export function uiCss(): string {
   left: 0;
   right: 0;
   top: 0;
-  height: 34px;
+  height: 48px;
   display: flex;
   align-items: stretch;
   justify-content: space-between;
@@ -99,6 +140,69 @@ export function uiCss(): string {
 .swl-resource-oil .swl-readout-value { color: #7fb3d5; }
 .swl-resource-steel .swl-readout-value { color: #cfd6e0; }
 .swl-resource-cash .swl-readout-value { color: #86d38a; }
+.swl-resource-mana .swl-readout-value { color: #b48ef0; }
+
+/*
+ * The XP bar is a narrow track with a fill whose width is the fraction the
+ * model derived. The number beside it is the server's XP over the content's
+ * requirement; the bar is only a picture of that pair.
+ */
+.swl-xp {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+}
+
+.swl-xp-label {
+  color: #8d97a8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.swl-xp-track {
+  display: block;
+  width: 72px;
+  height: 7px;
+  overflow: hidden;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: #10151d;
+}
+
+.swl-xp-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #7fb3d5, #f5c542);
+}
+
+.swl-xp-value {
+  color: #f2e6c8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  font-variant-numeric: tabular-nums;
+}
+
+/* The bonus is a gesture: the client asks, and the server names the reward. */
+/* The button qualifier beats the generic .swl-ui button reset above. */
+.swl-ui button.swl-bonus {
+  padding: 4px 8px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  background: #f5c542;
+  color: #10151d;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-ui button.swl-bonus:hover:not(:disabled) { background: #ffd75e; }
+
+.swl-ui button.swl-bonus:disabled {
+  border-color: #38445a;
+  background: #1d2430;
+  color: #5c6678;
+  cursor: not-allowed;
+}
 
 .swl-army {
   padding: 4px 8px;
@@ -145,7 +249,7 @@ export function uiCss(): string {
 .swl-chapters {
   position: absolute;
   right: 8px;
-  top: 44px;
+  top: 58px;
   display: flex;
   gap: 6px;
   padding: 6px;
@@ -188,12 +292,101 @@ export function uiCss(): string {
   color: #5c6678;
 }
 
+/* An opened slot is a button. The generic button rule above would otherwise
+   strip the slot's background, so these win with one more class. */
+.swl-ui button.swl-quest-slot {
+  padding: 0;
+}
+
+.swl-ui .swl-quest-open {
+  background: #f5c542;
+  color: #10151d;
+  font-weight: 700;
+}
+
+.swl-ui .swl-quest-locked {
+  background: #1d2430;
+  color: #5c6678;
+}
+
+.swl-quest-active {
+  outline: 1px solid var(--swl-accent);
+  outline-offset: 1px;
+}
+
+/* --- The inventory panel ---------------------------------------------- */
+
+.swl-inventory {
+  position: absolute;
+  right: 8px;
+  top: 104px;
+  width: 220px;
+  max-height: 240px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 8px 10px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: #131a24;
+  pointer-events: auto;
+}
+
+.swl-inventory-title {
+  color: #f2e6c8;
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(13px * var(--swl-font-scale-display, 1));
+  font-weight: 700;
+}
+
+.swl-inventory-empty {
+  margin: 6px 0 0;
+  color: #8d97a8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-inventory-list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swl-inventory-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+.swl-inventory-name {
+  flex: 1;
+  color: #e8e3d8;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+}
+
+.swl-inventory-qty {
+  color: #f5c542;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-ui button.swl-inventory-place {
+  padding: 3px 8px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  background: #f5c542;
+  color: #10151d;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-ui button.swl-inventory-place:hover { background: #ffd75e; }
+
 /* --- The goal panel --------------------------------------------------- */
 
 .swl-goals {
   position: absolute;
   left: 8px;
-  top: 44px;
+  top: 58px;
   width: 300px;
   display: flex;
   flex-direction: column;
@@ -290,6 +483,108 @@ export function uiCss(): string {
   color: #10151d;
   font-size: calc(12px * var(--swl-font-scale-body, 1));
   font-weight: 700;
+}
+
+/* The Upgrade and Finish actions share the resource button's shape. */
+.swl-info-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.swl-info-action-button {
+  width: 100%;
+  padding: 4px 10px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  background: #f5c542;
+  color: #10151d;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-info-action-button:hover { background: #ffd75e; }
+
+.swl-info-action-note {
+  margin-top: 2px;
+  color: #8d97a8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+/* --- The recruitment panel --------------------------------------------- */
+
+.swl-recruit {
+  position: absolute;
+  right: 236px;
+  bottom: 8px;
+  width: 220px;
+  padding: 8px 10px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: #131a24;
+  pointer-events: auto;
+}
+
+.swl-recruit-title {
+  color: #f2e6c8;
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(13px * var(--swl-font-scale-display, 1));
+  font-weight: 700;
+}
+
+.swl-recruit-units {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swl-recruit-unit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.swl-recruit-unit-name {
+  color: #e8e3d8;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+}
+
+.swl-recruit-train,
+.swl-recruit-take {
+  padding: 3px 8px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  color: #10151d;
+  background: #f5c542;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-recruit-train:hover,
+.swl-recruit-take:hover:not(:disabled) { background: #ffd75e; }
+
+.swl-recruit-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid #2b3546;
+}
+
+.swl-recruit-countdown {
+  color: #8d97a8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-recruit-take:disabled {
+  border-color: #38445a;
+  color: #5c6678;
+  background: #1d2430;
+  cursor: not-allowed;
 }
 
 /* --- The neighbour strip ----------------------------------------------- */
@@ -514,5 +809,232 @@ export function uiCss(): string {
 .swl-tutorial-next:hover {
   background: #ffd75e;
 }
+
+/* --- The dialog -------------------------------------------------------- */
+
+.swl-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: var(--swl-scrim);
+  pointer-events: auto;
+}
+
+.swl-dialog {
+  width: min(420px, calc(100% - 32px));
+  max-height: calc(100% - 48px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: var(--swl-gap-lg);
+  border: 1px solid var(--swl-border);
+  border-top: 3px solid var(--swl-accent);
+  border-radius: 6px;
+  background: linear-gradient(var(--swl-surface-raised), var(--swl-surface));
+  box-shadow: 0 10px 32px #000c, inset 0 1px 0 #ffffff14;
+  pointer-events: auto;
+  outline: none;
+}
+
+.swl-dialog:focus-visible {
+  outline: 2px solid var(--swl-accent);
+  outline-offset: 2px;
+}
+
+.swl-dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--swl-gap);
+}
+
+.swl-dialog-title {
+  margin: 0;
+  color: var(--swl-accent);
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(16px * var(--swl-font-scale-display, 1));
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.swl-dialog-close {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  color: var(--swl-ink-muted);
+  font-size: calc(18px * var(--swl-font-scale-body, 1));
+  line-height: 1;
+}
+
+.swl-dialog-close:hover {
+  background: #263043;
+  color: var(--swl-ink);
+}
+
+.swl-dialog-close:focus-visible {
+  outline: 2px solid var(--swl-accent);
+  outline-offset: 1px;
+}
+
+.swl-dialog-body {
+  margin-top: var(--swl-gap);
+  overflow-y: auto;
+  color: var(--swl-ink);
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  line-height: 1.4;
+}
+
+.swl-dialog-combat { border-top-color: var(--swl-danger); }
+.swl-dialog-result,
+.swl-dialog-reward { border-top-color: var(--swl-success); }
+
+/* --- The quest panels --------------------------------------------------- */
+
+.swl-quest-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--swl-gap-lg);
+}
+
+.swl-quest-subtitle,
+.swl-quest-won,
+.swl-quest-lost {
+  margin: 0;
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-won { color: var(--swl-success); }
+.swl-quest-lost { color: var(--swl-danger); }
+
+.swl-quest-difficulty {
+  display: flex;
+  align-items: center;
+  gap: var(--swl-gap);
+  margin: 0;
+  padding: var(--swl-gap);
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+}
+
+.swl-quest-difficulty legend {
+  padding: 0 4px;
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-star {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--swl-accent);
+}
+
+.swl-quest-counters,
+.swl-quest-roster,
+.swl-quest-rewards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swl-quest-counters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--swl-gap);
+}
+
+.swl-quest-counter {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--swl-gap);
+  padding: 4px 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface);
+}
+
+.swl-quest-counter dt { color: var(--swl-ink-muted); }
+.swl-quest-counter dd { margin: 0; color: var(--swl-accent); font-weight: 700; }
+
+.swl-quest-roster {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.swl-quest-unit {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--swl-gap);
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-unit .swl-quest-dead { color: var(--swl-danger); }
+
+.swl-quest-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--swl-gap);
+}
+
+.swl-quest-buttons button {
+  padding: 5px 10px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+
+.swl-quest-buttons button:hover:not(:disabled) { border-color: var(--swl-accent); }
+.swl-quest-buttons button:disabled { color: var(--swl-ink-muted); cursor: not-allowed; }
+.swl-quest-buttons .swl-quest-primary { border-color: var(--swl-accent); color: var(--swl-accent); }
+.swl-quest-buttons button:focus-visible { outline: 2px solid var(--swl-accent); outline-offset: 1px; }
+
+/* --- The feedback channel ---------------------------------------------- */
+
+.swl-feedback {
+  position: absolute;
+  top: 54px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: var(--swl-gap);
+  width: min(360px, calc(100% - 32px));
+  pointer-events: none;
+}
+
+.swl-feedback-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--swl-gap);
+  padding: var(--swl-gap) var(--swl-gap-lg);
+  border: 1px solid var(--swl-border);
+  border-left-width: 3px;
+  border-radius: 4px;
+  background: var(--swl-surface);
+  box-shadow: 0 4px 14px #000a;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  line-height: 1.3;
+}
+
+.swl-feedback-success {
+  border-left-color: var(--swl-success);
+  color: var(--swl-ink);
+}
+
+.swl-feedback-error {
+  border-left-color: var(--swl-danger);
+  color: var(--swl-ink);
+}
+
+.swl-feedback-mark { flex: none; font-weight: 700; }
+.swl-feedback-success .swl-feedback-mark { color: var(--swl-success); }
+.swl-feedback-error .swl-feedback-mark { color: var(--swl-danger); }
+.swl-feedback-text { white-space: pre-line; }
 `.trim();
 }
