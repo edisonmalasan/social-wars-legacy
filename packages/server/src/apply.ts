@@ -2590,11 +2590,24 @@ export function createQuestHelpers(deps: ApplierDeps): {
     let state: QuestState = loadQuestMap(startQuest(prepareQuest(questId, options)), roster);
 
     // The ledger is seeded from the content: every element starts alive with
-    // HP from its `life`, and no event has been seen yet.
+    // an **abstract encounter HP**, and no event has been seen yet.
+    //
+    // This is NOT the original client's combat HP. The new server has no
+    // positional battle simulator (an explicit non-goal), so the content's
+    // `life` is not a hit-point total that can be shot down one real bullet at
+    // a time. It is only a content-derived weight: scale it into a small,
+    // deterministic strike budget so that a roster element can always be
+    // killed by the server's own strikes in at most four authoritative
+    // actions — few enough for a real client to complete a quest well inside
+    // the API rate limit. Missing or invalid life falls back to one strike.
+    // The value never comes from the client's request.
     const elements: Record<string, QuestLedgerElement> = {};
     for (const element of roster) {
       const life = deps.items?.get(element.itemId)?.life;
-      const hp = typeof life === 'number' && Number.isFinite(life) && life > 0 ? Math.floor(life) : 1;
+      const hp =
+        typeof life === 'number' && Number.isFinite(life) && life > 0
+          ? Math.min(4, Math.max(1, Math.ceil(life / 400)))
+          : 1;
       elements[element.ref] = { hp, alive: true };
     }
 

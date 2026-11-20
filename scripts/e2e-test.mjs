@@ -134,6 +134,20 @@ function smallestEventQuest() {
   };
 }
 
+/**
+ * A destroy-one-element quest, for proving an accepted kill report.
+ *
+ * The quest id, its play index and the win element's ref come from the rules
+ * spec, so the test cannot invent a ref the server would not recognise.
+ */
+function killQuest() {
+  const spec = QUESTS.find((quest) => quest.id === '100000002');
+  if (!spec || spec.win.kind !== 'destroyAll' || spec.win.elements.length === 0) {
+    throw new Error('the nuclear quest no longer has a single destroy-all element');
+  }
+  return { questId: spec.id, playIndex: String(spec.playIndex), ref: spec.win.elements[0] };
+}
+
 /** A static server for the client's files, and a proxy for the API. */
 async function serve(port, apiPort) {
   const server = createServer((request, response) => {
@@ -388,7 +402,11 @@ async function main() {
   }
 
   const QUEST = smallestEventQuest();
-  console.log(`  quest: ${QUEST.questId} (${QUEST.actionType} × ${QUEST.count})`);
+  const KILL = killQuest();
+  console.log(
+    `  quests: ${QUEST.questId} (${QUEST.actionType} × ${QUEST.count}) ` +
+      `and ${KILL.questId} (kill ${KILL.ref})`,
+  );
 
   const dataDir = await mkdtemp(path.join(os.tmpdir(), 'swl-e2e-'));
   // **Free** ports: a stray server from an earlier run must not be able
@@ -952,8 +970,131 @@ async function main() {
           console.log('FAILED (the active quest was not cleared)');
           continue;
         }
-        questPlayer = { playerId: browserSession.playerId, password: 'correct horse' };
         console.log(`  the server awarded ${QUEST.questId} and cleared the active quest`);
+
+        // --- 3b. An accepted two-arg kill through the real client ----------
+        // The per-kill builder is strictly two arguments. The server's own
+        // strikes bring a roster element down (at most four of them), and only
+        // then is the same builder accepted. The quest is then completed from
+        // that server-owned state.
+        const kill = await page.evaluate(
+          `(async () => {
+             const handle = window.__swl;
+             if (!handle) return { error: 'the client has no handle' };
+             const id = ${JSON.stringify(KILL.questId)};
+             const ref = ${JSON.stringify(KILL.ref)};
+
+             const started = await handle.startQuest(id, 1);
+             if (!started.ok) {
+               return { error: 'the server refused the kill quest start', status: started.status };
+             }
+             const active = handle.activeQuest();
+             if (!active || active.questId !== id || !active.elements[ref]) {
+               return { error: 'the client saw no killable roster element' };
+             }
+
+             // Roster membership is not a kill: the same two-argument write
+             // is refused before the server's strikes bring the element down.
+             const early = await handle.send([handle.reportQuestKill(ref)]);
+             if (!early.response || early.response.ok !== false) {
+               return { error: 'an early kill was accepted' };
+             }
+
+             let strikes = 0;
+             let last = null;
+             for (let guard = 0; guard < 4; guard++) {
+               const action = await handle.questAction(id, { type: 'strike', ref });
+               if (!action.ok) {
+                 return { error: 'the server refused a strike', status: action.status };
+               }
+               strikes++;
+               last = action;
+               if (last.body && last.body.elements[ref] && last.body.elements[ref].alive === false) break;
+             }
+             if (!last || !last.body || !last.body.elements[ref] || last.body.elements[ref].alive !== false) {
+               return { error: 'the element survived four authoritative strikes' };
+             }
+
+             // The SAME two-argument builder is accepted now, because the
+             // server's ledger proves the kill.
+             const reported = await handle.send([handle.reportQuestKill(ref)]);
+             if (!reported.response || !reported.response.ok) {
+               return {
+                 error: 'the server refused the two-argument kill',
+                 outcome: reported.response ? reported.response.outcomes[0] : reported.reason,
+                 detail: reported.detail,
+               };
+             }
+             return { questId: started.body.questId, strikes, ref };
+           })()`,
+        );
+        if (!kill || kill.error || kill.questId !== KILL.questId || kill.ref !== KILL.ref ||
+            !Number.isInteger(kill.strikes) || kill.strikes < 1 || kill.strikes > 4) {
+          const detail = kill?.error ?? 'the kill quest did not run';
+          failures.push(`${entry.name}: ${detail} ${JSON.stringify(kill)}`);
+          console.log(`FAILED (${detail} ${JSON.stringify(kill)})`);
+          continue;
+        }
+
+        // The kill and the strike ledger are the server's, not the browser's.
+        const killWorld = await fetch(`http://127.0.0.1:${serverPort}/api/world`, {
+          headers: { authorization: `Bearer ${browserSession.token}` },
+        }).then((response) => response.json());
+        const killActive = killWorld?.privateState?.activeQuest;
+        if (!killActive || !Array.isArray(killActive.script?.destroyed) ||
+            !killActive.script.destroyed.includes(KILL.ref) ||
+            killActive.ledger?.elements?.[KILL.ref]?.alive !== false ||
+            !(killActive.ledger?.strikes?.[KILL.ref] >= 1)) {
+          failures.push(`${entry.name}: the server did not record the accepted kill`);
+          console.log('FAILED (the accepted kill was not recorded)');
+          continue;
+        }
+        if (killWorld?.privateState?.questProgress?.awarded?.includes(KILL.questId)) {
+          failures.push(`${entry.name}: the reward was paid before end_quest`);
+          console.log('FAILED (the reward was paid before end_quest)');
+          continue;
+        }
+        console.log(
+          `  the two-arg kill was accepted after ${kill.strikes} server strike(s); ` +
+            'the ledger proves it, no reward yet',
+        );
+
+        // Finish the quest: the server decides the win and pays the reward.
+        const killEnd = await page.evaluate(
+          `(async () => {
+             const handle = window.__swl;
+             if (!handle) return { error: 'the client has no handle' };
+             const ended = await handle.send([handle.endQuest(${JSON.stringify(KILL.questId)}, 1)]);
+             if (!ended.response || !ended.response.ok) {
+               return {
+                 error: 'the server refused the kill quest end',
+                 outcome: ended.response ? ended.response.outcomes[0] : ended.reason,
+                 detail: ended.detail,
+               };
+             }
+             return { ok: true };
+           })()`,
+        );
+        if (!killEnd || killEnd.error) {
+          const detail = killEnd?.error ?? 'the kill quest did not end';
+          failures.push(`${entry.name}: ${detail} ${JSON.stringify(killEnd)}`);
+          console.log(`FAILED (${detail} ${JSON.stringify(killEnd)})`);
+          continue;
+        }
+        const killAwarded = await fetch(`http://127.0.0.1:${serverPort}/api/world`, {
+          headers: { authorization: `Bearer ${browserSession.token}` },
+        }).then((response) => response.json());
+        const killProgress = killAwarded?.privateState?.questProgress;
+        if (!killProgress?.awarded?.includes(KILL.questId) ||
+            !(killProgress.ranks?.[KILL.playIndex] >= 1) ||
+            killAwarded?.privateState?.activeQuest) {
+          failures.push(`${entry.name}: the server did not award the completed kill quest`);
+          console.log('FAILED (the kill quest award was not recorded)');
+          continue;
+        }
+        console.log(`  the server awarded ${KILL.questId} from the accepted kill`);
+
+        questPlayer = { playerId: browserSession.playerId, password: 'correct horse' };
 
         // The **neighbour strip** lists the other players. The strip is
         // the server's list, and the client draws it.
@@ -1038,14 +1179,19 @@ async function main() {
           headers: { authorization: `Bearer ${fresh.token}` },
         }).then((response) => response.json());
         const saved = persisted?.privateState?.questProgress;
-        if (!saved || !Array.isArray(saved.awarded) || !saved.awarded.includes(QUEST.questId)) {
-          failures.push('the quest award did not survive the server restart');
-          console.log('FAILED (the award did not survive the restart)');
-        } else if (!(saved.ranks?.[QUEST.playIndex] >= 1)) {
-          failures.push('the quest rank did not survive the server restart');
-          console.log('FAILED (the rank did not survive the restart)');
-        } else {
-          console.log(`  the player signed in again and ${QUEST.questId} was still awarded`);
+        for (const award of [
+          { questId: QUEST.questId, playIndex: QUEST.playIndex },
+          { questId: KILL.questId, playIndex: KILL.playIndex },
+        ]) {
+          if (!saved || !Array.isArray(saved.awarded) || !saved.awarded.includes(award.questId)) {
+            failures.push(`the ${award.questId} award did not survive the server restart`);
+            console.log(`FAILED (the ${award.questId} award did not survive the restart)`);
+          } else if (!(saved.ranks?.[award.playIndex] >= 1)) {
+            failures.push(`the ${award.questId} rank did not survive the server restart`);
+            console.log(`FAILED (the ${award.questId} rank did not survive the restart)`);
+          } else {
+            console.log(`  the player signed in again and ${award.questId} was still awarded`);
+          }
         }
       }
     }

@@ -110,9 +110,35 @@ describe('beginQuest', () => {
       assert.equal(element.alive, true);
       assert.ok(element.hp > 0);
     }
+    // The ledger's HP is an abstract encounter budget derived from content,
+    // not the original client's combat HP. It is bounded so a kill can always
+    // be proven in at most four authoritative strikes.
     assert.equal(state.ledger.elements['commandCenter']!.hp, 1);
-    assert.equal(state.ledger.elements['centralNuclear']!.hp, 2);
+    assert.equal(state.ledger.elements['centralNuclear']!.hp, 1);
+    for (const element of Object.values(state.ledger.elements)) {
+      assert.ok(element.hp >= 1 && element.hp <= 4);
+    }
     assert.deepEqual(state.ledger.events, []);
+  });
+
+  it('derives at most four strikes of encounter HP from the content life', () => {
+    // The values are the server's own, scaled from the item's `life`, and a
+    // missing or invalid life falls back to a single strike. No client input
+    // reaches this calculation.
+    const items = new Map<number, ApplierItem>([
+      [1017, { id: 1017, name: 'goodBoy', type: 'u', life: 1, subcatFunctional: 115 } as ApplierItem],
+      [89, { id: 89, name: 'centralNuclear', type: 'b', life: 401, subcatFunctional: 112 } as ApplierItem],
+      [195, { id: 195, name: 'commandCenter', type: 'b', life: 2000, subcatFunctional: 113 } as ApplierItem],
+      // 1035 is absent: the fallback must be one strike.
+    ]);
+    const result = createQuestHelpers(qdeps({ items })).beginQuest(freshWorld(), Q02);
+    assert.equal(result.ok, true, result.ok ? '' : result.reason);
+    if (!result.ok) return;
+    const elements = active(result.world).ledger.elements;
+    assert.deepEqual(
+      Object.fromEntries(Object.entries(elements).map(([ref, element]) => [ref, element.hp])),
+      { goodBoy: 1, centralNuclear: 2, commandCenter: 4, truck: 1 },
+    );
   });
 
   it('seeds the four event quests with server-owned counters', () => {
@@ -190,7 +216,8 @@ describe('authoritative strikes and killed writes', () => {
     const early = applier(started.world, killed(['commandCenter']));
     assert.equal(early.applied, false);
     assert.equal(early.refused, 'element-not-killed');
-    assert.deepEqual(early.world.resources, started.world.resources);
+    // A refused write leaves the whole save untouched, not just the wallet.
+    assert.deepEqual(early.world, started.world);
     assert.deepEqual(active(early.world).script.destroyed, []);
 
     // The server's own strike damages the element deterministically.
@@ -202,9 +229,51 @@ describe('authoritative strikes and killed writes', () => {
     if (!struck.ok) return;
     assert.equal(active(struck.world).ledger.elements['commandCenter']!.alive, false);
 
+    const beforeAccepted = structuredClone(struck.world);
     const accepted = applier(struck.world, killed(['commandCenter']));
     assert.equal(accepted.applied, true);
     assert.deepEqual(active(accepted.world).script.destroyed, ['commandCenter']);
+    // The accepted write advances the server's quest state, and it does so
+    // without claiming a reward or any client-declared counter.
+    assert.notDeepEqual(accepted.world, beforeAccepted);
+    assert.deepEqual(active(accepted.world).ledger, active(beforeAccepted).ledger);
+  });
+
+  it('kills a high-life element in at most four server strikes', () => {
+    // Even a building whose content life is 2000 is an encounter that a real
+    // client can finish through the workflow: its ledger HP is bounded.
+    const items = new Map<number, ApplierItem>([
+      [89, { id: 89, name: 'centralNuclear', type: 'b', life: 2, subcatFunctional: 112 } as ApplierItem],
+      [195, { id: 195, name: 'commandCenter', type: 'b', life: 2000, subcatFunctional: 113 } as ApplierItem],
+    ]);
+    const helpers = createQuestHelpers(qdeps({ items }));
+    const started = helpers.beginQuest(freshWorld(), Q02);
+    assert.equal(started.ok, true);
+    if (!started.ok) return;
+    assert.equal(active(started.world).ledger.elements['commandCenter']!.hp, 4);
+
+    let world = started.world;
+    let strikes = 0;
+    while (active(world).ledger.elements['commandCenter']!.alive && strikes < 4) {
+      const next = helpers.applyQuestAction(world, Q02, {
+        type: 'strike',
+        ref: 'commandCenter',
+      });
+      assert.equal(next.ok, true, next.ok ? '' : next.reason);
+      if (!next.ok) return;
+      world = next.world;
+      strikes += 1;
+    }
+    assert.equal(active(world).ledger.elements['commandCenter']!.alive, false);
+    assert.ok(strikes >= 1 && strikes <= 4, `the kill took ${strikes} strikes`);
+
+    // The same strictly two-argument write that was refused before is now
+    // accepted because the server's ledger proves the kill.
+    const before = structuredClone(world);
+    const killedWrite = createApplier(qdeps({ items }))(world, killed(['commandCenter']));
+    assert.equal(killedWrite.applied, true);
+    assert.deepEqual(active(killedWrite.world).script.destroyed, ['commandCenter']);
+    assert.notDeepEqual(killedWrite.world, before);
   });
 
   it('damages from the server seed and refuses a strike on a dead element', () => {
