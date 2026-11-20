@@ -2697,6 +2697,12 @@ export function createQuestHelpers(deps: ApplierDeps): {
         const current = next.script.counters['trucksArrived'] ?? 0;
         if (current >= event.count) return { ok: false, reason: 'event-limit-reached' };
         const key = `arrival:${action.ref}:${current + 1}`;
+        // All three channels dedupe the same way: a key already in the ledger
+        // is a replay and must not move the counter. The count cap remains a
+        // second backstop, since every truck shares the one item ref.
+        if (next.ledger.events.includes(key)) {
+          return { ok: false, reason: 'event-already-seen' };
+        }
         next = addQuestCounter(next, 'trucksArrived', 1) as ActiveQuestState;
         next = { ...next, ledger: { ...next.ledger, events: [...next.ledger.events, key] } };
         break;

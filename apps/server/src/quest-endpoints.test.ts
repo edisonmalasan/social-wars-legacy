@@ -22,6 +22,8 @@ import {
   type ApplierDeps,
   type ApplierItem,
   type ContentQuestEvent,
+  type QuestActionHelper,
+  type QuestStartHelper,
   type ShimWorld,
 } from '@swl/server';
 import { REQUEST_ID_HEADER } from '@swl/server';
@@ -66,7 +68,14 @@ function freshWorld(): ShimWorld {
   };
 }
 
-function harness(over: { store?: MemoryPlayerStore } = {}) {
+function harness(
+  over: {
+    store?: MemoryPlayerStore;
+    /** Counts helper calls, so a replayed id can be seen reaching the applier. */
+    actions?: { value: number };
+    starts?: { value: number };
+  } = {},
+) {
   const sessions = new SessionStore();
   sessions.addPlayer('p1', 'pw');
   const identity = new LegacyIdentityBridge();
@@ -74,6 +83,14 @@ function harness(over: { store?: MemoryPlayerStore } = {}) {
   const helpers = createQuestHelpers(deps());
   const issued = sessions.authenticate('p1', 'pw', 1000);
   if (!issued.ok) throw new Error('could not authenticate the test player');
+  const beginQuest: QuestStartHelper = (world, questId, difficulty) => {
+    if (over.starts) over.starts.value += 1;
+    return helpers.beginQuest(world, questId, difficulty);
+  };
+  const applyQuestAction: QuestActionHelper = (world, questId, action) => {
+    if (over.actions) over.actions.value += 1;
+    return helpers.applyQuestAction(world, questId, action);
+  };
   const handle = createApp({
     store,
     sessions,
@@ -82,8 +99,8 @@ function harness(over: { store?: MemoryPlayerStore } = {}) {
     contentBundle: {},
     now: () => 1000,
     applyCommand: createApplier(deps()),
-    beginQuest: helpers.beginQuest,
-    applyQuestAction: helpers.applyQuestAction,
+    beginQuest,
+    applyQuestAction,
   });
   return { handle, store, token: issued.session.token };
 }
@@ -165,6 +182,23 @@ describe('POST /api/quest/start', () => {
     const active = saved.world.save.privateState['activeQuest'] as { questId: string };
     assert.equal(active.questId, Q02);
   });
+
+  it('does not start twice for concurrent identical request ids', async () => {
+    const starts = { value: 0 };
+    const { handle, store, token } = harness({ starts });
+    const [first, second] = await Promise.all([
+      handle(request('POST', '/api/quest/start', { questId: Q02 }, token, 'concurrent-start')),
+      handle(request('POST', '/api/quest/start', { questId: Q02 }, token, 'concurrent-start')),
+    ]);
+    assert.equal(first.status, 200);
+    assert.equal(second.status, 200);
+    assert.equal(second.body, first.body);
+    // Only the first request may reach the applier; the second is a replay.
+    assert.equal(starts.value, 1);
+    const saved = (await store.get('p1'))!;
+    const active = saved.world.save.privateState['activeQuest'] as { questId: string };
+    assert.equal(active.questId, Q02);
+  });
 });
 
 describe('POST /api/quest/action', () => {
@@ -233,6 +267,29 @@ describe('POST /api/quest/action', () => {
     assert.equal(first.status, 200);
     assert.equal(replay.status, 200);
     assert.equal(replay.body, first.body);
+    const saved = (await store.get('p1'))!;
+    const active = saved.world.save.privateState['activeQuest'] as {
+      script: { counters: Record<string, number> };
+    };
+    assert.equal(active.script.counters['trucksArrived'], 1);
+  });
+
+  it('does not apply a concurrently replayed request id twice', async () => {
+    const actions = { value: 0 };
+    const { handle, store, token } = harness({ actions });
+    await handle(request('POST', '/api/quest/start', { questId: Q03 }, token));
+    const body = { questId: Q03, action: { type: 'truck-arrival', ref: 'item:1013' } };
+    // Both requests are in flight together: neither can see the other's memo
+    // entry yet, so the check-and-claim must be serialised per player.
+    const [first, second] = await Promise.all([
+      handle(request('POST', '/api/quest/action', body, token, 'concurrent-1')),
+      handle(request('POST', '/api/quest/action', body, token, 'concurrent-1')),
+    ]);
+    assert.equal(first.status, 200);
+    assert.equal(second.status, 200);
+    assert.equal(second.body, first.body);
+    // A replay must be answered from the memo, never applied a second time.
+    assert.equal(actions.value, 1);
     const saved = (await store.get('p1'))!;
     const active = saved.world.save.privateState['activeQuest'] as {
       script: { counters: Record<string, number> };

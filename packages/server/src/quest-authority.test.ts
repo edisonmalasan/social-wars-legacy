@@ -322,6 +322,24 @@ describe('Q03 truck arrivals', () => {
     assert.deepEqual(fourth.world, before);
   });
 
+  it('refuses an arrival whose dedupe key is already in the ledger', () => {
+    const helpers = createQuestHelpers(qdeps());
+    const started = helpers.beginQuest(freshWorld(), Q03);
+    assert.equal(started.ok, true);
+    if (!started.ok) return;
+    // The first arrival's key has already been recorded — for example by a
+    // retry that reached the applier — so the counter must not move again.
+    const world = structuredClone(started.world);
+    active(world).ledger.events.push('arrival:item:1013:1');
+    const before = structuredClone(world);
+    const replayed = helpers.applyQuestAction(world, Q03, arrival);
+    assert.equal(replayed.ok, false);
+    if (replayed.ok) return;
+    assert.equal(replayed.reason, 'event-already-seen');
+    assert.equal(active(replayed.world).script.counters['trucksArrived'], 0);
+    assert.deepEqual(replayed.world, before);
+  });
+
   it('the action kind must match the quest event channel', () => {
     const helpers = createQuestHelpers(qdeps());
     const started = helpers.beginQuest(freshWorld(), Q03);

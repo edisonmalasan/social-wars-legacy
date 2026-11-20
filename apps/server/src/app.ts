@@ -626,6 +626,33 @@ export function createApp(
   }
 
   /**
+   * Per-player serialisation for the quest endpoints.
+   *
+   * The idempotency memo is checked before a transaction and claimed after it.
+   * Two concurrent requests with the same id could both pass the check before
+   * either claim, so a replay would be applied twice. Holding one lock across
+   * check → transact → claim makes that window atomic. It also keeps these
+   * endpoints safe with a store whose `transact` does not serialise callbacks.
+   */
+  const questLocks = new Map<string, Promise<void>>();
+
+  async function withQuestLock<T>(playerId: string, work: () => Promise<T>): Promise<T> {
+    const previous = questLocks.get(playerId) ?? Promise.resolve();
+    let release: () => void = () => {};
+    const mine = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    questLocks.set(playerId, previous.then(() => mine, () => mine));
+    await previous.catch(() => undefined);
+    try {
+      return await work();
+    } finally {
+      release();
+      if (questLocks.get(playerId) === mine) questLocks.delete(playerId);
+    }
+  }
+
+  /**
    * Map an authoritative quest refusal to a typed 4xx.
    *
    * The applier's reason is internal; the client gets a code from
@@ -656,6 +683,11 @@ export function createApp(
   async function handleQuestStart(request: AppRequest): Promise<AppResponse> {
     const playerId = identify(request);
     if (!playerId) return fail(401, 'unknown-player');
+    return withQuestLock(playerId, () => questStartLocked(request, playerId));
+  }
+
+  /** The start handler's body, run under the player's quest lock. */
+  async function questStartLocked(request: AppRequest, playerId: string): Promise<AppResponse> {
     const beginQuest = options.beginQuest;
     if (!beginQuest) return fail(503, 'internal-error');
 
@@ -675,6 +707,8 @@ export function createApp(
         ? body.difficulty
         : undefined;
 
+    // Check, transact and claim all run under the player's quest lock, so a
+    // concurrent retry cannot slip between the check and the claim.
     const id = questRequestId(request, body);
     if (id) {
       const remembered = rememberedAnswer(playerId, id);
@@ -702,6 +736,11 @@ export function createApp(
   async function handleQuestAction(request: AppRequest): Promise<AppResponse> {
     const playerId = identify(request);
     if (!playerId) return fail(401, 'unknown-player');
+    return withQuestLock(playerId, () => questActionLocked(request, playerId));
+  }
+
+  /** The action handler's body, run under the player's quest lock. */
+  async function questActionLocked(request: AppRequest, playerId: string): Promise<AppResponse> {
     const applyQuestAction = options.applyQuestAction;
     if (!applyQuestAction) return fail(503, 'internal-error');
 
@@ -731,6 +770,8 @@ export function createApp(
       QuestActionHelper
     >[2];
 
+    // Check, transact and claim all run under the player's quest lock, so a
+    // concurrent retry cannot slip between the check and the claim.
     const id = questRequestId(request, body);
     if (id) {
       const remembered = rememberedAnswer(playerId, id);
