@@ -401,6 +401,34 @@ function el(
 }
 
 /**
+ * The gun bot id of the five fixed weekly-quest instances.
+ *
+ * `re/data/quests.json:36` names `ID_UNIT_GUNBOT (id 1063)` for the map's five
+ * instances. Keep this separate from the legacy `ITEM.gunbot` (1061) used by
+ * the older weekly tests: the quest's own roster is pinned to 1063.
+ */
+export const WEEKLY_BOT_ITEM_ID = 1063;
+
+/**
+ * The five gun bots of `QuestWeekly01`, identified by their tile coordinates.
+ *
+ * Ported from `re/data/quests.json:30` (`quest/QuestWeekly01.as:128-171`): the
+ * client names the bots only by position, so the position is the ref. The
+ * chests beside them are scenery, not quest elements, and are not listed.
+ */
+export const WEEKLY_BOT_REFS: readonly string[] = [
+  [20, 45],
+  [38, 19],
+  [67, 22],
+  [63, 56],
+  [46, 37],
+].map(([x, y]) => `gunbot@${x},${y}`);
+
+const WEEKLY_BOT_ELEMENTS: readonly QuestElementSpec[] = WEEKLY_BOT_REFS.map((ref) =>
+  el(ref, WEEKLY_BOT_ITEM_ID, 'onKill'),
+);
+
+/**
  * The five laboratories of `Quest09Laboratories`.
  *
  * The client identifies them only by their tile coordinates — the airstrike
@@ -474,7 +502,7 @@ export const QUESTS: readonly QuestSpec[] = [
     levelRequired: 0,
     defaultDifficulty: 1,
     difficultyIsNoOp: false,
-    elements: [],
+    elements: WEEKLY_BOT_ELEMENTS,
     keyElementRefs: [],
     armyWipeEndsQuest: false,
     armyWipeResolvesImmediately: false,

@@ -6,8 +6,12 @@ import {
   DART_COST_CASH,
   QUEST_ID_01_BAZOOKA,
   QUEST_ID_02_CENTRAL_NUCLEAR,
+  QUEST_ID_03_DEFEND_CONVOY_AUTO,
   QUEST_ID_06_AIRSTRIKE,
   QUEST_ID_15_HARDCORE1,
+  QUEST_ID_WEEKLY_01,
+  WEEKLY_BOT_REFS,
+  WEEKLY_CASH_PER_BOT,
   applyCommandCost,
   buildDartsBoard,
   createGoalState,
@@ -2133,6 +2137,7 @@ const QUEST_ITEMS = new Map<number, ApplierItem>([
   [89, item({ id: 89, type: 'b', subcatFunctional: 112 })], // nuclear plant
   [195, item({ id: 195, type: 'b', subcatFunctional: 113 })], // command centre
   [1035, item({ id: 1035, type: 'u', subcatFunctional: 114 })], // truck (ITEM.truck2)
+  [1063, item({ id: 1063, type: 'u', subcatFunctional: 115 })], // gun bot (weekly quest)
 ]);
 
 const questDeps = (over: Partial<ApplierDeps> = {}): ApplierDeps =>
@@ -2530,6 +2535,117 @@ describe('the active assault quest', () => {
     const outcome = applier(killed.world, {
       name: 'end_quest',
       args: [QUEST_ID_06_AIRSTRIKE, 1],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+  });
+});
+
+describe('the weekly quest', () => {
+  /** Kill the named roster bots one `set_quest_var` write at a time. */
+  const killBots = (refs: readonly string[], questId = QUEST_ID_WEEKLY_01) => {
+    const applier = createApplier(questDeps());
+    let world = questWorld({ questId });
+    for (const ref of refs) {
+      const killed = applier(world, killedWrite([ref], questId));
+      assert.equal(killed.applied, true, `kill ${ref} was refused: ${killed.refused}`);
+      world = killed.world;
+    }
+    return world;
+  };
+
+  const endWeekly = (world: ShimWorld) =>
+    createApplier(questDeps())(world, {
+      name: 'end_quest',
+      args: [QUEST_ID_WEEKLY_01, 1],
+    });
+
+  it('pays the weekly cash after five distinct validated bot kills', () => {
+    const world = killBots(WEEKLY_BOT_REFS);
+    const state = activeState(world);
+    assert.deepEqual(state.script.destroyed, [...WEEKLY_BOT_REFS]);
+    assert.equal(state.script.counters['botsKilled'], 5);
+
+    const outcome = endWeekly(world);
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['c'], 5 * WEEKLY_CASH_PER_BOT);
+    assert.equal(ACTIVE_QUEST_KEY in outcome.world.save.privateState, false);
+  });
+
+  it('refuses four kills with no reward', () => {
+    const world = killBots(WEEKLY_BOT_REFS.slice(0, 4));
+    assert.equal(activeState(world).script.counters['botsKilled'], 4);
+    const outcome = endWeekly(world);
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+    assert.equal(outcome.world.resources['c'], 0);
+    assert.equal(ACTIVE_QUEST_KEY in outcome.world.save.privateState, true);
+  });
+
+  it('counts a repeated ref once, however many times it is re-sent', () => {
+    const world = killBots(Array(5).fill(WEEKLY_BOT_REFS[0]));
+    const state = activeState(world);
+    assert.deepEqual(state.script.destroyed, [WEEKLY_BOT_REFS[0]]);
+    assert.equal(state.script.counters['botsKilled'], 1);
+    const outcome = endWeekly(world);
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+    assert.equal(outcome.world.resources['c'], 0);
+  });
+
+  it('does not pay again when a validated ref is replayed after the win', () => {
+    const won = killBots(WEEKLY_BOT_REFS);
+    const replayed = createApplier(questDeps())(
+      won,
+      killedWrite([WEEKLY_BOT_REFS[4]!], QUEST_ID_WEEKLY_01),
+    );
+    assert.equal(replayed.applied, true);
+    assert.equal(activeState(replayed.world).script.counters['botsKilled'], 5);
+    const outcome = endWeekly(replayed.world);
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['c'], 5 * WEEKLY_CASH_PER_BOT);
+  });
+
+  it('refuses a kill ref outside the weekly roster', () => {
+    const applier = createApplier(questDeps());
+    const world = questWorld({ questId: QUEST_ID_WEEKLY_01 });
+    const before = structuredClone(world);
+    const outcome = applier(world, killedWrite(['item:1063'], QUEST_ID_WEEKLY_01));
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'unknown-quest-element');
+    assert.deepEqual(outcome.world, before);
+  });
+
+  it('refuses an end_quest with no validated kills', () => {
+    const world = questWorld({ questId: QUEST_ID_WEEKLY_01 });
+    const before = structuredClone(world);
+    const outcome = endWeekly(world);
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+    assert.deepEqual(outcome.world, before);
+  });
+
+  it('resolves the legacy client\'s chapter-status kills too', () => {
+    const world = questWorld({ vars: { killed: [...WEEKLY_BOT_REFS] } });
+    delete world.save.privateState[ACTIVE_QUEST_KEY];
+    const outcome = endWeekly(world);
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['c'], 5 * WEEKLY_CASH_PER_BOT);
+  });
+
+  it('never moves another quest\'s counter from a kill', () => {
+    // The convoy's `trucksArrived` counts trucks reaching the exit, not
+    // kills. A kill-driven counter must stay scoped to the weekly quest.
+    const applier = createApplier(questDeps());
+    const killed = applier(
+      questWorld({ questId: QUEST_ID_03_DEFEND_CONVOY_AUTO }),
+      killedWrite(['colonel'], QUEST_ID_03_DEFEND_CONVOY_AUTO),
+    );
+    assert.equal(killed.applied, true);
+    assert.equal(activeState(killed.world).script.counters['trucksArrived'], undefined);
+    const outcome = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_03_DEFEND_CONVOY_AUTO, 1],
     });
     assert.equal(outcome.applied, false);
     assert.equal(outcome.refused, 'no-victory');
