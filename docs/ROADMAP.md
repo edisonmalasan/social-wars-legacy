@@ -1376,32 +1376,33 @@ assault against the new server, and the cheat battery is fully rejected.
       battle result. Evidence: `apply.test.ts`'s "collect_mission" block — "grants exactly the
       content reward and advances the chapter", "wraps a next chapter above 99 back to 1",
       "pays nothing on a replay", and the `admin_set_quest_rank` no-overwrite test
-- [ ] Quests, goals, the darts minigame, the marketplace, premium and the weekly bonus are
+- [x] Quests, goals, the darts minigame, the marketplace, premium and the weekly bonus are
       functional — darts, the market, goals, premium and the weekly bonus are each verified
-      with a rules model, a server applier and a client request/model. **Assault quests are
-      still only partly resolved:** `end_quest` resolves wins that come from validated
-      scripted-element events. It dispatches each ref by `QuestElementSpec.trigger`, so
-      `destroyAll` (Q02, Q05, Q12, Q13), `nearDeathAll` (Q01, Q04) and `defendersClearedAll`
-      combinations (Q06, Q07, Q09) now win from the server-held `activeQuest`
-      (`isQuestVictory` / `finishQuest` / `awardQuest`, a content-derived reward paid once,
-      the client's `win` / `loot` / `difficulty` ignored, and empty-roster and recorded-loss
-      wins refused). Q08 Rocket is server-resolvable but client-unwinnable (`canDie: false`)
-      and stays flagged. The **weekly quest now resolves** from five validated gun-bot kill
-      refs derived from the client's documented positions: the server increments its own
-      `botsKilled` counter once per distinct kill and pays the weekly cash once, while four
-      kills, replays, off-roster refs and zero events are refused. **The eight hardcore quests
-      now resolve** from build-time-extracted rosters (100000017/018/019/020/021/022/026/025 —
-      79/122/114/45/84/153/138/46 enemy units): the bundle keys a roster by quest id, the
-      applier merges it into `questRoster()` for empty-element specs, every `item:<isoId>` kill
-      ref is checked against that roster, `enemiesAlive` starts at the roster size and only a
-      full set of validated kills takes it to zero, and the zero-event and recorded-loss guards
-      are unchanged. **The other counter-based quests still cannot resolve:** Q03 Convoy has no
-      truck-arrival event for `trucksArrived`, and Q10 Special Ops / Q11 Save Villages /
-      Q14 Spy2 use `countersZero` on counters absent from `initialCounters` with no mutator
-      seeding them. There is also no client per-kill request builder: the shipped
-      `set_quest_var` protocol carries only two arguments, so one validated kill at a time
-      needs a protocol/arity decision (the command catalogue is cross-checked). The precise
-      residual is in *Unimplemented layers*
+      with a rules model, a server applier and a client request/model, and quests now meet the
+      same bar with **server-authoritative** outcomes. The client starts a quest through the
+      authenticated, idempotent native `POST /api/quest/start` endpoint (`apps/server/src/app.ts`,
+      `startQuestOnServer` in `packages/client/src/requests.ts`) and drives server-authoritative
+      strikes plus a **two-argument** `set_quest_var` kill report through the native action
+      endpoint (`applyQuestAction` in `apps/server/src/app.ts`). `beginQuest` seeds a
+      server-owned ledger and counters from content, encounter HP is bounded to at most four
+      server strikes, and a kill ref is accepted only once the ledger marks the element dead.
+      The event quests now resolve from server-validated events: Q03 Convoy's three
+      `truck-arrival` events, Q10 Special Ops' and Q14 Spy2's `bastardsAlive` and Q11 Save
+      Villages' `workersInVillages` counters, and the weekly quest's five gun-bot kills — each
+      counted once from server-owned state, with forged, early, duplicate and off-roster events
+      refused. `end_quest` (`isQuestVictory` / `finishQuest` / `awardQuest` in
+      `packages/rules/src/quest.ts`, applied in `packages/server/src/apply.ts`) pays the
+      content-derived reward once, sets the rank and clears the active state; the client's
+      `win` / `loot` / `difficulty` are ignored and the awards survive a real server restart.
+      *Evidence:* `packages/server/src/quest-authority.test.ts` ("beginQuest",
+      "authoritative strikes and killed writes", "Q03 truck arrivals", "Q10/Q14 eligible
+      enemies", "Q11 civilian evacuations", "end_quest after an explicit start", "a restart"),
+      `apps/server/src/quest-endpoints.test.ts` (authenticated, idempotent start/action
+      endpoints), `packages/server/src/apply.test.ts`'s "the active assault quest" / "the
+      weekly quest" / "collect_mission" blocks, and the real-server `scripts/e2e-test.mjs` run
+      on Chrome and Edge (a two-arg kill accepted after two server strikes, and the Q03/Q02
+      awards still present after restart). Q08 Rocket remains client-unwinnable (`canDie: false`);
+      the remaining fidelity boundaries are in *Unimplemented layers*
 - [x] **Magic and tech are functional** (`packages/rules/src/magic.ts`,
       `packages/server/src/apply.ts`, `packages/server/src/shim.ts`): the ten shipped spells
       are indexed from the content bundle with their mana cost, area, unlock level and
@@ -2153,7 +2154,7 @@ owner and a precise condition for closing it.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| G | Full authoritative positional combat (the residual quest dependency) | The quest applier now dispatches each validated element ref by `QuestElementSpec.trigger` instead of always calling `killQuestElement`. Wins that come from **scripted elements** resolve: `destroyAll` (Q02 Central Nuclear, Q05 Assault Convoy, Q12 TankBoss, Q13 Tyrannosaurus), `nearDeathAll` (Q01 Bazooka, Q04 Supertank) and `defendersClearedAll` combinations (Q06 Airstrike, Q07 Ship, Q09 Labs). `onNearDeath` feeds `script.nearDeath` and `onKillDefenders` feeds `script.defendersCleared`; `onKill` and `none` still go through `killQuestElement` for destruction, counters and key-element loss, and the three-channel vacuity guard still refuses empty-roster and recorded-loss wins. Q08 Rocket is server-resolvable but client-unwinnable (`canDie: false`) and stays flagged. The **weekly quest `100000049` now resolves**: its spec carries a five-element gun-bot roster whose refs are derived from the client's documented tile positions (20,45) (38,19) (67,22) (63,56) (46,37), and the applier advances the spec's `botsKilled` counter by one per distinct validated bot kill, so `countersAtLeast botsKilled>=5` needs five real events. The weekly cash is computed and paid once by the server; four kills, a repeated ref, an off-roster ref and zero events are all refused. The eight hardcore quests (15-22) **now resolve**: build-time extraction from the vendored map snapshots puts their rosters in the content bundle — 100000017→79, 100000018→122, 100000019→114, 100000020→45, 100000021→84, 100000022→153, 100000026→138, 100000025→46 enemy units — and the applier merges them into `questRoster()` for empty-element specs. Each `item:<isoId>` kill ref is checked against that roster before it can move quest state, `enemiesAlive` is seeded from the roster size, and only a full set of validated kills takes it to zero; a partial roster, an off-roster ref, zero events and a recorded loss are all refused, and the zero-event and loss guards are unchanged. The residual gap is the **other counter-based quests**: Q03 Convoy needs `trucksArrived>=3` but no command or `set_quest_var` key carries a truck-arrival event; Q10 Special Ops, Q11 Save Villages and Q14 Spy2 use `countersZero` on counters absent from `initialCounters`, so the `c in script.counters` check fails and no mutator seeds or decrements them. There is also **no client per-kill request builder**: the shipped `set_quest_var` protocol carries only two arguments (`key`, `value`), so one validated kill at a time needs a protocol/arity decision rather than a silent extra argument. Every remaining gap is in-repo work, not an external blocker. *RE documentation note:* `re/data/quests.json:30,36` records the five bots as item id 1063, while `re/data/asset-manifest.json` and the vendored `100000049.json` snapshot call the GunBot 1061. The disagreement is in the analysis, not the server: the roster's item id is taken from the server's own spec (pinned to 1063) and the client supplies positional refs (`gunbot@x,y`) and never an item id, so no client input can choose an element or a counter | The eight hardcore rosters are done — no further build-time extraction is needed for them, and `upstream/` can never become a runtime dependency. Instrument the client to emit the missing truck-arrival and counter events, and decide whether to extend `set_quest_var` beyond its two shipped arguments (a protocol/arity decision) or add commands carrying those events — the latter changes the cross-checked 94-command catalogue and needs a scope decision. Resolve the 1061/1063 item-id disagreement in the RE documentation as a separate documentation task. Regenerating the tracked `apps/client/public/content-bundle.json` with `node scripts/build-client-manifest.mjs` is a **separate integration step**: it is the client's copy, not the server's `CONTENT_PATH` (`packages/content/dist/content-bundle.json`), so it does not affect server-side roster resolution. Until the remaining counter quests resolve, the G4 quest item stays open |
+| G | Full authoritative positional combat and remaining quest fidelity gaps | The server-authoritative workflow is in place and verified: `beginQuest` seeds a server-owned ledger and counters from content, strikes damage from the server seed with encounter HP bounded to at most four strikes, the two-argument `set_quest_var` kill report is accepted only once the ledger marks the element dead, and Q03 truck arrivals plus Q10/Q11/Q14 event counters advance from server-validated events. Rewards are paid once and survive a real server restart. What remains is not a missing event source but deliberate fidelity boundaries: (1) there is **no positional combat simulator** — the server validates player events against a server-owned ledger rather than replaying a battle from unit positions, so a "validated" event is one that matches the ledger, not one a simulated fight produced; (2) **Q11's 240-second timer and army-wipe defeat are not enforced** by this workflow — a known fidelity gap, the client still reports the outcome and the server neither times the mission nor checks an army wipe; (3) **Q08 Rocket remains client-unwinnable** (`canDie: false`) and stays flagged; (4) **chapters remain client-reported state predicates** — the client writes `spawned`/`ended`, while the server owns the reward, the once-only guard and the chapter state keys; (5) the **legacy Flash client cannot emit the new native start/strike operations** — those are web-client-only (`POST /api/quest/start` and the native action endpoint), so an unmodified original client cannot drive this workflow. These are in-repo fidelity boundaries, kept distinct from the external dependencies in *Externally Blocked Items* above, not relabelled as blockers | Close this row only when a real positional combat simulator replaces ledger validation, Q11's timer and army-wipe defeat are enforced server-side, Q08 becomes winnable, chapters stop relying on client-reported `spawned`/`ended`, and the legacy client can emit the start/strike operations. None of those is required for the G4 "Quests, goals, … functional" item, which is now closed on the verified three-layer workflow. *RE documentation note:* `re/data/quests.json:30,36` records the five bots as item id 1063 while `re/data/asset-manifest.json` and the vendored `100000049.json` snapshot call the GunBot 1061; resolving that disagreement is a separate documentation task, not a correctness issue — the server takes the roster item id from its own spec and the client sends positional refs only. Regenerating the tracked `apps/client/public/content-bundle.json` with `node scripts/build-client-manifest.mjs` remains a separate integration step and does not affect server-side roster resolution |
 
 ---
 
@@ -2307,6 +2308,40 @@ reviewed without reconstructing the conversation that led to it.*
   buildId `77fd37f12ead2d60a87e428619eea9d400c2371455417efa41eeca1e33a2da56`, and a green gate:
   `pnpm test` 1493 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
   `check-roadmap.mjs`, `check-report-sync.mjs`, `verify-command-catalogue.mjs` (94/94/94)
+
+- **2026-11-20 — authoritative quest workflow closes G4 (Groups C, F, G4).** Task 4 ran
+  every acceptance gate green, then closed the G4 "Quests, goals, the darts minigame, the
+  marketplace, premium and the weekly bonus are functional" item; the two neighbouring
+  "first chapter is completable" items were verified still closed with their evidence intact.
+  The workflow is now server-authoritative end to end: the authenticated, idempotent native
+  `POST /api/quest/start` endpoint (`apps/server/src/app.ts`, `startQuestOnServer` in
+  `packages/client/src/requests.ts`) starts a quest; `beginQuest` seeds a server-owned ledger
+  and counters from content; strikes draw from the server seed with encounter HP bounded to at
+  most four; the two-argument `set_quest_var` kill report is accepted only once the ledger
+  marks the ref dead; Q03 truck arrivals and Q10/Q11/Q14 event counters advance from
+  server-validated events; and `end_quest` pays the content-derived reward once, sets the rank
+  and clears the active state. The real-server e2e run on Chrome and Edge proved an accepted
+  two-arg kill after two server strikes and awards that survived a restart. *Rationale:* a
+  "functional" claim needs rules model + server application + client request/model; all three
+  are present and the formerly missing event sources are now server-owned, so the item can be
+  ticked without overstating fidelity. The remaining gaps — no positional combat simulator
+  (ledger validation, not a replayed battle), Q11's 240s timer and army-wipe defeat unenforced,
+  Q08 client-unwinnable, chapters client-reported, and the legacy Flash client unable to emit
+  the native start/strike operations — are recorded in *Unimplemented layers* and kept
+  distinct from *Externally Blocked Items*. This follows the locked decisions that the server
+  is authoritative (ADR 0003), the client is the specification (ADR 0009) and the rules are
+  deterministic by construction (ADR 0014). *Evidence:*
+  `packages/server/src/quest-authority.test.ts`, `apps/server/src/quest-endpoints.test.ts`,
+  `packages/server/src/apply.test.ts`, `packages/rules/src/quest.ts` and `scripts/e2e-test.mjs`.
+  Gates this session, all exit 0: `pnpm test` 1549 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
+  `pnpm build:content` + `pnpm check:content` (build id `63e067bd…`),
+  `pnpm --filter @swl/app-client build`, `verify-command-catalogue.mjs` (94/94/94),
+  `check-roadmap.mjs` (401 items), `check-report-sync.mjs` (4 claims), `golden-master.mjs`
+  (50 scenarios, 0 differences), `run-cheat-battery.mjs` (11/11 attacks caught),
+  `check-coverage.mjs` (97.52 / 95.22 / 85.32, above floors) and `e2e-test.mjs`
+  (Chrome + Edge + restart). `verify-upstream.mjs` also passed. Note: the `verify:provenance`
+  npm script is dangling (`scripts/verify-provenance.mjs` does not exist) in the repository
+  baseline; it is not a G4 gate and is unrelated to this change
 
 ---
 
