@@ -145,7 +145,9 @@ describe('hardcore quest rosters', () => {
 
   it('extracts the exact unit count of every roster', async () => {
     const { bundle } = await buildContent();
-    for (const roster of bundle.questRosters) {
+    const rosters = bundle.questRosters ?? [];
+    assert.equal(rosters.length, 8, 'the bundle has eight quest rosters');
+    for (const roster of rosters) {
       assert.equal(
         roster.items.length,
         EXPECTED_UNITS[roster.questId],
@@ -157,7 +159,9 @@ describe('hardcore quest rosters', () => {
   it('emits unique item:<isoId> refs from unit-typed content items', async () => {
     const { bundle } = await buildContent();
     const byId = new Map(bundle.items.map((i) => [i.id, i]));
-    for (const roster of bundle.questRosters) {
+    const rosters = bundle.questRosters ?? [];
+    assert.equal(rosters.length, 8, 'the bundle has eight quest rosters');
+    for (const roster of rosters) {
       const refs = roster.items.map((entry) => entry.ref);
       assert.equal(new Set(refs).size, refs.length, `quest ${roster.questId} has duplicate refs`);
       for (const entry of roster.items) {

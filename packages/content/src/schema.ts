@@ -167,7 +167,7 @@ export interface ContentBundle {
   levels: ContentLevel[];
   goals: ContentGoal[];
   /** Build-time-extracted enemy rosters for the eight hardcore quests. */
-  questRosters: QuestRoster[];
+  questRosters?: QuestRoster[];
   globals: Record<string, unknown>;
   collections: unknown[];
   inventoryItems: Record<string, unknown>;
