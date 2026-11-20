@@ -9,6 +9,9 @@
  */
 import { useState } from 'react';
 
+import { MAX_TEAM_SIZE, type Army } from '@swl/rules';
+import type { ArmyUnitView } from '@swl/client';
+
 import type {
   ActiveQuestView,
   QuestActionChoice,
@@ -28,8 +31,11 @@ export interface QuestPanelProps {
   readonly view: QuestPanelView;
   /** True while a quest request is pending; request buttons are disabled. */
   readonly busy: boolean;
-  /** The player asked to start. The host decides which request to send. */
-  readonly onStart: (questId: string, difficulty: QuestDifficulty) => void;
+  /**
+   * The player asked to start. A team is a request: the server decides which
+   * units, if any, it will actually accept.
+   */
+  readonly onStart: (questId: string, difficulty: QuestDifficulty, team?: Army) => void;
   /** The player pressed one of the server's allowed actions. */
   readonly onAction: (questId: string, action: QuestActionChoice) => void;
   /** The player cancelled a briefing, or left a result for the base. */
@@ -52,12 +58,72 @@ function Briefing({
   onStart: QuestPanelProps['onStart'];
   onCancel: QuestPanelProps['onCancel'];
 }): React.JSX.Element {
-  // The difficulty is the player's own choice, held only for the length of
-  // this panel. It is sent with the start request; the server owns the quest.
+  // The difficulty and the chosen counts are the player's own gestures, held
+  // only for the length of this panel. They are sent with the start request;
+  // the server owns the quest and checks every unit before accepting a team.
   const [difficulty, setDifficulty] = useState<QuestDifficulty>(briefing.difficulty);
+  const [counts, setCounts] = useState<Record<number, number>>(() => {
+    const initial: Record<number, number> = {};
+    let total = 0;
+    for (const unit of briefing.army) {
+      if (!unit.allowed) continue;
+      const count = Math.min(unit.available, MAX_TEAM_SIZE - total);
+      if (count > 0) {
+        initial[unit.itemId] = count;
+        total += count;
+      }
+    }
+    return initial;
+  });
+  const team: Army = briefing.army
+    .filter((unit) => unit.allowed && (counts[unit.itemId] ?? 0) > 0)
+    .map((unit) => ({ unitId: unit.itemId, count: counts[unit.itemId]! }));
+
+  /** Change one count, never above what the server's save accounts for. */
+  function choose(unit: ArmyUnitView, count: number): void {
+    const whole = Number.isFinite(count) ? Math.trunc(count) : 0;
+    setCounts((previous) => ({
+      ...previous,
+      [unit.itemId]: Math.max(0, Math.min(unit.available, whole)),
+    }));
+  }
+
   return (
     <div className="swl-quest-panel">
       <p className="swl-quest-subtitle">{briefing.subtitle}</p>
+      {briefing.teamQuest ? (
+        <fieldset className="swl-quest-team" data-swl-team-picker="">
+          <legend>Choose your team</legend>
+          {briefing.army.length === 0 ? (
+            <p className="swl-quest-subtitle">No units are available in your army.</p>
+          ) : (
+            briefing.army.map((unit) => (
+              <label key={unit.itemId} className="swl-quest-team-row">
+                <input
+                  type="checkbox"
+                  checked={(counts[unit.itemId] ?? 0) > 0}
+                  disabled={!unit.allowed || busy}
+                  onChange={(event) => choose(unit, event.target.checked ? unit.available : 0)}
+                />
+                <span>{unit.name}</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={unit.available}
+                  value={counts[unit.itemId] ?? 0}
+                  disabled={!unit.allowed || busy}
+                  onChange={(event) => choose(unit, Number(event.target.value))}
+                  aria-label={`${unit.name} count`}
+                />
+                <span>
+                  / {unit.available}
+                  {unit.allowed ? '' : ' · not allowed in this quest'}
+                </span>
+              </label>
+            ))
+          )}
+        </fieldset>
+      ) : null}
       <fieldset className="swl-quest-difficulty">
         <legend>Difficulty</legend>
         {([1, 2, 3] as const).map((stars) => (
@@ -77,8 +143,12 @@ function Briefing({
         <button
           type="button"
           className="swl-quest-primary"
-          disabled={!briefing.canStart || busy}
-          onClick={() => onStart(briefing.questId, difficulty)}
+          disabled={
+            !briefing.canStart || busy || (briefing.teamQuest && briefing.army.length === 0)
+          }
+          onClick={() =>
+            onStart(briefing.questId, difficulty, briefing.teamQuest ? team : undefined)
+          }
         >
           Start mission
         </button>
@@ -102,6 +172,11 @@ function Combat({
 }): React.JSX.Element {
   return (
     <div className="swl-quest-panel">
+      {active.team && active.team.length > 0 ? (
+        <p className="swl-quest-team-echo" data-swl-team="">
+          Team: {active.team.map((entry) => `${entry.unitId} ×${entry.count}`).join(', ')}
+        </p>
+      ) : null}
       <dl className="swl-quest-counters">
         {active.counters.map((counter) => (
           <div key={counter.name} className="swl-quest-counter">

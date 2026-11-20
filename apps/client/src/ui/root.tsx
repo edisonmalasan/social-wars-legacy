@@ -16,6 +16,7 @@ import { useMemo } from 'react';
 import {
   CLOSED_DIALOG,
   activeQuestState,
+  type ArmyUnitView,
   hudState,
   levelOf,
   questChoices,
@@ -30,6 +31,7 @@ import {
   type StoredItemView,
   type WorldSnapshot,
 } from '@swl/client';
+import type { Army } from '@swl/rules';
 import type { ContentBundle } from '@swl/content';
 
 import { BuildMenu } from './buildmenu.tsx';
@@ -89,8 +91,8 @@ export interface RootProps {
   onDialogDismiss?: () => void;
   /** The player picked an opened chapter slot. */
   onQuestPick?: (choice: QuestChoice) => void;
-  /** The player asked to start a quest at a difficulty. */
-  onQuestStart?: (questId: string, difficulty: QuestDifficulty) => void;
+  /** The player asked to start a quest at a difficulty, with an optional team. */
+  onQuestStart?: (questId: string, difficulty: QuestDifficulty, team?: Army) => void;
   /** The player pressed one of the quest's allowed actions. */
   onQuestAction?: (questId: string, action: QuestActionChoice) => void;
   /** The player asked to retry (or replay) a finished mission. */
@@ -101,6 +103,8 @@ export interface RootProps {
   onCollect?: () => void;
   /** The player picked a stored item to place on the map. */
   onPlaceStored?: (entry: StoredItemView) => void;
+  /** The army the server's save accounts for, drawn beside storage. */
+  army?: readonly ArmyUnitView[];
   /** The player asked for the daily bonus; the server decides the reward. */
   onClaimBonus?: () => void | Promise<unknown>;
   /** The player picked something to build, with its real wire type. */
@@ -150,6 +154,7 @@ export function Root({
   onQuestRetry,
   onQuestNext,
   onCollect,
+  army = [],
   onPlaceStored,
   onClaimBonus,
   onPick,
@@ -195,7 +200,7 @@ export function Root({
     <div className="swl-ui">
       <Hud state={state} placing={placingName} onClaimBonus={onClaimBonus} />
       <Goals goals={goals} onCommand={onCommand} />
-      <Inventory items={stored} onPlace={onPlaceStored} />
+      <Inventory items={stored} army={army} onPlace={onPlaceStored} />
       <Chapters
         ranks={ranks}
         minLevels={minLevels}

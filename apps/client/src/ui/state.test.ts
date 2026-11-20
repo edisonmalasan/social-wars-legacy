@@ -5,6 +5,7 @@ import { completeGoal, type WorldSnapshot } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 
 import {
+  armyPanel,
   buildingInfo,
   buildItems,
   categories,
@@ -586,5 +587,21 @@ describe('the inventory panel', () => {
       privateState: {},
     } as WorldSnapshot;
     assert.deepEqual(inventoryItems(bundle(), w), []);
+  });
+});
+
+describe('the army panel', () => {
+  it('bridges the server-owned units and the content names and group types', () => {
+    const w = {
+      maps: [{ id: 0, items: {}, store: { '1001': 2 } }],
+      resources: {},
+      privateState: { boughtUnits: [1001] },
+    } as WorldSnapshot;
+    const content = bundle({
+      items: [item({ id: 1001, name: 'Soldier', type: 'u', group_type: 'INFANTRY' })],
+    });
+    assert.deepEqual(armyPanel(content, w, 0), [
+      { itemId: 1001, name: 'Soldier', groupType: 'INFANTRY', available: 2, allowed: true },
+    ]);
   });
 });

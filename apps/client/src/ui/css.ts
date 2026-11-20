@@ -1000,6 +1000,37 @@ export function uiCss(): string {
   color: var(--swl-ink-muted);
 }
 
+.swl-quest-team {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: var(--swl-gap);
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+}
+
+.swl-quest-team legend {
+  padding: 0 4px;
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-team-row {
+  display: flex;
+  align-items: center;
+  gap: var(--swl-gap);
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-team-row input[type='number'] {
+  width: 4rem;
+}
+
+.swl-quest-team-echo {
+  margin: 0;
+  color: var(--swl-ink-muted);
+}
+
 .swl-quest-star {
   display: inline-flex;
   align-items: center;

@@ -16,7 +16,7 @@ import {
   Tutorial,
   type TutorialStep,
 } from '@swl/client';
-import { tutorialState } from '@swl/rules';
+import { tutorialState, type Army } from '@swl/rules';
 
 import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH } from './renderer.ts';
@@ -80,6 +80,7 @@ import { uiCss } from './ui/css.ts';
 import type { TutorialOverlayProps } from './ui/tutorial.tsx';
 import type { QuestPanelView } from './ui/quests.tsx';
 import {
+  armyPanel,
   productionPanel,
   questMinLevels,
   questRanks,
@@ -574,8 +575,8 @@ async function main(): Promise<void> {
       // the request so the HUD's button stays disabled until it settles.
       onClaimBonus: () => run([claimDailyBonus()]),
       onQuestPick: openQuestSlot,
-      onQuestStart: (questId, difficulty) => {
-        void beginQuest(questId, difficulty);
+      onQuestStart: (questId, difficulty, team) => {
+        void beginQuest(questId, difficulty, team);
       },
       onQuestAction: (questId, action) => {
         void applyQuestGesture(questId, action);
@@ -653,7 +654,11 @@ async function main(): Promise<void> {
       gestureRefusal('that quest is still locked');
       return;
     }
-    const briefing = briefingView(choice, chosenDifficulty);
+    const briefing = briefingView(
+      choice,
+      chosenDifficulty,
+      armyPanel(content, world, Math.floor(Date.now() / 1000)),
+    );
     questPanel = { kind: 'briefing', briefing };
     const panel = briefingDialog(briefing);
     dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
@@ -986,8 +991,9 @@ async function main(): Promise<void> {
   async function startQuest(
     questId: string,
     difficulty?: number,
+    team?: Army,
   ): Promise<QuestResult<QuestStartBody>> {
-    const result = await startQuestOnServer(signedIn, questId, difficulty);
+    const result = await startQuestOnServer(signedIn, questId, difficulty, team);
     world = await fetchWorld();
     drawInterface();
     return result;
@@ -1023,15 +1029,22 @@ async function main(): Promise<void> {
   }
 
   /** The briefing's Start button: ask the server, then host the live panel. */
-  async function beginQuest(questId: string, difficulty: 1 | 2 | 3): Promise<void> {
+  async function beginQuest(
+    questId: string,
+    difficulty: 1 | 2 | 3,
+    team?: Army,
+  ): Promise<void> {
     if (questBusy) return;
     questBusy = true;
     drawInterface();
     try {
-      const result = await startQuest(questId, difficulty);
+      const result = await startQuest(questId, difficulty, team);
       if (!result.ok || !result.body) {
+        // The server's typed code is shown through the one feedback channel;
+        // the client never turns a refusal into a local quest state.
+        const reason = result.serverError ? ` · ${result.serverError}` : '';
         feedback = [
-          { tone: 'error', text: `The server refused the quest start (${result.status}).` },
+          { tone: 'error', text: `The server refused the quest start (${result.status})${reason}.` },
         ];
         drawInterface();
         return;

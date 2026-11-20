@@ -14,6 +14,7 @@
  * without a browser: the tests are in `state.test.ts`.
  */
 import type {
+  ArmyUnitView,
   BuildingInfoView,
   BuildMenuItem,
   HudInput,
@@ -29,6 +30,7 @@ import type {
   WorldSnapshot,
 } from '@swl/client';
 import {
+  armyView,
   buildingInfoView,
   completeGoal,
   itemType,
@@ -117,6 +119,34 @@ export function expRequiredByLevel(bundle: ContentBundle): Map<number, number> {
  */
 export function inventoryItems(bundle: ContentBundle, world: WorldSnapshot): StoredItemView[] {
   return storedItems(world, bundle.items ?? []);
+}
+
+/**
+ * The army the base panel draws.
+ *
+ * The bridge is thin: the model reads the server's store, placed units and
+ * finished training queues; the content supplies the names, group types and
+ * training times. A caller hosting a team quest may pass that quest's excluded
+ * group types so the panel can grey out units the quest will not accept.
+ */
+export function armyPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  now: number,
+  excludedGroupTypes: readonly string[] = [],
+): ArmyUnitView[] {
+  return armyView(
+    world,
+    (bundle.items ?? []).map((item) => ({
+      id: item.id,
+      name: item.name,
+      type: item.type,
+      groupType: item.group_type ?? '',
+      trainingTime: item.training_time ?? 0,
+    })),
+    now,
+    excludedGroupTypes,
+  );
 }
 
 /** What the HUD needs to draw itself. */

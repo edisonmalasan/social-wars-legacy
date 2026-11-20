@@ -19,10 +19,11 @@ import type {
   StoredItemView,
   WorldSnapshot,
 } from '@swl/client';
+import type { Army } from '@swl/rules';
 import type { ContentBundle } from '@swl/content';
 
 import type { QuestPanelView } from './quests.tsx';
-import type { ProductionPanelView } from './state.ts';
+import { armyPanel, type ProductionPanelView } from './state.ts';
 import { Root } from './root.tsx';
 import type { TutorialOverlayProps } from './tutorial.tsx';
 
@@ -40,8 +41,8 @@ export interface UiOverlayState {
   readonly questBusy?: boolean;
   /** The player picked an opened chapter slot. */
   readonly onQuestPick?: (choice: QuestChoice) => void;
-  /** The player asked to start a quest. */
-  readonly onQuestStart?: (questId: string, difficulty: QuestDifficulty) => void;
+  /** The player asked to start a quest, with an optional chosen team. */
+  readonly onQuestStart?: (questId: string, difficulty: QuestDifficulty, team?: Army) => void;
   /** The player pressed a quest action. */
   readonly onQuestAction?: (questId: string, action: QuestActionChoice) => void;
   /** The player asked to retry (or replay) a finished mission. */
@@ -117,6 +118,7 @@ export function mountUi(
           feedback={overlays.feedback}
           questPanel={overlays.questPanel}
           questBusy={overlays.questBusy}
+          army={armyPanel(bundle, world, overlays.now ?? Math.floor(Date.now() / 1000))}
           onDialogDismiss={overlays.onDialogDismiss}
           onQuestPick={overlays.onQuestPick}
           onQuestStart={overlays.onQuestStart}

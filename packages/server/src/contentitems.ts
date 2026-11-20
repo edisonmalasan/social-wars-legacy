@@ -76,6 +76,9 @@ export function contentItems(bundle: { items?: unknown[] }): Map<number, Applier
       // The quest roster needs it to decide whether a kill earns the
       // minimum XP; a missing value falls back to "not a wall".
       subcatFunctional: numberOr(item['subcat_functional'], 0),
+      // The team selector needs the content's group_type to apply a quest's
+      // excludedUnitGroupTypes; a missing value names no group.
+      groupType: typeof item['group_type'] === 'string' ? item['group_type'] : '',
       width: numberOr(item['width'], 1),
       height: numberOr(item['height'], 1),
       trainsIds: Array.isArray(item['trains_ids'])

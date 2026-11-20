@@ -115,7 +115,23 @@ describe('briefing view', () => {
       subtitle: 'Blow up the Nuclear Plant and then the Command Center!',
       difficulty: 2,
       canStart: true,
+      teamQuest: false,
+      army: [],
     });
+  });
+
+  it('marks a team quest and carries the server-read army as choices', () => {
+    const teamChoice = {
+      ...choice,
+      questId: '100000021',
+      title: "DR. SHOCK'S MECH ARMY",
+    };
+    const army = [
+      { itemId: 1017, name: 'Good Boy', groupType: 'INFANTRY', available: 2, allowed: true },
+    ];
+    const briefing = briefingView(teamChoice, 1, army);
+    assert.equal(briefing.teamQuest, true);
+    assert.deepEqual(briefing.army, army);
   });
 
   it('normalises difficulty to the client\'s 1-3 stars', () => {
@@ -159,6 +175,13 @@ describe('active quest view', () => {
 
   it('never invents a quest from a bare seed', () => {
     assert.equal(activeQuestView(active(null)), null);
+  });
+
+  it('echoes only the team the server wrote into the active quest', () => {
+    const team = [{ unitId: 1017, count: 2 }];
+    const view = activeQuestView(active(Q02, { team }), {})!;
+    assert.deepEqual(view.team, team);
+    assert.equal(activeQuestView(state, {})!.team, undefined);
   });
 
   it('offers strikes, a two-argument kill report and an end action for a kill quest', () => {

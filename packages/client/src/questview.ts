@@ -15,8 +15,15 @@
  * gesture — whether it wins is decided by `end_quest` on the server.
  */
 import type { CommandOutcome, Reward } from '@swl/protocol';
-import { QUEST_IDS, getQuestSpec, questTitle } from '@swl/rules';
+import {
+  QUESTS_WITH_TEAMS,
+  QUEST_IDS,
+  getQuestSpec,
+  questTitle,
+  type Army,
+} from '@swl/rules';
 
+import type { ArmyUnitView } from './army.ts';
 import { chapterMap, type QuestSlot } from './chapters.ts';
 import {
   activeQuestState,
@@ -116,16 +123,32 @@ export interface QuestBriefing {
   readonly subtitle: string;
   readonly difficulty: QuestDifficulty;
   readonly canStart: boolean;
+  /** Whether this quest's client popup offers a team selection. */
+  readonly teamQuest: boolean;
+  /** The army the server's save says the player can field, for team quests. */
+  readonly army: readonly ArmyUnitView[];
 }
 
-/** A briefing model: content titles, a player-chosen difficulty, no outcome. */
-export function briefingView(choice: QuestChoice, difficulty: unknown): QuestBriefing {
+/**
+ * A briefing model: content titles, a player-chosen difficulty, no outcome.
+ *
+ * The army passed in is already a reading of the server's save. This function
+ * only decides whether the quest offers team selection at all, from the rules'
+ * `QUESTS_WITH_TEAMS`; it never decides which units may be fielded.
+ */
+export function briefingView(
+  choice: QuestChoice,
+  difficulty: unknown,
+  army: readonly ArmyUnitView[] = [],
+): QuestBriefing {
   return {
     questId: choice.questId,
     title: choice.title,
     subtitle: getQuestSpec(choice.questId)?.subtitle ?? '',
     difficulty: questDifficulty(difficulty),
     canStart: choice.unlocked && !choice.active,
+    teamQuest: QUESTS_WITH_TEAMS.has(choice.questId),
+    army,
   };
 }
 
@@ -186,6 +209,8 @@ export interface ActiveQuestView {
   readonly elements: readonly QuestElementView[];
   readonly events: readonly string[];
   readonly actions: readonly QuestActionChoice[];
+  /** The team the server bound to this quest, echoed straight from the save. */
+  readonly team?: Army;
 }
 
 /** Read one event channel's action from the server's counters and dedupe keys. */
@@ -301,6 +326,7 @@ export function activeQuestView(
       .sort((a, b) => a.ref.localeCompare(b.ref)),
     events: [...active.events],
     actions: questActions(active, options),
+    ...(active.team !== undefined ? { team: active.team } : {}),
   };
 }
 

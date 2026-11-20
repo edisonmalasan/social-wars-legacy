@@ -15,6 +15,7 @@
  * `PrivateState` interfaces).
  */
 import { RESOURCE_ORDER, type Reward } from '@swl/protocol';
+import type { Army } from '@swl/rules';
 
 import type { WorldSnapshot } from './session.ts';
 
@@ -31,6 +32,26 @@ function record(value: unknown): Record<string, unknown> | null {
 /** Whether a record owns a key. Inherited keys are not server state. */
 function has(source: Record<string, unknown>, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(source, key);
+}
+
+/** Read an echoed army, or nothing when the save does not hold a readable one. */
+function armyOf(value: unknown): Army | undefined {
+  if (!Array.isArray(value) || value.length === 0) return undefined;
+  const out: { unitId: number; count: number }[] = [];
+  for (const raw of value) {
+    const entry = record(raw);
+    if (!entry) return undefined;
+    const unitId = entry['unitId'];
+    const count = entry['count'];
+    if (
+      typeof unitId !== 'number' || !Number.isInteger(unitId) || unitId <= 0 ||
+      typeof count !== 'number' || !Number.isInteger(count) || count <= 0
+    ) {
+      return undefined;
+    }
+    out.push({ unitId, count });
+  }
+  return out;
 }
 
 /** Read a number only when it is finite. */
@@ -287,6 +308,8 @@ export interface ActiveQuestStateView {
   readonly elements: Readonly<Record<string, ActiveQuestElement>>;
   /** The dedupe keys of the events the server has accepted. */
   readonly events: readonly string[];
+  /** The team the server bound to this quest, when one was accepted. */
+  readonly team?: Army;
 }
 
 /**
@@ -309,11 +332,13 @@ export function activeQuestState(world: WorldSnapshot): ActiveQuestStateView | n
       view[ref] = { hp, alive: flag(element['alive']) };
     }
   }
+  const team = armyOf(stored['team']);
   return {
     questId: typeof stored['questId'] === 'string' ? stored['questId'] : null,
     counters: script ? numbers(script['counters']) : {},
     elements: view,
     events: ledger ? strings(ledger['events']) : [],
+    ...(team !== undefined ? { team } : {}),
   };
 }
 

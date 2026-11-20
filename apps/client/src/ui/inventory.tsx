@@ -7,18 +7,20 @@
  * itself. The tile the player clicks next becomes a `place_stored_item`
  * request, and the server decides whether the store really holds the item.
  */
-import type { StoredItemView } from '@swl/client';
+import type { ArmyUnitView, StoredItemView } from '@swl/client';
 
 /** The inventory panel's props. */
 export interface InventoryProps {
   /** The stored items, derived from the server's answer. */
   items: readonly StoredItemView[];
+  /** The army the server's save accounts for, from the same reading. */
+  army?: readonly ArmyUnitView[];
   /** The player picked an item to place. */
   onPlace?: (entry: StoredItemView) => void;
 }
 
 /** The stored items the player owns, or an empty panel. */
-export function Inventory({ items, onPlace }: InventoryProps): React.JSX.Element {
+export function Inventory({ items, army = [], onPlace }: InventoryProps): React.JSX.Element {
   return (
     <div className="swl-inventory" aria-label="Stored items">
       <div className="swl-inventory-title">Storage</div>
@@ -37,6 +39,19 @@ export function Inventory({ items, onPlace }: InventoryProps): React.JSX.Element
               >
                 Place
               </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="swl-inventory-title">Army</div>
+      {army.length === 0 ? (
+        <p className="swl-inventory-empty">No units available.</p>
+      ) : (
+        <ul className="swl-inventory-list" data-swl-army="">
+          {army.map((unit) => (
+            <li className="swl-inventory-item" key={unit.itemId}>
+              <span className="swl-inventory-name">{unit.name}</span>
+              <span className="swl-inventory-qty">×{unit.available}</span>
             </li>
           ))}
         </ul>
