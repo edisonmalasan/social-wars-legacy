@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 77,
+   "implemented": 85,
    "dropped": 52,
-   "planned": 131
+   "planned": 123
   }
  },
  "screens": [
@@ -296,7 +296,7 @@
    "overrides": [],
    "bytes": 993,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P1): the HUD shows the server's army count and the recruitment panel runs its queue; a per-unit army cell with its own selection state is outside the P0 slice."
   },
   {
    "class": "AssaultCountdown",
@@ -455,7 +455,7 @@
    "overrides": [],
    "bytes": 6386,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P1): base expansion is a later progression step; the G5.1 loop uses the starting map."
   },
   {
    "class": "ExtendedPortraitPopupButton",
@@ -704,7 +704,7 @@
    "overrides": [],
    "bytes": 2671,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P2): the HUD's popovers explain the readouts from the client's own model; the original info popup's timer and repositioning behaviour is not modelled."
   },
   {
    "class": "InventoryItem",
@@ -724,7 +724,7 @@
    "overrides": [],
    "bytes": 1616,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P1): the storage panel draws each server-owned item as a row with a Place gesture; the original cell's drag positioning and grid layout are not modelled."
   },
   {
    "class": "ItemButtonLarge",
@@ -2297,8 +2297,8 @@
    ],
    "overrides": [],
    "bytes": 409,
-   "decision": "planned",
-   "decisionNote": "The alert. The client's own literals are already captured."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/dialogmodel.ts` (the shared dialog and feedback channel)."
   },
   {
    "class": null,
@@ -2592,7 +2592,7 @@
    "overrides": [],
    "bytes": 478,
    "decision": "planned",
-   "decisionNote": "The confirmation. The client's own literals are already captured."
+   "decisionNote": "Deferred (P1): the shared dialog covers briefing, combat and result; a separate confirmation asset is not part of the playable alpha."
   },
   {
    "class": null,
@@ -2885,8 +2885,8 @@
    ],
    "overrides": [],
    "bytes": 619,
-   "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/inventory.ts` (the stored-item panel drawn in `apps/client/src/ui/inventory.tsx`)."
   },
   {
    "class": null,
@@ -3305,8 +3305,8 @@
    ],
    "overrides": [],
    "bytes": 1044,
-   "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/management.ts` (the recruitment panel drawn in `apps/client/src/ui/recruit.tsx`)."
   },
   {
    "class": null,
@@ -3733,7 +3733,7 @@
    "overrides": [],
    "bytes": 3353,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P2): collections are a later catalogue feature, not needed to place or collect stored items."
   },
   {
    "class": "InventoryTabItems",
@@ -3752,7 +3752,7 @@
    "overrides": [],
    "bytes": 3548,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P1): the storage panel lists the server's items; the original item-category tabs are not part of the P0 loop."
   },
   {
    "class": "MondayBonusPopUp",
@@ -3799,7 +3799,7 @@
    "overrides": [],
    "bytes": 5658,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P2): hover explanations are covered by the HUD popovers; a separate popover system is not needed for the alpha."
   },
   {
    "class": "PopUpBattleOptions",
@@ -3895,8 +3895,8 @@
    ],
    "overrides": [],
    "bytes": 1940,
-   "decision": "planned",
-   "decisionNote": "The alert. The client's own literals are already captured."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/dialogmodel.ts` (the one accessible dialog, plus the typed success/refusal feedback channel drawn by `apps/client/src/ui/dialog.tsx` and `apps/client/src/ui/feedback.tsx`)."
   },
   {
    "class": "PopupAllUnits",
@@ -3931,7 +3931,7 @@
    "overrides": [],
    "bytes": 18894,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P1): a full unit roster is not required to train units or play the weekly quest from the chapter map."
   },
   {
    "class": "PopupAssaultHistory",
@@ -4230,7 +4230,7 @@
    "overrides": [],
    "bytes": 2062,
    "decision": "planned",
-   "decisionNote": "The confirmation. The client's own literals are already captured."
+   "decisionNote": "Deferred (P1): the one accessible dialog hosts the game's panels, but a dedicated yes/no confirmation popup with the client's own button texts is not needed for the G5.1 loop."
   },
   {
    "class": "PopupCrossDCi",
@@ -4318,7 +4318,7 @@
    "overrides": [],
    "bytes": 4890,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P1): expansion choices and their cash/gold pricing are outside the P0 vertical slice."
   },
   {
    "class": "PopupGenericUnitSelector",
@@ -4362,7 +4362,7 @@
    "overrides": [],
    "bytes": 2053,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P2, excluded from G5.1): the original offers energy for real money; monetisation screens are out of scope for a Flash-free preservation client."
   },
   {
    "class": "PopupGetPack",
@@ -4510,7 +4510,7 @@
    "overrides": [],
    "bytes": 3214,
    "decision": "planned",
-   "decisionNote": "The help island. The tutorial's steps are already extracted and modelled."
+   "decisionNote": "Deferred (P2): an onboarding island that needs proprietary art and is outside the P0 loop."
   },
   {
    "class": "PopupHireFriendsGeneric",
@@ -4568,7 +4568,7 @@
    "overrides": [],
    "bytes": 17590,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P2): a late-era army-recovery screen outside the G5.1 playable slice."
   },
   {
    "class": "PopupHurryup",
@@ -4629,7 +4629,7 @@
    "overrides": [],
    "bytes": 4225,
    "decision": "planned",
-   "decisionNote": "The introduction. The tutorial's steps are already extracted and modelled."
+   "decisionNote": "Deferred (P2, excluded from G5.1): the original intro depends on proprietary artwork; the client's own tutorial overlay replaces it."
   },
   {
    "class": "PopupInventory",
@@ -4652,8 +4652,8 @@
    ],
    "overrides": [],
    "bytes": 3082,
-   "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/inventory.ts` (the server's stored items and the Place gesture, drawn by `apps/client/src/ui/inventory.tsx`)."
   },
   {
    "class": "PopupLevel",
@@ -4712,7 +4712,7 @@
    "overrides": [],
    "bytes": 7434,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P1): the briefing hands over to the live combat panel drawn from the server's ledger; a separate full-screen map-loading animation is cosmetic."
   },
   {
    "class": "PopupMagic",
@@ -4800,8 +4800,8 @@
    ],
    "overrides": [],
    "bytes": 6912,
-   "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/questview.ts` (the quest briefing: title, subtitle, difficulty and start gesture)."
   },
   {
    "class": "PopupMistery",
@@ -4917,7 +4917,7 @@
    "overrides": [],
    "bytes": 13436,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P2, excluded from G5.1): the news screen needs Zynga's live media and services, which the clone does not ship."
   },
   {
    "class": "PopupNextIslandAttack",
@@ -4968,7 +4968,7 @@
    "overrides": [],
    "bytes": 1532,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P1): the shared result dialog shows the server's end_quest outcome; a bespoke next-mission offer is not modelled."
   },
   {
    "class": "PopupObject",
@@ -5145,8 +5145,8 @@
    ],
    "overrides": [],
    "bytes": 26151,
-   "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/questview.ts` (the chapter slots, ranks and lock state, and the briefing/combat/result panels hosted in the one dialog)."
   },
   {
    "class": "PopupRecruitment",
@@ -5186,8 +5186,8 @@
    ],
    "overrides": [],
    "bytes": 20641,
-   "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/management.ts` (the training queue and unit cards, drawn by `apps/client/src/ui/recruit.tsx`)."
   },
   {
    "class": "PopupResearchCenter",
@@ -5228,7 +5228,7 @@
    "overrides": [],
    "bytes": 23945,
    "decision": "planned",
-   "decisionNote": "The research centre. The tech tree is already modelled."
+   "decisionNote": "Deferred (P2): a late-era progression screen outside the G5.1 playable slice."
   },
   {
    "class": "PopupRewards",
@@ -5250,7 +5250,7 @@
    "overrides": [],
    "bytes": 3240,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P1): the result dialog draws reward rows only when the native end_quest outcome carries a rewards result; the live outcome reports kind \"none\", so a dedicated rewards popup would have no authoritative data to show."
   },
   {
    "class": "PopupSelectResource",
@@ -5348,7 +5348,7 @@
    "overrides": [],
    "bytes": 19944,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred (P1): the weekly quest seeds its own roster from the rules; a bespoke team-selection window is outside G5.1."
   },
   {
    "class": "PopupSocialBuilding",
@@ -5422,7 +5422,7 @@
    "overrides": [],
    "bytes": 41931,
    "decision": "planned",
-   "decisionNote": "The soul mixer. Its rules are not modelled yet."
+   "decisionNote": "Deferred (P2): a late-era feature screen outside the G5.1 playable slice."
   },
   {
    "class": "PopupSoulMixerHelp",

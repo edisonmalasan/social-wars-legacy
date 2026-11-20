@@ -31,9 +31,33 @@ import path from 'node:path';
 import process from 'node:process';
 
 import { brokenBudgets } from '../packages/server/src/budgets.ts';
+import { COMMAND_CENTER_TILE } from '../packages/server/src/starttown.ts';
 import { QUESTS } from '../packages/rules/src/quest.ts';
+import { tileToPixel } from '../packages/client/src/iso.ts';
+import { BUILD_OUTLINE_OFFSET_Y, cameraCentredOn } from '../packages/client/src/camera.ts';
 
 const ROOT = process.cwd();
+
+/** The sleep between DOM polls. */
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * The weekly quest, from the rules the server uses.
+ *
+ * A fresh save has slot 1 open, and this is the quest in it. Reading the spec
+ * rather than hard-coding the id keeps the DOM scenario honest if the content
+ * changes.
+ */
+const WEEKLY = QUESTS.find((quest) => quest.constantName === 'QUEST_WEEKLY_01');
+if (!WEEKLY) throw new Error('the rules have no weekly quest');
+
+/** The viewport a fresh player's camera opens with, for tile clicks. */
+const CAMERA = cameraCentredOn(COMMAND_CENTER_TILE.x, COMMAND_CENTER_TILE.y);
+const VIEWPORT = {
+  topX: CAMERA.topX,
+  topY: CAMERA.topY,
+  buildOutlineOffsetY: BUILD_OUTLINE_OFFSET_Y,
+};
 
 /** Where the browsers are looked for. */
 const BROWSERS = [
@@ -390,6 +414,543 @@ async function register(port, playerId, password) {
   return response.json();
 }
 
+/** The server's world, with the player's own token. */
+async function worldOf(port, token) {
+  const response = await fetch(`http://127.0.0.1:${port}/api/world`, {
+    headers: { authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error(`the world was not served (${response.status})`);
+  return response.json();
+}
+
+/** Poll the server's world until `accept` agrees, for a gesture that is in flight. */
+async function worldWait(port, token, accept, label, timeoutMs = 15_000) {
+  const deadline = Date.now() + timeoutMs;
+  let last = null;
+  while (Date.now() < deadline) {
+    last = await worldOf(port, token);
+    if (accept(last)) return last;
+    await sleep(150);
+  }
+  throw new Error(`the world never showed ${label}`);
+}
+
+/** Evaluate an expression and hand its value back through JSON. */
+async function domValue(page, expression) {
+  const text = await page.evaluate(`JSON.stringify({v: (${expression})})`);
+  return text ? JSON.parse(text).v : undefined;
+}
+
+/** Poll the rendered interface until `accept` agrees. */
+async function domWait(page, expression, accept, label, timeoutMs = 15_000) {
+  const deadline = Date.now() + timeoutMs;
+  let last;
+  while (Date.now() < deadline) {
+    last = await domValue(page, expression);
+    if (accept(last)) return last;
+    await sleep(150);
+  }
+  throw new Error(`the interface never showed ${label} (last: ${JSON.stringify(last)})`);
+}
+
+/** Click a rendered control, waiting for a named part of the interface to change. */
+async function domClick(page, selector, signature, label, timeoutMs = 15_000) {
+  const before = await domValue(page, signature);
+  const clicked = await page.evaluate(
+    `(() => { const e = document.querySelector(${JSON.stringify(selector)});` +
+      ` if (!e) return {error: 'no control for ' + ${JSON.stringify(selector)}};` +
+      ` e.click(); return {ok: true}; })()`,
+  );
+  if (!clicked || clicked.error) {
+    throw new Error(clicked?.error ?? `the ${label} could not be clicked`);
+  }
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const after = await domValue(page, signature);
+    if (JSON.stringify(after) !== JSON.stringify(before)) return after;
+    await sleep(150);
+  }
+  throw new Error(`the ${label} changed nothing on the interface`);
+}
+
+/** Click a rendered control without expecting the interface to redraw. */
+async function domClickPlain(page, selector, label) {
+  const clicked = await page.evaluate(
+    `(() => { const e = document.querySelector(${JSON.stringify(selector)});` +
+      ` if (!e) return {error: 'no control for ' + ${JSON.stringify(selector)}};` +
+      ` e.click(); return {ok: true}; })()`,
+  );
+  if (!clicked || clicked.error) {
+    throw new Error(clicked?.error ?? `the ${label} could not be clicked`);
+  }
+}
+
+/**
+ * Click a map tile as a player would: the canvas's own pointer gesture, at the
+ * stage pixel the client's projection gives the tile. The target has to be the
+ * canvas itself — a panel over the tile would swallow a real click.
+ */
+async function domTileClick(page, tx, ty) {
+  const pixel = tileToPixel(tx, ty, VIEWPORT);
+  const result = await page.evaluate(
+    `(() => {
+       const canvas = document.querySelector('#game canvas');
+       if (!canvas) return {error: 'the client has no canvas'};
+       const rect = canvas.getBoundingClientRect();
+       const x = rect.left + (${pixel.x} / canvas.width) * rect.width;
+       const y = rect.top + (${pixel.y} / canvas.height) * rect.height;
+       const top = document.elementFromPoint(x, y);
+       if (top !== canvas) return {error: 'tile ${tx},${ty} is covered by ' + (top?.className || top?.tagName)};
+       canvas.dispatchEvent(new PointerEvent('pointerdown', {
+         clientX: x, clientY: y, bubbles: true, cancelable: true,
+         pointerId: 1, isPrimary: true, pointerType: 'mouse',
+       }));
+       return {ok: true};
+     })()`,
+  );
+  if (!result || result.error) {
+    throw new Error(result?.error ?? `tile ${tx},${ty} could not be clicked`);
+  }
+}
+
+/** The cash in the server's wallet, for the reward assertions. */
+function cashOf(world) {
+  return Number(world?.resources?.c ?? 0);
+}
+
+/**
+ * The whole gameplay loop, driven by the rendered interface.
+ *
+ * A fresh player is registered through the form, so the walk starts from a
+ * new save (the weekly quest is slot 1) and has its own rate-limit key. Every
+ * act below is a click on a rendered control; the client's own code turns it
+ * into a request, and the server's world is the evidence of what happened.
+ */
+async function playThroughDom(page, serverPort, browserName) {
+  const playerId = `e2e-ui-${browserName.toLowerCase()}`;
+
+  // The rendered account form: Register mode, a name, a password, submit.
+  await page.evaluate("window.localStorage.removeItem('swl.session'); true");
+  page.loaded = false;
+  await page.send('Page.reload', {});
+  await page.waitForLoad();
+  await domWait(page, "!!document.querySelector('#signin')", (v) => v === true, 'the account form');
+  const submitted = await page.evaluate(
+    `(() => {
+       const form = document.querySelector('#signin');
+       const register = form.querySelector('button[data-mode="register"]');
+       if (!register) return {error: 'the form has no Register mode'};
+       register.click();
+       const name = form.querySelector('input[name="playerId"]');
+       const secret = form.querySelector('input[name="password"]');
+       if (!name || !secret) return {error: 'the form has no credential fields'};
+       name.value = ${JSON.stringify(playerId)};
+       secret.value = 'correct horse';
+       form.requestSubmit();
+       return {ok: true};
+     })()`,
+  );
+  if (!submitted || submitted.error) {
+    throw new Error(submitted?.error ?? 'the account form did not submit');
+  }
+  const signed = await page.waitForStatus(['started', 'failed']);
+  if (!String(signed).startsWith('started')) throw new Error(`the client said "${signed}"`);
+  const session = await page.evaluate(
+    "JSON.parse(window.localStorage.getItem('swl.session') || 'null')",
+  );
+  if (!session || !session.token) throw new Error('the registration remembered no session');
+  console.log(`  UI: registered "${playerId}" through the rendered form`);
+
+  // A fresh save opens the tutorial. Skip it with the rendered Skip button.
+  await domClick(
+    page,
+    '#ui .swl-tutorial-skip',
+    "!!document.querySelector('#ui .swl-tutorial')",
+    'tutorial Skip button',
+  );
+  await domWait(
+    page,
+    "!document.querySelector('#ui .swl-tutorial')",
+    (v) => v === true,
+    'the tutorial to close',
+  );
+  console.log('  UI: skipped the tutorial with its rendered button');
+
+  // The 760x600 layout: the new HUD and inventory must not overlap.
+  const layout = await page.evaluate(
+    `(() => {
+       const rect = (selector) => {
+         const e = document.querySelector(selector);
+         if (!e) return null;
+         const r = e.getBoundingClientRect();
+         return {left: r.left, top: r.top, right: r.right, bottom: r.bottom};
+       };
+       const stage = document.querySelector('#stage');
+       return {
+         stage: rect('#stage'), hud: rect('#ui .swl-hud'), inventory: rect('#ui .swl-inventory'),
+         stageCss: stage ? {
+           width: getComputedStyle(stage).width, height: getComputedStyle(stage).height,
+         } : null,
+       };
+     })()`,
+  );
+  if (!layout?.stage || !layout?.hud || !layout?.inventory) {
+    throw new Error('the HUD or the inventory is missing from the 760x600 layout');
+  }
+  if (layout.stageCss?.width !== '760px' || layout.stageCss?.height !== '600px') {
+    throw new Error(`the stage is not 760x600: ${JSON.stringify(layout.stageCss)}`);
+  }
+  const overlap = !(
+    layout.hud.right <= layout.inventory.left ||
+    layout.inventory.right <= layout.hud.left ||
+    layout.hud.bottom <= layout.inventory.top ||
+    layout.inventory.bottom <= layout.hud.top
+  );
+  if (overlap) throw new Error(`the HUD overlaps the inventory: ${JSON.stringify(layout)}`);
+  if (
+    layout.inventory.right > layout.stage.right + 0.5 ||
+    layout.inventory.bottom > layout.stage.bottom + 0.5
+  ) {
+    throw new Error(`the inventory falls outside the stage: ${JSON.stringify(layout)}`);
+  }
+  console.log(
+    `  UI: at 760x600 the HUD ends at y=${layout.hud.bottom.toFixed(0)} ` +
+      `and the inventory starts at y=${layout.inventory.top.toFixed(0)} (no overlap)`,
+  );
+
+  // Build: pick the first unlocked item from the rendered menu, then click a
+  // free tile. The server prices and places it; the client only draws it.
+  const beforeBuild = await worldOf(serverPort, session.token);
+  const beforeItems = Object.keys(beforeBuild?.maps?.[0]?.items ?? {}).length;
+  await domClick(
+    page,
+    '#ui .swl-build-menu .swl-build-item:not(.swl-build-locked) button',
+    "document.querySelector('#ui .swl-placing')?.textContent ?? ''",
+    'build-menu item',
+  );
+  // The first unlocked item is a 4x4 Prison, so the tile has to clear the
+  // Command Center's own 4x4 footprint at 48,48.
+  await domTileClick(page, 52, 51);
+  await domWait(
+    page,
+    "!document.querySelector('#ui .swl-placing')",
+    (v) => v === true,
+    'the build to be placed',
+  );
+  const afterBuild = await worldOf(serverPort, session.token);
+  const builtItems = Object.values(afterBuild?.maps?.[0]?.items ?? {});
+  if (Object.keys(afterBuild?.maps?.[0]?.items ?? {}).length !== beforeItems + 1) {
+    const feedback = await domValue(
+      page,
+      "document.querySelector('#ui .swl-feedback')?.textContent ?? ''",
+    );
+    throw new Error(
+      `the rendered build did not add a building to the server's map ` +
+        `(${beforeItems} -> ${Object.keys(afterBuild?.maps?.[0]?.items ?? {}).length}; ` +
+        `feedback: ${JSON.stringify(feedback)})`,
+    );
+  }
+  if (!builtItems.some((tuple) => Number(tuple[1]) === 52 && Number(tuple[2]) === 51)) {
+    throw new Error('the rendered build did not place the item on the clicked tile');
+  }
+  console.log('  UI: picked a build-menu item and placed it on a tile through the canvas');
+
+  // A Wood Factory I produces wood, so the Collect button has real work.
+  const factoryPick = await page.evaluate(
+    `(() => {
+       const items = Array.from(document.querySelectorAll(
+         '#ui .swl-build-menu .swl-build-item:not(.swl-build-locked) button'));
+       const item = items.find((b) =>
+         b.querySelector('.swl-build-name')?.textContent === 'Wood Factory I');
+       if (!item) return {error: 'the build menu has no Wood Factory I'};
+       item.click();
+       return {ok: true};
+     })()`,
+  );
+  if (!factoryPick || factoryPick.error) {
+    throw new Error(factoryPick?.error ?? 'the Wood Factory could not be picked');
+  }
+  await domWait(
+    page,
+    "document.querySelector('#ui .swl-placing')?.textContent ?? ''",
+    (v) => typeof v === 'string' && v.includes('Wood Factory I'),
+    'the Wood Factory placement',
+  );
+  await domTileClick(page, 46, 46);
+  await domWait(
+    page,
+    "!document.querySelector('#ui .swl-placing')",
+    (v) => v === true,
+    'the Wood Factory to be placed',
+  );
+  const factoryWorld = await worldOf(serverPort, session.token);
+  if (
+    !Object.values(factoryWorld?.maps?.[0]?.items ?? {}).some(
+      (tuple) => Number(tuple[0]) === 2 && Number(tuple[1]) === 46 && Number(tuple[2]) === 46,
+    )
+  ) {
+    throw new Error('the Wood Factory was not placed by the rendered canvas click');
+  }
+
+  // Select that building on the map and collect its production.
+  await domTileClick(page, 46, 46);
+  await domWait(
+    page,
+    "document.querySelector('#ui .swl-info .swl-info-name')?.textContent ?? ''",
+    (v) => v === 'Wood Factory I',
+    'the Wood Factory info panel',
+  );
+  const woodBefore = Number((await worldOf(serverPort, session.token))?.resources?.w ?? 0);
+  await domClickPlain(page, '#ui .swl-info button.swl-info-collect', 'Collect button');
+  const collectAnswer = await domWait(
+    page,
+    "document.querySelector('#ui .swl-feedback')?.textContent ?? ''",
+    (v) => typeof v === 'string' && /refused|not-due|collect/i.test(v),
+    'the server answer to the Collect gesture',
+  );
+  // A freshly built factory's chosen five-minute cycle has not elapsed, so
+  // the server must refuse: a rendered Collect button cannot mint wood.
+  if (!/not-due/i.test(String(collectAnswer))) {
+    throw new Error(`the Collect gesture drew an unexpected answer: ${collectAnswer}`);
+  }
+  const afterCollect = await worldOf(serverPort, session.token);
+  if (Number(afterCollect?.resources?.w ?? 0) !== woodBefore) {
+    throw new Error('the client changed wood before the server said the collection was due');
+  }
+  console.log(
+    `  UI: the rendered Collect button asked the server, which refused ` +
+      `an undue cycle ("${String(collectAnswer).trim()}") and granted no wood`,
+  );
+
+  // Select the Command Center, which is the training building on a fresh save.
+  await domTileClick(page, COMMAND_CENTER_TILE.x, COMMAND_CENTER_TILE.y);
+  await domWait(
+    page,
+    "document.querySelector('#ui .swl-recruit .swl-recruit-title')?.textContent ?? ''",
+    (v) => typeof v === 'string' && v.includes('Command Center'),
+    'the Command Center recruitment panel',
+  );
+  await domClick(
+    page,
+    '#ui .swl-recruit button.swl-recruit-train',
+    "document.querySelector('#ui .swl-recruit .swl-recruit-countdown')?.textContent ?? ''",
+    'Train button',
+  );
+  const countdown = await domValue(
+    page,
+    "document.querySelector('#ui .swl-recruit .swl-recruit-countdown')?.textContent ?? ''",
+  );
+  if (!/Training|queued/i.test(String(countdown))) {
+    throw new Error(`the training queue did not start ("${countdown}")`);
+  }
+  const trainedWorld = await worldOf(serverPort, session.token);
+  const cc = Object.values(trainedWorld?.maps?.[0]?.items ?? {}).find(
+    (tuple) => Number(tuple[0]) === 26,
+  );
+  if (!(Number(cc?.[6]?.['nu'] ?? 0) >= 1)) {
+    throw new Error('the server did not record the trained unit in the queue');
+  }
+  console.log(`  UI: trained a unit (${countdown})`);
+
+  // Open the weekly quest from the chapter map, through the rendered slot.
+  const slotSelector = '#ui .swl-chapter:first-child .swl-chapter-quests > button:first-child';
+  const slot = await page.evaluate(
+    `(() => { const e = document.querySelector(${JSON.stringify(slotSelector)});` +
+      ` return e ? {tag: e.tagName, title: e.getAttribute('title')} : null; })()`,
+  );
+  if (!slot || slot.tag !== 'BUTTON') {
+    throw new Error('the open weekly quest slot is not a rendered button');
+  }
+  const cashBeforeQuest = cashOf(await worldOf(serverPort, session.token));
+  await domClick(
+    page,
+    slotSelector,
+    "document.querySelector('#ui .swl-dialog-title')?.textContent ?? ''",
+    'weekly quest slot',
+  );
+  const radios = await page.evaluate(
+    "document.querySelectorAll('#ui .swl-dialog .swl-quest-difficulty input[type=radio]').length",
+  );
+  if (radios !== 3) throw new Error(`the briefing drew ${radios} difficulty choices, not 3`);
+  await domClick(
+    page,
+    '#ui .swl-dialog button.swl-quest-primary',
+    "document.querySelectorAll('#ui .swl-dialog .swl-quest-roster .swl-quest-unit').length",
+    'Start mission button',
+  );
+  const rosterSize = await domWait(
+    page,
+    "document.querySelectorAll('#ui .swl-dialog .swl-quest-roster .swl-quest-unit').length",
+    (v) => v >= WEEKLY.elements.length,
+    'the quest roster',
+  );
+  const combatSignature =
+    "JSON.stringify({c: document.querySelector('#ui .swl-dialog .swl-quest-counters')?.textContent ?? '', r: document.querySelector('#ui .swl-dialog .swl-quest-roster')?.textContent ?? ''})";
+  const killed = () =>
+    domValue(
+      page,
+      `(() => {
+         const rows = Array.from(document.querySelectorAll('#ui .swl-dialog .swl-quest-counter'));
+         const row = rows.find((r) => r.querySelector('dt')?.textContent === 'botsKilled');
+         return row ? Number(row.querySelector('dd')?.textContent ?? 0) : 0;
+       })()`,
+    );
+  let reported = false;
+  for (let guard = 0; guard < 16; guard++) {
+    if ((await killed()) >= WEEKLY.elements.length) break;
+    const hasKillReport = await domValue(
+      page,
+      "!!document.querySelector('#ui .swl-dialog button[data-swl-action=\"kill-report\"]')",
+    );
+    if (hasKillReport && !reported) {
+      // The strictly two-argument `killed` write, from a rendered button.
+      await domClickPlain(
+        page,
+        '#ui .swl-dialog button[data-swl-action="kill-report"]',
+        'Report kill button',
+      );
+      await worldWait(
+        serverPort,
+        session.token,
+        (world) =>
+          (world?.privateState?.activeQuest?.script?.destroyed ?? []).length >= 1,
+        'the server to record the reported kill',
+      );
+      reported = true;
+      console.log('  UI: reported a server-verified kill with the two-argument builder');
+      continue;
+    }
+    const hasStrike = await domValue(
+      page,
+      "!!document.querySelector('#ui .swl-dialog button[data-swl-action=\"strike\"]:not([disabled])')",
+    );
+    if (!hasStrike) throw new Error('no enabled Strike button while the counter is short');
+    await domClick(
+      page,
+      '#ui .swl-dialog button[data-swl-action="strike"]:not([disabled])',
+      combatSignature,
+      'Strike button',
+    );
+  }
+  if (!reported) throw new Error('no dead element ever offered the two-argument Report kill');
+  if ((await killed()) < WEEKLY.elements.length) {
+    throw new Error('the rendered strikes did not move the server\'s kill counter to five');
+  }
+  console.log(`  UI: strikes on ${rosterSize} rendered roster rows moved botsKilled to five`);
+
+  // Finish is a request. The server decides the win and pays the reward.
+  await domClick(
+    page,
+    '#ui .swl-dialog button[data-swl-action="end"]',
+    "document.querySelector('#ui .swl-dialog .swl-quest-won')?.textContent ?? ''",
+    'Finish quest button',
+  );
+  const wonText = await domValue(
+    page,
+    "document.querySelector('#ui .swl-dialog .swl-quest-won')?.textContent ?? ''",
+  );
+  if (!/server completed/i.test(String(wonText))) {
+    throw new Error(`the victory dialog did not confirm the server's win: ${wonText}`);
+  }
+  const resultText = await domValue(
+    page,
+    "document.querySelector('#ui .swl-dialog')?.textContent ?? ''",
+  );
+  console.log(`  UI: the server's result dialog read "${String(resultText).trim()}"`);
+  const awardedWorld = await worldOf(serverPort, session.token);
+  const progress = awardedWorld?.privateState?.questProgress;
+  if (!progress?.awarded?.includes(WEEKLY.id)) {
+    throw new Error('the server did not record the weekly award');
+  }
+  if (!(progress.ranks?.[String(WEEKLY.playIndex)] >= 1)) {
+    throw new Error('the server did not record the weekly rank');
+  }
+  if (!(cashOf(awardedWorld) > cashBeforeQuest)) {
+    throw new Error('the server paid no cash for the weekly quest');
+  }
+  console.log('  UI: the reward dialog is the server\'s result, and the server paid the cash');
+
+  // A replay of the same quest must not pay twice. Drive it through the same
+  // rendered controls, then check both the dialog and the server's wallet.
+  await domClick(
+    page,
+    '#ui .swl-dialog button.swl-dialog-close',
+    "!!document.querySelector('#ui .swl-dialog')",
+    'reward dialog Close button',
+  );
+  const cashBeforeReplay = cashOf(await worldOf(serverPort, session.token));
+  await domClick(
+    page,
+    slotSelector,
+    "document.querySelector('#ui .swl-dialog-title')?.textContent ?? ''",
+    'weekly quest slot on replay',
+  );
+  await domClick(
+    page,
+    '#ui .swl-dialog button.swl-quest-primary',
+    "document.querySelectorAll('#ui .swl-dialog .swl-quest-roster .swl-quest-unit').length",
+    'Start mission button on replay',
+  );
+  for (let guard = 0; guard < 16; guard++) {
+    if ((await killed()) >= WEEKLY.elements.length) break;
+    await domClick(
+      page,
+      '#ui .swl-dialog button[data-swl-action="strike"]:not([disabled])',
+      combatSignature,
+      'Strike button on replay',
+    );
+  }
+  await domClick(
+    page,
+    '#ui .swl-dialog button[data-swl-action="end"]',
+    "document.querySelector('#ui .swl-dialog .swl-quest-lost')?.textContent ?? ''",
+    'Finish quest button on replay',
+  );
+  const refusal = await domValue(
+    page,
+    "document.querySelector('#ui .swl-dialog .swl-quest-lost')?.textContent ?? ''",
+  );
+  if (!/already-awarded|not finished/i.test(String(refusal))) {
+    throw new Error(`the replay produced no refusal dialog ("${refusal}")`);
+  }
+  const afterReplay = await worldOf(serverPort, session.token);
+  if (cashOf(afterReplay) !== cashBeforeReplay) {
+    throw new Error(`the replay paid a second reward (${cashBeforeReplay} -> ${cashOf(afterReplay)})`);
+  }
+  const awards = afterReplay?.privateState?.questProgress?.awarded ?? [];
+  if (awards.filter((id) => id === WEEKLY.id).length !== 1) {
+    throw new Error(`the server's award list is not unique: ${JSON.stringify(awards)}`);
+  }
+  console.log(`  UI: replay refused with "${String(refusal).trim()}" and paid no second reward`);
+
+  // Reload the client: the world and the quest rank have to survive it.
+  page.loaded = false;
+  await page.send('Page.reload', {});
+  await page.waitForLoad();
+  const reloaded = await page.waitForStatus(['started', 'failed']);
+  if (!String(reloaded).startsWith('started')) throw new Error(`the reloaded client said "${reloaded}"`);
+  // The replay's end_quest was refused, so the server still holds that active
+  // quest. A reloaded client has to restore its combat panel from /api/world,
+  // not from browser memory.
+  const restored = await domValue(
+    page,
+    "!!document.querySelector('#ui .swl-dialog .swl-quest-roster')",
+  );
+  if (!restored) {
+    throw new Error('the reloaded client did not restore the server\'s active quest');
+  }
+  const persisted = await worldOf(serverPort, session.token);
+  if (!persisted?.privateState?.questProgress?.awarded?.includes(WEEKLY.id)) {
+    throw new Error('the award did not survive the client reload');
+  }
+  if (!persisted?.privateState?.activeQuest) {
+    throw new Error('the active quest did not survive the client reload');
+  }
+  console.log('  UI: after a client reload the active quest and the server award are still there');
+
+  return { playerId, password: 'correct horse' };
+}
+
 async function main() {
   const only = process.argv.includes('--browser')
     ? process.argv[process.argv.indexOf('--browser') + 1]
@@ -421,6 +982,8 @@ async function main() {
   // the one that is replaced when the server is restarted for the quest.
   const serverHandles = [server];
   let questPlayer = null;
+  // The players registered through the rendered form, for the restart check.
+  const uiQuestPlayers = [];
   const client = await serve(clientPort, serverPort);
 
   const failures = [];
@@ -1127,6 +1690,19 @@ async function main() {
         );
         console.log(`  the render loop is running at ${Number(rate).toFixed(0)} frames a second`);
 
+        // --- 3c. The whole loop through the rendered interface -------------
+        // A fresh player, a real registration form, rendered controls for
+        // every act, and the server's world as the evidence. The earlier
+        // assertions above stay intact; this is an added, stronger session.
+        try {
+          const uiPlayer = await playThroughDom(page, serverPort, entry.name);
+          uiQuestPlayers.push(uiPlayer);
+        } catch (error) {
+          const detail = String(error);
+          failures.push(`${entry.name}: the DOM gameplay loop: ${detail}`);
+          console.log(`FAILED (the DOM gameplay loop: ${detail})`);
+        }
+
         ran.push(entry.name);
       } catch (error) {
         // A browser that **cannot be driven** is not run rather than
@@ -1153,7 +1729,7 @@ async function main() {
     // and started again over the same database, a fresh credential signs the
     // player in, and the award is read from the server's world — not from a
     // browser that might simply be remembering it.
-    if (questPlayer) {
+    if (questPlayer || uiQuestPlayers.length > 0) {
       const restartPort = serverPort + 2;
       // The database allows one writer. Stop the original server and wait for
       // it to release the data directory before reopening the same database.
@@ -1165,33 +1741,62 @@ async function main() {
       const restarted = await startServer(dataDir, restartPort);
       serverHandles.push(restarted);
       console.log('  the server was restarted with the same database');
-      const signIn = await fetch(`http://127.0.0.1:${restartPort}/api/session`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(questPlayer),
-      });
-      if (signIn.status !== 200) {
-        failures.push(`the quest player could not sign in after the restart: ${signIn.status}`);
-        console.log(`FAILED (sign-in after restart: ${signIn.status})`);
-      } else {
+
+      // The hook-driven player's two awards, as before.
+      if (questPlayer) {
+        const signIn = await fetch(`http://127.0.0.1:${restartPort}/api/session`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(questPlayer),
+        });
+        if (signIn.status !== 200) {
+          failures.push(`the quest player could not sign in after the restart: ${signIn.status}`);
+          console.log(`FAILED (sign-in after restart: ${signIn.status})`);
+        } else {
+          const fresh = await signIn.json();
+          const persisted = await fetch(`http://127.0.0.1:${restartPort}/api/world`, {
+            headers: { authorization: `Bearer ${fresh.token}` },
+          }).then((response) => response.json());
+          const saved = persisted?.privateState?.questProgress;
+          for (const award of [
+            { questId: QUEST.questId, playIndex: QUEST.playIndex },
+            { questId: KILL.questId, playIndex: KILL.playIndex },
+          ]) {
+            if (!saved || !Array.isArray(saved.awarded) || !saved.awarded.includes(award.questId)) {
+              failures.push(`the ${award.questId} award did not survive the server restart`);
+              console.log(`FAILED (the ${award.questId} award did not survive the restart)`);
+            } else if (!(saved.ranks?.[award.playIndex] >= 1)) {
+              failures.push(`the ${award.questId} rank did not survive the server restart`);
+              console.log(`FAILED (the ${award.questId} rank did not survive the restart)`);
+            } else {
+              console.log(`  the player signed in again and ${award.questId} was still awarded`);
+            }
+          }
+        }
+      }
+
+      // The players who played the whole loop through the rendered interface.
+      for (const player of uiQuestPlayers) {
+        const signIn = await fetch(`http://127.0.0.1:${restartPort}/api/session`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(player),
+        });
+        if (signIn.status !== 200) {
+          failures.push(`the UI player ${player.playerId} could not sign in after the restart`);
+          console.log(`FAILED (sign-in after restart for ${player.playerId}: ${signIn.status})`);
+          continue;
+        }
         const fresh = await signIn.json();
         const persisted = await fetch(`http://127.0.0.1:${restartPort}/api/world`, {
           headers: { authorization: `Bearer ${fresh.token}` },
         }).then((response) => response.json());
         const saved = persisted?.privateState?.questProgress;
-        for (const award of [
-          { questId: QUEST.questId, playIndex: QUEST.playIndex },
-          { questId: KILL.questId, playIndex: KILL.playIndex },
-        ]) {
-          if (!saved || !Array.isArray(saved.awarded) || !saved.awarded.includes(award.questId)) {
-            failures.push(`the ${award.questId} award did not survive the server restart`);
-            console.log(`FAILED (the ${award.questId} award did not survive the restart)`);
-          } else if (!(saved.ranks?.[award.playIndex] >= 1)) {
-            failures.push(`the ${award.questId} rank did not survive the server restart`);
-            console.log(`FAILED (the ${award.questId} rank did not survive the restart)`);
-          } else {
-            console.log(`  the player signed in again and ${award.questId} was still awarded`);
-          }
+        if (!saved?.awarded?.includes(WEEKLY.id) || !(saved.ranks?.[String(WEEKLY.playIndex)] >= 1)) {
+          failures.push(`the ${WEEKLY.id} award from the UI loop did not survive the restart`);
+          console.log(`FAILED (the UI award did not survive the restart)`);
+        } else {
+          console.log(`  ${player.playerId} signed in again and ${WEEKLY.id} was still awarded`);
         }
       }
     }
