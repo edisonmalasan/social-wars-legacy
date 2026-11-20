@@ -642,13 +642,14 @@ export function createApp(
     const mine = new Promise<void>((resolve) => {
       release = resolve;
     });
-    questLocks.set(playerId, previous.then(() => mine, () => mine));
+    const chained = previous.then(() => mine, () => mine);
+    questLocks.set(playerId, chained);
     await previous.catch(() => undefined);
     try {
       return await work();
     } finally {
       release();
-      if (questLocks.get(playerId) === mine) questLocks.delete(playerId);
+      if (questLocks.get(playerId) === chained) questLocks.delete(playerId);
     }
   }
 
