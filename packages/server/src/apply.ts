@@ -76,6 +76,9 @@ import {
   killQuestElement,
   nearDeathQuestElement,
   defendersClearedQuestElement,
+  addQuestCounter,
+  QUEST_ID_WEEKLY_01,
+  WEEKLY_BOT_ITEM_ID,
   isQuestVictory,
   finishQuest,
   applyQuestVar,
@@ -2290,6 +2293,22 @@ function ensureActiveQuest(
 }
 
 /**
+ * The win counter a validated gun-bot kill advances, from the server's spec.
+ *
+ * Only the weekly quest advances a counter on a kill. The other
+ * `countersAtLeast` quest (the convoy) counts trucks reaching the exit, so a
+ * kill must never move its counter. The name is read from the quest spec —
+ * never from the client's event — and is `null` unless the spec is the weekly
+ * quest with a single counter condition. The caller increments it by exactly
+ * one, and only for a newly destroyed gun-bot ref.
+ */
+function killDrivenWinCounter(spec: QuestSpec): string | null {
+  if (spec.id !== QUEST_ID_WEEKLY_01 || spec.win.kind !== 'countersAtLeast') return null;
+  if (spec.win.counters.length !== 1) return null;
+  return spec.win.counters[0]?.name ?? null;
+}
+
+/**
  * Feed validated event refs into the state, newest first-check-all.
  *
  * A ref is a *kill* from the client's point of view, but the element's own
@@ -2315,6 +2334,7 @@ function applyQuestEvents(
   for (const ref of refs) {
     if (!byRef.has(ref)) return { ok: false, reason: 'unknown-quest-element' };
   }
+  const killCounter = killDrivenWinCounter(spec);
   let next = state;
   for (const ref of refs) {
     const trigger = triggerByRef.get(ref);
@@ -2336,12 +2356,21 @@ function applyQuestEvents(
         }
         break;
       case 'onKill':
-      case 'none':
+      case 'none': {
         // Kept for accounting: destruction, counters and key-element loss.
+        const element = byRef.get(ref)!;
         if (!next.script.destroyed.includes(ref)) {
-          next = killQuestElement(next, byRef.get(ref)!).state;
+          next = killQuestElement(next, element).state;
+          // The weekly win needs real kills: a validated, previously unseen
+          // gun-bot ref advances the spec's counter by exactly one. The ref
+          // came from the roster and the name came from the spec, so neither
+          // can be chosen by the client.
+          if (killCounter !== null && element.itemId === WEEKLY_BOT_ITEM_ID) {
+            next = addQuestCounter(next, killCounter, 1);
+          }
         }
         break;
+      }
       default: {
         // Exhaustive over QuestElementTrigger: a new trigger value cannot be
         // added without this check failing at compile time.

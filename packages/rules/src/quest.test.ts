@@ -23,6 +23,7 @@ import {
   GROUP_TYPE_AIR_VEHICLE,
   LABORATORY_REFS,
   NUM_STORY_QUESTS,
+  WEEKLY_BOT_REFS,
   WEEKLY_CASH_PER_BOT,
   addQuestCounter,
   advanceSimpleChapter,
@@ -287,6 +288,25 @@ describe('the quest lifecycle', () => {
 });
 
 describe('the weekly quest', () => {
+  it('places the five documented gun bots on the map', () => {
+    const spec = getQuestSpec(QUEST_ID_WEEKLY_01)!;
+    assert.deepEqual(WEEKLY_BOT_REFS, [
+      'gunbot@20,45',
+      'gunbot@38,19',
+      'gunbot@67,22',
+      'gunbot@63,56',
+      'gunbot@46,37',
+    ]);
+    assert.deepEqual(
+      spec.elements.map((element) => element.ref),
+      [...WEEKLY_BOT_REFS],
+    );
+    for (const element of spec.elements) {
+      assert.equal(element.itemId, 1063, `${element.ref} has the wrong item id`);
+      assert.equal(element.trigger, 'onKill', `${element.ref} has the wrong trigger`);
+    }
+  });
+
   it('is won when the fifth gun bot dies', () => {
     let state = running(QUEST_ID_WEEKLY_01);
     for (let bot = 1; bot <= 4; bot += 1) {
