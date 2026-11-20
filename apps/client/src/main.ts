@@ -33,7 +33,15 @@ import {
 } from '@swl/client';
 import type { NativeCommand, NativeResponse } from '@swl/protocol';
 import type { ContentBundle, ContentItem } from '@swl/content';
-import { buy, claimDailyBonus, completeTutorial } from '@swl/client';
+import {
+  buy,
+  claimDailyBonus,
+  completeTutorial,
+  finishBuilding,
+  finishView,
+  takeTrainedUnit,
+  type ItemType,
+} from '@swl/client';
 import {
   activeQuestState,
   endQuest,
@@ -436,6 +444,8 @@ async function main(): Promise<void> {
   const interaction = new Interaction();
   let placing: number | null = null;
   let selected: number | null = null;
+  /** The map id of the selected element, for its server attribute bag. */
+  let selectedIso: number | null = null;
   let neighbours: Neighbour[] = [];
   /**
    * The one open dialog and the feedback channel. Neither is a reading of
@@ -454,6 +464,12 @@ async function main(): Promise<void> {
         dialogState = closeDialog(dialogState);
         drawInterface();
       },
+      selectedIso,
+      now: Math.floor(Date.now() / 1000),
+      onUpgrade,
+      onFinish,
+      onTrain,
+      onTake,
     });
   }
 
@@ -528,11 +544,54 @@ async function main(): Promise<void> {
    *
    * Picking one **begins** a placement; it does not build anything.
    */
-  function onPick(itemId: number): void {
-    interaction.beginPlacement(itemId, 'b');
+  function onPick(itemId: number, type: ItemType): void {
+    // The menu entry carries its own wire type: a unit must be requested as
+    // a unit, not as the building the old code hardcoded here.
+    interaction.beginPlacement(itemId, type);
     placing = itemId;
     selected = null;
+    selectedIso = null;
     drawInterface();
+  }
+
+  /** A local gesture refusal, surfaced on the same typed channel as the server's. */
+  function gestureRefusal(refusal: string): void {
+    feedback = [{ tone: 'error', text: `That action is not available (${refusal}).` }];
+    drawInterface();
+  }
+
+  /** Upgrade the selected building. The server checks the level, tiles and cost. */
+  function onUpgrade(): void {
+    const gesture = interaction.upgradeSelected();
+    if (!gesture.ok) {
+      gestureRefusal(gesture.refusal);
+      return;
+    }
+    void run([gesture.command]);
+  }
+
+  /** Hurry the selected building's construction, carrying the content's clicks. */
+  function onFinish(): void {
+    if (selected === null || selectedIso === null) return;
+    const item = content.items.find((entry) => entry.id === selected);
+    if (!item) return;
+    void run([finishBuilding(selectedIso, item.clicks_to_build)]);
+  }
+
+  /** Train a unit in the selected building. The server prices it. */
+  function onTrain(unitItemId: number): void {
+    const gesture = interaction.trainSelected(unitItemId);
+    if (!gesture.ok) {
+      gestureRefusal(gesture.refusal);
+      return;
+    }
+    void run([gesture.command]);
+  }
+
+  /** Take the finished unit out of the selected building's queue. */
+  function onTake(): void {
+    if (selectedIso === null) return;
+    void run([takeTrainedUnit(selectedIso)]);
   }
 
   /**
@@ -567,6 +626,13 @@ async function main(): Promise<void> {
   drawInterface();
   void refreshNeighbours();
 
+  // Countdowns are a presentation of the server's timestamps. Redraw once a
+  // second while something is selected so they advance; the server still
+  // decides when a unit is really finished or a build is done.
+  window.setInterval(() => {
+    if (selected !== null) drawInterface();
+  }, 1000);
+
   // The map's click. The click is a **gesture**: the client turns it
   // into a command and the server decides the outcome.
   renderer.onClick = (x, y) => {
@@ -586,9 +652,25 @@ async function main(): Promise<void> {
     if (!found) {
       interaction.clear();
       selected = null;
+      selectedIso = null;
     } else {
-      interaction.selectElement(found.isoId, found.itemId, 'building');
+      const definition = content.items.find((entry) => entry.id === found.itemId);
+      const tuple = world.maps[0]?.items?.[String(found.isoId)];
+      const build = finishView(
+        Number(tuple?.[3] ?? 0),
+        definition?.build_time ?? 0,
+        definition?.clicks_to_build ?? 0,
+        Math.floor(Date.now() / 1000),
+      );
+      const element = definition?.type === 'u' ? 'unit' : 'building';
+      interaction.selectElement(
+        found.isoId,
+        found.itemId,
+        element,
+        element === 'building' && build !== null,
+      );
       selected = found.itemId;
+      selectedIso = found.isoId;
     }
     drawInterface();
   };

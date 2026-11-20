@@ -18,6 +18,7 @@ import {
   hudState,
   type DialogState,
   type FeedbackMessage,
+  type ItemType,
   type NativeCommand,
   type Neighbour,
   type WorldSnapshot,
@@ -32,8 +33,10 @@ import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
 import { InfoPanel } from './info.tsx';
 import { Neighbours } from './neighbours.tsx';
+import { RecruitPanel } from './recruit.tsx';
 import { TutorialOverlay, type TutorialOverlayProps } from './tutorial.tsx';
 import {
+  buildingInfo,
   buildItems,
   categories,
   goalList,
@@ -41,6 +44,7 @@ import {
   infoPanel,
   questMinLevels,
   questRanks,
+  recruitView,
   unitInfoPanel,
 } from './state.ts';
 
@@ -54,6 +58,10 @@ export interface RootProps {
   placing?: number | null;
   /** The item the player selected on the map, or null. */
   selected?: number | null;
+  /** The map id of the selected element, for its server attribute bag. */
+  selectedIso?: number | null;
+  /** The client's unix second, used only for on-screen countdowns. */
+  now?: number;
   /** The other players, for the neighbour strip. */
   neighbours?: readonly Neighbour[];
   /** The tutorial step to draw, or null when the tutorial is not running. */
@@ -66,10 +74,18 @@ export interface RootProps {
   onDialogDismiss?: () => void;
   /** The player asked to collect the selected building's production. */
   onCollect?: () => void;
-  /** The player picked something to build. */
-  onPick?: (itemId: number) => void;
+  /** The player picked something to build, with its real wire type. */
+  onPick?: (itemId: number, type: ItemType) => void;
   /** The player claimed a goal; send it through the client's transport. */
   onCommand?: (command: NativeCommand) => void;
+  /** The player asked to upgrade the selected building. */
+  onUpgrade?: () => void;
+  /** The player asked to hurry the selected building's construction. */
+  onFinish?: () => void;
+  /** The player asked to train a unit in the selected building. */
+  onTrain?: (unitItemId: number) => void;
+  /** The player asked to take the finished unit out of the queue. */
+  onTake?: () => void;
 }
 
 /**
@@ -84,6 +100,8 @@ export function Root({
   bundle,
   placing,
   selected,
+  selectedIso = null,
+  now = Math.floor(Date.now() / 1000),
   neighbours = [],
   tutorial = null,
   dialog = null,
@@ -92,6 +110,10 @@ export function Root({
   onCollect,
   onPick,
   onCommand,
+  onUpgrade,
+  onFinish,
+  onTrain,
+  onTake,
 }: RootProps): React.JSX.Element {
   const state = hudState(hudInput(bundle, world));
   const items = useMemo(() => buildItems(bundle), [bundle]);
@@ -105,13 +127,29 @@ export function Root({
   const minLevels = useMemo(() => questMinLevels(bundle), [bundle]);
   const panel = useMemo(() => infoPanel(bundle, selected ?? null), [bundle, selected]);
   const unit = useMemo(() => unitInfoPanel(bundle, selected ?? null), [bundle, selected]);
+  const building = useMemo(
+    () => buildingInfo(bundle, world, selectedIso, now),
+    [bundle, world, selectedIso, now],
+  );
+  const recruit = useMemo(
+    () => recruitView(bundle, world, selectedIso, now),
+    [bundle, world, selectedIso, now],
+  );
 
   return (
     <div className="swl-ui">
       <Hud state={state} placing={placingName} />
       <Goals goals={goals} onCommand={onCommand} />
       <Chapters ranks={ranks} minLevels={minLevels} />
-      <InfoPanel resource={panel} unit={unit} onCollect={onCollect} />
+      <InfoPanel
+        resource={panel}
+        unit={unit}
+        building={building}
+        onCollect={onCollect}
+        onUpgrade={onUpgrade}
+        onFinish={onFinish}
+      />
+      <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
       <Neighbours neighbours={neighbours} />
       {tutorial ? <TutorialOverlay {...tutorial} /> : null}
       <Feedback messages={feedback} />
@@ -123,7 +161,7 @@ export function Root({
         items={items}
         categories={tabs}
         playerLevel={state.level}
-        onPick={onPick ? (entry) => onPick(entry.id) : undefined}
+        onPick={onPick ? (entry) => onPick(entry.id, entry.type) : undefined}
       />
     </div>
   );

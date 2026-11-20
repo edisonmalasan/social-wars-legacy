@@ -1,10 +1,11 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { completeGoal } from '@swl/client';
+import { completeGoal, type WorldSnapshot } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 
 import {
+  buildingInfo,
   buildItems,
   categories,
   expRequiredByLevel,
@@ -15,6 +16,7 @@ import {
   populationItems,
   questMinLevels,
   questRanks,
+  recruitView,
   unitInfoPanel,
 } from './state.ts';
 import { QUEST_IDS } from '@swl/rules';
@@ -397,5 +399,43 @@ describe('the HUD\'s input', () => {
     assert.equal(input.world, world);
     assert.equal(input.items.get(26)?.population, 3);
     assert.equal(input.rules.maxEnergy, 30);
+  });
+});
+
+describe('building management views', () => {
+  it('shows a building that produces nothing, so the panel is not empty', () => {
+    const b = bundle({ items: [item({ id: 26, name: 'Command Center' })] });
+    const w = {
+      maps: [{ id: 0, items: { '7': [26, 1, 2, 0, 0, 0, {}, 1] }, level: 1 }],
+      resources: {},
+      privateState: {},
+    } as unknown as WorldSnapshot;
+    const view = buildingInfo(b, w, 7, 100);
+    assert.equal(view?.name, 'Command Center');
+    assert.equal(view?.upgrade, null);
+    assert.equal(view?.finish, null);
+  });
+
+  it('reads a training queue from the server attribute bag', () => {
+    const b = bundle({
+      items: [
+        item({ id: 50, name: 'Barracks', trains_ids: [1008], training_time: 20 }),
+        item({ id: 1008, name: 'Rifleman', type: 'u' }),
+      ],
+    });
+    const w = {
+      maps: [{
+        id: 0,
+        items: { '9': [50, 1, 2, 0, 0, 0, { nu: 1, ts: 80, ui: 1008 }, 1] },
+        level: 1,
+      }],
+      resources: {},
+      privateState: {},
+    } as unknown as WorldSnapshot;
+    const view = recruitView(b, w, 9, 95);
+    assert.equal(view?.buildingName, 'Barracks');
+    assert.deepEqual(view?.units, [{ itemId: 1008, name: 'Rifleman' }]);
+    assert.equal(view?.queue.remainingSeconds, 5);
+    assert.equal(view?.queue.readyToTake, false);
   });
 });

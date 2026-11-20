@@ -14,16 +14,27 @@
  * without a browser: the tests are in `state.test.ts`.
  */
 import type {
+  BuildingInfoView,
   BuildMenuItem,
   HudInput,
   HudRules,
   ItemPopulation,
   NativeCommand,
+  RecruitView,
   ResourcePanel,
+  UnitCard,
   UnitPanel,
   WorldSnapshot,
 } from '@swl/client';
-import { completeGoal, resourcePanel, unitPanel } from '@swl/client';
+import {
+  buildingInfoView,
+  completeGoal,
+  itemType,
+  levelOf,
+  resourcePanel,
+  trainingView,
+  unitPanel,
+} from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 import { QUEST_IDS } from '@swl/rules';
 
@@ -116,6 +127,9 @@ export function buildItems(bundle: ContentBundle): BuildMenuItem[] {
   for (const item of bundle.items) {
     if (!buildable(item)) continue;
     items.push({
+      // The buy request needs the item's own type. Hardcoding 'b' here is
+      // what made a unit bought from the menu be requested as a building.
+      type: itemType(item.type),
       id: item.id,
       name: item.name,
       categoryId: item.category_id,
@@ -321,4 +335,90 @@ export function categories(bundle: ContentBundle): Categories {
     out[key] = { id: category.id, name: category.name, sub };
   }
   return out;
+}
+
+/* -------------------------------------------------------------------------
+ * Building management and recruitment
+ *
+ * These are the bridge between the server's map item, the content and the
+ * pure view models in `packages/client/src/management.ts`. They read values;
+ * they never build a command or decide an outcome.
+ * ---------------------------------------------------------------------- */
+
+/** The map item the player selected, from the server's answer. */
+function selectedItem(
+  world: WorldSnapshot,
+  isoId: number | null,
+): readonly number[] | null {
+  if (isoId === null) return null;
+  return world.maps[0]?.items?.[String(isoId)] ?? null;
+}
+
+/** The attribute bag in a map item, or null when there is none. */
+function attributesOf(tuple: readonly number[]): Readonly<Record<string, unknown>> | null {
+  const attrs: unknown = tuple[6];
+  return typeof attrs === 'object' && attrs !== null
+    ? (attrs as Record<string, unknown>)
+    : null;
+}
+
+/**
+ * A building's info view, for every building — not only the ones that
+ * produce a resource. The name is the content's, the level and the build
+ * timestamp are the server's, and the upgrade/hurry views only restate
+ * content numbers.
+ */
+export function buildingInfo(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  isoId: number | null,
+  now: number,
+): BuildingInfoView | null {
+  const tuple = selectedItem(world, isoId);
+  if (!tuple) return null;
+  const item = (bundle.items ?? []).find((entry) => entry.id === Number(tuple[0]));
+  if (!item || item.type !== 'b') return null;
+  const next = item.upgrades_to === null
+    ? null
+    : (bundle.items ?? []).find((entry) => entry.id === item.upgrades_to) ?? null;
+  return buildingInfoView({
+    name: item.name,
+    nextName: next?.name ?? null,
+    nextMinLevel: next?.min_level ?? null,
+    playerLevel: levelOf(world),
+    startedAt: Number(tuple[3]),
+    buildTime: item.build_time,
+    clicksToBuild: item.clicks_to_build,
+    now,
+  });
+}
+
+/**
+ * A training building's recruit view.
+ *
+ * The trainable units and their names are the content's; the queue count,
+ * start time and unit id are the server's, read from the attribute bag. A
+ * building with no units listed but a live queue is still shown, so the
+ * player can take a unit the server already finished.
+ */
+export function recruitView(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  isoId: number | null,
+  now: number,
+): RecruitView | null {
+  const tuple = selectedItem(world, isoId);
+  if (!tuple) return null;
+  const item = (bundle.items ?? []).find((entry) => entry.id === Number(tuple[0]));
+  if (!item || item.type !== 'b') return null;
+  const queue = trainingView(attributesOf(tuple), item.training_time, now);
+  if (item.trains_ids.length === 0 && queue.queued <= 0) return null;
+
+  const byId = new Map((bundle.items ?? []).map((entry) => [entry.id, entry]));
+  const units: UnitCard[] = [];
+  for (const id of item.trains_ids) {
+    const unit = byId.get(id);
+    if (unit) units.push({ itemId: id, name: unit.name });
+  }
+  return { buildingName: item.name, units, queue };
 }

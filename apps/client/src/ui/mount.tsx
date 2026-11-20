@@ -10,6 +10,7 @@ import { createRoot } from 'react-dom/client';
 import type {
   DialogState,
   FeedbackMessage,
+  ItemType,
   NativeCommand,
   Neighbour,
   WorldSnapshot,
@@ -27,6 +28,18 @@ export interface UiOverlayState {
   readonly feedback?: readonly FeedbackMessage[];
   /** The player asked the dialog to close. */
   readonly onDialogDismiss?: () => void;
+  /** The selected element's map id, for its server attribute bag. */
+  readonly selectedIso?: number | null;
+  /** The client's unix second, for on-screen countdowns. */
+  readonly now?: number;
+  /** The player asked to upgrade the selected building. */
+  readonly onUpgrade?: () => void;
+  /** The player asked to hurry the selected building's construction. */
+  readonly onFinish?: () => void;
+  /** The player asked to train a unit in the selected building. */
+  readonly onTrain?: (unitItemId: number) => void;
+  /** The player asked to take the finished unit out of the queue. */
+  readonly onTake?: () => void;
 }
 
 /** The mounted interface. */
@@ -46,7 +59,7 @@ export interface UiHandle {
 export function mountUi(
   element: HTMLElement,
   bundle: ContentBundle,
-  onPick?: (itemId: number) => void,
+  onPick?: (itemId: number, type: ItemType) => void,
   onCollect?: () => void,
   onCommand?: (command: NativeCommand) => void,
 ): UiHandle {
@@ -66,6 +79,8 @@ export function mountUi(
           bundle={bundle}
           placing={placing}
           selected={selected}
+          selectedIso={overlays.selectedIso}
+          now={overlays.now}
           neighbours={neighbours}
           tutorial={tutorial}
           dialog={overlays.dialog}
@@ -74,6 +89,10 @@ export function mountUi(
           onPick={onPick}
           onCollect={onCollect}
           onCommand={onCommand}
+          onUpgrade={overlays.onUpgrade}
+          onFinish={overlays.onFinish}
+          onTrain={overlays.onTrain}
+          onTake={overlays.onTake}
         />,
       ),
   };

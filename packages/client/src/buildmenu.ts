@@ -27,8 +27,24 @@
  */
 import type { Resources } from '@swl/rules';
 
+/** The wire type of an item, as the `buy` request names it. */
+export type ItemType = 'b' | 'u' | 'n';
+
+/**
+ * The buy-request type of a content item.
+ *
+ * The content uses the same letters (`b` for a building, `u` for a unit)
+ * that the `buy` request carries. Anything else is treated as a building,
+ * the client's existing default; the menu only offers buildings and units.
+ */
+export function itemType(contentType: string): ItemType {
+  return contentType === 'u' ? 'u' : contentType === 'n' ? 'n' : 'b';
+}
+
 /** An item the build menu can show. */
 export interface BuildMenuItem {
+  /** The wire type the `buy` request must carry for this item. */
+  type: ItemType;
   id: number;
   name: string;
   /** The category the item belongs to, which is the tab. */

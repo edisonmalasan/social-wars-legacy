@@ -311,6 +311,108 @@ export function uiCss(): string {
   font-weight: 700;
 }
 
+/* The Upgrade and Finish actions share the resource button's shape. */
+.swl-info-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.swl-info-action-button {
+  width: 100%;
+  padding: 4px 10px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  background: #f5c542;
+  color: #10151d;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-info-action-button:hover { background: #ffd75e; }
+
+.swl-info-action-note {
+  margin-top: 2px;
+  color: #8d97a8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+/* --- The recruitment panel --------------------------------------------- */
+
+.swl-recruit {
+  position: absolute;
+  right: 236px;
+  bottom: 8px;
+  width: 220px;
+  padding: 8px 10px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: #131a24;
+  pointer-events: auto;
+}
+
+.swl-recruit-title {
+  color: #f2e6c8;
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(13px * var(--swl-font-scale-display, 1));
+  font-weight: 700;
+}
+
+.swl-recruit-units {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swl-recruit-unit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.swl-recruit-unit-name {
+  color: #e8e3d8;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+}
+
+.swl-recruit-train,
+.swl-recruit-take {
+  padding: 3px 8px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  color: #10151d;
+  background: #f5c542;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-recruit-train:hover,
+.swl-recruit-take:hover:not(:disabled) { background: #ffd75e; }
+
+.swl-recruit-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid #2b3546;
+}
+
+.swl-recruit-countdown {
+  color: #8d97a8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-recruit-take:disabled {
+  border-color: #38445a;
+  color: #5c6678;
+  background: #1d2430;
+  cursor: not-allowed;
+}
+
 /* --- The neighbour strip ----------------------------------------------- */
 
 .swl-neighbours {
