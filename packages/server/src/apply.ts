@@ -74,6 +74,8 @@ import {
   startQuest,
   loadQuestMap,
   killQuestElement,
+  nearDeathQuestElement,
+  defendersClearedQuestElement,
   isQuestVictory,
   finishQuest,
   applyQuestVar,
@@ -2100,7 +2102,7 @@ function setQuestVarCommand(
       if (!spec) return { applied: false, refused: 'unknown-quest', world };
       const ensured = ensureActiveQuest(world, questId, deps);
       if (!ensured.ok) return { applied: false, refused: ensured.reason, world };
-      const kills = applyQuestKills(ensured.state, value as string[], spec, deps);
+      const kills = applyQuestEvents(ensured.state, value as string[], spec, deps);
       if (!kills.ok) return { applied: false, refused: kills.reason, world };
       advanced = kills.state;
     }
@@ -2287,21 +2289,66 @@ function ensureActiveQuest(
   return { ok: true, state: loadQuestMap(startQuest(prepared), questRoster(spec, deps.items)) };
 }
 
-/** Feed validated kill refs into the state, newest first-check-all. */
-function applyQuestKills(
+/**
+ * Feed validated event refs into the state, newest first-check-all.
+ *
+ * A ref is a *kill* from the client's point of view, but the element's own
+ * trigger decides which scripted channel it advances: `onNearDeath` and
+ * `onKillDefenders` never append to `script.destroyed` (the client fires
+ * those callbacks from the health threshold and the defender count, not from
+ * the kill signal). `none` elements still go through `killQuestElement` for
+ * the counters and the key-element loss it accounts for.
+ *
+ * Each channel is deduped so a re-sent ref cannot double-apply — notably,
+ * `killQuestElement` would award its gold/XP again on a duplicate destroyed
+ * ref.
+ */
+function applyQuestEvents(
   state: QuestState,
   refs: readonly string[],
   spec: QuestSpec,
   deps: ApplierDeps,
 ): QuestStateResult {
-  const byRef = new Map(questRoster(spec, deps.items).map((element) => [element.ref, element]));
+  const roster = questRoster(spec, deps.items);
+  const byRef = new Map(roster.map((element) => [element.ref, element]));
+  const triggerByRef = new Map(spec.elements.map((element) => [element.ref, element.trigger]));
   for (const ref of refs) {
     if (!byRef.has(ref)) return { ok: false, reason: 'unknown-quest-element' };
   }
   let next = state;
   for (const ref of refs) {
-    if (next.script.destroyed.includes(ref)) continue;
-    next = killQuestElement(next, byRef.get(ref)!).state;
+    const trigger = triggerByRef.get(ref);
+    // The roster is built 1:1 over spec.elements, so a validated ref always
+    // has a trigger. Fail loudly rather than consume it silently if that
+    // invariant ever breaks.
+    if (trigger === undefined) {
+      throw new Error(`unknown quest element trigger for ref: ${ref}`);
+    }
+    switch (trigger) {
+      case 'onNearDeath':
+        if (!next.script.nearDeath.includes(ref)) {
+          next = nearDeathQuestElement(next, ref);
+        }
+        break;
+      case 'onKillDefenders':
+        if (!next.script.defendersCleared.includes(ref)) {
+          next = defendersClearedQuestElement(next, ref);
+        }
+        break;
+      case 'onKill':
+      case 'none':
+        // Kept for accounting: destruction, counters and key-element loss.
+        if (!next.script.destroyed.includes(ref)) {
+          next = killQuestElement(next, byRef.get(ref)!).state;
+        }
+        break;
+      default: {
+        // Exhaustive over QuestElementTrigger: a new trigger value cannot be
+        // added without this check failing at compile time.
+        const exhaustive: never = trigger;
+        throw new Error(`unhandled quest element trigger: ${String(exhaustive)}`);
+      }
+    }
   }
   return { ok: true, state: next };
 }
@@ -2382,7 +2429,7 @@ function endQuestCommand(
     // Only this quest's roster is replayed here; direct `set_quest_var` writes
     // still refuse any off-roster ref outright.
     const rosterRefs = new Set(questRoster(spec, deps.items).map((element) => element.ref));
-    const kills = applyQuestKills(
+    const kills = applyQuestEvents(
       ensured.state,
       refs.filter((ref) => rosterRefs.has(ref)),
       spec,
@@ -2395,7 +2442,16 @@ function endQuestCommand(
   // An empty roster would satisfy a `countersZero` win with zero events
   // (loadQuestMap seeds enemiesAlive = 0), minting currency for no work. A
   // recorded loss is never payable either. Both are refused before any award.
-  if (state.result === 'loss' || state.script.destroyed.length === 0) {
+  // A validated event may land in any of the three trigger channels — a
+  // nearDeath or defendersCleared ref is as real an event as a destruction —
+  // so the guard checks all three, but still refuses when none has fired
+  // (including a vacuously satisfied `countersZero`).
+  if (
+    state.result === 'loss' ||
+    (state.script.destroyed.length === 0 &&
+      state.script.nearDeath.length === 0 &&
+      state.script.defendersCleared.length === 0)
+  ) {
     return { applied: false, refused: 'no-victory', world };
   }
   if (!isQuestVictory(state)) return { applied: false, refused: 'no-victory', world };

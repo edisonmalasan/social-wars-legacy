@@ -6,6 +6,7 @@ import {
   DART_COST_CASH,
   QUEST_ID_01_BAZOOKA,
   QUEST_ID_02_CENTRAL_NUCLEAR,
+  QUEST_ID_06_AIRSTRIKE,
   QUEST_ID_15_HARDCORE1,
   applyCommandCost,
   buildDartsBoard,
@@ -2432,5 +2433,105 @@ describe('the active assault quest', () => {
     assert.equal(outcome.applied, false);
     assert.equal(outcome.refused, 'no-victory');
     assert.deepEqual(outcome.world, before);
+  });
+
+  it('resolves a nearDeath quest from validated killed refs without recording kills', () => {
+    const applier = createApplier(questDeps());
+    const killed = applier(
+      questWorld({ questId: QUEST_ID_01_BAZOOKA }),
+      killedWrite(['boss1', 'jeep'], QUEST_ID_01_BAZOOKA),
+    );
+    assert.equal(killed.applied, true);
+    const state = activeState(killed.world);
+    assert.deepEqual(state.script.nearDeath, ['boss1', 'jeep']);
+    // A nearDeath event must reach the nearDeath channel only, never
+    // script.destroyed (which would let a destroy-only quest win by proxy).
+    assert.deepEqual(state.script.destroyed, []);
+    assert.deepEqual(state.script.defendersCleared, []);
+    const outcome = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_01_BAZOOKA, 1],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 1500);
+    assert.equal(outcome.world.resources['w'], 400);
+  });
+
+  it('does not double-apply a re-sent trigger ref', () => {
+    const applier = createApplier(questDeps());
+    const first = applier(
+      questWorld({ questId: QUEST_ID_01_BAZOOKA }),
+      killedWrite(['boss1', 'jeep'], QUEST_ID_01_BAZOOKA),
+    );
+    assert.equal(first.applied, true);
+    const second = applier(first.world, killedWrite(['boss1', 'jeep'], QUEST_ID_01_BAZOOKA));
+    assert.equal(second.applied, true);
+    assert.deepEqual(activeState(second.world).script.nearDeath, ['boss1', 'jeep']);
+    assert.deepEqual(activeState(second.world).script.destroyed, []);
+  });
+
+  it('refuses a nearDeath win when the key element was also destroyed', () => {
+    const applier = createApplier(questDeps());
+    const killed = applier(
+      questWorld({ questId: QUEST_ID_01_BAZOOKA }),
+      killedWrite(['boss1', 'jeep', 'general'], QUEST_ID_01_BAZOOKA),
+    );
+    assert.equal(killed.applied, true);
+    assert.equal(activeState(killed.world).result, 'loss');
+    assert.deepEqual(activeState(killed.world).script.keyElementsLost, ['general']);
+    const outcome = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_01_BAZOOKA, 1],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+  });
+
+  it('resolves a legacy end_quest replay of a nearDeath quest', () => {
+    const applier = createApplier(questDeps());
+    const world = questWorld({ vars: { killed: ['boss1', 'jeep'] } });
+    delete world.save.privateState[ACTIVE_QUEST_KEY];
+    const outcome = applier(world, {
+      name: 'end_quest',
+      args: [JSON.stringify({ quest_id: QUEST_ID_01_BAZOOKA })],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 1500);
+    assert.equal(outcome.world.resources['w'], 400);
+  });
+
+  it('resolves a quest that mixes defendersCleared and destroy events', () => {
+    const applier = createApplier(questDeps());
+    const killed = applier(
+      questWorld({ questId: QUEST_ID_06_AIRSTRIKE }),
+      killedWrite(['radioStation', 'enemyCommandCenter'], QUEST_ID_06_AIRSTRIKE),
+    );
+    assert.equal(killed.applied, true);
+    const state = activeState(killed.world);
+    assert.deepEqual(state.script.defendersCleared, ['radioStation']);
+    assert.deepEqual(state.script.destroyed, ['enemyCommandCenter']);
+    assert.deepEqual(state.script.nearDeath, []);
+    const outcome = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_06_AIRSTRIKE, 1],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 2000);
+    assert.equal(outcome.world.resources['w'], 600);
+  });
+
+  it('requires both events for the mixed defender/destroy quest', () => {
+    const applier = createApplier(questDeps());
+    const killed = applier(
+      questWorld({ questId: QUEST_ID_06_AIRSTRIKE }),
+      killedWrite(['radioStation'], QUEST_ID_06_AIRSTRIKE),
+    );
+    assert.equal(killed.applied, true);
+    const outcome = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_06_AIRSTRIKE, 1],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
   });
 });
