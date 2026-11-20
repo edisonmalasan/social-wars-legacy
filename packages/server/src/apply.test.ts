@@ -2604,6 +2604,13 @@ describe('the weekly quest', () => {
     const outcome = endWeekly(replayed.world);
     assert.equal(outcome.applied, true);
     assert.equal(outcome.world.resources['c'], 5 * WEEKLY_CASH_PER_BOT);
+
+    // The active state is cleared on award, so a second claim is refused by
+    // the zero-event guard before the once-only award guard is even reached.
+    const second = endWeekly(outcome.world);
+    assert.equal(second.applied, false);
+    assert.equal(second.refused, 'no-victory');
+    assert.equal(second.world.resources['c'], 5 * WEEKLY_CASH_PER_BOT);
   });
 
   it('refuses a kill ref outside the weekly roster', () => {

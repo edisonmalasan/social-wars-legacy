@@ -34,17 +34,17 @@
 - Modify: `packages/server/src/apply.ts`
 - Test: `packages/rules/src/quest.test.ts`, `packages/server/src/apply.test.ts`
 
-- [ ] **Step 1: Write failing tests** for: weekly spec has five bot elements with refs derived from the documented positions; `killQuestElement` on each bot increments the server's `botsKilled` counter through the applier; five kills allow `end_quest` to pay the weekly cash reward; four kills are refused; a repeated ref is idempotent; an off-roster ref is refused.
-- [ ] **Step 2:** Run the focused tests and confirm RED.
-- [ ] **Step 3:** Add the five elements to the weekly `QuestSpec` using the client's item id 1063 and refs derived from the five positions. In `applyQuestEvents`, for a quest whose win is `countersAtLeast` on `botsKilled`, increment that counter once per distinct validated bot kill (derive the counter name from the spec, not from client input).
-- [ ] **Step 4:** Run the focused tests plus shim tests and confirm GREEN.
-- [ ] **Step 5:** Run the whole gate before committing.
-- [ ] **Step 6:** Commit `feat(f): make the weekly quest resolvable from validated bot kills`.
+- [x] **Step 1: Write failing tests** for: weekly spec has five bot elements with refs derived from the documented positions; `killQuestElement` on each bot increments the server's `botsKilled` counter through the applier; five kills allow `end_quest` to pay the weekly cash reward; four kills are refused; a repeated ref is idempotent; an off-roster ref is refused.
+- [x] **Step 2:** Run the focused tests and confirm RED.
+- [x] **Step 3:** Add the five elements to the weekly `QuestSpec` using the client's item id 1063 and refs derived from the five positions. In `applyQuestEvents`, for a quest whose win is `countersAtLeast` on `botsKilled`, increment that counter once per distinct validated bot kill (derive the counter name from the spec, not from client input).
+- [x] **Step 4:** Run the focused tests plus shim tests and confirm GREEN.
+- [x] **Step 5:** Run the whole gate before committing.
+- [x] **Step 6:** Commit `feat(f): make the weekly quest resolvable from validated bot kills`.
 
 ### Task 2: Roadmap disposition
 
 **Files:** Modify `docs/ROADMAP.md`.
 
-- [ ] **Step 1:** Update *Unimplemented layers* to record that the weekly quest now resolves; the eight hardcore quests and the counter quests without event sources remain, needing build-time roster extraction and client instrumentation.
-- [ ] **Step 2:** Add an amendment-log entry. Do not tick the G4 quest item unless every remaining sub-feature is genuinely supported (it is not).
-- [ ] **Step 3:** Run the whole gate and commit `docs(roadmap): record weekly quest resolution`.
+- [x] **Step 1:** Update *Unimplemented layers* to record that the weekly quest now resolves; the eight hardcore quests and the counter quests without event sources remain, needing build-time roster extraction and client instrumentation.
+- [x] **Step 2:** Add an amendment-log entry. Do not tick the G4 quest item unless every remaining sub-feature is genuinely supported (it is not).
+- [x] **Step 3:** Run the whole gate and commit `docs(roadmap): record weekly quest resolution`.
