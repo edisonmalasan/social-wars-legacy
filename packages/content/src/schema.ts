@@ -154,6 +154,32 @@ export interface QuestRoster {
   readonly items: QuestRosterEntry[];
 }
 
+/**
+ * The quest-specific event channels whose counters cannot be derived from a
+ * quest's spec alone: truck arrivals (Q03), eligible enemy kills (Q10/Q14)
+ * and civilian evacuations (Q11).
+ */
+export type QuestEventKind = 'truckArrivals' | 'eligibleEnemies' | 'civilianEvacuations';
+
+/**
+ * Build-time-extracted data for one quest's event channel.
+ *
+ * `refs` addresses the map elements a client may report: `item:<isoId>` for
+ * the units read off a vendored map snapshot. Q03 is the exception — its
+ * trucks spawn dynamically, so its single ref is `item:<itemId>` (1013), the
+ * truck item id from the client constants.
+ *
+ * `count` is the authoritative counter value the server seeds or targets: the
+ * number of extracted refs for Q10/Q14/Q11, and the client's
+ * `totalTrucksToSave = 3` for Q03. It is never taken from a client request.
+ */
+export interface QuestEventData {
+  readonly questId: string;
+  readonly kind: QuestEventKind;
+  readonly refs: string[];
+  readonly count: number;
+}
+
 export interface ContentBundle {
   /** Bumped when the bundle shape changes. */
   formatVersion: 1;
@@ -168,6 +194,8 @@ export interface ContentBundle {
   goals: ContentGoal[];
   /** Build-time-extracted enemy rosters for the eight hardcore quests. */
   questRosters?: QuestRoster[];
+  /** Build-time-extracted event data for the four event-driven quests, keyed by quest id. */
+  questEvents?: Record<string, QuestEventData>;
   globals: Record<string, unknown>;
   collections: unknown[];
   inventoryItems: Record<string, unknown>;

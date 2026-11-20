@@ -4,6 +4,8 @@
  * Input   upstream/socialwarriors/config/main.json        (the 2012 capture)
  *         upstream/socialwarriors/config/patch/patches.txt (the patch order)
  *         upstream/socialwarriors/config/patch/*.json     (the five deltas)
+ *         upstream/socialwarriors/villages/quest/*.json   (build-time quest maps:
+ *           the hardcore rosters and the Q03/Q10/Q11/Q14 event elements)
  * Output  packages/content/dist/content-bundle.json       (canonical, hashed)
  *
  * Design notes
@@ -31,6 +33,7 @@ import type {
   ContentGoal,
   ContentItem,
   ContentLevel,
+  QuestEventData,
   QuestRoster,
   QuestRosterEntry,
 } from './schema.ts';
@@ -384,7 +387,7 @@ const HARDCORE_QUEST_UNITS: Readonly<Record<string, number>> = {
   '100000025': 46, // HC10
 };
 
-interface QuestMapSnapshot {
+export interface QuestMapSnapshot {
   readonly playerInfo?: { readonly pid?: unknown };
   readonly maps?: readonly { readonly items?: Record<string, unknown> }[];
 }
@@ -453,6 +456,153 @@ async function extractQuestRosters(
   return rosters;
 }
 
+/**
+ * The Q03 truck constants, from the decompiled client
+ * (`quest/Quest03DefendConvoyAuto.as:49-51, 175-189`; recorded in
+ * `re/data/quests.json`: ID_UNIT_TRUCK_1 = 1013, totalTrucksToSave = 3).
+ *
+ * These are server-owned constants, never values supplied by a client
+ * request. Q03's trucks spawn dynamically, so its map has no static truck
+ * element to extract — the ref is the item id, not a map iso id.
+ */
+const Q03_TRUCK_ITEM_ID = 1013;
+const Q03_TRUCK_ARRIVALS = 3;
+
+/**
+ * The group types the client's `Quest10SpecialOps` / `Quest14Spy2` treat as
+ * eligible enemies ("bastards") — `re/data/quests.json` Q10/Q14.
+ */
+const ELIGIBLE_ENEMY_GROUP_TYPES = ['LONG_RANGE', 'SHORT_RANGE', 'LAND_VEHICLE'] as const;
+
+/** One build-time quest event source and the rule that selects its elements. */
+export type QuestEventSource =
+  | {
+      readonly kind: 'truckArrivals';
+      readonly questId: string;
+      readonly itemId: number;
+      readonly count: number;
+    }
+  | {
+      readonly kind: 'eligibleEnemies';
+      readonly questId: string;
+      readonly groupTypes: readonly string[];
+    }
+  | {
+      readonly kind: 'civilianEvacuations';
+      readonly questId: string;
+      readonly nameIncludes: string;
+    };
+
+/** The four quests whose event counters the applier cannot derive from a spec. */
+const QUEST_EVENT_SOURCES: readonly QuestEventSource[] = [
+  {
+    questId: '100000003',
+    kind: 'truckArrivals',
+    itemId: Q03_TRUCK_ITEM_ID,
+    count: Q03_TRUCK_ARRIVALS,
+  },
+  {
+    questId: '100000010',
+    kind: 'eligibleEnemies',
+    groupTypes: ELIGIBLE_ENEMY_GROUP_TYPES,
+  },
+  {
+    questId: '100000011',
+    kind: 'civilianEvacuations',
+    nameIncludes: 'worker',
+  },
+  {
+    questId: '100000014',
+    kind: 'eligibleEnemies',
+    groupTypes: ELIGIBLE_ENEMY_GROUP_TYPES,
+  },
+];
+
+/**
+ * Extract the quest event data from the vendored map snapshots and the
+ * patched content items. Pure over its arguments: no clock, no upstream read
+ * inside this function, so the bundle stays byte-identical across builds.
+ *
+ * A missing snapshot for a configured quest id, a mismatched `playerInfo.pid`
+ * or an empty selection is a build problem — shipping an empty event would
+ * let a `countersZero` win fire without any gameplay.
+ */
+export function extractQuestEvents(
+  itemsById: ReadonlyMap<number, ContentItem>,
+  snapshots: ReadonlyMap<string, QuestMapSnapshot>,
+  problems: string[],
+  sources: readonly QuestEventSource[] = QUEST_EVENT_SOURCES,
+): Record<string, QuestEventData> {
+  const events: Record<string, QuestEventData> = {};
+  for (const source of sources) {
+    const snapshot = snapshots.get(source.questId);
+    if (snapshot === undefined) {
+      problems.push(`quest event source has no vendored map snapshot: ${source.questId}`);
+      continue;
+    }
+    const pid = snapshot.playerInfo?.pid;
+    if (String(pid) !== source.questId) {
+      problems.push(
+        `quest event snapshot ${source.questId}.json has an unexpected playerInfo.pid: ${String(pid)}`,
+      );
+    }
+
+    let refs: string[];
+    let count: number;
+    if (source.kind === 'truckArrivals') {
+      const truck = itemsById.get(source.itemId);
+      if (truck === undefined || truck.type !== 'u') {
+        problems.push(`quest ${source.questId} truck item ${source.itemId} is not a content unit`);
+        continue;
+      }
+      refs = [`item:${source.itemId}`];
+      count = source.count;
+    } else {
+      const groupTypes =
+        source.kind === 'eligibleEnemies' ? new Set(source.groupTypes) : null;
+      const nameIncludes =
+        source.kind === 'civilianEvacuations' ? source.nameIncludes.toLowerCase() : null;
+      const mapItems = asRecord(snapshot.maps?.[0]?.items ?? {});
+      refs = [];
+      for (const [isoId, rawTuple] of Object.entries(mapItems)) {
+        const content = itemsById.get(asInt(asArray(rawTuple)[0], -1));
+        if (content === undefined || content.type !== 'u') continue;
+        if (groupTypes !== null && !groupTypes.has(content.group_type)) continue;
+        if (nameIncludes !== null && !content.name.toLowerCase().includes(nameIncludes)) continue;
+        refs.push(`item:${isoId}`);
+      }
+      // Object key order comes from the file; sort explicitly so a reordered
+      // snapshot cannot change the bundle bytes.
+      refs.sort(compareRefs);
+      count = refs.length;
+    }
+    if (refs.length === 0) {
+      problems.push(`quest ${source.questId} has no ${source.kind} elements`);
+      continue;
+    }
+    if (new Set(refs).size !== refs.length) {
+      problems.push(`quest ${source.questId} has duplicate ${source.kind} refs`);
+      continue;
+    }
+    events[source.questId] = { questId: source.questId, kind: source.kind, refs, count };
+  }
+  return events;
+}
+
+/** Read the four quest event snapshots. Build-time only; never used at runtime. */
+async function readQuestEventSnapshots(problems: string[]): Promise<Map<string, QuestMapSnapshot>> {
+  const snapshots = new Map<string, QuestMapSnapshot>();
+  for (const source of QUEST_EVENT_SOURCES) {
+    const file = path.join(QUEST_DIR, `${source.questId}.json`);
+    if (!(await exists(file))) {
+      problems.push(`quest event snapshot is missing: ${source.questId}.json`);
+      continue;
+    }
+    snapshots.set(source.questId, await readJson<QuestMapSnapshot>(file));
+  }
+  return snapshots;
+}
+
 export interface BuildResult {
   bundle: ContentBundle;
   problems: string[];
@@ -509,6 +659,15 @@ export async function buildContent(): Promise<BuildResult> {
   //     Build-time only — the shipped bundle never reads `upstream/` again.
   const itemsById = new Map(items.map((item) => [item.id, item]));
   const questRosters = await extractQuestRosters(itemsById, problems);
+
+  // 4c. Quest event data (Q03 trucks, Q10/Q14 eligible enemies, Q11
+  //     civilians). Also build-time only: the bundle carries the extracted
+  //     refs and counts, so the server needs no access to `upstream/`.
+  const questEvents = extractQuestEvents(
+    itemsById,
+    await readQuestEventSnapshots(problems),
+    problems,
+  );
 
   // 5. Dangling references.
   for (const item of items) {
@@ -599,6 +758,7 @@ export async function buildContent(): Promise<BuildResult> {
     levels,
     goals,
     questRosters,
+    questEvents,
     globals: asRecord(doc['globals']),
     collections: asArray(doc['collections']),
     inventoryItems: asRecord(doc['inventory_items']),

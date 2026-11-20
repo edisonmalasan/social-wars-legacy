@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildContent, canonicalise } from './build.ts';
+import { buildContent, canonicalise, extractQuestEvents, type QuestMapSnapshot } from './build.ts';
 import { applyPatch, parsePointer } from './patch.ts';
 
 describe('JSON Pointer', () => {
@@ -190,5 +190,104 @@ describe('hardcore quest rosters', () => {
     assert.equal(Object.keys(bundle.globals).length, 105);
     assert.equal(bundle.dartsItems.length, 27);
     assert.deepEqual(problems, []);
+  });
+});
+
+describe('quest event data', () => {
+  // Q03 trucks spawn dynamically, so the map has no static truck element: the
+  // ref and the arrival count are the client's hard-coded constants recorded in
+  // re/data/quests.json (ID_UNIT_TRUCK_1 = 1013, totalTrucksToSave = 3).
+  // Q10/Q14's eligible enemies and Q11's civilians ARE on the vendored maps.
+  const EVENT_QUEST_IDS = ['100000003', '100000010', '100000011', '100000014'];
+
+  it('has an entry for each of the four event-driven quests', async () => {
+    const { bundle, problems } = await buildContent();
+    assert.ok(bundle.questEvents, 'questEvents is missing from the bundle');
+    assert.deepEqual(Object.keys(bundle.questEvents).sort(), EVENT_QUEST_IDS);
+    assert.deepEqual(problems, []);
+  });
+
+  it('seeds Q03 truck arrivals from the client constants', async () => {
+    const { bundle } = await buildContent();
+    assert.deepEqual(bundle.questEvents!['100000003'], {
+      questId: '100000003',
+      kind: 'truckArrivals',
+      refs: ['item:1013'],
+      count: 3,
+    });
+  });
+
+  it('extracts every eligible enemy of Q10 and Q14', async () => {
+    const { bundle } = await buildContent();
+    for (const [questId, count] of [
+      ['100000010', 23],
+      ['100000014', 24],
+    ] as const) {
+      const event = bundle.questEvents![questId]!;
+      assert.equal(event.kind, 'eligibleEnemies', `${questId} has the wrong kind`);
+      assert.equal(event.count, count, `${questId} has the wrong eligible-enemy count`);
+      assert.equal(event.refs.length, count, `${questId} has the wrong number of refs`);
+    }
+  });
+
+  it('extracts every civilian of Q11', async () => {
+    const { bundle } = await buildContent();
+    const event = bundle.questEvents!['100000011']!;
+    assert.equal(event.kind, 'civilianEvacuations');
+    assert.equal(event.count, 12);
+    assert.equal(event.refs.length, 12);
+  });
+
+  it('emits unique item:<isoId> refs for every extracted event', async () => {
+    const { bundle } = await buildContent();
+    for (const questId of EVENT_QUEST_IDS) {
+      const refs = bundle.questEvents![questId]!.refs;
+      assert.equal(new Set(refs).size, refs.length, `quest ${questId} has duplicate refs`);
+      for (const ref of refs) assert.match(ref, /^item:\d+$/, `quest ${questId} has a bad ref`);
+    }
+    // The truck ref addresses an item id, not a static map element.
+    assert.deepEqual(bundle.questEvents!['100000003']!.refs, ['item:1013']);
+  });
+
+  it('keeps the build id stable with quest events in the bundle', async () => {
+    const first = await buildContent();
+    const second = await buildContent();
+    assert.equal(second.bundle.buildId, first.bundle.buildId);
+    assert.deepEqual(second.bundle.questEvents, first.bundle.questEvents);
+    assert.match(first.bundle.buildId, /^[0-9a-f]{64}$/);
+  });
+
+  it('leaves the rosters and the other bundle counts unchanged', async () => {
+    const { bundle } = await buildContent();
+    assert.equal(bundle.items.length, 900);
+    assert.equal(bundle.levels.length, 100);
+    assert.equal(bundle.goals.length, 91);
+    assert.equal(Object.keys(bundle.globals).length, 105);
+    assert.equal(bundle.dartsItems.length, 27);
+    assert.equal(bundle.questRosters?.length, 8);
+  });
+});
+
+describe('quest event extraction validation', () => {
+  it('rejects a source whose quest id has no vendored snapshot', () => {
+    const problems: string[] = [];
+    const events = extractQuestEvents(new Map(), new Map(), problems, [
+      { questId: '999999999', kind: 'eligibleEnemies', groupTypes: ['LONG_RANGE'] },
+    ]);
+    assert.deepEqual(events, {});
+    assert.ok(problems.some((p) => p.includes('999999999')));
+  });
+
+  it('rejects an empty selection and a mismatched snapshot pid', () => {
+    const problems: string[] = [];
+    const snapshots = new Map<string, QuestMapSnapshot>([
+      ['100000010', { playerInfo: { pid: '999' }, maps: [{ items: {} }] }],
+    ]);
+    const events = extractQuestEvents(new Map(), snapshots, problems, [
+      { questId: '100000010', kind: 'eligibleEnemies', groupTypes: ['LONG_RANGE'] },
+    ]);
+    assert.deepEqual(events, {});
+    assert.ok(problems.some((p) => p.includes('playerInfo.pid')));
+    assert.ok(problems.some((p) => p.includes('has no eligibleEnemies elements')));
   });
 });
