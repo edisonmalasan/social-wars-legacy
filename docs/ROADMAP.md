@@ -1386,9 +1386,13 @@ assault against the new server, and the cheat battery is fully rejected.
       (`isQuestVictory` / `finishQuest` / `awardQuest`, a content-derived reward paid once,
       the client's `win` / `loot` / `difficulty` ignored, and empty-roster and recorded-loss
       wins refused). Q08 Rocket is server-resolvable but client-unwinnable (`canDie: false`)
-      and stays flagged. **Counter-based quests still cannot resolve:** the weekly quest and
-      the eight hardcore quests have empty element rosters, Q03 Convoy has no truck-arrival
-      event, and Q10 / Q11 / Q14 use `countersZero` on counters no mutator seeds. The precise
+      and stays flagged. The **weekly quest now resolves** from five validated gun-bot kill
+      refs derived from the client's documented positions: the server increments its own
+      `botsKilled` counter once per distinct kill and pays the weekly cash once, while four
+      kills, replays, off-roster refs and zero events are refused. **The other counter-based
+      quests still cannot resolve:** the eight hardcore quests have empty element rosters and
+      their vacuous `countersZero` win stays refused, Q03 Convoy has no truck-arrival event,
+      and Q10 / Q11 / Q14 use `countersZero` on counters no mutator seeds. The precise
       dependency — build-time roster extraction from the vendored quest maps plus client
       instrumentation, or new event commands (a scope decision, since the catalogue is
       cross-checked) — is in *Unimplemented layers*
@@ -2143,7 +2147,7 @@ owner and a precise condition for closing it.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| G | Full authoritative positional combat (the residual quest dependency) | The quest applier now dispatches each validated element ref by `QuestElementSpec.trigger` instead of always calling `killQuestElement`. Wins that come from **scripted elements** resolve: `destroyAll` (Q02 Central Nuclear, Q05 Assault Convoy, Q12 TankBoss, Q13 Tyrannosaurus), `nearDeathAll` (Q01 Bazooka, Q04 Supertank) and `defendersClearedAll` combinations (Q06 Airstrike, Q07 Ship, Q09 Labs). `onNearDeath` feeds `script.nearDeath` and `onKillDefenders` feeds `script.defendersCleared`; `onKill` and `none` still go through `killQuestElement` for destruction, counters and key-element loss, and the three-channel vacuity guard still refuses empty-roster and recorded-loss wins. Q08 Rocket is server-resolvable but client-unwinnable (`canDie: false`) and stays flagged. The residual gap is **counter-based quests**: the weekly `100000049` needs `countersAtLeast botsKilled>=5` but has `elements: []`, so it needs a 5-GunBot (item 1061) roster and per-bot kill events; the eight hardcore quests (15-22) need `countersZero enemiesAlive` but have `elements: []`, so the guard correctly refuses their vacuous win; Q03 Convoy needs `trucksArrived>=3` but no command or `set_quest_var` key carries a truck-arrival event; Q10 Special Ops, Q11 Save Villages and Q14 Spy2 use `countersZero` on counters absent from `initialCounters`, so the `c in script.counters` check fails and no mutator seeds or decrements them. This is in-repo work, not an external blocker | Extract the quest rosters at **build time** from the vendored, read-only `upstream/socialwarriors/villages/quest/<id>.json` map snapshots (the weekly roster is in `100000049.json`: five unit id 1061) into the content bundle, and instrument the client to emit the missing counter / truck-arrival events — `upstream/` can never become a runtime dependency. Alternatively add commands carrying those events, but that changes the cross-checked 94-command catalogue and needs a scope decision. Until then the G4 quest item stays open |
+| G | Full authoritative positional combat (the residual quest dependency) | The quest applier now dispatches each validated element ref by `QuestElementSpec.trigger` instead of always calling `killQuestElement`. Wins that come from **scripted elements** resolve: `destroyAll` (Q02 Central Nuclear, Q05 Assault Convoy, Q12 TankBoss, Q13 Tyrannosaurus), `nearDeathAll` (Q01 Bazooka, Q04 Supertank) and `defendersClearedAll` combinations (Q06 Airstrike, Q07 Ship, Q09 Labs). `onNearDeath` feeds `script.nearDeath` and `onKillDefenders` feeds `script.defendersCleared`; `onKill` and `none` still go through `killQuestElement` for destruction, counters and key-element loss, and the three-channel vacuity guard still refuses empty-roster and recorded-loss wins. Q08 Rocket is server-resolvable but client-unwinnable (`canDie: false`) and stays flagged. The **weekly quest `100000049` now resolves**: its spec carries a five-element gun-bot roster whose refs are derived from the client's documented tile positions (20,45) (38,19) (67,22) (63,56) (46,37), and the applier advances the spec's `botsKilled` counter by one per distinct validated bot kill, so `countersAtLeast botsKilled>=5` needs five real events. The weekly cash is computed and paid once by the server; four kills, a repeated ref, an off-roster ref and zero events are all refused. The residual gap is the **other counter-based quests**: the eight hardcore quests (15-22) still have `elements: []`, so their `countersZero enemiesAlive` win is vacuous and the three-channel guard correctly refuses it; Q03 Convoy needs `trucksArrived>=3` but no command or `set_quest_var` key carries a truck-arrival event; Q10 Special Ops, Q11 Save Villages and Q14 Spy2 use `countersZero` on counters absent from `initialCounters`, so the `c in script.counters` check fails and no mutator seeds or decrements them. Every remaining gap is in-repo work, not an external blocker. *RE documentation note:* `re/data/quests.json:30,36` records the five bots as item id 1063, while `re/data/asset-manifest.json` and the vendored `100000049.json` snapshot call the GunBot 1061. The disagreement is in the analysis, not the server: the roster's item id is taken from the server's own spec (pinned to 1063) and the client supplies positional refs (`gunbot@x,y`) and never an item id, so no client input can choose an element or a counter | Extract the remaining quest rosters at **build time** from the vendored, read-only `upstream/socialwarriors/villages/quest/<id>.json` map snapshots into the content bundle, and instrument the client to emit the missing counter / truck-arrival events — `upstream/` can never become a runtime dependency. Alternatively add commands carrying those events, but that changes the cross-checked 94-command catalogue and needs a scope decision. Resolve the 1061/1063 item-id disagreement in the RE documentation as a separate documentation task. Until the remaining counter quests resolve, the G4 quest item stays open |
 
 ---
 
@@ -2259,6 +2263,22 @@ reviewed without reconstructing the conversation that led to it.*
   gate: `pnpm test` 1473 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
   `check-roadmap.mjs` (401 items, Group G still 72 done / 9 open),
   `check-report-sync.mjs` (4 claims), `verify-command-catalogue.mjs` (94/94/94)
+- **2026-11-20 — weekly quest resolves from validated bot kills (Group G4).** The weekly
+  spec now carries five gun-bot elements whose refs are derived from the client's documented
+  tile positions, and `applyQuestEvents` advances the spec's `botsKilled` counter by one per
+  distinct validated kill. Five kills pay the weekly cash once; four kills, a replayed ref,
+  an off-roster ref and zero events are refused. *Rationale:* the weekly win condition was
+  unreachable, and deriving both the refs and the counter name from server data keeps a
+  client from choosing an element or a counter. The G4 quest item stays open because the
+  eight hardcore quests and the truck / special-ops / save-villages / spy2 counters still
+  have no event source. *Evidence:* one roster test in `quest.test.ts` and eight applier
+  tests in `apply.test.ts` (RED: four failures with `botsKilled` undefined before the
+  increment, GREEN after), plus a green gate — `pnpm test` 1482 pass / 0 fail,
+  `pnpm typecheck`, `pnpm lint`, `check-roadmap.mjs`, `check-report-sync.mjs`,
+  `verify-command-catalogue.mjs` (94/94/94). *RE note:* `re/data/quests.json` says item id
+  1063 for the five bots while `re/data/asset-manifest.json` says 1061 for GunBot;
+  recorded as a documentation discrepancy, not a correctness issue — the roster item id
+  is spec-derived and the client sends positional refs only
 
 ---
 
