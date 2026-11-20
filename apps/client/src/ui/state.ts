@@ -118,7 +118,15 @@ export function expRequiredByLevel(bundle: ContentBundle): Map<number, number> {
  * quantity is decided here.
  */
 export function inventoryItems(bundle: ContentBundle, world: WorldSnapshot): StoredItemView[] {
-  return storedItems(world, bundle.items ?? []);
+  return storedItems(
+    world,
+    (bundle.items ?? []).map((item) => ({
+      id: item.id,
+      name: item.name,
+      type: item.type,
+      categoryId: item.category_id,
+    })),
+  );
 }
 
 /**

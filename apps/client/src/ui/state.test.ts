@@ -576,7 +576,7 @@ describe('the inventory panel', () => {
       privateState: {},
     } as WorldSnapshot;
     assert.deepEqual(inventoryItems(b, w), [
-      { itemId: 1, quantity: 2, name: 'House I', type: 'b' },
+      { itemId: 1, quantity: 2, name: 'House I', type: 'b', categoryId: 1 },
     ]);
   });
 

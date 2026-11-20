@@ -9,6 +9,7 @@ import {
   dialogAria,
   feedbackFrom,
   openDialog,
+  restoredFocus,
 } from './dialogmodel.ts';
 
 describe('the dialog model', () => {
@@ -68,6 +69,39 @@ describe('the dialog model', () => {
       const state = openDialog(CLOSED_DIALOG, kind, kind, kind);
       assert.equal(state.dialog?.kind, kind);
     }
+  });
+});
+
+describe('restoring focus after the dialog closes', () => {
+  // Stand-ins for DOM elements: a target either is or is not attached.
+  const attached = new Set(['opener', 'body']);
+  const isAttached = (target: string): boolean => attached.has(target);
+
+  it('returns the previous target while it is still attached', () => {
+    assert.equal(restoredFocus('opener', isAttached, 'body'), 'opener');
+  });
+
+  it('falls back when the previous target was removed from the document', () => {
+    assert.equal(restoredFocus('gone', isAttached, 'body'), 'body');
+  });
+
+  it('returns null when neither candidate is attached, so no stale focus is left', () => {
+    assert.equal(restoredFocus('gone', isAttached, 'also-gone'), null);
+    assert.equal(restoredFocus(null, isAttached, null), null);
+  });
+
+  it('only checks attachment of the fallback when there is no previous target', () => {
+    let checks = 0;
+    const target = restoredFocus(
+      null,
+      (value) => {
+        checks += 1;
+        return isAttached(value);
+      },
+      'body',
+    );
+    assert.equal(target, 'body');
+    assert.equal(checks, 1);
   });
 });
 

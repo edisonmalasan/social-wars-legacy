@@ -200,7 +200,12 @@ export function Root({
     <div className="swl-ui">
       <Hud state={state} placing={placingName} onClaimBonus={onClaimBonus} />
       <Goals goals={goals} onCommand={onCommand} />
-      <Inventory items={stored} army={army} onPlace={onPlaceStored} />
+      <Inventory
+        items={stored}
+        categories={tabs}
+        army={army}
+        onPlace={onPlaceStored}
+      />
       <Chapters
         ranks={ranks}
         minLevels={minLevels}

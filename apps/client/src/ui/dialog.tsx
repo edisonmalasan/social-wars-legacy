@@ -12,7 +12,7 @@
  * focus restoration are all part of the primitive, not of each panel.
  */
 import { useEffect, useRef } from 'react';
-import { DIALOG_TITLE_ID, dialogAria, type DialogState } from '@swl/client';
+import { DIALOG_TITLE_ID, dialogAria, restoredFocus, type DialogState } from '@swl/client';
 
 /** The way the player asked the dialog to close. */
 export type DialogDismiss = 'escape' | 'backdrop' | 'button';
@@ -93,7 +93,15 @@ export function Dialog({
     const first = root?.querySelector<HTMLElement>(FOCUSABLE) ?? null;
     (first ?? root)?.focus();
     return () => {
-      previous?.focus();
+      // The opener may have been removed while the dialog was open (a hosted
+      // panel can replace its own button). Focus a detached node and the
+      // player is left nowhere; fall back to a still-attached element.
+      const target = restoredFocus<HTMLElement>(
+        previous,
+        (element) => document.contains(element),
+        document.body,
+      );
+      target?.focus();
     };
   }, [open, id]);
 

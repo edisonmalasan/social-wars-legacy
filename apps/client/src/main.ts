@@ -1076,12 +1076,15 @@ async function main(): Promise<void> {
             ? { type: 'strike', ref: action.ref }
             : { type: action.action, ref: action.ref };
         const result = await questAction(questId, request);
+        // Show the server's typed code, the way a refused quest start does,
+        // so a refusal is never just a bare status number.
+        const reason = result.serverError ? ` · ${result.serverError}` : '';
         feedback = result.ok
           ? [{ tone: 'success', text: 'The server applied the quest action.' }]
           : [
               {
                 tone: 'error',
-                text: `The server refused the quest action (${result.status}).`,
+                text: `The server refused the quest action (${result.status})${reason}.`,
               },
             ];
         drawInterface();

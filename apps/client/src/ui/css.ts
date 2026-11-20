@@ -323,12 +323,33 @@ export function uiCss(): string {
   width: 220px;
   max-height: 240px;
   box-sizing: border-box;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   padding: 8px 10px;
   border: 1px solid #38445a;
   border-radius: 4px;
   background: #131a24;
   pointer-events: auto;
+}
+
+/* The head holds the title and its category tabs; only the list below it
+   scrolls. Long contents never push the tabs out of the 760x600 stage. */
+.swl-inventory-head {
+  flex: none;
+}
+
+.swl-inventory-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 5px;
+}
+
+.swl-inventory-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .swl-inventory-title {
@@ -950,7 +971,11 @@ export function uiCss(): string {
 
 .swl-dialog-body {
   margin-top: var(--swl-gap);
+  /* A flex child must be allowed to shrink before overflow-y can scroll,
+     so a long briefing stays inside the 760x600 stage. */
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   color: var(--swl-ink);
   font-size: calc(12px * var(--swl-font-scale-body, 1));
   line-height: 1.4;
