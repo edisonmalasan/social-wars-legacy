@@ -1,197 +1,379 @@
-# Social Wars Legacy — G5.1: Essential Gameplay UI & Playable Alpha
+# GOAL: Social Wars Legacy — G5.2 Gameplay Systems Completion & UI/UX Refinement
 
-## Role
+## Mission
 
-Act as a senior full-stack game developer, game UI/UX engineer, and software architect responsible for advancing Social Wars Legacy toward a complete, production-quality, cross-platform game.
+Continue development of Social Wars Legacy from the successfully completed G5.1 milestone.
 
-Repository: https://github.com/edisonmalasan/social-wars-legacy
+**Repository:** https://github.com/edisonmalasan/social-wars-legacy
 
-Current baseline: `main` at `ba2667c` (PR #19 and PR #20 merged).
+**Baseline:** `main` at `7a584b8` — PR #21 merged.
 
-Your objective is to implement the next milestone, **G5.1 — Essential Gameplay UI & Playable Alpha**, using the project's established architecture, specifications, and development practices.
+**New milestone:** G5.2 — Gameplay Systems Completion & UI/UX Refinement.
 
-Work autonomously within the approved scope. Do not stop after analysis or documentation. Implement, test, verify, and prepare the changes for review.
+Your responsibility is to complete the remaining high-priority P1 gameplay systems, improve the existing interface, and deliver a more complete playable alpha without breaking the functionality verified in G5.1.
 
-## 1. Mandatory Repository Analysis
+This is an **implementation goal**, not a request for another analysis-only report.
 
-Before making changes:
+Use the installed Superpowers workflow for repository exploration, specification, planning, implementation, testing, debugging, code review, and verification.
 
-1. Read `README.md`, `docs/CONTEXT.md`, `docs/ROADMAP.md`, and `docs/DEVELOPING.md`.
-2. Review the existing ADRs and architectural constraints.
-3. Examine the existing React UI, PixiJS renderer, server endpoints, client request builders, and game-state models.
-4. Review `re/docs/14-ui-screen-inventory.md` and `re/data/ui-screens.json`.
-5. Inspect the current G4 quest workflow and its existing tests.
-6. Review the asset licensing restrictions in `docs/LICENSING.md`.
-7. Identify which essential screens already exist, which are partially implemented, and which are missing.
+Work autonomously within the approved scope. Make justified implementation decisions using repository evidence, existing ADRs, and test results.
 
-Do not assume a feature is absent merely because it is unchecked in the roadmap. Verify the actual implementation first.
+Do not stop after writing a plan. Continue through implementation and verification.
 
-Produce a concise implementation plan grounded in the repository.
+---
+
+## 1. Establish the Current Baseline
+
+Before changing code:
+
+1. Read `docs/CONTEXT.md`, `docs/GOAL.md`, `docs/ROADMAP.md`, and `docs/DEVELOPING.md`.
+2. Examine PR #21 and its resulting implementation.
+3. Review `re/docs/14-ui-screen-inventory.md` and `re/data/ui-screens.json`.
+4. Inspect the current React components, PixiJS renderer, pure view models, and native server endpoints.
+5. Review relevant quest, production, economy, and army rules.
+6. Inspect existing e2e tests and the CI configuration.
+7. Verify the current branch, working-tree state, and latest commit.
+
+Treat G5.1 as completed work.
+
+Do not recreate components already implemented or replace working systems unnecessarily.
+
+Identify the exact remaining gaps, their dependencies, and the smallest safe changes needed to close them.
+
+Record a concise technical plan using the repository's existing Superpowers/SDD conventions.
+
+---
 
 ## 2. Primary Objective
 
-Build a coherent, functional, polished gameplay interface that allows players to perform essential Social Wars actions without relying on developer tools or direct API calls.
+Complete the missing user-facing gameplay workflows:
 
-The target gameplay loop is:
+**Base → Production → Collection Period → Recruitment → Army Management → Quest Team Selection → Combat → Victory/Defeat → Reward Details → Next Mission**
 
-**Register/Login → Load Base → Construct Buildings → Train Units → Manage Army → Start Quest → Fight → Complete Quest → Claim Rewards → Return to Base**
+The player must be able to complete these interactions through the actual rendered interface.
 
-Every implemented interface must use actual game data and communicate with the existing server-authoritative backend.
+Every gameplay operation must remain server-authoritative.
 
-A working component with disconnected buttons or mocked gameplay is not considered complete.
+Success is not measured by how many new components exist. It is measured by whether real players can complete the workflows reliably without debug tools, manual requests, or fabricated game state.
 
-## 3. Essential UI Implementation
+---
 
-### A. Building Management
+## 3. P0 — Authoritative Reward Payloads and Result Screens
 
-Implement or complete:
+### Problem
 
-- Building selection and information panels.
-- Construction and placement interfaces.
-- Upgrade actions and requirements.
-- Resource collection controls.
-- Construction and production countdowns.
-- Clear error and success feedback.
+G5.1 successfully pays quest rewards, but the actual native command outcome returns `kind: "none"`.
 
-Reuse existing models, APIs, and React components wherever possible.
+The existing `QuestResultView` already supports reward rows, but those rows are empty because the response does not contain the authoritative reward information.
 
-### B. Recruitment and Army Management
+### Required implementation
 
-Implement or complete:
+Trace the complete quest-reward flow:
 
-- Unit recruitment panels.
-- Unit statistics and requirements.
-- Training queues and countdowns.
-- Available army and unit counts.
-- Unit selection for quests or battles.
-- Clear insufficient-resource and unavailable-unit states.
+- `packages/server/src/apply.ts`
+- `apps/server/src/app.ts`
+- `packages/protocol/src/commands.ts`
+- `packages/client/src/questview.ts`
+- `apps/client/src/main.ts`
+- `apps/client/src/ui/quests.tsx`
 
-Never allow the client to determine authoritative army or resource changes.
+Implement an authoritative, typed reward result from the successful server transaction.
 
-### C. Quest Interface
+The result should provide the actual awarded resource types and amounts.
 
-Integrate the completed G4 quest workflow into the actual gameplay UI.
+Reuse the existing `CommandResult` rewards variant wherever appropriate.
 
-Include:
+### Requirements
 
-- Quest selection and availability.
-- Quest briefing and difficulty selection.
-- Army selection where supported.
-- Quest loading and active-state display.
-- Combat actions connected to the native quest workflow.
-- Progress indicators and objective counters.
-- Victory, defeat, and reward screens.
-- Safe recovery after reconnection or application restart.
+1. The server computes and grants rewards.
+2. The response reflects exactly what the server granted.
+3. The client only formats and displays those results.
+4. Failed quests never display granted rewards.
+5. Duplicate completion attempts never issue additional rewards.
+6. Retried requests remain idempotent.
+7. Result information remains consistent with persisted player state.
+8. Legacy protocol compatibility is preserved.
 
-Use the existing native quest-start and action APIs. Preserve the two-argument `set_quest_var` contract and the existing `end_quest` semantics.
+Do not calculate reward rows from client-side formulas, hardcoded reward tables, or guessed wallet differences.
 
-Do not simulate victories using fabricated client-side outcomes.
+Avoid introducing a second reward authority or a second reward-granting operation.
 
-### D. Inventory and Player Information
+If displaying a reward after reconnecting requires retaining an authoritative receipt, design the smallest safe persisted representation rather than replaying a reward transaction.
 
-Implement or complete:
+### Result screen improvements
 
-- Inventory navigation.
-- Item categories and selection.
-- Relevant item actions.
-- Resource and currency displays.
-- Player level and experience information.
-- Selected-unit and selected-building details.
+Implement dedicated presentations for:
 
-All displayed player-owned values must come from authoritative state.
+- Quest victory.
+- Quest defeat.
+- Reward details.
+- Mission completion confirmation.
+- Next mission availability.
+- Retry or return to base.
 
-### E. Core Popups and Navigation
+Use the existing shared accessible Dialog architecture.
 
-Implement a reusable popup/dialog system that supports:
+Do not introduce another unrelated modal system.
+
+The next-mission action must respect actual server-side quest progression and unlock restrictions.
+
+**Acceptance criteria:** A player completes a quest and sees exactly the rewards granted by the server. Replay, failure, and restart cases cannot produce incorrect reward displays or duplicate payments.
+
+---
+
+## 4. P0 — Resource Collection Period Selection
+
+### Problem
+
+G5.1 supports building production and resource collection, but it does not provide the original collection-period chooser.
+
+The existing protocol already defines the `activate` command. Verify whether its server-side application is complete before implementing the UI.
+
+### Required implementation
+
+Implement an interactive production-period selector using the documented collection periods:
+
+- 5 minutes
+- 60 minutes
+- 240 minutes
+- 480 minutes
+
+The existing rules describe corresponding production multipliers of 0.25×, 1×, 2×, and 3×. Verify all indices, eligible buildings, costs, and constraints against the actual rules before using them.
+
+### Required behavior
+
+1. Select a supported resource-producing building.
+2. Open its production settings.
+3. Display available collection periods.
+4. Show the server/content-derived production details.
+5. Select and activate a period.
+6. Display the active production cycle and countdown.
+7. Collect resources after the server confirms readiness.
+8. Update the interface from the returned world state.
+
+Validate eligibility, period indices, resource capacity, timestamps, and duplicate requests server-side.
+
+Do not allow users to bypass timers by modifying the client clock.
+
+Do not permit arbitrary production multipliers.
+
+Use the current shared dialog and feedback components.
+
+**Acceptance criteria:** A player selects a production period, waits for the authoritative completion condition, collects the correct resources, and sees the next production state.
+
+---
+
+## 5. P0 — Army Management and Team Selection
+
+### Problem
+
+G5.1 implements recruitment and training queues, but full army roster management and team selection remain deferred.
+
+### Required implementation
+
+Create a functional army-management interface that supports:
+
+- Viewing owned units.
+- Unit names and appropriate statistics.
+- Available unit quantities.
+- Units currently training.
+- Unit selection and deselection.
+- Selected army composition.
+- Relevant population or capacity restrictions.
+- Quest-specific eligibility rules.
+- Clear validation and error feedback.
+
+Use existing content and server-owned player inventory.
+
+Do not manufacture unit ownership or availability.
+
+### Team selection
+
+Implement team selection for quest workflows where the original game requires it.
+
+Review `re/docs/12-quest-system.md` and the original `QUESTS_WITH_TEAMS` behavior. The documented team-selection quests include the four higher-level quests.
+
+Do not incorrectly force every quest to use the same selection workflow.
+
+For supported quests:
+
+1. Display the player's available army.
+2. Allow selection of eligible units.
+3. Validate availability and restrictions.
+4. Submit the selected composition to the authoritative server.
+5. Persist or bind the accepted composition to the correct active quest.
+6. Reject forged, unavailable, excessive, or disallowed selections.
+
+First determine whether the current quest-start endpoint accepts team composition.
+
+If additional native endpoint fields are necessary, make the smallest backward-compatible change with server validation and tests. Do not change the 94-command catalogue simply to add a selection interface.
+
+The selected team must matter to the authoritative gameplay state. A cosmetic team selector that is ignored by the server is not complete.
+
+If full team-to-combat integration exposes a larger missing simulator dependency, implement the safely supported portion, document the precise limitation, and do not claim full team-selection fidelity.
+
+**Acceptance criteria:** Players can manage owned units and, for applicable quests, select a team whose composition the server validates and actually uses.
+
+---
+
+## 6. P1 — Remaining Gameplay Interface Improvements
+
+After the three P0 goals are complete, continue with the remaining achievable P1 work.
+
+### Building and inventory improvements
+
+- Improve building information and production feedback.
+- Implement item-category tabs using existing inventory data.
+- Improve building upgrade and collection confirmations.
+- Implement expansion UI if the existing authoritative server operation supports it.
+- Show requirements, costs, and refusal reasons clearly.
+
+### Quest navigation improvements
+
+- Add a coherent next-mission flow.
+- Improve mission progression indicators.
+- Improve difficulty and team-selection presentation.
+- Preserve progress correctly when a dialog closes or the client reloads.
+
+### General interaction improvements
+
+- Prevent duplicate submissions.
+- Provide consistent loading and disabled states.
+- Restore focus when dialogs close.
+- Improve handling of long content and small viewports.
+- Ensure server refusals are displayed meaningfully.
+- Keep the interface navigable without a mouse where practical.
+
+Avoid adding decorative components that do not improve the player's ability to understand or operate the game.
+
+---
+
+## 7. UI/UX Standards
+
+The existing G5.1 UI is the foundation.
+
+Refine it rather than rebuilding it.
+
+Maintain:
+
+- PixiJS v8 for the game world.
+- React for interface panels.
+- The existing shared Dialog.
+- The existing Feedback system.
+- The established typography and styling conventions.
+- Server-driven state models.
+- Reusable UI elements and consistent spacing.
+
+Improve the interface so that it feels like an integrated strategy game rather than a collection of development tools.
+
+Prioritize usability, readable resource information, understandable unit statistics, and clear gameplay feedback.
+
+Use purposeful animation where it helps convey changes.
+
+Do not invent unrelated features, promotional sections, filler text, or unnecessary UI elements.
+
+### Asset restrictions
+
+Do not introduce proprietary Zynga artwork, audio, or fonts into distributable outputs.
+
+Use existing CSS/SVG primitives and appropriately licensed assets.
+
+Do not let unavailable original art stop implementation of functional UI elements.
+
+---
+
+## 8. Non-Negotiable Architecture
+
+Preserve these decisions:
+
+1. Server-authoritative gameplay, economy, and rewards.
+2. Shared TypeScript rules and protocol types.
+3. PixiJS world renderer and React DOM interface.
+4. Existing 94-command catalogue and legacy compatibility.
+5. Two-argument `set_quest_var`.
+6. Explicit quest-start semantics.
+7. `end_quest` as completion, never implicit initialization.
+8. Transactional and idempotent reward processing.
+9. No runtime dependency on `upstream/`.
+10. No modification of vendored source files.
+11. No Flash dependency in shipped applications.
+12. No unauthorized proprietary assets in release builds.
+
+Where a native API enhancement is genuinely needed, document and test it instead of silently changing the wire contract.
+
+---
+
+## 9. Testing Strategy
+
+Follow test-driven development where practical.
+
+Add unit tests, integration tests, and actual browser e2e coverage for the new features.
+
+### Reward tests
+
+Verify:
+
+- Successful quest returns exact awarded reward rows.
+- Client displays authoritative amounts.
+- Failure grants and displays nothing.
+- Duplicate completion cannot pay twice.
+- Request retries produce consistent results.
+- Server restart preserves rewards and relevant receipts.
+
+### Collection-period tests
+
+Verify:
+
+- Every supported period.
+- Correct period validation.
+- Production not ready.
+- Production ready.
+- Duplicate collection.
+- Insufficient capacity.
+- Invalid building and invalid period.
+- Persistence across reload/restart.
+
+### Army tests
+
+Verify:
+
+- Correct owned-unit counts.
+- Selection and deselection.
+- Unavailable units.
+- Exceeded quantities.
+- Quest restrictions.
+- Server-side acceptance or refusal.
+- Correct binding to the active quest.
+- No client-forged unit availability.
+
+### UI tests
+
+Verify:
 
 - Opening and closing dialogs.
-- Keyboard navigation and Escape handling.
-- Focus management.
-- Accessible labels and controls.
-- Loading, empty, and error states.
+- Keyboard and focus behavior.
 - Responsive layouts.
-- Prevention of duplicate requests during pending actions.
+- Accurate loading and refusal states.
+- No duplicate actions.
+- Correct result and reward presentation.
 
-Do not create multiple incompatible popup implementations.
+### End-to-end requirements
 
-## 4. UI/UX Quality Standards
+Extend the actual G5.1 Chrome and Edge e2e tests.
 
-The interface must feel like a cohesive strategy game rather than disconnected administrative panels.
+The browser must interact with rendered controls, not merely call internal request builders.
 
-Requirements:
+Test the complete enhanced gameplay loop, including production-period selection, army selection where supported, quest completion, reward presentation, reload, and server restart.
 
-- Maintain a consistent visual design system.
-- Establish reusable colors, typography, spacing, and component styles.
-- Preserve the original game's gameplay identity without copying proprietary interface artwork.
-- Use smooth, purposeful transitions where appropriate.
-- Maintain readable information hierarchy.
-- Avoid unnecessary visual effects that impair performance.
-- Support common desktop resolutions and reasonable responsive layouts.
-- Preserve PixiJS as the world renderer and React as the interface layer.
+Use deterministic clocks and fixtures where required. Do not introduce arbitrary sleeps or weaken assertions to make tests pass.
 
-Use original, properly licensed, or clearly temporary assets for any missing artwork.
+Fix failing tests at their cause, not by skipping them.
 
-Do not embed proprietary Zynga media into distributable builds.
+---
 
-Do not expand this milestone into a complete recreation of every historical popup.
+## 10. Verification Gates
 
-## 5. Architecture and Engineering Constraints
-
-Preserve all approved architectural decisions.
-
-In particular:
-
-1. Maintain the TypeScript monorepo.
-2. Preserve the existing PixiJS v8 + React architecture.
-3. Keep the server authoritative for combat, resources, progression, and rewards.
-4. Preserve the existing 94-command catalogue and protocol compatibility.
-5. Do not introduce runtime dependencies on `upstream/`.
-6. Do not modify vendored upstream files.
-7. Reuse existing client request builders, state models, and server endpoints.
-8. Avoid duplicating business logic between client and server.
-9. Avoid adding dependencies unless there is a justified need.
-10. Keep the implementation compatible with future Tauri and Capacitor integrations.
-
-If an architectural change is genuinely necessary, document its rationale and consequences before implementing it.
-
-## 6. Scope Control
-
-Prioritize a complete vertical slice over broad but shallow feature coverage.
-
-Classify UI screens into:
-
-- **P0:** Essential for completing the playable alpha.
-- **P1:** Important for improving the gameplay experience.
-- **P2:** Optional, historical, or future features.
-
-Complete P0 first.
-
-Do not automatically implement all 131 planned screens.
-
-For each screen, record whether it is implemented, partially implemented, deferred, or intentionally excluded, together with supporting evidence.
-
-Do not mark unfinished screens as complete merely to improve roadmap statistics.
-
-## 7. Testing and Verification
-
-Create meaningful tests covering the complete user workflow.
-
-At minimum, verify:
-
-- Building purchase, placement, and collection.
-- Insufficient-resource behavior.
-- Training queue interactions.
-- Quest start and objective progression.
-- Quest victory and defeat interfaces.
-- Reward claiming without duplication.
-- Reconnection and persisted game state.
-- Server refusals and error handling.
-- Popup accessibility and keyboard behavior.
-- Existing G4 quest behavior remaining intact.
-
-Use existing testing conventions and the project's end-to-end infrastructure.
-
-Run all applicable verification gates, including:
+Run all applicable existing project gates, including:
 
 ```bash
 pnpm test
@@ -199,82 +381,148 @@ pnpm test:integration
 pnpm typecheck
 pnpm lint
 pnpm build:content
+
 node scripts/verify-command-catalogue.mjs
 node scripts/check-roadmap.mjs
 node scripts/check-report-sync.mjs
 node scripts/run-cheat-battery.mjs
+node scripts/golden-master.mjs
+node scripts/check-coverage.mjs
 node scripts/e2e-test.mjs
 ```
 
-Also run the existing client build, licensing checks, and relevant repository verification scripts.
+Also run the client build, relevant security checks, licensing checks, and CI-defined validation steps.
 
-Do not report tests as passing unless they were actually executed successfully.
+G5.1 recorded false positives when running certain licensing/no-Flash checks after generating `dist` artefacts. Investigate those precisely, distinguish legitimate assets from harmless identifiers, and make any checker correction narrowly scoped and tested.
 
-If a test requires unavailable hardware or external resources, report the exact limitation and complete every locally verifiable portion.
+Never disable a security or licensing check just to get a green result.
 
-## 8. Documentation and Roadmap
+Do not claim that a platform or test passed unless it actually ran.
 
-After implementation:
+---
 
-1. Update `docs/ROADMAP.md` with the verified outcomes.
-2. Record G5.1 as a proposed or approved milestone without corrupting existing roadmap counters.
-3. Preserve the distinction between incomplete implementation, external blockers, non-goals, and deferred work.
-4. Update developer documentation if component architecture or workflows change.
-5. Record any remaining gaps honestly.
-6. Keep licensing restrictions visible.
+## 11. Documentation and Milestone Tracking
 
-Do not mark G5.1 complete until the core gameplay loop is verified end-to-end.
+Update the appropriate documentation:
 
-## 9. Git and Pull Request Workflow
+- `docs/ROADMAP.md`
+- `docs/GOAL.md` or the repository's established milestone history
+- Relevant developer documentation
+- `re/data/ui-screens.json`
+- Architectural decisions, where applicable
 
-Use a dedicated feature branch:
+Preserve G5.1's historical completion record.
 
-`feat/g5-essential-gameplay-ui`
+Record G5.2 separately without corrupting the established 401-item roadmap accounting.
 
-Follow the repository's established development workflow.
+Use evidence-based screen classifications.
 
-- Make logically grouped commits.
-- Keep unrelated refactoring outside this milestone.
-- Review the complete diff.
-- Resolve test failures before submitting.
-- Prepare a pull request with a clear description and verification evidence.
-- Do not merge without the required checks and review approval.
+Do not label a partially implemented feature complete.
 
-## 10. Definition of Done
+Maintain the distinction between:
 
-G5.1 is considered complete only when:
+- Implemented and verified.
+- Partially implemented.
+- Deferred.
+- Externally blocked.
+- Explicit non-goals.
 
-- A player can access the core gameplay through the actual UI.
-- Essential building, recruitment, inventory, and quest workflows function.
-- The client communicates with the existing authoritative server.
-- Victory and reward progression cannot be forged by client-only changes.
-- Essential UI interactions are responsive and accessible.
-- The gameplay loop survives a client restart and server restart where supported.
-- Relevant automated tests and repository gates pass.
-- No proprietary assets are introduced into distributable output.
-- The roadmap accurately describes what is complete and what remains.
+Do not claim that the full positional combat simulator, original artwork, mobile builds, or production release have been completed as part of G5.2.
 
-## 11. Final Deliverables
+---
 
-Provide:
+## 12. Development Workflow
 
-1. A summary of implemented features.
-2. A list of new and modified components.
-3. The completed P0/P1/P2 screen inventory.
-4. Testing results and verification evidence.
-5. Architectural decisions and trade-offs.
-6. Known limitations and remaining blockers.
-7. Pull request information.
-8. A recommended next milestone.
+Use the installed Superpowers skills and established repository practices.
 
-## Execution Instructions
+Suggested workflow:
 
-Begin by auditing the repository, then create an implementation plan and execute it incrementally.
+1. Inspect the current implementation.
+2. Produce a scoped implementation plan.
+3. Write failing tests.
+4. Implement authoritative reward responses.
+5. Implement resource-period selection.
+6. Implement army management and team selection.
+7. Complete achievable P1 improvements.
+8. Run focused tests after each increment.
+9. Run the full verification gate.
+10. Perform code review and fix actual findings.
+11. Update documentation and the milestone ledger.
+12. Prepare the completed pull request.
 
-Do not ask for confirmation on routine implementation decisions covered by this specification.
+Suggested branch:
 
-Do not introduce unnecessary protocol changes, weaken authority checks, or bypass licensing restrictions.
+`feat/g5-2-gameplay-systems`
 
-If a specific feature cannot be completed, implement the safely achievable portion, document the blocker, and continue with other approved work.
+Suggested PR title:
 
-**Primary success criterion: A player can experience a complete and functional Social Wars Legacy gameplay loop through a polished interface, without using developer tools, manual API requests, or fabricated client-side outcomes.**
+`feat(g5.2): complete gameplay systems and reward UI`
+
+Keep commits logically organized.
+
+Do not include unrelated refactoring.
+
+Follow repository branch protection and review requirements. Do not bypass required checks.
+
+---
+
+## 13. Definition of Done
+
+G5.2 is complete when:
+
+- [ ] The native quest response returns authoritative reward details.
+- [ ] Dedicated result/reward dialogs show the correct outcomes.
+- [ ] Failed and replayed quests cannot generate duplicate rewards.
+- [ ] Players can select valid production periods through the UI.
+- [ ] Collection timers, requirements, and rewards remain server-authoritative.
+- [ ] Army management displays real player-owned units.
+- [ ] Team selection is implemented and server-enforced for supported quests.
+- [ ] Quest navigation and next-mission interactions work correctly.
+- [ ] The existing G5.1 gameplay loop remains functional.
+- [ ] The shared dialog and feedback architecture is preserved.
+- [ ] Chrome and Edge e2e tests verify the enhanced gameplay loop.
+- [ ] All applicable CI, security, protocol, and licensing checks pass.
+- [ ] Documentation accurately records completed and unfinished work.
+
+A visually polished interface with disconnected actions does not satisfy this definition.
+
+An API that works but cannot be used through the actual game interface also does not satisfy it.
+
+---
+
+## 14. Final Report
+
+When implementation and verification are complete, provide:
+
+1. Implemented features and their player-facing behavior.
+2. Files and modules changed.
+3. New or modified server/API contracts.
+4. Exact automated test results.
+5. Chrome/Edge e2e verification evidence.
+6. Compatibility and security verification.
+7. Architectural decisions and trade-offs.
+8. Remaining blockers and fidelity gaps.
+9. Pull request and merge status.
+10. Recommended next milestone, G5.3.
+
+Do not represent unmerged work as merged or partially tested features as verified.
+
+---
+
+## Final Execution Directive
+
+**Continue Social Wars Legacy from G5.1 to G5.2.**
+
+Do not restart the project, replace the established architecture, or spend the milestone rebuilding features already completed.
+
+Focus on closing the actual gameplay gaps identified in G5.1:
+
+**Reward payloads → Collection-period chooser → Army management/team selection → Result and mission navigation → Integrated gameplay verification.**
+
+Execute the work, verify it, resolve regressions, and deliver a reviewable implementation.
+
+Make routine technical decisions autonomously using repository evidence.
+
+Escalate only decisions that would alter approved architecture, introduce licensing risks, weaken security, or materially expand scope.
+
+**Success criterion: G5.2 delivers a complete, coherent, and server-authoritative gameplay experience that meaningfully extends G5.1 rather than simply adding more screens.**
