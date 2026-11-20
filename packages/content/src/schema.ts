@@ -133,6 +133,27 @@ export interface ContentGoal {
   reward: unknown;
 }
 
+/**
+ * One enemy unit in a hardcore quest's extracted roster.
+ *
+ * The shape mirrors the `QuestElement` the rules engine builds from a spec:
+ * `ref` addresses the map element, `itemId` is the unit's config id and
+ * `subcatFunctional` is its functional subcategory. Every extracted entry is
+ * a unit (`type === 'u'`), so the applier can mark it as an enemy unit.
+ */
+export interface QuestRosterEntry {
+  /** `item:<isoId>`, where `isoId` is the object key in the map snapshot. */
+  readonly ref: string;
+  readonly itemId: number;
+  readonly subcatFunctional: number;
+}
+
+/** The build-time roster for one hardcore quest, keyed by its quest id. */
+export interface QuestRoster {
+  readonly questId: string;
+  readonly items: QuestRosterEntry[];
+}
+
 export interface ContentBundle {
   /** Bumped when the bundle shape changes. */
   formatVersion: 1;
@@ -145,6 +166,8 @@ export interface ContentBundle {
   items: ContentItem[];
   levels: ContentLevel[];
   goals: ContentGoal[];
+  /** Build-time-extracted enemy rosters for the eight hardcore quests. */
+  questRosters?: QuestRoster[];
   globals: Record<string, unknown>;
   collections: unknown[];
   inventoryItems: Record<string, unknown>;

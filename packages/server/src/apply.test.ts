@@ -2541,6 +2541,102 @@ describe('the active assault quest', () => {
   });
 });
 
+describe('hardcore quests with extracted rosters', () => {
+  // The real bundle supplies 79..153 units per hardcore quest. A small roster
+  // exercises the same `enemiesAlive` accounting without a giant kill list.
+  const HC = QUEST_ID_15_HARDCORE1;
+  const ROSTER = [
+    { ref: 'item:101', itemId: 1017, subcatFunctional: 111 },
+    { ref: 'item:102', itemId: 1035, subcatFunctional: 114 },
+    { ref: 'item:103', itemId: 1063, subcatFunctional: 115 },
+  ];
+  const REFS = ROSTER.map((entry) => entry.ref);
+  const hardcoreDeps = (over: Partial<ApplierDeps> = {}): ApplierDeps =>
+    questDeps({ questRosters: [{ questId: HC, items: ROSTER }], ...over });
+
+  it('merges extracted entries into the roster of an empty-element quest', () => {
+    const spec = getQuestSpec(HC)!;
+    assert.deepEqual(spec.elements, []);
+    // Without the bundle there is no roster: the safe default stays empty.
+    assert.deepEqual(questRoster(spec, QUEST_ITEMS), []);
+    assert.deepEqual(
+      questRoster(spec, QUEST_ITEMS, [{ questId: HC, items: ROSTER }]).map((element) => [
+        element.ref,
+        element.itemId,
+        element.affiliation,
+        element.isUnit,
+        element.subcatFunctional,
+      ]),
+      [
+        ['item:101', 1017, 'enemy', true, 111],
+        ['item:102', 1035, 'enemy', true, 114],
+        ['item:103', 1063, 'enemy', true, 115],
+      ],
+    );
+  });
+
+  it('pays exactly once after the whole roster is killed', () => {
+    const applier = createApplier(hardcoreDeps());
+    const killed = applier(questWorld({ questId: HC }), killedWrite(REFS));
+    assert.equal(killed.applied, true);
+    const state = activeState(killed.world);
+    assert.equal(state.script.counters['enemiesAlive'], 0);
+    assert.deepEqual(state.script.destroyed, REFS);
+    const end = applier(killed.world, { name: 'end_quest', args: [HC, 1] });
+    assert.equal(end.applied, true);
+    // QUEST_15's content reward is { g: 10000, s: 3200 }.
+    assert.equal(end.world.resources['g'], 10000);
+    assert.equal(end.world.resources['s'], 3200);
+    const replay = applier(end.world, { name: 'end_quest', args: [HC, 1] });
+    assert.equal(replay.applied, false);
+    assert.equal(replay.refused, 'already-awarded');
+    assert.deepEqual(replay.world.resources, end.world.resources);
+  });
+
+  it('refuses a partial roster', () => {
+    const applier = createApplier(hardcoreDeps());
+    const before = structuredClone(questWorld({ questId: HC }));
+    const killed = applier(questWorld({ questId: HC }), killedWrite(REFS.slice(0, 2)));
+    assert.equal(killed.applied, true);
+    assert.equal(activeState(killed.world).script.counters['enemiesAlive'], 1);
+    const end = applier(killed.world, { name: 'end_quest', args: [HC, 1] });
+    assert.equal(end.applied, false);
+    assert.equal(end.refused, 'no-victory');
+    assert.deepEqual(end.world.resources, before.resources);
+  });
+
+  it('refuses an off-roster ref without mutating the save', () => {
+    const applier = createApplier(hardcoreDeps());
+    const world = questWorld({ questId: HC });
+    const before = structuredClone(world);
+    const outcome = applier(world, killedWrite(['item:999']));
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'unknown-quest-element');
+    assert.deepEqual(outcome.world, before);
+  });
+
+  it('refuses a zero-event hardcore end_quest even with a full roster available', () => {
+    const applier = createApplier(hardcoreDeps());
+    const world = questWorld({ questId: HC });
+    const before = structuredClone(world);
+    const outcome = applier(world, { name: 'end_quest', args: [HC, 1] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+    assert.deepEqual(outcome.world, before);
+  });
+
+  it('refuses a hardcore quest recorded as a loss', () => {
+    const applier = createApplier(hardcoreDeps());
+    const killed = applier(questWorld({ questId: HC }), killedWrite(REFS));
+    assert.equal(killed.applied, true);
+    const world = killed.world;
+    world.save.privateState[ACTIVE_QUEST_KEY] = { ...activeState(world), result: 'loss' };
+    const outcome = applier(world, { name: 'end_quest', args: [HC, 1] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+  });
+});
+
 describe('the weekly quest', () => {
   /** Kill the named roster bots one `set_quest_var` write at a time. */
   const killBots = (refs: readonly string[], questId = QUEST_ID_WEEKLY_01) => {

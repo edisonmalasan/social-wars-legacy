@@ -31,6 +31,8 @@ import type {
   ContentGoal,
   ContentItem,
   ContentLevel,
+  QuestRoster,
+  QuestRosterEntry,
 } from './schema.ts';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -38,6 +40,8 @@ const REPO_ROOT = path.resolve(HERE, '../../..');
 const CONFIG_DIR = path.join(REPO_ROOT, 'upstream/socialwarriors/config');
 const PATCH_DIR = path.join(CONFIG_DIR, 'patch');
 const ASSETS_DIR = path.join(REPO_ROOT, 'upstream/socialwarriors/assets');
+/** Vendored quest map snapshots — a build-time source only, never read at runtime. */
+const QUEST_DIR = path.join(REPO_ROOT, 'upstream/socialwarriors/villages/quest');
 const OUT_DIR = path.join(REPO_ROOT, 'packages/content/dist');
 
 export const UPSTREAM_COMMIT = 'c3fceeb1f8e93734a293b9bc25ae6025656f6822';
@@ -363,6 +367,92 @@ export function assetCandidates(item: ContentItem): string[] {
   return out;
 }
 
+/**
+ * The eight hardcore quests and the exact number of enemy units each snapshot
+ * holds (recorded in re/docs/01-network-protocol.md §3.5). The expected count
+ * is a guard: an upstream drift or a wrong filter must fail the build rather
+ * than silently ship an incomplete roster.
+ */
+const HARDCORE_QUEST_UNITS: Readonly<Record<string, number>> = {
+  '100000017': 79, // HC1
+  '100000018': 122, // HC2
+  '100000019': 114, // HC3
+  '100000020': 45, // HC4
+  '100000021': 84, // HC5
+  '100000022': 153, // HC6
+  '100000026': 138, // HC9
+  '100000025': 46, // HC10
+};
+
+interface QuestMapSnapshot {
+  readonly playerInfo?: { readonly pid?: unknown };
+  readonly maps?: readonly { readonly items?: Record<string, unknown> }[];
+}
+
+/** A deterministic string comparison, independent of the host locale. */
+function compareRefs(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
+/**
+ * Extract the hardcore quest rosters from the vendored quest map snapshots.
+ *
+ * A snapshot stores `maps[0].items` as an object keyed by the iso id; each
+ * value is the tuple `[item_id, x, y, timestamp, frame, queue, attrs, player]`.
+ * The `player` flag is 1 for every item in these snapshots, so it cannot tell
+ * friend from foe — only the content item's `type === 'u'` can. Refs are the
+ * object keys (`item:<isoId>`), not the tuple's item id.
+ */
+async function extractQuestRosters(
+  itemsById: Map<number, ContentItem>,
+  problems: string[],
+): Promise<QuestRoster[]> {
+  const rosters: QuestRoster[] = [];
+  for (const [questId, expectedUnits] of Object.entries(HARDCORE_QUEST_UNITS)) {
+    const file = path.join(QUEST_DIR, `${questId}.json`);
+    if (!(await exists(file))) {
+      problems.push(`hardcore quest roster snapshot is missing: ${questId}.json`);
+      continue;
+    }
+    const snapshot = await readJson<QuestMapSnapshot>(file);
+    const pid = snapshot.playerInfo?.pid;
+    if (String(pid) !== questId) {
+      problems.push(
+        `hardcore quest snapshot ${questId}.json has an unexpected playerInfo.pid: ${String(pid)}`,
+      );
+    }
+    const mapItems = asRecord(snapshot.maps?.[0]?.items ?? {});
+    const entries: QuestRosterEntry[] = [];
+    for (const [isoId, rawTuple] of Object.entries(mapItems)) {
+      const tuple = asArray(rawTuple);
+      const itemId = asInt(tuple[0], -1);
+      const content = itemsById.get(itemId);
+      // The snapshot's `player` flag is useless here; `type === 'u'` is the
+      // only reliable enemy-unit filter. Buildings are deliberately dropped.
+      if (content === undefined || content.type !== 'u') continue;
+      entries.push({
+        ref: `item:${isoId}`,
+        itemId,
+        subcatFunctional: content.subcat_functional,
+      });
+    }
+    // Object key order comes from the file; sort explicitly so the bundle is
+    // byte-identical even if a future snapshot reorders its keys.
+    entries.sort((a, b) => compareRefs(a.ref, b.ref));
+    if (entries.length === 0) {
+      problems.push(`hardcore quest ${questId} has an empty roster`);
+    }
+    if (entries.length !== expectedUnits) {
+      problems.push(
+        `hardcore quest ${questId} roster has ${entries.length} units, expected ${expectedUnits}`,
+      );
+    }
+    rosters.push({ questId, items: entries });
+  }
+  rosters.sort((a, b) => compareRefs(a.questId, b.questId));
+  return rosters;
+}
+
 export interface BuildResult {
   bundle: ContentBundle;
   problems: string[];
@@ -414,6 +504,11 @@ export async function buildContent(): Promise<BuildResult> {
     items.push(item);
   }
   items.sort((a, b) => a.id - b.id);
+
+  // 4b. Hardcore quest rosters, extracted from the vendored map snapshots.
+  //     Build-time only — the shipped bundle never reads `upstream/` again.
+  const itemsById = new Map(items.map((item) => [item.id, item]));
+  const questRosters = await extractQuestRosters(itemsById, problems);
 
   // 5. Dangling references.
   for (const item of items) {
@@ -503,6 +598,7 @@ export async function buildContent(): Promise<BuildResult> {
     items,
     levels,
     goals,
+    questRosters,
     globals: asRecord(doc['globals']),
     collections: asArray(doc['collections']),
     inventoryItems: asRecord(doc['inventory_items']),

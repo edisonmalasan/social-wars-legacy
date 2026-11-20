@@ -29,6 +29,7 @@ import {
   SessionStore,
   WebhookAlertSender,
   runMigrations,
+  type ContentQuestRoster,
   type CredentialStore,
   type PlayerStore,
 } from '@swl/server';
@@ -127,7 +128,13 @@ function migrationItems(bundle: {
 async function main(): Promise<void> {
   const bundle = JSON.parse(await readFile(CONTENT_PATH, 'utf8')) as Parameters<
     typeof costContentFrom
-  >[0] & { dartsItems?: readonly DartsGame[]; levels?: { exp_required?: number }[] };
+  >[0] & {
+    dartsItems?: readonly DartsGame[];
+    levels?: { exp_required?: number }[];
+    // Built by `pnpm build:content` from the vendored quest maps. Older bundles
+    // do not carry it, so the applier's safe empty default still applies.
+    questRosters?: readonly ContentQuestRoster[];
+  };
   const content = costContentFrom(bundle);
 
   const sessions = new SessionStore();
@@ -237,6 +244,8 @@ async function main(): Promise<void> {
       // The content, so the applier can check the **rules**: the level,
       // the population and the limits are all the game's own.
       items: contentItems(bundle),
+      // The hardcore rosters are read from the bundle only — never from upstream.
+      questRosters: bundle.questRosters ?? [],
       offerPacks: content.offerPacks,
       populationRules: populationRules(globalsOf(bundle)),
       // The darts schedule and the market prices are the content's own.
