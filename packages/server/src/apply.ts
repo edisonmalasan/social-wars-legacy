@@ -284,6 +284,25 @@ export interface ApplierItem {
   grantsPopulation: boolean;
 }
 
+/**
+ * One enemy unit from a build-time-extracted hardcore roster.
+ *
+ * Structural on purpose: the content bundle is the only source of these, and
+ * the applier must not gain a runtime dependency on the content package (or
+ * read `upstream/`). The content schema's entries are assignable to this.
+ */
+export interface ContentQuestRosterEntry {
+  readonly ref: string;
+  readonly itemId: number;
+  readonly subcatFunctional?: number;
+}
+
+/** A hardcore quest roster from the build-time content bundle. */
+export interface ContentQuestRoster {
+  readonly questId: string;
+  readonly items: readonly ContentQuestRosterEntry[];
+}
+
 /** What the applier needs. */
 export interface ApplierDeps {
   /** The clock, in seconds. */
@@ -298,6 +317,15 @@ export interface ApplierDeps {
   goalRewardGold?: number;
   /** The content items, by id, for the costs and the placement rules. */
   items?: Map<number, ApplierItem>;
+  /**
+   * Build-time-extracted hardcore rosters, keyed by quest id.
+   *
+   * Older bundles do not carry them; an absent or unknown roster simply leaves
+   * the spec-derived roster unchanged. The rosters are enemy units only — the
+   * client still supplies the kill refs, and every ref is checked against the
+   * merged roster before it can move the quest state.
+   */
+  questRosters?: readonly ContentQuestRoster[];
   /** The offer packs, by id, for `buy_offer_pack`. */
   offerPacks?: Map<number, CostOfferPack>;
   /** The darts schedule, for the board's prize items and the extra prize. */
@@ -2223,13 +2251,21 @@ function adminSetQuestRankCommand(world: ShimWorld, args: readonly unknown[]): C
  * The spec owns the refs and item ids; the content owns whether an item is a
  * unit and its `subcat_functional`. A losing (key) element belongs to the
  * player's side; every other scripted element is an enemy.
+ *
+ * The eight hardcore quests have no scripted elements: their real rosters were
+ * extracted at build time from the vendored map snapshots into the bundle.
+ * When the spec's element list is empty and the bundle supplies a roster for
+ * this quest id, those entries become enemy units. This is the only merge
+ * path — a quest with scripted elements keeps its spec-derived roster exactly
+ * as before.
  */
 export function questRoster(
   spec: QuestSpec,
   items?: Map<number, ApplierItem>,
+  rosters?: readonly ContentQuestRoster[],
 ): QuestElement[] {
   const keyRefs = new Set(spec.keyElementRefs);
-  return spec.elements.map((element) => {
+  const fromSpec = spec.elements.map((element) => {
     const contentItem = items?.get(element.itemId);
     return {
       ref: element.ref,
@@ -2239,6 +2275,24 @@ export function questRoster(
       ...(typeof contentItem?.subcatFunctional === 'number'
         ? { subcatFunctional: contentItem.subcatFunctional }
         : {}),
+    };
+  });
+  if (fromSpec.length > 0) return fromSpec;
+
+  const extracted = rosters?.find((roster) => roster.questId === spec.id);
+  if (!extracted) return fromSpec;
+  return extracted.items.map((entry) => {
+    // The extraction already filtered to `type === 'u'` and recorded the
+    // functional subcategory. The content item is consulted for the XP rule
+    // when it is present; the bundle's own value is the fallback.
+    const contentItem = items?.get(entry.itemId);
+    const subcatFunctional = contentItem?.subcatFunctional ?? entry.subcatFunctional;
+    return {
+      ref: entry.ref,
+      itemId: entry.itemId,
+      affiliation: 'enemy' as const,
+      isUnit: true,
+      ...(typeof subcatFunctional === 'number' ? { subcatFunctional } : {}),
     };
   });
 }
@@ -2289,7 +2343,10 @@ function ensureActiveQuest(
     questVars: currentQuestVars(ownMap(world)),
     hasRank: ranks[String(spec.playIndex)] !== undefined,
   });
-  return { ok: true, state: loadQuestMap(startQuest(prepared), questRoster(spec, deps.items)) };
+  return {
+    ok: true,
+    state: loadQuestMap(startQuest(prepared), questRoster(spec, deps.items, deps.questRosters)),
+  };
 }
 
 /**
@@ -2328,7 +2385,7 @@ function applyQuestEvents(
   spec: QuestSpec,
   deps: ApplierDeps,
 ): QuestStateResult {
-  const roster = questRoster(spec, deps.items);
+  const roster = questRoster(spec, deps.items, deps.questRosters);
   const byRef = new Map(roster.map((element) => [element.ref, element]));
   const triggerByRef = new Map(spec.elements.map((element) => [element.ref, element.trigger]));
   for (const ref of refs) {
@@ -2337,13 +2394,12 @@ function applyQuestEvents(
   const killCounter = killDrivenWinCounter(spec);
   let next = state;
   for (const ref of refs) {
-    const trigger = triggerByRef.get(ref);
-    // The roster is built 1:1 over spec.elements, so a validated ref always
-    // has a trigger. Fail loudly rather than consume it silently if that
-    // invariant ever breaks.
-    if (trigger === undefined) {
-      throw new Error(`unknown quest element trigger for ref: ${ref}`);
-    }
+    // A scripted element uses its own trigger. A hardcore roster entry has no
+    // scripted trigger: 'none' is the plain destruction-accounting channel,
+    // which decrements `enemiesAlive` for an enemy unit. The ref has already
+    // been checked against the server's merged roster above, so the client
+    // cannot choose an element this way.
+    const trigger = triggerByRef.get(ref) ?? 'none';
     switch (trigger) {
       case 'onNearDeath':
         if (!next.script.nearDeath.includes(ref)) {
@@ -2457,7 +2513,9 @@ function endQuestCommand(
     // half-finished chapter can leave stale chapter refs beside quest refs.
     // Only this quest's roster is replayed here; direct `set_quest_var` writes
     // still refuse any off-roster ref outright.
-    const rosterRefs = new Set(questRoster(spec, deps.items).map((element) => element.ref));
+    const rosterRefs = new Set(
+      questRoster(spec, deps.items, deps.questRosters).map((element) => element.ref),
+    );
     const kills = applyQuestEvents(
       ensured.state,
       refs.filter((ref) => rosterRefs.has(ref)),
