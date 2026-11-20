@@ -1,0 +1,149 @@
+/**
+ * The player's army, as a reading of the server's own save.
+ *
+ * This is derived presentation state, not a grant and not a decision. The
+ * counts come from the three fields the server owns: `maps[0].store` (bought
+ * but unplaced), the units placed on the map, and training queues whose real
+ * start timestamp has elapsed. The names, group types and training times come
+ * from the content. Nothing here can create a unit the server does not have.
+ */
+import { MAX_TEAM_SIZE } from '@swl/rules';
+
+import { trainingView } from './management.ts';
+import type { WorldSnapshot } from './session.ts';
+
+/** The part of a content item the army needs to name and check a unit. */
+export interface ArmyItemDefinition {
+  /** The content id of the item. */
+  readonly id: number;
+  /** The content's name, never a client label. */
+  readonly name: string;
+  /** The content's type letter; only `'u'` is a unit. */
+  readonly type: string;
+  /** The content's `group_type`, for a quest's exclusion filter. */
+  readonly groupType: string;
+  /** The content's seconds to train one unit. */
+  readonly trainingTime: number;
+}
+
+/** One unit type the server says the player can field. */
+export interface ArmyUnitView {
+  /** The content id sent with a team request. */
+  readonly itemId: number;
+  /** The name from the content. */
+  readonly name: string;
+  /** The content's group type. */
+  readonly groupType: string;
+  /** How many the server's save accounts for. */
+  readonly available: number;
+  /** False when the quest excludes this group type; display only. */
+  readonly allowed: boolean;
+}
+
+/**
+ * The army the interface may draw, in the content's order.
+ *
+ * An unknown id, a non-positive quantity, a building, an in-progress training
+ * queue and another map are all ignored rather than guessed at. An excluded
+ * group type is still shown — greyed out — so the player can see what they
+ * own, but the server alone decides whether it may be fielded.
+ */
+export function armyView(
+  world: WorldSnapshot,
+  definitions: readonly ArmyItemDefinition[],
+  now: number,
+  excludedGroupTypes: readonly string[] = [],
+): ArmyUnitView[] {
+  const byId = new Map<number, ArmyItemDefinition>();
+  for (const definition of definitions) {
+    if (
+      Number.isInteger(definition.id) && definition.id > 0 && definition.type === 'u' &&
+      !byId.has(definition.id)
+    ) {
+      byId.set(definition.id, definition);
+    }
+  }
+  const counts = new Map<number, number>();
+  const add = (id: number, count: number): void => {
+    if (!byId.has(id) || !Number.isInteger(count) || count <= 0) return;
+    counts.set(id, (counts.get(id) ?? 0) + count);
+  };
+
+  const map = world.maps[0];
+  const store = map?.store;
+  if (store && typeof store === 'object' && !Array.isArray(store)) {
+    for (const [key, value] of Object.entries(store)) {
+      add(Number(key), Number(value));
+    }
+  }
+  for (const tuple of Object.values(map?.items ?? {})) {
+    if (!Array.isArray(tuple)) continue;
+    add(Number(tuple[0]), 1);
+    const attrs: unknown = tuple[6];
+    if (!attrs || typeof attrs !== 'object' || Array.isArray(attrs)) continue;
+    const bag = attrs as Record<string, unknown>;
+    const queue = trainingView(bag, byId.get(Number(bag['ui']))?.trainingTime ?? 0, now);
+    if (queue.readyToTake) add(queue.unitItemId, queue.queued);
+  }
+
+  const out: ArmyUnitView[] = [];
+  for (const definition of byId.values()) {
+    const available = counts.get(definition.id) ?? 0;
+    if (available <= 0) continue;
+    out.push({
+      itemId: definition.id,
+      name: definition.name,
+      groupType: definition.groupType,
+      available,
+      allowed: !excludedGroupTypes.includes(definition.groupType),
+    });
+  }
+  return out;
+}
+
+/**
+ * The default team: every allowed unit up to the shared cap, in army order.
+ *
+ * The counts are only a gesture the selector sends; the server re-checks them
+ * against its own save and its own cap before accepting a team.
+ */
+export function initialArmySelection(
+  army: readonly ArmyUnitView[],
+): Record<number, number> {
+  const counts: Record<number, number> = {};
+  let total = 0;
+  for (const unit of army) {
+    if (!unit.allowed) continue;
+    const count = Math.max(0, Math.min(unit.available, MAX_TEAM_SIZE - total));
+    if (count > 0) {
+      counts[unit.itemId] = count;
+      total += count;
+    }
+  }
+  return counts;
+}
+
+/**
+ * Change one unit's count while keeping the whole team within the cap.
+ *
+ * `available` is the server-owned quantity for that unit; the other entries
+ * are the selector's current counts. The new value is clamped first by the
+ * unit's own availability, then by the budget left by every other unit.
+ */
+export function chooseArmyCount(
+  counts: Readonly<Record<number, number>>,
+  unitId: number,
+  requested: number,
+  available: number,
+): Record<number, number> {
+  const whole = Number.isFinite(requested) ? Math.trunc(requested) : 0;
+  let otherTotal = 0;
+  for (const [id, count] of Object.entries(counts)) {
+    if (Number(id) === unitId) continue;
+    if (typeof count === 'number' && Number.isFinite(count) && count > 0) {
+      otherTotal += Math.trunc(count);
+    }
+  }
+  const capped = Math.max(0, Math.min(whole, available, MAX_TEAM_SIZE - otherTotal));
+  return { ...counts, [unitId]: capped };
+}

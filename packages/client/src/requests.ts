@@ -15,7 +15,7 @@
  * authority: `packages/protocol/src/commands.ts`.
  */
 import type { CommandName, NativeCommand } from '@swl/protocol';
-import type { MagicPayment } from '@swl/rules';
+import type { Army, MagicPayment } from '@swl/rules';
 import type { Neighbour } from './neighbours.ts';
 import { authorizationHeader, type ClientSession } from './session.ts';
 import { requestId } from './transport.ts';
@@ -94,11 +94,23 @@ export function move(isoId: number, tx: number, ty: number, frame = 0): NativeCo
 }
 
 /**
+ * Choose a resource building's collection period.
+ *
+ * The client names the building and one of the content's 1-based periods; it
+ * never names a duration or a multiplier. The server checks the building's
+ * eligibility and stamps the countdown from its own clock.
+ */
+export function activate(isoId: number, period: number): NativeCommand {
+  return command('activate', [isoId, period]);
+}
+
+/**
  * Collect a building's production.
  *
  * The collect period is the **server's**: the native form carries only the
  * element's id, so the client cannot choose which period's multiplier it
- * gets.
+ * gets. `activate` only picks which of the content's periods the server
+ * should time.
  */
 export function collect(isoId: number): NativeCommand {
   return command('collect', [isoId]);
@@ -234,6 +246,8 @@ export type QuestActionRequest =
 export interface QuestStartBody {
   readonly questId: string;
   readonly started: boolean;
+  /** The team the server accepted, echoed rather than guessed. */
+  readonly team?: Army;
 }
 
 /** One element of the server's engagement ledger, as it answers. */
@@ -249,6 +263,8 @@ export interface QuestLedgerSummary {
   readonly counters: Record<string, number>;
   readonly elements: Record<string, QuestLedgerElement>;
   readonly events: string[];
+  /** The team bound to the active quest, as the server answered it. */
+  readonly team?: Army;
 }
 
 /** A typed native result: an answer, or the reason there was none. */
@@ -261,6 +277,8 @@ export interface QuestResult<T> {
   readonly body: T | null;
   /** A transport-level or malformed-answer failure. */
   readonly error?: 'network' | 'bad-answer';
+  /** The typed error code the server sent with a refusal. */
+  readonly serverError?: string;
 }
 
 /** Read a plain record only when it really is one. */
@@ -280,6 +298,31 @@ function questCounters(value: unknown): Record<string, number> | null {
   return out;
 }
 
+/** Copy an echoed army only when every entry is the server's own shape. */
+function questArmy(value: unknown): Army | null {
+  if (!Array.isArray(value)) return null;
+  const out: { unitId: number; count: number }[] = [];
+  for (const raw of value) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+    const entry = raw as { unitId?: unknown; count?: unknown };
+    if (
+      typeof entry.unitId !== 'number' || !Number.isInteger(entry.unitId) || entry.unitId <= 0 ||
+      typeof entry.count !== 'number' || !Number.isInteger(entry.count) || entry.count <= 0
+    ) {
+      return null;
+    }
+    out.push({ unitId: entry.unitId, count: entry.count });
+  }
+  return out;
+}
+
+/** A typed team field, or null when the server echoed something unreadable. */
+function optionalArmy(source: Record<string, unknown>): { team?: Army } | null {
+  if (!('team' in source)) return {};
+  const army = questArmy(source['team']);
+  return army === null ? null : { team: army };
+}
+
 /** Parse a ledger summary, returning null rather than fabricating one. */
 function questSummaryBody(value: unknown): QuestLedgerSummary | null {
   const source = questRecord(value);
@@ -297,12 +340,15 @@ function questSummaryBody(value: unknown): QuestLedgerSummary | null {
     }
     parsedElements[ref] = { hp: element['hp'], alive: element['alive'] };
   }
+  const team = optionalArmy(source);
+  if (team === null) return null;
   return {
     questId: source['questId'],
     phase: source['phase'],
     counters,
     elements: parsedElements,
     events: source['events'].filter((event): event is string => typeof event === 'string'),
+    ...team,
   };
 }
 
@@ -327,7 +373,23 @@ async function postQuest<T>(
   } catch {
     return { ok: false, status: 0, body: null, error: 'network' };
   }
-  if (!response.ok) return { ok: false, status: response.status, body: null };
+  if (!response.ok) {
+    // Read the typed refusal so the interface can say *why* the server said
+    // no. A missing or malformed error body is not a transport failure.
+    let serverError: string | undefined;
+    try {
+      const errorBody = (await response.json()) as { error?: unknown } | null;
+      if (errorBody && typeof errorBody.error === 'string') serverError = errorBody.error;
+    } catch {
+      // No readable body: the status alone is still a typed refusal.
+    }
+    return {
+      ok: false,
+      status: response.status,
+      body: null,
+      ...(serverError !== undefined ? { serverError } : {}),
+    };
+  }
   try {
     const parsed = parse(await response.json());
     if (!parsed) return { ok: false, status: response.status, body: null, error: 'bad-answer' };
@@ -337,23 +399,39 @@ async function postQuest<T>(
   }
 }
 
-/** Start a quest in the server's own state. */
+/**
+ * Start a quest in the server's own state.
+ *
+ * The optional team was added after the fetch double. The fourth argument is
+ * therefore ambiguous: a function there is the legacy `(session, questId,
+ * difficulty, fetchImpl)` form and is used as the fetcher, with no team. The
+ * five-argument form keeps `team` and `fetchImpl` separate.
+ */
 export async function startQuestOnServer(
   session: ClientSession,
   questId: string,
   difficulty?: number,
+  team?: Army | typeof fetch,
   fetchImpl: typeof fetch = fetch,
 ): Promise<QuestResult<QuestStartBody>> {
+  const chosenTeam: Army | undefined = typeof team === 'function' ? undefined : team;
+  const fetcher: typeof fetch = typeof team === 'function' ? team : fetchImpl;
   return postQuest(
     '/api/quest/start',
     session,
-    { questId, ...(difficulty === undefined ? {} : { difficulty }) },
+    {
+      questId,
+      ...(difficulty === undefined ? {} : { difficulty }),
+      ...(chosenTeam === undefined ? {} : { team: chosenTeam }),
+    },
     (value): QuestStartBody | null => {
       const source = questRecord(value);
       if (!source || typeof source['questId'] !== 'string' || source['started'] !== true) return null;
-      return { questId: source['questId'], started: true };
+      const echoed = optionalArmy(source);
+      if (echoed === null) return null;
+      return { questId: source['questId'], started: true, ...echoed };
     },
-    fetchImpl,
+    fetcher,
   );
 }
 

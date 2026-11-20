@@ -9,6 +9,9 @@
  */
 import { useState } from 'react';
 
+import { type Army } from '@swl/rules';
+import { chooseArmyCount, initialArmySelection, type ArmyUnitView } from '@swl/client';
+
 import type {
   ActiveQuestView,
   QuestActionChoice,
@@ -28,12 +31,19 @@ export interface QuestPanelProps {
   readonly view: QuestPanelView;
   /** True while a quest request is pending; request buttons are disabled. */
   readonly busy: boolean;
-  /** The player asked to start. The host decides which request to send. */
-  readonly onStart: (questId: string, difficulty: QuestDifficulty) => void;
+  /**
+   * The player asked to start. A team is a request: the server decides which
+   * units, if any, it will actually accept.
+   */
+  readonly onStart: (questId: string, difficulty: QuestDifficulty, team?: Army) => void;
   /** The player pressed one of the server's allowed actions. */
   readonly onAction: (questId: string, action: QuestActionChoice) => void;
-  /** The player cancelled a briefing. */
+  /** The player cancelled a briefing, or left a result for the base. */
   readonly onCancel: () => void;
+  /** The player asked to retry (or replay) the finished mission. */
+  readonly onRetry?: (questId: string) => void;
+  /** The player asked to open the next mission the server made available. */
+  readonly onNext?: (questId: string) => void;
 }
 
 /** The brief, before the player asks the server to start. */
@@ -48,12 +58,64 @@ function Briefing({
   onStart: QuestPanelProps['onStart'];
   onCancel: QuestPanelProps['onCancel'];
 }): React.JSX.Element {
-  // The difficulty is the player's own choice, held only for the length of
-  // this panel. It is sent with the start request; the server owns the quest.
+  // The difficulty and the chosen counts are the player's own gestures, held
+  // only for the length of this panel. They are sent with the start request;
+  // the server owns the quest and checks every unit before accepting a team.
   const [difficulty, setDifficulty] = useState<QuestDifficulty>(briefing.difficulty);
+  const [counts, setCounts] = useState<Record<number, number>>(() =>
+    initialArmySelection(briefing.army),
+  );
+  const team: Army = briefing.army
+    .filter((unit) => unit.allowed && (counts[unit.itemId] ?? 0) > 0)
+    .map((unit) => ({ unitId: unit.itemId, count: counts[unit.itemId]! }));
+
+  /**
+   * Change one count within both the unit's availability and the total team
+   * budget, so the selector cannot send an army the server must refuse for
+   * being too large. The server still checks everything on receipt.
+   */
+  function choose(unit: ArmyUnitView, count: number): void {
+    setCounts((previous) =>
+      chooseArmyCount(previous, unit.itemId, count, unit.available),
+    );
+  }
+
   return (
     <div className="swl-quest-panel">
       <p className="swl-quest-subtitle">{briefing.subtitle}</p>
+      {briefing.teamQuest ? (
+        <fieldset className="swl-quest-team" data-swl-team-picker="">
+          <legend>Choose your team</legend>
+          {briefing.army.length === 0 ? (
+            <p className="swl-quest-subtitle">No units are available in your army.</p>
+          ) : (
+            briefing.army.map((unit) => (
+              <label key={unit.itemId} className="swl-quest-team-row">
+                <input
+                  type="checkbox"
+                  checked={(counts[unit.itemId] ?? 0) > 0}
+                  disabled={!unit.allowed || busy}
+                  onChange={(event) => choose(unit, event.target.checked ? unit.available : 0)}
+                />
+                <span>{unit.name}</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={unit.available}
+                  value={counts[unit.itemId] ?? 0}
+                  disabled={!unit.allowed || busy}
+                  onChange={(event) => choose(unit, Number(event.target.value))}
+                  aria-label={`${unit.name} count`}
+                />
+                <span>
+                  / {unit.available}
+                  {unit.allowed ? '' : ' · not allowed in this quest'}
+                </span>
+              </label>
+            ))
+          )}
+        </fieldset>
+      ) : null}
       <fieldset className="swl-quest-difficulty">
         <legend>Difficulty</legend>
         {([1, 2, 3] as const).map((stars) => (
@@ -73,8 +135,12 @@ function Briefing({
         <button
           type="button"
           className="swl-quest-primary"
-          disabled={!briefing.canStart || busy}
-          onClick={() => onStart(briefing.questId, difficulty)}
+          disabled={
+            !briefing.canStart || busy || (briefing.teamQuest && briefing.army.length === 0)
+          }
+          onClick={() =>
+            onStart(briefing.questId, difficulty, briefing.teamQuest ? team : undefined)
+          }
         >
           Start mission
         </button>
@@ -98,6 +164,11 @@ function Combat({
 }): React.JSX.Element {
   return (
     <div className="swl-quest-panel">
+      {active.team && active.team.length > 0 ? (
+        <p className="swl-quest-team-echo" data-swl-team="">
+          Team: {active.team.map((entry) => `${entry.unitId} ×${entry.count}`).join(', ')}
+        </p>
+      ) : null}
       <dl className="swl-quest-counters">
         {active.counters.map((counter) => (
           <div key={counter.name} className="swl-quest-counter">
@@ -142,26 +213,61 @@ function Combat({
 /** The server's answer to the Finish gesture. */
 function Result({
   result,
+  busy,
+  onRetry,
+  onNext,
   onCancel,
 }: {
   result: QuestResultView;
+  busy: boolean;
+  onRetry: QuestPanelProps['onRetry'];
+  onNext: QuestPanelProps['onNext'];
   onCancel: QuestPanelProps['onCancel'];
 }): React.JSX.Element {
+  const next = result.next;
   return (
     <div className="swl-quest-panel">
+      <h3 className="swl-quest-result-heading">
+        {result.won ? 'Mission complete' : 'Mission failed'}
+      </h3>
       <p className={result.won ? 'swl-quest-won' : 'swl-quest-lost'}>{result.message}</p>
+      {result.missionComplete && result.rank !== null ? (
+        <p className="swl-quest-rank">Rank {result.rank}</p>
+      ) : null}
       {result.rewards.length > 0 ? (
-        <ul className="swl-quest-rewards">
-          {result.rewards.map((reward, index) => (
-            <li key={`${reward.resource}:${index}`}>
-              {reward.resource} +{reward.amount}
-            </li>
-          ))}
-        </ul>
+        <>
+          <p className="swl-quest-reward-title">Rewards granted by the server</p>
+          <ul className="swl-quest-rewards" data-swl-rewards="">
+            {result.rewards.map((reward, index) => (
+              <li key={`${reward.resource}:${index}`} data-swl-reward={reward.resource}>
+                {reward.resource} +{reward.amount}
+              </li>
+            ))}
+          </ul>
+        </>
       ) : null}
       <div className="swl-quest-buttons">
+        {next?.available ? (
+          <button
+            type="button"
+            className="swl-quest-primary"
+            data-swl-action="next"
+            disabled={busy}
+            onClick={() => next && onNext?.(next.questId)}
+          >
+            Next mission: {next.title}
+          </button>
+        ) : null}
+        <button
+          type="button"
+          data-swl-action="retry"
+          disabled={busy}
+          onClick={() => onRetry?.(result.questId)}
+        >
+          {result.won ? 'Replay mission' : 'Retry mission'}
+        </button>
         <button type="button" onClick={onCancel}>
-          Close
+          Return to base
         </button>
       </div>
     </div>
@@ -183,5 +289,13 @@ export function QuestPanel(props: QuestPanelProps): React.JSX.Element {
   if (props.view.kind === 'combat') {
     return <Combat active={props.view.active} busy={props.busy} onAction={props.onAction} />;
   }
-  return <Result result={props.view.result} onCancel={props.onCancel} />;
+  return (
+    <Result
+      result={props.view.result}
+      busy={props.busy}
+      onRetry={props.onRetry}
+      onNext={props.onNext}
+      onCancel={props.onCancel}
+    />
+  );
 }

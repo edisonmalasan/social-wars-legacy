@@ -16,6 +16,7 @@ import { useMemo } from 'react';
 import {
   CLOSED_DIALOG,
   activeQuestState,
+  type ArmyUnitView,
   hudState,
   levelOf,
   questChoices,
@@ -30,6 +31,7 @@ import {
   type StoredItemView,
   type WorldSnapshot,
 } from '@swl/client';
+import type { Army } from '@swl/rules';
 import type { ContentBundle } from '@swl/content';
 
 import { BuildMenu } from './buildmenu.tsx';
@@ -38,7 +40,7 @@ import { Dialog } from './dialog.tsx';
 import { Feedback } from './feedback.tsx';
 import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
-import { InfoPanel } from './info.tsx';
+import { InfoPanel, ProductionSelector, PRODUCTION_DIALOG_ID } from './info.tsx';
 import { Inventory } from './inventory.tsx';
 import { Neighbours } from './neighbours.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
@@ -52,6 +54,7 @@ import {
   hudInput,
   infoPanel,
   inventoryItems,
+  type ProductionPanelView,
   questMinLevels,
   questRanks,
   recruitView,
@@ -88,14 +91,20 @@ export interface RootProps {
   onDialogDismiss?: () => void;
   /** The player picked an opened chapter slot. */
   onQuestPick?: (choice: QuestChoice) => void;
-  /** The player asked to start a quest at a difficulty. */
-  onQuestStart?: (questId: string, difficulty: QuestDifficulty) => void;
+  /** The player asked to start a quest at a difficulty, with an optional team. */
+  onQuestStart?: (questId: string, difficulty: QuestDifficulty, team?: Army) => void;
   /** The player pressed one of the quest's allowed actions. */
   onQuestAction?: (questId: string, action: QuestActionChoice) => void;
+  /** The player asked to retry (or replay) a finished mission. */
+  onQuestRetry?: (questId: string) => void;
+  /** The player asked to open the next mission the server made available. */
+  onQuestNext?: (questId: string) => void;
   /** The player asked to collect the selected building's production. */
   onCollect?: () => void;
   /** The player picked a stored item to place on the map. */
   onPlaceStored?: (entry: StoredItemView) => void;
+  /** The army the server's save accounts for, drawn beside storage. */
+  army?: readonly ArmyUnitView[];
   /** The player asked for the daily bonus; the server decides the reward. */
   onClaimBonus?: () => void | Promise<unknown>;
   /** The player picked something to build, with its real wire type. */
@@ -110,6 +119,12 @@ export interface RootProps {
   onTrain?: (unitItemId: number) => void;
   /** The player asked to take the finished unit out of the queue. */
   onTake?: () => void;
+  /** The selected building's production cycle, when it can choose one. */
+  production?: ProductionPanelView | null;
+  /** The player asked to open the collection-period selector. */
+  onOpenProduction?: () => void;
+  /** The player picked one of the content's collection periods. */
+  onActivate?: (period: number) => void;
 }
 
 /**
@@ -136,7 +151,10 @@ export function Root({
   onQuestPick,
   onQuestStart,
   onQuestAction,
+  onQuestRetry,
+  onQuestNext,
   onCollect,
+  army = [],
   onPlaceStored,
   onClaimBonus,
   onPick,
@@ -145,6 +163,9 @@ export function Root({
   onFinish,
   onTrain,
   onTake,
+  production = null,
+  onOpenProduction,
+  onActivate,
 }: RootProps): React.JSX.Element {
   const state = hudState(hudInput(bundle, world));
   const items = useMemo(() => buildItems(bundle), [bundle]);
@@ -179,7 +200,12 @@ export function Root({
     <div className="swl-ui">
       <Hud state={state} placing={placingName} onClaimBonus={onClaimBonus} />
       <Goals goals={goals} onCommand={onCommand} />
-      <Inventory items={stored} onPlace={onPlaceStored} />
+      <Inventory
+        items={stored}
+        categories={tabs}
+        army={army}
+        onPlace={onPlaceStored}
+      />
       <Chapters
         ranks={ranks}
         minLevels={minLevels}
@@ -193,6 +219,8 @@ export function Root({
         onCollect={onCollect}
         onUpgrade={onUpgrade}
         onFinish={onFinish}
+        production={production}
+        onOpenProduction={onOpenProduction}
       />
       <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
       <Neighbours neighbours={neighbours} />
@@ -215,8 +243,13 @@ export function Root({
             busy={questBusy}
             onStart={onQuestStart}
             onAction={onQuestAction}
+            onRetry={onQuestRetry}
+            onNext={onQuestNext}
             onCancel={onDialogDismiss ?? (() => {})}
           />
+        ) : null}
+        {dialog?.dialog?.id === PRODUCTION_DIALOG_ID && production && onActivate ? (
+          <ProductionSelector view={production} onActivate={onActivate} />
         ) : null}
       </Dialog>
       <BuildMenu

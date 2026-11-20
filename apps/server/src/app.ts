@@ -48,6 +48,7 @@ import {
   handleGetPlayerInfo,
   LegacyIdentityBridge,
   SessionStore,
+  parseQuestArmy,
   type CommandApplier,
   type PlayerStore,
   type QuestActionHelper,
@@ -58,7 +59,7 @@ import {
   type ShimResponse,
   type ShimWorld,
 } from '@swl/server';
-import { applyCommandCost, computeCommandCost, type CostContent } from '@swl/rules';
+import { applyCommandCost, computeCommandCost, type Army, type CostContent } from '@swl/rules';
 import { MemoryPlayerStore } from '@swl/server';
 import {
   dashboardHtml,
@@ -131,6 +132,10 @@ export const ERROR_CODES = {
   'quest-already-active': 'a quest is already active',
   'quest-not-active': 'the named quest is not the active quest',
   'quest-refused': 'the server refused the quest action',
+  'quest-team-invalid': 'the team is missing, malformed, duplicated or too large',
+  'quest-team-not-supported': 'this quest does not accept a team',
+  'quest-team-unit-unavailable': 'the team names a unit the server does not own in that quantity',
+  'quest-team-unit-not-allowed': 'the team names a unit this quest excludes',
   'internal-error': 'the server failed to handle the request',
 } as const;
 
@@ -588,7 +593,11 @@ export function createApp(
         if (outcome.applied) {
           current = outcome.world;
           applied.push(command.name);
-          outcomes.push({ index, ok: true, result: { kind: 'none' } });
+          // The single forwarding point: whatever the authoritative applier
+          // reports is what the client is told it was granted. A command with
+          // no result keeps the old `{kind:'none'}` answer. The legacy shim
+          // never reads this field, so its body stays `{result:'success'}`.
+          outcomes.push({ index, ok: true, result: outcome.result ?? { kind: 'none' } });
         } else {
           // A refused command spends nothing. The applier validates before
           // it mutates, so the settled price is the only change to undo.
@@ -668,6 +677,16 @@ export function createApp(
       case 'no-active-quest':
       case 'quest-mismatch':
         return fail(409, 'quest-not-active');
+      case 'team-invalid':
+      case 'team-duplicate':
+      case 'team-too-large':
+        return fail(400, 'quest-team-invalid');
+      case 'team-not-supported':
+        return fail(400, 'quest-team-not-supported');
+      case 'team-unit-unavailable':
+        return fail(400, 'quest-team-unit-unavailable');
+      case 'team-unit-not-allowed':
+        return fail(400, 'quest-team-unit-not-allowed');
       default:
         return fail(409, 'quest-refused');
     }
@@ -692,7 +711,7 @@ export function createApp(
     const beginQuest = options.beginQuest;
     if (!beginQuest) return fail(503, 'internal-error');
 
-    let body: { id?: unknown; questId?: unknown; difficulty?: unknown };
+    let body: { id?: unknown; questId?: unknown; difficulty?: unknown; team?: unknown };
     try {
       body = JSON.parse(request.body) as typeof body;
     } catch {
@@ -708,6 +727,15 @@ export function createApp(
         ? body.difficulty
         : undefined;
 
+    // Shape first, ownership second. An omitted team keeps the old behaviour;
+    // a present but malformed one is refused before any state is touched.
+    let team: Army | undefined;
+    if (body.team !== undefined) {
+      const parsed = parseQuestArmy(body.team);
+      if (!parsed.ok) return questRefusal(parsed.reason);
+      team = parsed.army;
+    }
+
     // Check, transact and claim all run under the player's quest lock, so a
     // concurrent retry cannot slip between the check and the claim.
     const id = questRequestId(request, body);
@@ -718,7 +746,7 @@ export function createApp(
 
     let result: QuestHelperResult | undefined;
     const stored = await options.store.transact(playerId, (world) => {
-      result = beginQuest(world, questId, difficulty);
+      result = beginQuest(world, questId, difficulty, team);
       return result.world;
     });
     if (!stored) return fail(401, 'unknown-player');
@@ -727,7 +755,15 @@ export function createApp(
 
     // Only successful answers are remembered: a refusal mutates nothing, so a
     // retry is free to be re-evaluated against the current state.
-    const answer = { questId, started: true };
+    // Only echo a team when the client sent one. The echoed copy is the
+    // server's accepted army, not the submitted body.
+    const answer = {
+      questId,
+      started: true,
+      ...(team !== undefined && result.summary.team
+        ? { team: result.summary.team }
+        : {}),
+    };
     if (id) rememberAnswer(playerId, id, answer);
     requestContext['quest'] = questId;
     return json(200, answer);

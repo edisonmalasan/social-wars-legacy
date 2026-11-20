@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import type { CommandOutcome, Reward } from '@swl/protocol';
-import { QUEST_IDS } from '@swl/rules';
+import { QUEST_IDS, getQuestSpec } from '@swl/rules';
 
 import {
   activeQuestFromWorld,
@@ -15,9 +15,12 @@ import {
   questChoices,
   questDialogId,
   questDifficulty,
+  questResultActionChoice,
+  questResultFromReceipt,
   questResultView,
   resultDialog,
 } from './questview.ts';
+import { lastQuestReward } from './featurestate.ts';
 import type { ActiveQuestStateView } from './featurestate.ts';
 import type { WorldSnapshot } from './session.ts';
 
@@ -112,7 +115,23 @@ describe('briefing view', () => {
       subtitle: 'Blow up the Nuclear Plant and then the Command Center!',
       difficulty: 2,
       canStart: true,
+      teamQuest: false,
+      army: [],
     });
+  });
+
+  it('marks a team quest and carries the server-read army as choices', () => {
+    const teamChoice = {
+      ...choice,
+      questId: '100000021',
+      title: "DR. SHOCK'S MECH ARMY",
+    };
+    const army = [
+      { itemId: 1017, name: 'Good Boy', groupType: 'INFANTRY', available: 2, allowed: true },
+    ];
+    const briefing = briefingView(teamChoice, 1, army);
+    assert.equal(briefing.teamQuest, true);
+    assert.deepEqual(briefing.army, army);
   });
 
   it('normalises difficulty to the client\'s 1-3 stars', () => {
@@ -156,6 +175,13 @@ describe('active quest view', () => {
 
   it('never invents a quest from a bare seed', () => {
     assert.equal(activeQuestView(active(null)), null);
+  });
+
+  it('echoes only the team the server wrote into the active quest', () => {
+    const team = [{ unitId: 1017, count: 2 }];
+    const view = activeQuestView(active(Q02, { team }), {})!;
+    assert.deepEqual(view.team, team);
+    assert.equal(activeQuestView(state, {})!.team, undefined);
   });
 
   it('offers strikes, a two-argument kill report and an end action for a kill quest', () => {
@@ -231,11 +257,15 @@ describe('result view', () => {
       result: { kind: 'rewards', rewards },
     };
     assert.deepEqual(questResultView(Q02, outcome), {
+      questId: Q02,
       won: true,
       title: 'Quest complete',
       message: 'The server completed BLOW THE POWER PLANT.',
       kind: 'reward',
       rewards,
+      missionComplete: true,
+      rank: null,
+      next: null,
     });
   });
 
@@ -246,11 +276,15 @@ describe('result view', () => {
       error: { code: 'command-failed', message: 'no-victory', status: 409 },
     };
     assert.deepEqual(questResultView(Q02, outcome), {
+      questId: Q02,
       won: false,
       title: 'Quest not finished',
       message: 'command-failed: no-victory',
       kind: 'result',
       rewards: [],
+      missionComplete: false,
+      rank: null,
+      next: null,
     });
   });
 
@@ -259,6 +293,150 @@ describe('result view', () => {
     assert.equal(view.won, false);
     assert.equal(view.message, 'The request failed (network).');
     assert.deepEqual(view.rewards, []);
+  });
+
+  it('reads the rank the server recorded for the completed mission', () => {
+    const outcome: CommandOutcome = {
+      index: 0,
+      ok: true,
+      result: { kind: 'rewards', rewards },
+    };
+    const view = questResultView(Q02, outcome, undefined, {
+      ranks: { [getQuestSpec(Q02)!.playIndex]: 2 },
+    });
+    assert.equal(view.missionComplete, true);
+    assert.equal(view.rank, 2);
+  });
+
+  it('offers the next mission only where the server rank and unlock allow it', () => {
+    const outcome: CommandOutcome = {
+      index: 0,
+      ok: true,
+      result: { kind: 'rewards', rewards },
+    };
+    const playIndex = getQuestSpec(Q02)!.playIndex;
+    const nextIndex = playIndex + 1;
+    const nextId = QUEST_IDS[nextIndex]!;
+    const options = {
+      ranks: { [playIndex]: 1 },
+      playerLevel: 1,
+      numQuests: QUEST_IDS.length - 1,
+    };
+    const open = questResultView(Q02, outcome, undefined, options);
+    assert.equal(open.next?.questId, nextId);
+    assert.equal(open.next?.index, nextIndex);
+    assert.equal(open.next?.available, true);
+
+    const locked = questResultView(Q02, outcome, undefined, {
+      ...options,
+      minLevels: { [nextIndex]: 10 },
+    });
+    assert.equal(locked.next?.available, false);
+  });
+
+  it('offers no next mission and no rewards on a defeat', () => {
+    const outcome: CommandOutcome = {
+      index: 0,
+      ok: false,
+      error: { code: 'command-failed', message: 'no-victory', status: 409 },
+    };
+    const view = questResultView(Q02, outcome, undefined, {
+      ranks: { [getQuestSpec(Q02)!.playIndex]: 1 },
+      playerLevel: 1,
+    });
+    assert.equal(view.next, null);
+    assert.deepEqual(view.rewards, []);
+    assert.equal(view.missionComplete, false);
+  });
+
+  it('rebuilds a result from the persisted server receipt, never a replay', () => {
+    const receipt = {
+      questId: Q02,
+      rank: 2,
+      rewards: [
+        { resource: 'gold' as const, amount: 4000 },
+        { resource: 'xp' as const, amount: 100 },
+      ],
+    };
+    assert.deepEqual(lastQuestReward(world({ lastQuestReward: receipt })), receipt);
+    assert.equal(lastQuestReward(world()), null);
+    const view = questResultFromReceipt(receipt, {
+      ranks: { [getQuestSpec(Q02)!.playIndex]: 2 },
+    });
+    assert.equal(view.won, true);
+    assert.equal(view.rank, 2);
+    assert.equal(view.missionComplete, true);
+    assert.deepEqual(view.rewards, receipt.rewards);
+  });
+
+  // Host-level: the exact gate the dialog's Next button goes through before
+  // it calls openQuestSlot. A first-time unlock must open QUEST_IDS[p+1],
+  // not be refused by the one-based chapter-slot lookup.
+  it('opens the freshly unlocked next mission from the server play index', () => {
+    const playIndex = getQuestSpec(Q02)!.playIndex;
+    const ranks = { [playIndex]: 1 };
+    const options = {
+      ranks,
+      minLevels: {},
+      playerLevel: 1,
+      numQuests: QUEST_IDS.length - 1,
+    };
+    const won = questResultView(
+      Q02,
+      { index: 0, ok: true, result: { kind: 'rewards', rewards } },
+      undefined,
+      options,
+    );
+    const nextId = QUEST_IDS[playIndex + 1]!;
+    assert.equal(won.next?.questId, nextId);
+    assert.equal(won.next?.available, true);
+
+    const choice = questResultActionChoice(won, nextId, 'next', options);
+    assert.ok(choice, 'the Next gesture must not be refused');
+    assert.equal(choice.questId, nextId);
+    assert.equal(choice.index, playIndex + 2);
+    assert.equal(choice.rank, 0, 'the first-time unlock is not ranked yet');
+    assert.equal(choice.unlocked, true);
+    assert.equal(choice.locked, false);
+    assert.equal(choice.active, false);
+  });
+
+  it('fails closed when the server has not unlocked the next mission', () => {
+    const playIndex = getQuestSpec(Q02)!.playIndex;
+    const nextIndex = playIndex + 1;
+    const options = {
+      ranks: { [playIndex]: 1 },
+      minLevels: { [nextIndex]: 99 },
+      playerLevel: 1,
+      numQuests: QUEST_IDS.length - 1,
+    };
+    const won = questResultView(
+      Q02,
+      { index: 0, ok: true, result: { kind: 'rewards', rewards } },
+      undefined,
+      options,
+    );
+    assert.equal(won.next?.available, false);
+    assert.equal(
+      questResultActionChoice(won, QUEST_IDS[nextIndex]!, 'next', options),
+      null,
+    );
+  });
+
+  it('still allows a retry of the ranked mission the server completed', () => {
+    const playIndex = getQuestSpec(Q02)!.playIndex;
+    const options = { ranks: { [playIndex]: 1 }, minLevels: {}, playerLevel: 1 };
+    const won = questResultView(
+      Q02,
+      { index: 0, ok: true, result: { kind: 'rewards', rewards } },
+      undefined,
+      options,
+    );
+    const choice = questResultActionChoice(won, Q02, 'retry', options);
+    assert.ok(choice);
+    assert.equal(choice.questId, Q02);
+    assert.equal(choice.rank, 1);
+    assert.equal(choice.unlocked, true);
   });
 });
 

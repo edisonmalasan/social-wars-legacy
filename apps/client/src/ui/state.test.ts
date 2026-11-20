@@ -5,6 +5,7 @@ import { completeGoal, type WorldSnapshot } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 
 import {
+  armyPanel,
   buildingInfo,
   buildItems,
   categories,
@@ -15,6 +16,7 @@ import {
   infoPanel,
   inventoryItems,
   populationItems,
+  productionPanel,
   questMinLevels,
   questRanks,
   recruitView,
@@ -441,6 +443,132 @@ describe('building management views', () => {
   });
 });
 
+describe('the production selector', () => {
+  const producer = item({
+    id: 2,
+    name: 'Wood Factory I',
+    collect: 100,
+    collect_type: 'w',
+    properties: { multiCollectable: 1 },
+  });
+  const bundleWithPeriods = (items: ContentItem[] = [producer]): ContentBundle =>
+    bundle({
+      items,
+      globals: {
+        COLLECT_MINUTES: [5, 60, 240, 480],
+        COLLECT_MULTIPLIER: [0.25, 1, 2, 3],
+      },
+    });
+  const worldFor = (
+    attrs: unknown,
+    itemId = 2,
+  ): WorldSnapshot =>
+    ({
+      maps: [{ id: 0, items: { '7': [itemId, 0, 0, 0, 0, [], attrs, 1] } }],
+      resources: {},
+      privateState: {},
+    }) as unknown as WorldSnapshot;
+
+  it('offers the four content periods with their content multipliers', () => {
+    const view = productionPanel(
+      bundleWithPeriods(),
+      worldFor({ cp: 4, lastAccruedAt: 1000 }),
+      7,
+      1000,
+    )!;
+    assert.deepEqual(
+      view.options.map((option) => [
+        option.period,
+        option.minutes,
+        option.multiplier,
+        option.amount,
+      ]),
+      [
+        [1, 5, 0.25, 25],
+        [2, 60, 1, 100],
+        [3, 240, 2, 200],
+        [4, 480, 3, 300],
+      ],
+    );
+    assert.equal(view.period, 4);
+    assert.equal(view.options.find((option) => option.active)?.period, 4);
+    assert.equal(view.resource, 'w');
+  });
+
+  it('predicts the server payout from stored production state, including the peasant bonus', () => {
+    const withPeasants = productionPanel(
+      bundleWithPeriods(),
+      worldFor({ cp: 4, collect: 100, unitsInside: 3, unitCapacity: 5 }),
+      7,
+      1000,
+    )!;
+    // 100 + 2 * 100 * 0.2 = 140; floor(140 * 3) = 420.
+    assert.equal(withPeasants.options[3]!.amount, 420);
+
+    const stored = productionPanel(
+      bundleWithPeriods(),
+      worldFor({ cp: 4, collect: 150, unitsInside: 1, unitCapacity: 5 }),
+      7,
+      1000,
+    )!;
+    assert.equal(stored.options[3]!.amount, 450);
+
+    const capacityOne = productionPanel(
+      bundleWithPeriods(),
+      worldFor({ cp: 4, collect: 100, unitsInside: 3, unitCapacity: 1 }),
+      7,
+      1000,
+    )!;
+    assert.equal(capacityOne.options[3]!.amount, 300);
+  });
+
+  it('counts down from the server timestamp and treats a fresh cycle as due', () => {
+    const started = worldFor({ cp: 3, lastAccruedAt: 1000 });
+    const early = productionPanel(bundleWithPeriods(), started, 7, 1060)!;
+    assert.equal(early.secondsRemaining, 240 * 60 - 60);
+    assert.equal(early.due, false);
+    const due = productionPanel(bundleWithPeriods(), started, 7, 1000 + 240 * 60)!;
+    assert.equal(due.secondsRemaining, 0);
+    assert.equal(due.due, true);
+    const fresh = productionPanel(bundleWithPeriods(), worldFor({}), 7, 1060)!;
+    assert.equal(fresh.startedAt, 0);
+    assert.equal(fresh.due, true);
+  });
+
+  it('matches the server default until a period has been chosen', () => {
+    const view = productionPanel(
+      bundleWithPeriods(),
+      worldFor({ cp: 0, lastAccruedAt: 0 }),
+      7,
+      1000,
+    )!;
+    // buildingState() defaults cp to 1, so the server collects on the 5-minute
+    // cycle until the player explicitly chooses a period.
+    assert.equal(view.period, 1);
+    assert.equal(view.options.find((option) => option.active)?.period, 1);
+  });
+
+  it('is null for a building that cannot choose a period', () => {
+    const plain = item({ id: 3, name: 'House', collect: 10, collect_type: 'w' });
+    const unit = item({
+      id: 4,
+      type: 'u',
+      collect: 10,
+      collect_type: 'w',
+      properties: { multiCollectable: 1 },
+    });
+    assert.equal(
+      productionPanel(bundleWithPeriods([plain]), worldFor({}, 3), 7, 1000),
+      null,
+    );
+    assert.equal(
+      productionPanel(bundleWithPeriods([unit]), worldFor({}, 4), 7, 1000),
+      null,
+    );
+    assert.equal(productionPanel(bundleWithPeriods(), worldFor({}, 2), 99, 1000), null);
+  });
+});
+
 describe('the inventory panel', () => {
   it('lists the server\'s stored items, named by the content', () => {
     const b = bundle({ items: [item({ id: 1, name: 'House I' })] });
@@ -450,7 +578,7 @@ describe('the inventory panel', () => {
       privateState: {},
     } as WorldSnapshot;
     assert.deepEqual(inventoryItems(b, w), [
-      { itemId: 1, quantity: 2, name: 'House I', type: 'b' },
+      { itemId: 1, quantity: 2, name: 'House I', type: 'b', categoryId: 1 },
     ]);
   });
 
@@ -461,5 +589,21 @@ describe('the inventory panel', () => {
       privateState: {},
     } as WorldSnapshot;
     assert.deepEqual(inventoryItems(bundle(), w), []);
+  });
+});
+
+describe('the army panel', () => {
+  it('bridges the server-owned units and the content names and group types', () => {
+    const w = {
+      maps: [{ id: 0, items: {}, store: { '1001': 2 } }],
+      resources: {},
+      privateState: { boughtUnits: [1001] },
+    } as WorldSnapshot;
+    const content = bundle({
+      items: [item({ id: 1001, name: 'Soldier', type: 'u', group_type: 'INFANTRY' })],
+    });
+    assert.deepEqual(armyPanel(content, w, 0), [
+      { itemId: 1001, name: 'Soldier', groupType: 'INFANTRY', available: 2, allowed: true },
+    ]);
   });
 });

@@ -1578,6 +1578,124 @@ progression and rewards remain server-side.
 
 ---
 
+## G5.2 — Gameplay Systems Completion & UI/UX Refinement
+
+*Status: **the implemented systems are browser-verified**; the four team quests,
+the positional simulator, original art, mobile builds and production release are
+not claimed. This milestone is recorded here, outside the `## Group X` sections
+above, so `node scripts/check-roadmap.mjs` still counts the same **401** items.
+G5.1's record above is preserved unchanged. Implemented, partial, blocked and
+non-goal work are kept distinct; an unfinished screen is not counted as complete.*
+
+**Verified outcomes (every command below was run on branch
+`feat/g5-2-gameplay-systems`):**
+
+- **Authoritative rewards and the result screen.** The native `end_quest`
+  outcome now carries the exact rows the server paid, and a minimal receipt in
+  `privateState.lastQuestReward` lets a reconnecting client rebuild the result
+  without replaying a payment (`packages/server/src/apply.ts`,
+  `packages/client/src/featurestate.ts`, `apps/client/src/ui/quests.tsx`).
+  The rendered result has dedicated victory and defeat text, a rank, reward
+  rows, next-mission, replay/retry and return actions in the **one** shared
+  dialog. Failed and replayed quests still pay nothing.
+- **Collection-period selection.** The factory info panel opens a four-option
+  selector whose waits and multipliers are read from the content bundle
+  (5/60/240/480 minutes at 0.25/1/2/3×). Choosing one sends `activate`; the
+  server alone writes `cp` and `lastAccruedAt`, checks capacity and construction,
+  refuses an undue cycle, and restarts the cycle on collection. A
+  **deterministic clock fixture** (`scripts/e2e-clock.mjs`, loaded only by the
+  e2e server child) crosses the five-minute cycle without sleeping; the
+  browser's clock is untouched, so the countdown remains presentation only.
+- **Army and team.** The storage panel draws one row per owned unit from
+  `armyView` — server store, placed units and finished queues, never a guessed
+  quantity. The briefing's team picker is shown only for the four
+  `QUESTS_WITH_TEAMS` quests; the server validates ownership, content type,
+  group restrictions and size, then binds and echoes the accepted team. A
+  forged team on a non-team quest is refused (HTTP 400 in the e2e).
+- **The full loop in Chrome and Edge.** `node scripts/e2e-test.mjs` ended with
+  `the browsers that ran: chrome, edge` and
+  `OK: a player registers, signs in, plays, and signs in again after a restart.`
+  New rendered-DOM assertions, on top of every G5.1 assertion, reported:
+  `UI: 3 reward row(s) match the wallet delta and the persisted receipt (gold +0, xp +0, cash +5)`;
+  `UI: picked the 5-minute period (+0 w), the server accepted the due Collect and paid its own 0 wood; the cycle restarted at …`;
+  `UI: the army panel shows the placed Worker I (×1) from the server's map`;
+  `UI: a forged team was refused on the non-team quest (HTTP 400)`;
+  `UI: after reload the receipt rebuilt 3 reward row(s) and the five-minute cycle is still …`.
+  After the server restart both UI players signed in again with the same award,
+  the same reward receipt and the same production cycle.
+- **Gates:** `pnpm test` (**1696 pass, 0 fail**), `pnpm test:integration`
+  (**64 pass**), `pnpm typecheck`, `pnpm lint` (138 browser modules, none needs
+  node), `pnpm build:content` (build id `63e067bd…`), the client build and its
+  reproducibility check, `node scripts/verify-command-catalogue.mjs`,
+  `node scripts/check-roadmap.mjs` (**401 items**),
+  `node scripts/check-report-sync.mjs`, `node scripts/run-cheat-battery.mjs`
+  (**11 attacks had no effect**), `node scripts/golden-master.mjs` (50
+  scenarios, 0 differences), `node scripts/check-coverage.mjs` (97.60 % lines /
+  85.50 % functions / 95.53 % branches, above every floor),
+  `node scripts/smoke-test-client.mjs` (Chrome and Edge; Firefox not run),
+  `node scripts/verify-upstream.mjs`, `node --expose-gc scripts/soak-server.mjs`
+  (no state drift), `node scripts/load-test.mjs` (671 commands/s, budgets met),
+  `node scripts/check-adrs.mjs`, `node scripts/check-security-review.mjs`,
+  `node scripts/check-corrections.mjs`, `node scripts/check-release.mjs`,
+  `node scripts/build-asset-manifest.mjs`, `pnpm audit --audit-level=high`
+  (one moderate advisory, none high/critical) and the Tauri `cargo check`,
+  `cargo test` and `cargo fmt --check` all passed.
+  `node scripts/build-licence-report.mjs --check` passed.
+- **The licensing / no-Flash ordering quirk was investigated, not disabled.**
+  In the CI ordering — the `verify` job never builds the client — both checks
+  pass: `check-no-flash.mjs` reports `3 shipped trees (1 absent), 2 files
+  scanned` and `OK: nothing that ships needs Flash`, and `check-licensing.mjs`
+  reports `OK: the licensing position holds`. After a local client build they
+  report two classes of false positive only: the copied `content-bundle.json`
+  and `frame-manifest.json` contain upstream asset **identifiers** ending in
+  `.swf` (the client uses them as atlas lookup keys, not URLs), and the two
+  OFL-licensed substitute font **filenames** `Nunito-ArialRoundedBold.woff2`
+  and `RubikMonoOne-KomikaAxis.woff2` are named after the faces they replace.
+  No SWF file, Flash runtime or proprietary font is shipped. No checker was
+  changed or weakened; the limitation is recorded here as in G5.1.
+- **Screen inventory.** Four entries in `re/data/ui-screens.json` now name a
+  real model path — the army unit cell, the inventory items tab, the reward
+  screen and the team-selection window — so the 260 screens read **89
+  implemented, 52 dropped, 119 planned** (G5.1: 85/52/123). The four team
+  quests, the collections-content tab and the next-mission confirmation remain
+  planned where the clone has only an inline action.
+
+**Partial, not complete:**
+
+- A freshly built producer stores a base amount of zero, so its correct
+  collection payout in the e2e is `+0 w`. The browser proves the period choice,
+  server-clock readiness, acceptance, exact prediction and next cycle; the
+  non-zero multiplier arithmetic is proved by the deterministic applier tests,
+  not by fabricating a stored amount in the live save.
+- A submitted team is validated, bound and echoed by the server and feeds its
+  authoritative `playerUnitsAlive` state. There is **no** positional combat
+  simulator: the team changes the server's state, but the battle is still the
+  rules engine's deterministic ledger, not the original's unit simulation.
+- The reward receipt rebuilds the result through the client's own
+  `showLastReward` handle; there is no separate player-facing "Rewards" button
+  in the base UI.
+
+**Externally blocked:** the four `QUESTS_WITH_TEAMS` quests carry the content's
+level-40 gate (`QUESTS_MIN_LEVELS`). An e2e player cannot reach level 40
+legitimately, so no level was fabricated: the picker's rendering and the
+server's acceptance/refusal of teams are proved by the HTTP and unit suite
+(`packages/server/src/quest-army.test.ts`, `apps/server/src/quest-endpoints.test.ts`)
+and by the forged-team check in the browser.
+
+**Explicit non-goals for G5.2:** the positional simulator, the original Zynga
+art/audio/fonts, the mobile shell and mobile builds, signed installers and a
+production release. Firefox and a real phone remain external platform blockers.
+
+**Remaining gaps:** the mobile shell (Group G5) is still not implemented; the
+two licensing/no-Flash checks must still be run before the client build or on a
+cleaned tree, as in CI; the four level-40 team quests need a legitimately
+high-level save for a browser happy-path run; and the insert-unit expansion UI
+and full collections-content tabs remain deferred. No change here weakens the
+server's authority: combat, resources, progression and rewards remain
+server-side.
+
+---
+
 ## Group H — Desktop Shell & Release
 
 *Outcome: a standalone, signed, updatable desktop executable.*

@@ -17,6 +17,7 @@ import {
   QUEST_ID_10_SPECIAL_OPS,
   QUEST_ID_13_TYRANNOSAURUS,
   QUEST_ID_15_HARDCORE1,
+  QUEST_ID_19_HARDCORE5,
   QUEST_ID_22_HARDCORE9,
   QUEST_ID_23_HARDCORE10,
   QUEST_ID_WEEKLY_01,
@@ -25,6 +26,9 @@ import {
   NUM_STORY_QUESTS,
   WEEKLY_BOT_REFS,
   WEEKLY_CASH_PER_BOT,
+  QUESTS_WITH_TEAMS,
+  WEEKLY_PLAYER_ARMY,
+  type Army,
   addQuestCounter,
   advanceSimpleChapter,
   applyQuestVar,
@@ -829,5 +833,43 @@ describe('the set_quest_var command', () => {
       command: 'set_quest_var',
       args: ['killed', '["boss1"]'],
     });
+  });
+});
+
+describe('team quests and the player army', () => {
+  it('names exactly the four level-40 team quests', () => {
+    assert.deepEqual([...QUESTS_WITH_TEAMS].sort(), [
+      '100000021',
+      '100000022',
+      '100000025',
+      '100000026',
+    ]);
+    for (const id of QUESTS_WITH_TEAMS) {
+      const spec = getQuestSpec(id)!;
+      assert.ok(spec.playIndex >= 19 && spec.playIndex <= 22, `${id} has play index ${spec.playIndex}`);
+    }
+  });
+
+  it('derives playerUnitsAlive from the counts in the submitted army', () => {
+    const army: Army = [
+      { unitId: 1017, count: 2 },
+      { unitId: 1035, count: 1 },
+    ];
+    assert.equal(
+      prepareQuest(QUEST_ID_19_HARDCORE5, { army }).playerUnitsAlive,
+      3,
+    );
+    assert.equal(
+      prepareQuest(QUEST_ID_19_HARDCORE5, { army: [{ unitId: 1017, count: 7 }] })
+        .playerUnitsAlive,
+      7,
+    );
+  });
+
+  it('still ignores a submitted army on the weekly quest', () => {
+    const weekly = prepareQuest(QUEST_ID_WEEKLY_01, {
+      army: [{ unitId: 1017, count: 99 }],
+    });
+    assert.equal(weekly.playerUnitsAlive, WEEKLY_PLAYER_ARMY.length);
   });
 });

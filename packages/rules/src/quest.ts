@@ -120,6 +120,31 @@ export const QUEST_ID_22_HARDCORE9 = '100000026';
 export const QUEST_ID_23_HARDCORE10 = '100000025';
 
 /**
+ * The four level-40 quests whose client popup offers team selection.
+ *
+ * `Config.QUESTS_WITH_TEAMS` (`core/Config.as:160`) names them; the same four
+ * carry the level-40 gate in `globals.QUESTS_MIN_LEVELS`. They are the only
+ * quests where a player-chosen army may be sent. Everywhere else the quest
+ * captures the player's units itself, so a submitted team must be refused.
+ */
+export const QUESTS_WITH_TEAMS: ReadonlySet<string> = new Set([
+  QUEST_ID_19_HARDCORE5,
+  QUEST_ID_20_HARDCORE6,
+  QUEST_ID_22_HARDCORE9,
+  QUEST_ID_23_HARDCORE10,
+]);
+
+/**
+ * The largest army a team quest may field.
+ *
+ * This is a server-side safety cap, not a value recovered from the original
+ * client: an untrusted request must not be able to declare an enormous army.
+ * The accepted count feeds `playerUnitsAlive`, so capping it also bounds that
+ * authoritative state.
+ */
+export const MAX_TEAM_SIZE = 20;
+
+/**
  * The client's play order (`quest/Quest.as:192`).
  *
  * The index is load-bearing: it is the quest's *rank key*
@@ -1569,10 +1594,21 @@ export function xpForKill(gold: number, subcatFunctional?: number): number {
   return xp;
 }
 
+/** One unit type in an army, with the count the server accepted. */
+export interface ArmyEntry {
+  /** The content id of the unit. */
+  readonly unitId: number;
+  /** How many of that unit are fielded. */
+  readonly count: number;
+}
+
+/** A player army, as passed to `prepareQuest` and sent on a team quest. */
+export type Army = readonly ArmyEntry[];
+
 /** Options for `prepareQuest`. */
 export interface PrepareQuestOptions {
   /** The player's army: unit id and count. */
-  readonly army?: readonly { readonly unitId: number; readonly count: number }[];
+  readonly army?: Army;
   /** The difficulty the quest starts at. */
   readonly difficulty?: QuestDifficulty;
   /** Whether the player already has a rank for this quest. */

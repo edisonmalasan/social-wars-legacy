@@ -16,7 +16,7 @@ import {
   Tutorial,
   type TutorialStep,
 } from '@swl/client';
-import { tutorialState } from '@swl/rules';
+import { tutorialState, type Army } from '@swl/rules';
 
 import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH } from './renderer.ts';
@@ -35,6 +35,7 @@ import {
 import type { CommandOutcome, NativeCommand, NativeResponse } from '@swl/protocol';
 import type { ContentBundle, ContentItem } from '@swl/content';
 import {
+  activate,
   buy,
   claimDailyBonus,
   completeTutorial,
@@ -55,6 +56,11 @@ import {
   endQuest,
   questActionOnServer,
   questDifficulty,
+  levelOf,
+  lastQuestReward,
+  questResultActionChoice,
+  type QuestResultAction,
+  questResultFromReceipt,
   questResultView,
   reportQuestKill,
   resultDialog,
@@ -65,6 +71,7 @@ import {
   type QuestChoice,
   type QuestLedgerSummary,
   type QuestResult,
+  type QuestResultView,
   type QuestStartBody,
 } from '@swl/client';
 
@@ -72,7 +79,14 @@ import { mountUi } from './ui/mount.tsx';
 import { uiCss } from './ui/css.ts';
 import type { TutorialOverlayProps } from './ui/tutorial.tsx';
 import type { QuestPanelView } from './ui/quests.tsx';
-import { questViewOptions } from './ui/state.ts';
+import {
+  armyPanel,
+  productionPanel,
+  questMinLevels,
+  questRanks,
+  questViewOptions,
+} from './ui/state.ts';
+import { PRODUCTION_DIALOG_ID } from './ui/info.tsx';
 import {
   CLOSED_DIALOG,
   closeDialog,
@@ -250,6 +264,15 @@ export interface ClientHandle {
   /** Close the shared dialog. */
   dismissDialog?: () => void;
   /**
+   * The last reward the server persisted, rebuilt as a result view.
+   *
+   * This reads the save's receipt — it never replays `end_quest` — so a
+   * reconnecting client can show the same rows the server already paid.
+   */
+  lastReward?: () => QuestResultView | null;
+  /** Open that persisted reward in the one shared dialog. */
+  showLastReward?: () => boolean;
+  /**
    * The client's own request builders.
    *
    * The end-to-end test drives them, so the test exercises the request
@@ -310,6 +333,8 @@ export interface ClientHandle {
   reportQuestKill: typeof reportQuestKill;
   /** The `end_quest` request, whose reward the server computes. */
   endQuest: typeof endQuest;
+  /** The `activate` request, whose period the server validates and times. */
+  activate: typeof activate;
   /** The active quest read from the server's answer, never fabricated. */
   activeQuest: () => ActiveQuestStateView | null;
 }
@@ -525,8 +550,16 @@ async function main(): Promise<void> {
   /** One quest request at a time; a rapid double-click must not send two. */
   let questBusy = false;
 
+  /** Close a period dialog that is about to lose its selected building. */
+  function closeProductionDialog(): void {
+    if (dialogState.dialog?.id === PRODUCTION_DIALOG_ID) {
+      dialogState = closeDialog(dialogState);
+    }
+  }
+
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
+    const now = Math.floor(Date.now() / 1000);
     ui?.draw(world, placing, selected, neighbours, tutorialProps(), {
       dialog: dialogState,
       feedback,
@@ -542,18 +575,43 @@ async function main(): Promise<void> {
       // the request so the HUD's button stays disabled until it settles.
       onClaimBonus: () => run([claimDailyBonus()]),
       onQuestPick: openQuestSlot,
-      onQuestStart: (questId, difficulty) => {
-        void beginQuest(questId, difficulty);
+      onQuestStart: (questId, difficulty, team) => {
+        void beginQuest(questId, difficulty, team);
       },
       onQuestAction: (questId, action) => {
         void applyQuestGesture(questId, action);
       },
+      // Both gestures are gated on the server's ranks and unlock levels, the
+      // same authoritative reading that rendered their buttons.
+      onQuestRetry: (questId) => openResultQuest(questId, 'retry'),
+      onQuestNext: (questId) => openResultQuest(questId, 'next'),
       selectedIso,
-      now: Math.floor(Date.now() / 1000),
+      now,
       onUpgrade,
       onFinish,
       onTrain,
       onTake,
+      // The periods are the content's and the cycle is the server's; the
+      // selector only sends a request and reads the answer as feedback.
+      production: productionPanel(content, world, selectedIso, now),
+      onOpenProduction: () => {
+        if (selectedIso === null) {
+          gestureRefusal('no building selected');
+          return;
+        }
+        dialogState = openDialog(
+          dialogState,
+          PRODUCTION_DIALOG_ID,
+          'confirm',
+          'Collection period',
+        );
+        drawInterface();
+      },
+      onActivate: (period) => {
+        if (selectedIso === null) return;
+        closeProductionDialog();
+        void run([activate(selectedIso, period)]);
+      },
     });
   }
 
@@ -596,11 +654,51 @@ async function main(): Promise<void> {
       gestureRefusal('that quest is still locked');
       return;
     }
-    const briefing = briefingView(choice, chosenDifficulty);
+    const briefing = briefingView(
+      choice,
+      chosenDifficulty,
+      armyPanel(content, world, Math.floor(Date.now() / 1000)),
+    );
     questPanel = { kind: 'briefing', briefing };
     const panel = briefingDialog(briefing);
     dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
     drawInterface();
+  }
+
+  /**
+   * The server readings the result screen needs for its next-step actions.
+   *
+   * The ranks come from the world the server just answered with; the unlock
+   * levels come from the content. Neither is a client guess about progression.
+   */
+  function resultQuestOptions() {
+    return {
+      ranks: questRanks(world),
+      minLevels: questMinLevels(content),
+      playerLevel: levelOf(world),
+      activeQuestId: activeQuestState(world)?.questId ?? null,
+    };
+  }
+
+  /**
+   * Open a result action's mission through the same authoritative slot path.
+   *
+   * The gate and the choice both come from the server's rank keyed by play
+   * index — never from `questChoices`/`chapterMap`, whose one-based slots see
+   * a freshly unlocked mission as locked. A null choice fails closed.
+   */
+  function openResultQuest(questId: string, action: QuestResultAction): void {
+    const panel = questPanel;
+    if (!panel || panel.kind !== 'result') {
+      gestureRefusal('that mission is not available');
+      return;
+    }
+    const choice = questResultActionChoice(panel.result, questId, action, resultQuestOptions());
+    if (!choice) {
+      gestureRefusal('that mission is not available');
+      return;
+    }
+    openQuestSlot(choice);
   }
 
   /** The tutorial's drawing, or null when it is not running. */
@@ -677,6 +775,7 @@ async function main(): Promise<void> {
   function onPick(itemId: number, type: ItemType): void {
     // The menu entry carries its own wire type: a unit must be requested as
     // a unit, not as the building the old code hardcoded here.
+    closeProductionDialog();
     interaction.beginPlacement(itemId, type);
     placing = itemId;
     placingStored = null;
@@ -693,6 +792,7 @@ async function main(): Promise<void> {
    * the item is already the server's, and only its position is chosen here.
    */
   function onPlaceStored(entry: StoredItemView): void {
+    closeProductionDialog();
     interaction.beginPlacement(entry.itemId, entry.type);
     placing = entry.itemId;
     placingStored = entry;
@@ -818,7 +918,9 @@ async function main(): Promise<void> {
       return;
     }
 
-    // Otherwise the click selects what is under it.
+    // Otherwise the click selects what is under it. A period dialog belongs
+    // to the building that was selected when it opened, not to the next one.
+    closeProductionDialog();
     const found = itemsByTile(world).get(`${tile.tx},${tile.ty}`);
     if (!found) {
       interaction.clear();
@@ -889,8 +991,9 @@ async function main(): Promise<void> {
   async function startQuest(
     questId: string,
     difficulty?: number,
+    team?: Army,
   ): Promise<QuestResult<QuestStartBody>> {
-    const result = await startQuestOnServer(signedIn, questId, difficulty);
+    const result = await startQuestOnServer(signedIn, questId, difficulty, team);
     world = await fetchWorld();
     drawInterface();
     return result;
@@ -926,15 +1029,22 @@ async function main(): Promise<void> {
   }
 
   /** The briefing's Start button: ask the server, then host the live panel. */
-  async function beginQuest(questId: string, difficulty: 1 | 2 | 3): Promise<void> {
+  async function beginQuest(
+    questId: string,
+    difficulty: 1 | 2 | 3,
+    team?: Army,
+  ): Promise<void> {
     if (questBusy) return;
     questBusy = true;
     drawInterface();
     try {
-      const result = await startQuest(questId, difficulty);
+      const result = await startQuest(questId, difficulty, team);
       if (!result.ok || !result.body) {
+        // The server's typed code is shown through the one feedback channel;
+        // the client never turns a refusal into a local quest state.
+        const reason = result.serverError ? ` · ${result.serverError}` : '';
         feedback = [
-          { tone: 'error', text: `The server refused the quest start (${result.status}).` },
+          { tone: 'error', text: `The server refused the quest start (${result.status})${reason}.` },
         ];
         drawInterface();
         return;
@@ -966,12 +1076,15 @@ async function main(): Promise<void> {
             ? { type: 'strike', ref: action.ref }
             : { type: action.action, ref: action.ref };
         const result = await questAction(questId, request);
+        // Show the server's typed code, the way a refused quest start does,
+        // so a refusal is never just a bare status number.
+        const reason = result.serverError ? ` · ${result.serverError}` : '';
         feedback = result.ok
           ? [{ tone: 'success', text: 'The server applied the quest action.' }]
           : [
               {
                 tone: 'error',
-                text: `The server refused the quest action (${result.status}).`,
+                text: `The server refused the quest action (${result.status})${reason}.`,
               },
             ];
         drawInterface();
@@ -986,7 +1099,9 @@ async function main(): Promise<void> {
       // A player's gesture. The server's outcome — never a client condition —
       // becomes the result dialog, including its rewards when it answered any.
       const result = await run([endQuest(questId, chosenDifficulty)]);
-      const view = questResultView(questId, result.outcome ?? null);
+      // The world has been refreshed by `run`, so the ranks here are the
+      // server's post-quest ones — the base for the next-mission action.
+      const view = questResultView(questId, result.outcome ?? null, undefined, resultQuestOptions());
       questPanel = { kind: 'result', result: view };
       const panel = resultDialog(questId, view);
       dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
@@ -1011,6 +1126,20 @@ async function main(): Promise<void> {
       dialogState = closeDialog(dialogState);
       drawInterface();
     },
+    lastReward: () => {
+      const receipt = lastQuestReward(world);
+      return receipt ? questResultFromReceipt(receipt, resultQuestOptions()) : null;
+    },
+    showLastReward: () => {
+      const receipt = lastQuestReward(world);
+      if (!receipt) return false;
+      const view = questResultFromReceipt(receipt, resultQuestOptions());
+      questPanel = { kind: 'result', result: view };
+      const panel = resultDialog(view.questId, view);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+      drawInterface();
+      return true;
+    },
     claimDailyBonus,
     buy,
     framesPerSecond: () => framesPerSecond,
@@ -1022,6 +1151,7 @@ async function main(): Promise<void> {
     questAction,
     reportQuestKill,
     endQuest,
+    activate,
     activeQuest: () => activeQuestState(world),
     visibleSprites: () =>
       scene.filter(

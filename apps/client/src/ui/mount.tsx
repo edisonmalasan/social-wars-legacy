@@ -19,9 +19,11 @@ import type {
   StoredItemView,
   WorldSnapshot,
 } from '@swl/client';
+import type { Army } from '@swl/rules';
 import type { ContentBundle } from '@swl/content';
 
 import type { QuestPanelView } from './quests.tsx';
+import { armyPanel, type ProductionPanelView } from './state.ts';
 import { Root } from './root.tsx';
 import type { TutorialOverlayProps } from './tutorial.tsx';
 
@@ -39,10 +41,14 @@ export interface UiOverlayState {
   readonly questBusy?: boolean;
   /** The player picked an opened chapter slot. */
   readonly onQuestPick?: (choice: QuestChoice) => void;
-  /** The player asked to start a quest. */
-  readonly onQuestStart?: (questId: string, difficulty: QuestDifficulty) => void;
+  /** The player asked to start a quest, with an optional chosen team. */
+  readonly onQuestStart?: (questId: string, difficulty: QuestDifficulty, team?: Army) => void;
   /** The player pressed a quest action. */
   readonly onQuestAction?: (questId: string, action: QuestActionChoice) => void;
+  /** The player asked to retry (or replay) a finished mission. */
+  readonly onQuestRetry?: (questId: string) => void;
+  /** The player asked to open the next mission the server made available. */
+  readonly onQuestNext?: (questId: string) => void;
   /** The selected element's map id, for its server attribute bag. */
   readonly selectedIso?: number | null;
   /** The client's unix second, for on-screen countdowns. */
@@ -59,6 +65,12 @@ export interface UiOverlayState {
   readonly onTrain?: (unitItemId: number) => void;
   /** The player asked to take the finished unit out of the queue. */
   readonly onTake?: () => void;
+  /** The selected building's production cycle, when it can choose one. */
+  readonly production?: ProductionPanelView | null;
+  /** The player asked to open the collection-period selector. */
+  readonly onOpenProduction?: () => void;
+  /** The player picked one of the content's collection periods. */
+  readonly onActivate?: (period: number) => void;
 }
 
 /** The mounted interface. */
@@ -106,6 +118,7 @@ export function mountUi(
           feedback={overlays.feedback}
           questPanel={overlays.questPanel}
           questBusy={overlays.questBusy}
+          army={armyPanel(bundle, world, overlays.now ?? Math.floor(Date.now() / 1000))}
           onDialogDismiss={overlays.onDialogDismiss}
           onQuestPick={overlays.onQuestPick}
           onQuestStart={overlays.onQuestStart}
@@ -119,6 +132,9 @@ export function mountUi(
           onFinish={overlays.onFinish}
           onTrain={overlays.onTrain}
           onTake={overlays.onTake}
+          production={overlays.production}
+          onOpenProduction={overlays.onOpenProduction}
+          onActivate={overlays.onActivate}
         />,
       ),
   };

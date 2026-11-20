@@ -40,6 +40,7 @@ import {
   verifyFrameAny,
   type ServerKey,
 } from '@swl/protocol/commandphp';
+import type { CommandResult } from '@swl/protocol';
 
 import {
   applyCommandCost,
@@ -110,6 +111,16 @@ export interface CommandOutcome {
   refused?: string;
   /** The world after the command. */
   world: ShimWorld;
+  /**
+   * The typed result of a successful command, when it has one.
+   *
+   * This is the *native* result — a reward row the server actually granted,
+   * a state patch it actually applied. The native endpoint forwards it
+   * verbatim; the legacy shim never reads it (the legacy body stays exactly
+   * `{result:'success'}`). Optional so that appliers which do not report a
+   * result keep working unchanged.
+   */
+  result?: CommandResult;
 }
 
 /** Applies one command's semantics. The shim owns the cost. */

@@ -323,12 +323,33 @@ export function uiCss(): string {
   width: 220px;
   max-height: 240px;
   box-sizing: border-box;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   padding: 8px 10px;
   border: 1px solid #38445a;
   border-radius: 4px;
   background: #131a24;
   pointer-events: auto;
+}
+
+/* The head holds the title and its category tabs; only the list below it
+   scrolls. Long contents never push the tabs out of the 760x600 stage. */
+.swl-inventory-head {
+  flex: none;
+}
+
+.swl-inventory-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 5px;
+}
+
+.swl-inventory-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .swl-inventory-title {
@@ -511,6 +532,73 @@ export function uiCss(): string {
   color: #8d97a8;
   font-size: calc(10px * var(--swl-font-scale-body, 1));
 }
+
+/* --- The collection-period selector ------------------------------------ */
+
+.swl-info-production {
+  margin-top: 5px;
+  color: var(--swl-accent);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-info-period-button {
+  width: 100%;
+  margin-top: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  background: var(--swl-surface-raised);
+  color: var(--swl-ink);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-info-period-button:hover { border-color: var(--swl-accent); }
+
+.swl-production {
+  display: flex;
+  flex-direction: column;
+  gap: var(--swl-gap);
+}
+
+.swl-production-head { font-weight: 700; }
+
+.swl-production-cycle { color: var(--swl-accent); }
+
+.swl-production-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--swl-gap);
+}
+
+.swl-production-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  background: var(--swl-surface-raised);
+  text-align: left;
+}
+
+.swl-production-option:hover { border-color: var(--swl-accent); }
+
+.swl-production-option-active {
+  border-color: var(--swl-accent);
+  background: #2a2a20;
+}
+
+.swl-production-wait { font-weight: 700; }
+
+.swl-production-mult { color: var(--swl-accent); }
+
+.swl-production-amount,
+.swl-production-note {
+  color: var(--swl-ink-muted);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-production-note { margin: 0; }
 
 /* --- The recruitment panel --------------------------------------------- */
 
@@ -883,7 +971,11 @@ export function uiCss(): string {
 
 .swl-dialog-body {
   margin-top: var(--swl-gap);
+  /* A flex child must be allowed to shrink before overflow-y can scroll,
+     so a long briefing stays inside the 760x600 stage. */
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   color: var(--swl-ink);
   font-size: calc(12px * var(--swl-font-scale-body, 1));
   line-height: 1.4;
@@ -911,6 +1003,13 @@ export function uiCss(): string {
 .swl-quest-won { color: var(--swl-success); }
 .swl-quest-lost { color: var(--swl-danger); }
 
+.swl-quest-result-heading,
+.swl-quest-rank,
+.swl-quest-reward-title {
+  margin: 0;
+  color: var(--swl-ink-muted);
+}
+
 .swl-quest-difficulty {
   display: flex;
   align-items: center;
@@ -923,6 +1022,37 @@ export function uiCss(): string {
 
 .swl-quest-difficulty legend {
   padding: 0 4px;
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-team {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: var(--swl-gap);
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+}
+
+.swl-quest-team legend {
+  padding: 0 4px;
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-team-row {
+  display: flex;
+  align-items: center;
+  gap: var(--swl-gap);
+  color: var(--swl-ink-muted);
+}
+
+.swl-quest-team-row input[type='number'] {
+  width: 4rem;
+}
+
+.swl-quest-team-echo {
+  margin: 0;
   color: var(--swl-ink-muted);
 }
 

@@ -40,7 +40,13 @@ import type { CostContent, DartsGame } from '@swl/rules';
 import { createApp, type AppRequest } from './app.ts';
 import { DEFAULT_LIMITS } from './limits.ts';
 import { MemoryPlayerStore } from '@swl/server';
-import { contentItems, marketRules, populationRules } from '@swl/server';
+import {
+  collectPeriods,
+  contentItems,
+  marketRules,
+  populationRules,
+  reactivateWonderDiscount,
+} from '@swl/server';
 import { createApplier, createQuestHelpers, initialWorld, tracedDatabase } from '@swl/server';
 
 /** The port to listen on. */
@@ -219,11 +225,14 @@ async function main(): Promise<void> {
 
   // One set of content deps for both the command applier and the authoritative
   // quest helpers: the server seed and the quest events are the server's own,
-  // never supplied by a client request.
+  // never supplied by a client request. The periods, their multipliers and
+  // the reactivation discount are the content's, not literals here.
+  const globals = globalsOf(bundle);
   const applierDeps = {
     now: () => Math.floor(Date.now() / 1000),
     tzOffsetHours: 0,
-    collectPeriods: { minutes: [5, 60, 240, 480], multiplier: [0.25, 1, 2, 3] },
+    collectPeriods: collectPeriods(globals),
+    reactivateWonderDiscount: reactivateWonderDiscount(globals),
     dailyBonus: { goldRewards: [100, 250, 500, 1000, 0], heroItemId: 1001 },
     // The content, so the applier can check the **rules**: the level,
     // the population and the limits are all the game's own.
@@ -235,19 +244,19 @@ async function main(): Promise<void> {
     // Deterministic strike damage, from the server's own seed.
     serverSeed: process.env['SWL_SERVER_SEED'] ?? 'swl-server-v1',
     offerPacks: content.offerPacks,
-    populationRules: populationRules(globalsOf(bundle)),
+    populationRules: populationRules(globals),
     // The darts schedule and the market prices are the content's own.
     dartsItems: bundle.dartsItems,
-    market: marketRules(globalsOf(bundle)),
+    market: marketRules(globals),
     // Chapters and assault quests are paid from the content's own tables.
     // The chapter reward rows come straight from REWARDS_CHAPTERS; the XP
     // context for a quest's static reward row is derived from the level table.
-    chapterRewards: globalsOf(bundle)['REWARDS_CHAPTERS'],
+    chapterRewards: globals['REWARDS_CHAPTERS'],
     questExpRequired: questExpRequiredOf(bundle),
     // Magic and tech: the ten spells and the globals their economy reads.
     magic: {
       spells: magicCatalogFrom(Array.isArray(bundle.magics) ? bundle.magics : []),
-      globals: globalsOf(bundle),
+      globals,
     },
   };
   const questHelpers = createQuestHelpers(applierDeps);

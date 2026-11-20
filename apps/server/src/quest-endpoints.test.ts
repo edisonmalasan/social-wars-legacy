@@ -10,8 +10,10 @@ import assert from 'node:assert/strict';
 
 import {
   costContentFrom,
+  MAX_TEAM_SIZE,
   QUEST_ID_02_CENTRAL_NUCLEAR,
   QUEST_ID_03_DEFEND_CONVOY_AUTO,
+  QUEST_ID_19_HARDCORE5,
 } from '@swl/rules';
 import {
   createApplier,
@@ -32,6 +34,7 @@ import { createApp, type AppRequest } from './app.ts';
 
 const Q02 = QUEST_ID_02_CENTRAL_NUCLEAR;
 const Q03 = QUEST_ID_03_DEFEND_CONVOY_AUTO;
+const Q19 = QUEST_ID_19_HARDCORE5;
 
 const ITEMS = new Map<number, ApplierItem>([
   [1017, { id: 1017, name: 'goodBoy', type: 'u', life: 1 } as ApplierItem],
@@ -68,9 +71,17 @@ function freshWorld(): ShimWorld {
   };
 }
 
+/** A world where the server's own store really holds two unit types. */
+function teamWorld(): ShimWorld {
+  const world = freshWorld();
+  (world.save.maps[0] as Record<string, unknown>)['store'] = { '1017': 4, '1035': 2 };
+  return world;
+}
+
 function harness(
   over: {
     store?: MemoryPlayerStore;
+    world?: ShimWorld;
     /** Counts helper calls, so a replayed id can be seen reaching the applier. */
     actions?: { value: number };
     starts?: { value: number };
@@ -79,13 +90,14 @@ function harness(
   const sessions = new SessionStore();
   sessions.addPlayer('p1', 'pw');
   const identity = new LegacyIdentityBridge();
-  const store = over.store ?? new MemoryPlayerStore([{ playerId: 'p1', world: freshWorld() }]);
+  const store =
+    over.store ?? new MemoryPlayerStore([{ playerId: 'p1', world: over.world ?? freshWorld() }]);
   const helpers = createQuestHelpers(deps());
   const issued = sessions.authenticate('p1', 'pw', 1000);
   if (!issued.ok) throw new Error('could not authenticate the test player');
-  const beginQuest: QuestStartHelper = (world, questId, difficulty) => {
+  const beginQuest: QuestStartHelper = (world, questId, difficulty, army) => {
     if (over.starts) over.starts.value += 1;
-    return helpers.beginQuest(world, questId, difficulty);
+    return helpers.beginQuest(world, questId, difficulty, army);
   };
   const applyQuestAction: QuestActionHelper = (world, questId, action) => {
     if (over.actions) over.actions.value += 1;
@@ -295,5 +307,146 @@ describe('POST /api/quest/action', () => {
       script: { counters: Record<string, number> };
     };
     assert.equal(active.script.counters['trucksArrived'], 1);
+  });
+});
+
+describe('POST /api/quest/start with a team', () => {
+  const team = [
+    { unitId: 1017, count: 2 },
+    { unitId: 1035, count: 1 },
+  ];
+
+  it('accepts an owned team, persists it bound to the quest and derives playerUnitsAlive', async () => {
+    const { handle, store, token } = harness({ world: teamWorld() });
+    const response = await handle(
+      request('POST', '/api/quest/start', { questId: Q19, team }, token),
+    );
+    assert.equal(response.status, 200);
+    const body = JSON.parse(response.body) as {
+      questId: string;
+      started: boolean;
+      team: typeof team;
+    };
+    assert.deepEqual(body, { questId: Q19, started: true, team });
+    const saved = (await store.get('p1'))!;
+    const active = saved.world.save.privateState['activeQuest'] as {
+      questId: string;
+      team: typeof team;
+      playerUnitsAlive: number;
+    };
+    assert.equal(active.questId, Q19);
+    assert.deepEqual(active.team, team);
+    assert.equal(active.playerUnitsAlive, 3);
+  });
+
+  it('refuses a forged unit with a typed 400 and writes no active quest', async () => {
+    const { handle, store, token } = harness({ world: teamWorld() });
+    const response = await handle(
+      request('POST', '/api/quest/start', {
+        questId: Q19,
+        team: [{ unitId: 9999, count: 1 }],
+      }, token),
+    );
+    assert.equal(response.status, 400);
+    assert.equal((JSON.parse(response.body) as { error: string }).error, 'quest-team-unit-unavailable');
+    const saved = (await store.get('p1'))!;
+    assert.equal(saved.world.save.privateState['activeQuest'], undefined);
+  });
+
+  it('refuses a unit beyond the server-owned quantity with a typed 400', async () => {
+    const { handle, store, token } = harness({ world: teamWorld() });
+    const response = await handle(
+      request('POST', '/api/quest/start', {
+        questId: Q19,
+        team: [{ unitId: 1017, count: 5 }],
+      }, token),
+    );
+    assert.equal(response.status, 400);
+    assert.equal((JSON.parse(response.body) as { error: string }).error, 'quest-team-unit-unavailable');
+    assert.equal((await store.get('p1'))!.world.save.privateState['activeQuest'], undefined);
+  });
+
+  it('refuses excessive, duplicate and malformed teams with a typed 400', async () => {
+    for (const submitted of [
+      [{ unitId: 1017, count: MAX_TEAM_SIZE + 1 }],
+      [{ unitId: 1017, count: 1 }, { unitId: 1017, count: 2 }],
+      'not-an-array',
+      [{ unitId: 1017, count: -1 }],
+    ]) {
+      const { handle, store, token } = harness({ world: teamWorld() });
+      const response = await handle(
+        request('POST', '/api/quest/start', { questId: Q19, team: submitted }, token),
+      );
+      assert.equal(response.status, 400, JSON.stringify(submitted));
+      assert.equal(
+        (JSON.parse(response.body) as { error: string }).error,
+        'quest-team-invalid',
+      );
+      assert.equal((await store.get('p1'))!.world.save.privateState['activeQuest'], undefined);
+    }
+  });
+
+  it('refuses a team on a quest with no team selection', async () => {
+    const { handle, store, token } = harness({ world: teamWorld() });
+    const response = await handle(
+      request('POST', '/api/quest/start', { questId: Q02, team }, token),
+    );
+    assert.equal(response.status, 400);
+    assert.equal((JSON.parse(response.body) as { error: string }).error, 'quest-team-not-supported');
+    assert.equal((await store.get('p1'))!.world.save.privateState['activeQuest'], undefined);
+  });
+
+  it('replays a team request id once, echoing the first accepted team', async () => {
+    const starts = { value: 0 };
+    const { handle, store, token } = harness({ world: teamWorld(), starts });
+    const first = await handle(
+      request('POST', '/api/quest/start', { questId: Q19, team }, token, 'team-start'),
+    );
+    const replay = await handle(
+      request('POST', '/api/quest/start', {
+        questId: Q19,
+        team: [{ unitId: 1017, count: 1 }],
+      }, token, 'team-start'),
+    );
+    assert.equal(first.status, 200);
+    assert.equal(replay.status, 200);
+    assert.equal(replay.body, first.body);
+    // The replay never reaches the applier, so only one start was attempted.
+    assert.equal(starts.value, 1);
+    const active = (await store.get('p1'))!.world.save.privateState['activeQuest'] as {
+      team: typeof team;
+    };
+    assert.deepEqual(active.team, team);
+  });
+
+  it('refuses a second start with a different team and keeps the first', async () => {
+    const { handle, store, token } = harness({ world: teamWorld() });
+    const first = await handle(
+      request('POST', '/api/quest/start', { questId: Q19, team }, token),
+    );
+    const second = await handle(
+      request('POST', '/api/quest/start', {
+        questId: Q19,
+        team: [{ unitId: 1017, count: 1 }],
+      }, token),
+    );
+    assert.equal(first.status, 200);
+    assert.equal(second.status, 409);
+    assert.equal((JSON.parse(second.body) as { error: string }).error, 'quest-already-active');
+    const active = (await store.get('p1'))!.world.save.privateState['activeQuest'] as {
+      team: typeof team;
+    };
+    assert.deepEqual(active.team, team);
+  });
+
+  it('keeps the old behaviour when a client omits the team', async () => {
+    const { handle, store, token } = harness();
+    const response = await handle(request('POST', '/api/quest/start', { questId: Q02 }, token));
+    assert.equal(response.status, 200);
+    assert.deepEqual(JSON.parse(response.body), { questId: Q02, started: true });
+    const active = (await store.get('p1'))!.world.save.privateState['activeQuest'] as {
+      team?: unknown;
+    };
+    assert.equal(active.team, undefined);
   });
 });

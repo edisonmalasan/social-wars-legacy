@@ -14,6 +14,9 @@
  * vendored `villages/initial.json` and the protocol's `GameMap` /
  * `PrivateState` interfaces).
  */
+import { RESOURCE_ORDER, type Reward } from '@swl/protocol';
+import type { Army } from '@swl/rules';
+
 import type { WorldSnapshot } from './session.ts';
 
 /* -------------------------------------------------------------------------
@@ -29,6 +32,26 @@ function record(value: unknown): Record<string, unknown> | null {
 /** Whether a record owns a key. Inherited keys are not server state. */
 function has(source: Record<string, unknown>, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(source, key);
+}
+
+/** Read an echoed army, or nothing when the save does not hold a readable one. */
+function armyOf(value: unknown): Army | undefined {
+  if (!Array.isArray(value) || value.length === 0) return undefined;
+  const out: { unitId: number; count: number }[] = [];
+  for (const raw of value) {
+    const entry = record(raw);
+    if (!entry) return undefined;
+    const unitId = entry['unitId'];
+    const count = entry['count'];
+    if (
+      typeof unitId !== 'number' || !Number.isInteger(unitId) || unitId <= 0 ||
+      typeof count !== 'number' || !Number.isInteger(count) || count <= 0
+    ) {
+      return undefined;
+    }
+    out.push({ unitId, count });
+  }
+  return out;
 }
 
 /** Read a number only when it is finite. */
@@ -285,6 +308,8 @@ export interface ActiveQuestStateView {
   readonly elements: Readonly<Record<string, ActiveQuestElement>>;
   /** The dedupe keys of the events the server has accepted. */
   readonly events: readonly string[];
+  /** The team the server bound to this quest, when one was accepted. */
+  readonly team?: Army;
 }
 
 /**
@@ -307,10 +332,104 @@ export function activeQuestState(world: WorldSnapshot): ActiveQuestStateView | n
       view[ref] = { hp, alive: flag(element['alive']) };
     }
   }
+  const team = armyOf(stored['team']);
   return {
     questId: typeof stored['questId'] === 'string' ? stored['questId'] : null,
     counters: script ? numbers(script['counters']) : {},
     elements: view,
     events: ledger ? strings(ledger['events']) : [],
+    ...(team !== undefined ? { team } : {}),
+  };
+}
+
+/**
+ * The last quest reward the server granted, as a view of the save.
+ *
+ * This is a reading of a past grant, not a reward authority: nothing pays
+ * from it. A reconnecting client uses it to rebuild the result screen
+ * without replaying `end_quest`. An absent or malformed receipt reads as
+ * `null` — the client never fabricates a row the server did not write.
+ */
+export interface LastQuestRewardView {
+  /** The authoritative quest id that was completed. */
+  readonly questId: string;
+  /** The rank the server recorded for the win. */
+  readonly rank: number;
+  /** The exact rows the wallet received. */
+  readonly rewards: readonly Reward[];
+}
+
+/** Read the persisted reward receipt, or `null` when there is none. */
+export function lastQuestReward(world: WorldSnapshot): LastQuestRewardView | null {
+  const stored = record(world.privateState['lastQuestReward']);
+  if (!stored) return null;
+  const questId = stored['questId'];
+  const rank = number(stored['rank']);
+  const rawRewards = stored['rewards'];
+  if (typeof questId !== 'string' || questId === '' || rank === null || !Array.isArray(rawRewards)) {
+    return null;
+  }
+  const allowed = new Set<string>(RESOURCE_ORDER);
+  const rewards: Reward[] = [];
+  for (const entry of rawRewards) {
+    const row = record(entry);
+    const resource = row?.['resource'];
+    const amount = row ? number(row['amount']) : null;
+    if (!row || typeof resource !== 'string' || !allowed.has(resource) || amount === null) {
+      return null;
+    }
+    rewards.push({ resource: resource as Reward['resource'], amount });
+  }
+  return { questId, rank, rewards };
+}
+
+/* -------------------------------------------------------------------------
+ * Production
+ * ---------------------------------------------------------------------- */
+
+/**
+ * A building's production state, as the server keeps it in the map item's
+ * attribute bag.
+ *
+ * Every value is the server's own. A missing or malformed one reads as null —
+ * the client never fills in a period, a multiplier or a countdown of its own.
+ */
+export interface ProductionStateView {
+  /** The chosen 1-based period, or null before one has been chosen. */
+  readonly period: number | null;
+  /** When the server started the current cycle, or null if it never did. */
+  readonly startedAt: number | null;
+  /** The uncollected base amount, or null when absent. */
+  readonly collect: number | null;
+  /** How many units fit inside, or null when absent. */
+  readonly unitCapacity: number | null;
+  /** How many units are inside, or null when absent. */
+  readonly unitsInside: number | null;
+  /** The resource produced, or null when absent. */
+  readonly collectType: string | null;
+}
+
+/**
+ * Read a building's production state, or null when there is no such item.
+ *
+ * An empty attribute bag is a fresh building, not an invented cycle: its
+ * fields read as null and the selector decides what, if anything, to show.
+ */
+export function productionState(
+  world: WorldSnapshot,
+  isoId: number | null,
+): ProductionStateView | null {
+  if (isoId === null) return null;
+  const tuple = world.maps[0]?.items?.[String(isoId)];
+  if (!tuple) return null;
+  const attrs = record(tuple[6]);
+  return {
+    period: attrs ? number(attrs['cp']) : null,
+    startedAt: attrs ? number(attrs['lastAccruedAt']) : null,
+    collect: attrs ? number(attrs['collect']) : null,
+    unitCapacity: attrs ? number(attrs['unitCapacity']) : null,
+    unitsInside: attrs ? number(attrs['unitsInside']) : null,
+    collectType:
+      attrs && typeof attrs['collectType'] === 'string' ? attrs['collectType'] : null,
   };
 }

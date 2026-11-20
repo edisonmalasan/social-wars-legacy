@@ -79,7 +79,12 @@ import {
   addQuestCounter,
   setQuestCounter,
   QUEST_ID_WEEKLY_01,
+  MAX_TEAM_SIZE,
+  QUESTS_WITH_TEAMS,
   WEEKLY_BOT_ITEM_ID,
+  isUnitAllowedInQuest,
+  type Army,
+  type ArmyEntry,
   isQuestVictory,
   finishQuest,
   applyQuestVar,
@@ -98,6 +103,7 @@ import {
   type DailyBonusRules,
   type GoalRuntimeState,
   type QuestProgress,
+  type QuestRewardKey,
   type MagicSpellDefinition,
   isMagicLearned,
   magicUses,
@@ -117,7 +123,9 @@ import {
   type CostOfferPack,
 } from '@swl/rules';
 
-import { addStoreItem, removeStoreItem, storeQuantity } from './mapstore.ts';
+import type { CommandResult, ResourceName, Reward } from '@swl/protocol';
+
+import { addStoreItem, mapStore, removeStoreItem, storeQuantity } from './mapstore.ts';
 import type { CommandApplier, CommandOutcome, ShimWorld } from './shim.ts';
 
 export type { CommandApplier, CommandOutcome, ShimWorld } from './shim.ts';
@@ -193,6 +201,43 @@ export const QUEST_PROGRESS_KEY = 'questProgress';
  */
 export const ACTIVE_QUEST_KEY = 'activeQuest';
 
+/**
+ * The private-state key for the last quest reward the server granted.
+ *
+ * A minimal receipt — quest id, the exact rows that were paid, and the rank
+ * the server recorded — so a reconnecting client can rebuild the result
+ * screen from the save. It is a *reading* of a past grant, never a second
+ * reward authority: nothing pays from it, and replaying `end_quest` cannot
+ * rebuild it (the award is once-only).
+ */
+export const LAST_QUEST_REWARD_KEY = 'lastQuestReward';
+
+/** The persisted reward receipt, in the wire's resource vocabulary. */
+export interface LastQuestReward {
+  /** The authoritative quest id that was completed. */
+  readonly questId: string;
+  /** The rank the server recorded for the win. */
+  readonly rank: number;
+  /** The exact rows the wallet received. */
+  readonly rewards: readonly Reward[];
+}
+
+/**
+ * The quest engine's short reward keys, in the protocol's resource names.
+ *
+ * The wallet mutates with these same short keys; the wire result uses the
+ * protocol's `ResourceName` vocabulary. Keeping the map here (and nowhere in
+ * the client) makes the row the server reports the row it actually paid.
+ */
+const QUEST_REWARD_RESOURCE: Readonly<Record<QuestRewardKey, ResourceName>> = {
+  g: 'gold',
+  x: 'xp',
+  w: 'wood',
+  o: 'oil',
+  s: 'steel',
+  c: 'cash',
+};
+
 /** One element in a quest's server-owned engagement ledger. */
 export interface QuestLedgerElement {
   /** Remaining hit points, seeded from the content item's `life`. */
@@ -219,7 +264,11 @@ export interface QuestLedger {
 }
 
 /** A stored active quest: the rules state plus the server's ledger. */
-export type ActiveQuestState = QuestState & { ledger: QuestLedger };
+export type ActiveQuestState = QuestState & {
+  ledger: QuestLedger;
+  /** The army the server accepted for a team quest, bound to this quest id. */
+  team?: Army;
+};
 
 /** One authoritative action a client asks the server to apply to a quest. */
 export type QuestAction =
@@ -240,6 +289,137 @@ export interface QuestLedgerSummary {
   counters: Readonly<Record<string, number>>;
   elements: Readonly<Record<string, QuestLedgerElement>>;
   events: readonly string[];
+  /** The team the server accepted, echoed so the client never guesses it. */
+  team?: Army;
+}
+
+/** Why a client-submitted team was refused. */
+export type TeamRefusalReason =
+  | 'team-invalid'
+  | 'team-duplicate'
+  | 'team-too-large'
+  | 'team-not-supported'
+  | 'team-unit-unavailable'
+  | 'team-unit-not-allowed';
+
+/** The outcome of parsing or validating an untrusted army. */
+export type ArmyCheck = { ok: true; army: Army } | { ok: false; reason: TeamRefusalReason };
+
+/**
+ * Parse the `team` field of a start request.
+ *
+ * Only whole, positive ids and counts are kept, repeated ids are refused
+ * (never silently double-counted), and the total is capped. This reads only
+ * the request: ownership and per-quest legality are checked later, against the
+ * server's own save.
+ */
+function normaliseArmy(value: unknown): ArmyCheck {
+  if (!Array.isArray(value) || value.length === 0) return { ok: false, reason: 'team-invalid' };
+  const out: ArmyEntry[] = [];
+  const seen = new Set<number>();
+  let total = 0;
+  for (const raw of value) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+      return { ok: false, reason: 'team-invalid' };
+    }
+    const entry = raw as { unitId?: unknown; count?: unknown };
+    if (
+      typeof entry.unitId !== 'number' || !Number.isInteger(entry.unitId) || entry.unitId <= 0 ||
+      typeof entry.count !== 'number' || !Number.isInteger(entry.count) || entry.count <= 0
+    ) {
+      return { ok: false, reason: 'team-invalid' };
+    }
+    if (seen.has(entry.unitId)) return { ok: false, reason: 'team-duplicate' };
+    seen.add(entry.unitId);
+    total += entry.count;
+    if (total > MAX_TEAM_SIZE) return { ok: false, reason: 'team-too-large' };
+    out.push({ unitId: entry.unitId, count: entry.count });
+  }
+  return { ok: true, army: out };
+}
+
+/** The HTTP layer's typed parse of a submitted team. */
+export function parseQuestArmy(value: unknown): ArmyCheck {
+  return normaliseArmy(value);
+}
+
+/**
+ * Validate a parsed army against the server's own state and the quest's rules.
+ *
+ * `owned` is derived from the save, never from the request. Each unit must be
+ * owned in that quantity, named by the content as a unit, and allowed by the
+ * quest's `excludedUnitGroupTypes`.
+ */
+export function validateQuestArmy(
+  army: Army,
+  questId: string,
+  owned: ReadonlyMap<number, number>,
+  items: ReadonlyMap<number, ApplierItem> | undefined,
+  spec?: QuestSpec,
+): ArmyCheck {
+  const parsed = normaliseArmy(army);
+  if (!parsed.ok) return parsed;
+  const questSpec = spec ?? getQuestSpec(questId) ?? null;
+  if (!questSpec || !QUESTS_WITH_TEAMS.has(questId)) {
+    return { ok: false, reason: 'team-not-supported' };
+  }
+  for (const entry of parsed.army) {
+    if ((owned.get(entry.unitId) ?? 0) < entry.count) {
+      return { ok: false, reason: 'team-unit-unavailable' };
+    }
+    const item = items?.get(entry.unitId);
+    if (!item || item.type !== 'u') return { ok: false, reason: 'team-unit-unavailable' };
+    if (!isUnitAllowedInQuest(item.groupType ?? '', questSpec)) {
+      return { ok: false, reason: 'team-unit-not-allowed' };
+    }
+  }
+  return parsed;
+}
+
+/**
+ * The units the server's own save says the player can field.
+ *
+ * Three server-owned sources count: bought-but-unplaced units in the map's
+ * store, units placed on the player's map, and units whose training queue has
+ * actually finished (a real start timestamp and a positive content duration).
+ * A building, an in-progress queue, a malformed entry and another player's map
+ * are all ignored. No id here comes from a client request.
+ */
+export function ownedArmy(
+  world: ShimWorld,
+  items: ReadonlyMap<number, ApplierItem> | undefined,
+  now: number,
+): Map<number, number> {
+  const out = new Map<number, number>();
+  const map = ownMap(world);
+  const add = (id: number, count: number): void => {
+    if (!Number.isInteger(id) || id <= 0 || !Number.isInteger(count) || count <= 0) return;
+    out.set(id, (out.get(id) ?? 0) + count);
+  };
+  for (const [key, quantity] of Object.entries(mapStore(map))) {
+    const id = Number(key);
+    if (items?.get(id)?.type === 'u') add(id, quantity);
+  }
+  for (const tuple of Object.values(mapItems(map))) {
+    const id = Number(tuple[0]);
+    if (items?.get(id)?.type === 'u') add(id, 1);
+    const attrs: unknown = tuple[6];
+    if (!attrs || typeof attrs !== 'object' || Array.isArray(attrs)) continue;
+    const bag = attrs as Record<string, unknown>;
+    const unitId = Number(bag['ui']);
+    const queued = Number(bag['nu']);
+    const startedAt = Number(bag['ts']);
+    const duration = items?.get(unitId)?.trainingTime ?? 0;
+    if (
+      bag['ts'] === undefined || bag['ts'] === null || !Number.isFinite(startedAt) ||
+      items?.get(unitId)?.type !== 'u' || !Number.isInteger(queued) || queued <= 0 ||
+      !Number.isFinite(duration) || duration <= 0 || now - startedAt < duration
+    ) {
+      continue;
+    }
+    add(unitId, queued);
+  }
+  return out;
 }
 
 /** Start a quest authoritatively. */
@@ -247,6 +427,7 @@ export type QuestStartHelper = (
   world: ShimWorld,
   questId: string,
   difficulty?: number,
+  team?: Army,
 ) => QuestHelperResult;
 
 /** Apply one authoritative quest action. */
@@ -323,11 +504,24 @@ export interface ApplierItem {
   /** The sub-category, for the per-sub-category limit. */
   subcategoryId: number;
   /**
+   * Whether the content marks this building as offering the four collection
+   * periods (`properties.multiCollectable === 1`).
+   *
+   * A building without the flag collects on the server's default period and
+   * may not choose one. The flag comes from the content, never the command.
+   */
+  multiCollectable: boolean;
+  /**
    * The item's `subcat_functional`; 221 is a wall.
    *
    * The quest roster uses it to decide whether a kill earns the minimum XP.
    */
   subcatFunctional?: number;
+  /**
+   * The item's `group_type`, used to check a teamed unit against the quest's
+   * `excludedUnitGroupTypes`. A missing value means the content names no group.
+   */
+  groupType?: string;
   /** The footprint, in tiles. */
   width: number;
   height: number;
@@ -550,6 +744,8 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return buyOfferPackCommand(world, command.args, deps);
       case 'collect':
         return collectCommand(world, command.args, deps);
+      case 'activate':
+        return activateCommand(world, command.args, deps);
       case 'complete_goal':
         return completeGoalCommand(world, command.args, deps);
       case 'complete_tutorial':
@@ -1496,6 +1692,90 @@ function upgradeCommand(
   attrs['unitCapacity'] = newBuilding.unitCapacity;
 
   world.resources = settled.resources;
+  return { applied: true, world };
+}
+
+/**
+ * `activate` — let the player choose a collection period.
+ *
+ * This is the only client choice in the production cycle, and even here the
+ * client chooses **which** of the content's periods to wait, never **what**
+ * the wait is worth. Every eligibility rule is checked here from the server's
+ * map item, the content item and the server clock:
+ *
+ * - the period must be one the content actually defines (1..4);
+ * - the map item must exist, be a building, and be multi-collectable;
+ * - the building may not be over its unit capacity or still under
+ *   construction;
+ * - a repeat of the same, already-started cycle is a no-op, so a duplicate
+ *   request cannot push the countdown out.
+ *
+ * Only `cp` and `lastAccruedAt` are written. The wallet and the item's
+ * `tuple[3]` build timestamp belong to other commands and are left alone.
+ */
+function activateCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const period = args[1];
+  if (
+    typeof period !== 'number' ||
+    !Number.isInteger(period) ||
+    period < 1 ||
+    period > deps.collectPeriods.minutes.length
+  ) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+
+  const isoId = String(args[0] ?? '');
+  const tuple = mapItems(ownMap(world))[isoId];
+  if (!tuple) return { applied: false, refused: 'unknown-building', world };
+  const itemId = tuple[0];
+  if (typeof itemId !== 'number') {
+    return { applied: false, refused: 'unknown-building', world };
+  }
+  const item = deps.items?.get(itemId);
+  if (!item) return { applied: false, refused: 'unknown-item', world };
+  if (item.type !== 'b') return { applied: false, refused: 'not-a-building', world };
+  if (!item.multiCollectable) {
+    return { applied: false, refused: 'not-multi-collectable', world };
+  }
+
+  // Read the bag without creating one: a refused request must leave the map
+  // item exactly as it was, including a legacy item with no attribute bag.
+  const existing = tuple[6];
+  const attrs: Record<string, unknown> =
+    existing && typeof existing === 'object'
+      ? (existing as Record<string, unknown>)
+      : {};
+  const state = buildingState(attrs);
+  if (state.unitsInside > state.unitCapacity) {
+    return { applied: false, refused: 'over-capacity', world };
+  }
+  const now = deps.now();
+  const startedAt = tuple[3];
+  if (
+    typeof startedAt === 'number' &&
+    item.buildTime > 0 &&
+    now - startedAt < item.buildTime
+  ) {
+    return { applied: false, refused: 'under-construction', world };
+  }
+
+  // Idempotent by the server's clock: a replay with the same period does not
+  // restamp a countdown that is already running. A fresh building (no
+  // accrual yet) still needs its first stamp, and a different period restarts
+  // the cycle by design.
+  if (state.cp === period && state.lastAccruedAt > 0) {
+    return { applied: true, world };
+  }
+  // Literal write fidelity: choosing a period owns exactly these two keys.
+  // The other four production fields, and any unknown bag keys, are left as
+  // they were rather than being rewritten from a reconstructed state object.
+  tuple[6] = attrs;
+  attrs['cp'] = period;
+  attrs['lastAccruedAt'] = now;
   return { applied: true, world };
 }
 
@@ -2540,6 +2820,7 @@ function questSummary(state: ActiveQuestState): QuestLedgerSummary {
       Object.entries(state.ledger.elements).map(([ref, element]) => [ref, { ...element }]),
     ),
     events: [...state.ledger.events],
+    ...(state.team ? { team: state.team } : {}),
   };
 }
 
@@ -2567,7 +2848,12 @@ export function createQuestHelpers(deps: ApplierDeps): {
   const eventFor = (questId: string): ContentQuestEvent | null =>
     deps.questEvents?.[questId] ?? null;
 
-  const beginQuest = (world: ShimWorld, questId: string, difficulty?: number): LooseQuestResult => {
+  const beginQuest = (
+    world: ShimWorld,
+    questId: string,
+    difficulty?: number,
+    team?: Army,
+  ): LooseQuestResult => {
     // Only a full, authoritative state blocks a new start. A legacy
     // `{ questId }` seed carries no ledger and cannot prove anything.
     if (readFullActiveQuest(world.save.privateState)) {
@@ -2575,6 +2861,28 @@ export function createQuestHelpers(deps: ApplierDeps): {
     }
     const spec = getQuestSpec(questId);
     if (!spec) return { ok: false, reason: 'unknown-quest', world };
+
+    // A team is a request, not a fact. It is accepted only when the quest
+    // offers team selection, every unit is owned in this server's save in the
+    // requested quantity, and the quest's content filter allows its group.
+    // A refusal leaves the world untouched, so no active quest is written.
+    //
+    // Fidelity limit: the ledger is an abstract encounter, not the original
+    // client's positional simulator. The accepted team changes admission,
+    // `playerUnitsAlive` (hence the army-wipe loss) and the quest it is bound
+    // to; it does NOT give any unit damage, targeting or movement in combat.
+    let acceptedTeam: Army | undefined;
+    if (team !== undefined) {
+      const checked = validateQuestArmy(
+        team,
+        questId,
+        ownedArmy(world, deps.items, deps.now()),
+        deps.items,
+        spec,
+      );
+      if (!checked.ok) return { ok: false, reason: checked.reason, world };
+      acceptedTeam = checked.army;
+    }
 
     const ranks = questProgress(world.save.privateState).ranks;
     const validDifficulty = difficulty === 1 || difficulty === 2 || difficulty === 3
@@ -2584,6 +2892,7 @@ export function createQuestHelpers(deps: ApplierDeps): {
       questVars: currentQuestVars(ownMap(world)),
       hasRank: ranks[String(spec.playIndex)] !== undefined,
       ...(validDifficulty !== undefined ? { difficulty: validDifficulty } : {}),
+      ...(acceptedTeam !== undefined ? { army: acceptedTeam } : {}),
     };
 
     const roster = questRoster(spec, deps.items, deps.questRosters);
@@ -2633,6 +2942,7 @@ export function createQuestHelpers(deps: ApplierDeps): {
     const activeState: ActiveQuestState = {
       ...state,
       ledger: { elements, events: [], strikes: {} },
+      ...(acceptedTeam !== undefined ? { team: acceptedTeam } : {}),
     };
     const nextWorld: ShimWorld = {
       ...world,
@@ -2773,8 +3083,13 @@ export function createQuestHelpers(deps: ApplierDeps): {
   // Every refusal carries the world back unchanged, so a caller can always
   // hand it to `store.transact` and be sure no save was written.
   return {
-    beginQuest: (world: ShimWorld, questId: string, difficulty?: number): QuestHelperResult => {
-      const result = beginQuest(world, questId, difficulty);
+    beginQuest: (
+      world: ShimWorld,
+      questId: string,
+      difficulty?: number,
+      team?: Army,
+    ): QuestHelperResult => {
+      const result = beginQuest(world, questId, difficulty, team);
       return result.ok ? result : { ok: false, reason: result.reason, world };
     },
     applyQuestAction: (world: ShimWorld, questId: string, action: QuestAction): QuestHelperResult => {
@@ -2874,13 +3189,23 @@ function endQuestCommand(
   if (!awarded.award.awarded) return { applied: false, refused: 'already-awarded', world };
 
   // Every check has passed; the wallet, the progress, the client-visible rank
-  // and the active-state clear move together.
-  const resources = { ...world.resources };
-  for (const reward of awarded.award.rewards) {
+  // and the active-state clear move together. Build the wire rows from the
+  // exact amounts paid — including the same XP rounding — so the native
+  // result can report nothing the wallet did not actually receive.
+  const paid = awarded.award.rewards.map((reward) => ({
+    key: reward.key,
     // A gold row's extra XP is capped at a third of expRequired, which can be
     // fractional; the wallet holds whole resources only.
-    const amount = reward.key === 'x' ? Math.round(reward.amount) : reward.amount;
-    resources[reward.key] = (resources[reward.key] ?? 0) + amount;
+    amount: reward.key === 'x' ? Math.round(reward.amount) : reward.amount,
+  }));
+  const rewards: Reward[] = paid.map((row) => ({
+    resource: QUEST_REWARD_RESOURCE[row.key],
+    amount: row.amount,
+  }));
+
+  const resources = { ...world.resources };
+  for (const row of paid) {
+    resources[row.key] = (resources[row.key] ?? 0) + row.amount;
   }
   world.resources = resources;
   privateState[QUEST_PROGRESS_KEY] = awarded.progress;
@@ -2888,6 +3213,15 @@ function endQuestCommand(
     ...questRanks(privateState),
     [String(spec.playIndex)]: awarded.award.rank,
   };
+  // A reconnecting client reads this receipt instead of replaying end_quest.
+  // It records a past grant only — it never pays anything.
+  const receipt: LastQuestReward = {
+    questId,
+    rank: awarded.award.rank,
+    rewards,
+  };
+  privateState[LAST_QUEST_REWARD_KEY] = receipt;
   delete privateState[ACTIVE_QUEST_KEY];
-  return { applied: true, world };
+  const result: CommandResult = { kind: 'rewards', rewards };
+  return { applied: true, world, result };
 }

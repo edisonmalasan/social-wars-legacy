@@ -28,6 +28,7 @@ import {
   type ApplierItem,
   BUILDING_STATE_KEYS,
   GOAL_STATE_KEY,
+  LAST_QUEST_REWARD_KEY,
   QUEST_PROGRESS_KEY,
   createApplier,
   createQuestHelpers,
@@ -113,6 +114,7 @@ function item(over: Partial<ApplierItem> = {}): ApplierItem {
     upgradesTo: null,
     premiumUpgradeCosts: {},
     type: 'b',
+    multiCollectable: false,
     grantsPopulation: false,
     ...over,
   };
@@ -609,6 +611,197 @@ describe('the production clock', () => {
     const later = createApplier(deps({ now: () => 1_700_000_000 + 60 * 60 }));
     const outcome = later(world, { name: 'collect', args: ['7'] });
     assert.equal(outcome.applied, true);
+  });
+});
+
+/* -------------------------------------------------------------------------
+ * Choosing a collection period
+ * ---------------------------------------------------------------------- */
+
+const ACTIVATE_START = 1_700_000_000;
+
+/** A multi-collectable producer, the only building that may choose a period. */
+function producer(over: Partial<ApplierItem> = {}): ApplierItem {
+  return item({ multiCollectable: true, buildTime: 60, ...over });
+}
+
+/** Applier deps with the given content items and a given server clock. */
+function activateDeps(items: ApplierItem[], clock = ACTIVATE_START): ApplierDeps {
+  return deps({ now: () => clock, items: new Map(items.map((entry) => [entry.id, entry])) });
+}
+
+/** A producer with the given attribute bag and build timestamp. */
+function producerWorld(
+  attrs: Record<string, unknown>,
+  startedAt = 0,
+  itemId = 30,
+): ShimWorld {
+  return worldWithItems({ '7': [itemId, 0, 0, startedAt, 0, [], attrs, 1] });
+}
+
+/** A producer's attribute bag from a world. */
+function producerAttrs(world: ShimWorld): Record<string, unknown> {
+  const tuple = mapItems(world.save.maps[0] as Record<string, unknown>)['7']!;
+  return tuple[6] as Record<string, unknown>;
+}
+
+describe('choosing a collection period', () => {
+  it('stores all four periods from the server clock, leaving the wallet and build time alone', () => {
+    for (const period of [1, 2, 3, 4]) {
+      const clock = ACTIVATE_START + period;
+      const applier = createApplier(activateDeps([producer()], clock));
+      const world = producerWorld({ collect: 100, unitCapacity: 5, collectType: 'w' });
+      const outcome = applier(world, { name: 'activate', args: ['7', period] });
+      assert.equal(outcome.applied, true, `period ${period} was refused`);
+      const attrs = producerAttrs(outcome.world);
+      assert.equal(attrs['cp'], period, `period ${period} was not stored`);
+      assert.equal(attrs['lastAccruedAt'], clock, `period ${period} used a wrong clock`);
+      assert.equal(outcome.world.resources['w'], 0, 'activate changed the wallet');
+      assert.equal(
+        mapItems(outcome.world.save.maps[0] as Record<string, unknown>)['7']![3],
+        0,
+        'activate overwrote the build timestamp',
+      );
+    }
+  });
+
+  it('credits floor(collect x multiplier) once the content minutes have elapsed', () => {
+    const minutes = [5, 60, 240, 480];
+    const expected = [25, 100, 200, 300];
+    for (const [index, period] of [1, 2, 3, 4].entries()) {
+      const activate = createApplier(activateDeps([producer()]));
+      const started = activate(
+        producerWorld({ collect: 100, unitCapacity: 5, unitsInside: 0, collectType: 'w' }),
+        { name: 'activate', args: ['7', period] },
+      );
+      assert.equal(started.applied, true);
+      const collect = createApplier(
+        activateDeps([producer()], ACTIVATE_START + minutes[index]! * 60),
+      );
+      const due = collect(started.world, { name: 'collect', args: ['7'] });
+      assert.equal(due.applied, true, `period ${period} was not due at its minutes`);
+      assert.equal(due.world.resources['w'], expected[index], `period ${period} paid wrong`);
+    }
+  });
+
+  it('refuses a collection before the chosen period has elapsed', () => {
+    const activate = createApplier(activateDeps([producer()]));
+    const started = activate(
+      producerWorld({ collect: 100, unitCapacity: 5, collectType: 'w' }),
+      { name: 'activate', args: ['7', 1] },
+    );
+    const early = createApplier(activateDeps([producer()], ACTIVATE_START + 5 * 60 - 1));
+    const outcome = early(started.world, { name: 'collect', args: ['7'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'not-due');
+    assert.equal(outcome.world.resources['w'], 0);
+  });
+
+  it('refuses invalid periods and leaves the world unchanged', () => {
+    for (const bad of [0, 5, -1, 1.5, '2', Number.NaN]) {
+      const applier = createApplier(activateDeps([producer()]));
+      const world = producerWorld({ collect: 100, unitCapacity: 5, collectType: 'w' });
+      const before = JSON.stringify(world);
+      const outcome = applier(world, { name: 'activate', args: ['7', bad] });
+      assert.equal(outcome.applied, false, `period ${String(bad)} was accepted`);
+      assert.equal(outcome.refused, 'bad-argument');
+      assert.equal(JSON.stringify(outcome.world), before, `period ${String(bad)} wrote state`);
+    }
+  });
+
+  it('refuses an unknown building, an unknown item, a unit and an ineligible building', () => {
+    const world = producerWorld({});
+    const outcomes = [
+      createApplier(activateDeps([producer()]))(world, {
+        name: 'activate', args: ['999', 1],
+      }),
+      createApplier(activateDeps([producer()]))(producerWorld({}, 0, 999), {
+        name: 'activate', args: ['7', 1],
+      }),
+      createApplier(activateDeps([producer({ type: 'u' })]))(world, {
+        name: 'activate', args: ['7', 1],
+      }),
+      createApplier(activateDeps([producer({ multiCollectable: false })]))(world, {
+        name: 'activate', args: ['7', 1],
+      }),
+    ];
+    const refusals = [
+      'unknown-building',
+      'unknown-item',
+      'not-a-building',
+      'not-multi-collectable',
+    ];
+    outcomes.forEach((outcome, index) => {
+      assert.equal(outcome.applied, false);
+      assert.equal(outcome.refused, refusals[index]);
+    });
+  });
+
+  it('refuses an over-capacity building', () => {
+    const applier = createApplier(activateDeps([producer()]));
+    const world = producerWorld({
+      collect: 100,
+      unitCapacity: 2,
+      unitsInside: 3,
+      collectType: 'w',
+    });
+    const before = JSON.stringify(world);
+    const outcome = applier(world, { name: 'activate', args: ['7', 4] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'over-capacity');
+    assert.equal(JSON.stringify(outcome.world), before);
+  });
+
+  it('refuses a building whose construction is still in progress', () => {
+    const applier = createApplier(activateDeps([producer()]));
+    const world = producerWorld({ collect: 100, unitCapacity: 5 }, ACTIVATE_START - 10);
+    const outcome = applier(world, { name: 'activate', args: ['7', 4] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'under-construction');
+    assert.equal(producerAttrs(outcome.world)['cp'], undefined);
+  });
+
+  it('does not restamp on a duplicate, but does when the period changes', () => {
+    const activate = createApplier(activateDeps([producer()]));
+    const started = activate(
+      producerWorld({ collect: 100, unitCapacity: 5, collectType: 'w' }),
+      { name: 'activate', args: ['7', 3] },
+    );
+    assert.equal(producerAttrs(started.world)['lastAccruedAt'], ACTIVATE_START);
+
+    const later = createApplier(activateDeps([producer()], ACTIVATE_START + 30));
+    const duplicate = later(started.world, { name: 'activate', args: ['7', 3] });
+    assert.equal(duplicate.applied, true, 'a repeat of the same period was refused');
+    assert.equal(producerAttrs(duplicate.world)['lastAccruedAt'], ACTIVATE_START);
+
+    const switched = later(duplicate.world, { name: 'activate', args: ['7', 4] });
+    assert.equal(switched.applied, true);
+    assert.equal(producerAttrs(switched.world)['cp'], 4);
+    assert.equal(producerAttrs(switched.world)['lastAccruedAt'], ACTIVATE_START + 30);
+  });
+
+  it('restamps a fresh building that has never accrued, even on the same period', () => {
+    const activate = createApplier(activateDeps([producer()]));
+    const world = producerWorld({ cp: 4, lastAccruedAt: 0, collect: 100, unitCapacity: 5 });
+    const outcome = activate(world, { name: 'activate', args: ['7', 4] });
+    assert.equal(outcome.applied, true);
+    assert.equal(producerAttrs(outcome.world)['lastAccruedAt'], ACTIVATE_START);
+  });
+
+  it('survives a serialised world and a rebuilt applier', () => {
+    const activate = createApplier(activateDeps([producer()]));
+    const started = activate(
+      producerWorld({ collect: 100, unitCapacity: 5, unitsInside: 0, collectType: 'w' }),
+      { name: 'activate', args: ['7', 4] },
+    );
+    const restored = JSON.parse(JSON.stringify(started.world)) as ShimWorld;
+    const collect = createApplier(
+      activateDeps([producer()], ACTIVATE_START + 480 * 60),
+    );
+    const outcome = collect(restored, { name: 'collect', args: ['7'] });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['w'], 300);
+    assert.equal(producerAttrs(outcome.world)['cp'], 4);
   });
 });
 
@@ -2579,6 +2772,82 @@ describe('the active assault quest', () => {
     });
     assert.equal(outcome.applied, false);
     assert.equal(outcome.refused, 'no-victory');
+  });
+});
+
+describe('the authoritative quest reward result', () => {
+  // REWARDS_QUESTS[6] = { g: 4000, o: 1400 }; expRequired 300 gives 100 XP
+  // for the gold row. The exact rows the applier reports must equal what it
+  // writes into the wallet, including the rounding of the fractional XP.
+  const exactRows = [
+    { resource: 'gold', amount: 0 },
+    { resource: 'xp', amount: 0 },
+    { resource: 'xp', amount: 100 },
+    { resource: 'gold', amount: 4000 },
+    { resource: 'oil', amount: 1400 },
+  ];
+
+  function winningOutcome() {
+    const applier = createApplier(questDeps());
+    const killed = applier(questWorld(), killedWrite(['commandCenter']));
+    return applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+  }
+
+  it('returns the exact awarded rows, mapped to resource names', () => {
+    const outcome = winningOutcome();
+    assert.equal(outcome.applied, true);
+    assert.deepEqual(outcome.result, { kind: 'rewards', rewards: exactRows });
+  });
+
+  it('reports the same amounts it actually paid into the wallet', () => {
+    const outcome = winningOutcome();
+    const paid: Record<string, number> = {};
+    for (const row of exactRows) {
+      paid[row.resource] = (paid[row.resource] ?? 0) + row.amount;
+    }
+    assert.equal(outcome.world.resources['g'], paid['gold']);
+    assert.equal(outcome.world.resources['x'], paid['xp']);
+    assert.equal(outcome.world.resources['o'], paid['oil']);
+  });
+
+  it('returns no result when the server refuses the quest', () => {
+    const applier = createApplier(questDeps());
+    const outcome = applier(questWorld(), {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-victory');
+    assert.equal(outcome.result, undefined);
+    assert.equal(LAST_QUEST_REWARD_KEY in outcome.world.save.privateState, false);
+  });
+
+  it('returns no result on an already-awarded replay', () => {
+    const applier = createApplier(questDeps());
+    const killed = applier(questWorld(), killedWrite(['commandCenter']));
+    killed.world.save.privateState[QUEST_PROGRESS_KEY] = {
+      ranks: {},
+      awarded: [QUEST_ID_02_CENTRAL_NUCLEAR],
+    };
+    const outcome = applier(killed.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_02_CENTRAL_NUCLEAR, 1],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'already-awarded');
+    assert.equal(outcome.result, undefined);
+  });
+
+  it('persists a minimal reward receipt with the quest id, rows and rank', () => {
+    const outcome = winningOutcome();
+    assert.deepEqual(outcome.world.save.privateState[LAST_QUEST_REWARD_KEY], {
+      questId: QUEST_ID_02_CENTRAL_NUCLEAR,
+      rank: 1,
+      rewards: exactRows,
+    });
   });
 });
 

@@ -6,6 +6,7 @@ import { COMMAND_TABLE, minArgs, maxArgs } from '@swl/protocol';
 import {
   FORBIDDEN_COMMANDS,
   OWN_TOWN,
+  activate,
   buy,
   buyMagic,
   buyMana,
@@ -43,6 +44,7 @@ import {
 
 /** Every builder, with arguments that satisfy its specification. */
 const BUILDERS: { name: string; command: ReturnType<typeof buy> }[] = [
+  { name: 'activate', command: activate(7, 4) },
   { name: 'buy', command: buy(30, 1, 2, 'b') },
   { name: 'place_stored_item', command: placeStoredItem(30, 1, 2) },
   { name: 'move', command: move(7, 1, 2) },
@@ -79,6 +81,7 @@ const BUILDERS: { name: string; command: ReturnType<typeof buy> }[] = [
 
 /** The Group G4 builders, whose argument shapes the table must also confirm. */
 const NEW_COMMAND_NAMES = new Set([
+  'activate',
   'darts_new_free',
   'darts_reset',
   'darts_shoot_balloon',
@@ -324,7 +327,7 @@ describe('the authoritative quest requests', () => {
 
   it('startQuestOnServer posts an authenticated, keyed start request', async () => {
     const { calls, fetchImpl } = capture(200, { questId: '100000002', started: true });
-    const result = await startQuestOnServer(SESSION, '100000002', 2, fetchImpl);
+    const result = await startQuestOnServer(SESSION, '100000002', 2, undefined, fetchImpl);
     assert.equal(result.ok, true);
     assert.equal(result.status, 200);
     assert.deepEqual(result.body, { questId: '100000002', started: true });
@@ -343,14 +346,14 @@ describe('the authoritative quest requests', () => {
 
   it('startQuestOnServer omits the difficulty when none is given', async () => {
     const { calls, fetchImpl } = capture(200, { questId: '100000002', started: true });
-    await startQuestOnServer(SESSION, '100000002', undefined, fetchImpl);
+    await startQuestOnServer(SESSION, '100000002', undefined, undefined, fetchImpl);
     const body = JSON.parse(calls[0]!.init.body as string) as Record<string, unknown>;
     assert.equal('difficulty' in body, false);
   });
 
   it('startQuestOnServer reports a typed refusal without a body', async () => {
     const { fetchImpl } = capture(409, { error: 'quest-already-active' });
-    const result = await startQuestOnServer(SESSION, '100000002', 1, fetchImpl);
+    const result = await startQuestOnServer(SESSION, '100000002', 1, undefined, fetchImpl);
     assert.equal(result.ok, false);
     assert.equal(result.status, 409);
     assert.equal(result.body, null);
@@ -408,7 +411,7 @@ describe('the authoritative quest requests', () => {
     const offline: typeof fetch = async () => {
       throw new Error('offline');
     };
-    const started = await startQuestOnServer(SESSION, '100000002', 1, offline);
+    const started = await startQuestOnServer(SESSION, '100000002', 1, undefined, offline);
     assert.deepEqual(
       { ok: started.ok, status: started.status, body: started.body, error: started.error },
       { ok: false, status: 0, body: null, error: 'network' },
@@ -421,5 +424,77 @@ describe('the authoritative quest requests', () => {
       { ok: action.ok, status: action.status, body: action.body, error: action.error },
       { ok: false, status: 0, body: null, error: 'network' },
     );
+  });
+
+  it('startQuestOnServer sends the chosen team and reads back the accepted one', async () => {
+    const team = [{ unitId: 1017, count: 2 }];
+    const { calls, fetchImpl } = capture(200, {
+      questId: '100000021',
+      started: true,
+      team,
+    });
+    const result = await startQuestOnServer(SESSION, '100000021', 1, team, fetchImpl);
+    assert.equal(result.ok, true);
+    assert.deepEqual(result.body, { questId: '100000021', started: true, team });
+    const body = JSON.parse(calls[0]!.init.body as string) as Record<string, unknown>;
+    assert.deepEqual(body['team'], team);
+    assert.equal('team' in body, true);
+  });
+
+  it('startQuestOnServer omits the team when none is chosen', async () => {
+    const { calls, fetchImpl } = capture(200, { questId: '100000002', started: true });
+    await startQuestOnServer(SESSION, '100000002', undefined, undefined, fetchImpl);
+    const body = JSON.parse(calls[0]!.init.body as string) as Record<string, unknown>;
+    assert.equal('team' in body, false);
+  });
+
+  it('startQuestOnServer still accepts the legacy 4-argument fetch double', async () => {
+    // Callers that predate the optional team pass a fetch implementation as
+    // the fourth argument. It must be used as the fetcher, not as a team.
+    const { calls, fetchImpl } = capture(200, { questId: '100000002', started: true });
+    const result = await startQuestOnServer(SESSION, '100000002', 1, fetchImpl);
+    assert.equal(result.ok, true);
+    assert.equal(calls.length, 1);
+    const body = JSON.parse(calls[0]!.init.body as string) as Record<string, unknown>;
+    assert.equal(body['difficulty'], 1);
+    assert.equal('team' in body, false);
+  });
+
+  it('reports the server typed team refusal for the feedback channel', async () => {
+    const { fetchImpl } = capture(400, {
+      result: 'error',
+      error: 'quest-team-unit-unavailable',
+      message: 'the team names a unit the server does not own',
+    });
+    const result = await startQuestOnServer(
+      SESSION,
+      '100000021',
+      1,
+      [{ unitId: 9999, count: 1 }],
+      fetchImpl,
+    );
+    assert.equal(result.ok, false);
+    assert.equal(result.status, 400);
+    assert.equal(result.serverError, 'quest-team-unit-unavailable');
+    assert.equal(result.body, null);
+  });
+
+  it('questActionOnServer reads the team echoed in the ledger summary', async () => {
+    const team = [{ unitId: 1017, count: 2 }];
+    const summary = {
+      questId: '100000021',
+      phase: 'started',
+      counters: {},
+      elements: {},
+      events: [],
+      team,
+    };
+    const { fetchImpl } = capture(200, summary);
+    const result = await questActionOnServer(SESSION, '100000021', {
+      type: 'strike',
+      ref: 'x',
+    }, fetchImpl);
+    assert.equal(result.ok, true);
+    assert.deepEqual(result.body?.team, team);
   });
 });

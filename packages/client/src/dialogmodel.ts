@@ -90,6 +90,30 @@ export function dialogAction(
   return closeDialog(state);
 }
 
+/**
+ * Where focus should go when the dialog closes.
+ *
+ * `previous` is whatever had focus before the dialog opened. A hosted panel
+ * can replace its own opener, so that element may have been removed by the
+ * time the dialog closes: calling `focus()` on a detached node would leave
+ * the player's focus on nothing. Keep the previous target only while it is
+ * still attached, otherwise move to an attached `fallback` (and to nothing
+ * at all if neither is attached) so no stale focus is left behind.
+ *
+ * The check is a callback so this stays pure — the DOM lives in the view,
+ * this module only decides which candidate is valid. The callback is not
+ * called for a null candidate.
+ */
+export function restoredFocus<T>(
+  previous: T | null,
+  isAttached: (target: T) => boolean,
+  fallback: T | null,
+): T | null {
+  if (previous !== null && isAttached(previous)) return previous;
+  if (fallback !== null && isAttached(fallback)) return fallback;
+  return null;
+}
+
 /** The ARIA attributes of an open dialog. */
 export interface DialogAria {
   readonly role: 'dialog';

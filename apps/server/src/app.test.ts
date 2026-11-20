@@ -336,6 +336,27 @@ describe('the legacy command endpoint', () => {
     assert.equal((await store.get('p1'))!.world.nextCommandNumber, 1);
   });
 
+  it('answers exactly {result:"success"} with both keys, even when the applier reports rewards', async () => {
+    const { handle } = await app({
+      applyCommand: (w) => ({
+        applied: true,
+        world: w,
+        result: {
+          kind: 'rewards',
+          rewards: [{ resource: 'gold', amount: 4000 }] as const,
+        },
+      }),
+    });
+    for (const key of [SERVER_KEYS.current, SERVER_KEYS.legacy]) {
+      const frame = framePayload(payload(1, []), key);
+      const response = await handle(
+        legacyRequest('/command.php', { USERID: LEGACY_USER_ID, data: frame }),
+      );
+      assert.equal(response.status, 200);
+      assert.deepEqual(JSON.parse(response.body), { result: 'success' });
+    }
+  });
+
   it('refuses an unauthenticated batch with a typed error', async () => {
     const { handle } = await app();
     const frame = framePayload(payload(1, []), SERVER_KEYS.current);
@@ -554,6 +575,68 @@ describe('the native command endpoint', () => {
     const stored = (await store.get('p1'))!.world;
     assert.equal(stored.resources['g'], 1000);
     assert.equal(stored.resources['s'], 1000);
+  });
+
+  it('forwards the applier\'s authoritative reward rows in the native outcome', async () => {
+    const rewards = [
+      { resource: 'gold', amount: 4000 },
+      { resource: 'xp', amount: 100 },
+    ] as const;
+    const { handle, store, token } = await app({
+      applyCommand: (w) => ({
+        applied: true,
+        world: {
+          ...w,
+          resources: {
+            ...w.resources,
+            g: (w.resources['g'] ?? 0) + 4000,
+            x: (w.resources['x'] ?? 0) + 100,
+          },
+        },
+        result: { kind: 'rewards', rewards },
+      }),
+    });
+    const response = await handle(
+      native(token, 'req-reward', [{ map: 0, name: 'end_quest', args: ['100000002', 1] }]),
+    );
+    assert.equal(response.status, 200);
+    const body = JSON.parse(response.body);
+    assert.deepEqual(body.outcomes[0], {
+      index: 0,
+      ok: true,
+      result: { kind: 'rewards', rewards },
+    });
+    // The wallet holds exactly what the forwarded rows report.
+    const stored = (await store.get('p1'))!.world;
+    assert.equal(stored.resources['g'], 5000);
+    assert.equal(stored.resources['x'], 100);
+  });
+
+  it('repeats the same reward rows on an idempotent retry', async () => {
+    let applied = 0;
+    const rewards = [{ resource: 'gold', amount: 4000 }] as const;
+    const { handle, token } = await app({
+      applyCommand: (w) => {
+        applied += 1;
+        return {
+          applied: true,
+          world: { ...w, resources: { ...w.resources, g: (w.resources['g'] ?? 0) + 4000 } },
+          result: { kind: 'rewards', rewards },
+        };
+      },
+    });
+    const first = await handle(
+      native(token, 'req-retry', [{ map: 0, name: 'end_quest', args: ['100000002', 1] }]),
+    );
+    const second = await handle(
+      native(token, 'req-retry', [{ map: 0, name: 'end_quest', args: ['100000002', 1] }]),
+    );
+    assert.equal(applied, 1, 'the retried request was applied again');
+    assert.deepEqual(JSON.parse(second.body), JSON.parse(first.body));
+    assert.deepEqual(JSON.parse(second.body).outcomes[0].result, {
+      kind: 'rewards',
+      rewards,
+    });
   });
 });
 

@@ -14,6 +14,7 @@
  * without a browser: the tests are in `state.test.ts`.
  */
 import type {
+  ArmyUnitView,
   BuildingInfoView,
   BuildMenuItem,
   HudInput,
@@ -29,17 +30,19 @@ import type {
   WorldSnapshot,
 } from '@swl/client';
 import {
+  armyView,
   buildingInfoView,
   completeGoal,
   itemType,
   levelOf,
+  productionState,
   resourcePanel,
   storedItems,
   trainingView,
   unitPanel,
 } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
-import { QUEST_IDS, getQuestSpec } from '@swl/rules';
+import { MULTIPLIER_PEASANTS, QUEST_IDS, getQuestSpec } from '@swl/rules';
 
 /** The categories, as the build menu's tabs read them. */
 export type Categories = Record<
@@ -115,7 +118,43 @@ export function expRequiredByLevel(bundle: ContentBundle): Map<number, number> {
  * quantity is decided here.
  */
 export function inventoryItems(bundle: ContentBundle, world: WorldSnapshot): StoredItemView[] {
-  return storedItems(world, bundle.items ?? []);
+  return storedItems(
+    world,
+    (bundle.items ?? []).map((item) => ({
+      id: item.id,
+      name: item.name,
+      type: item.type,
+      categoryId: item.category_id,
+    })),
+  );
+}
+
+/**
+ * The army the base panel draws.
+ *
+ * The bridge is thin: the model reads the server's store, placed units and
+ * finished training queues; the content supplies the names, group types and
+ * training times. A caller hosting a team quest may pass that quest's excluded
+ * group types so the panel can grey out units the quest will not accept.
+ */
+export function armyPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  now: number,
+  excludedGroupTypes: readonly string[] = [],
+): ArmyUnitView[] {
+  return armyView(
+    world,
+    (bundle.items ?? []).map((item) => ({
+      id: item.id,
+      name: item.name,
+      type: item.type,
+      groupType: item.group_type ?? '',
+      trainingTime: item.training_time ?? 0,
+    })),
+    now,
+    excludedGroupTypes,
+  );
 }
 
 /** What the HUD needs to draw itself. */
@@ -436,6 +475,144 @@ export function buildingInfo(
     clicksToBuild: item.clicks_to_build,
     now,
   });
+}
+
+/** One of the content's four collection periods, as a button. */
+export interface ProductionOption {
+  /** The 1-based wire value the `activate` command carries. */
+  readonly period: number;
+  /** The wait, from the content's `COLLECT_MINUTES`. */
+  readonly minutes: number;
+  /** The payout factor, from the content's `COLLECT_MULTIPLIER`. */
+  readonly multiplier: number;
+  /**
+   * The payout the server's own formula predicts from its stored production
+   * state (including any peasant bonus), shown only — never paid here.
+   */
+  readonly amount: number;
+  /** Whether the server's current `cp` is this period. */
+  readonly active: boolean;
+}
+
+/** The production selector, read from the server's save and the content. */
+export interface ProductionPanelView {
+  /** The selected building's id, used by the request. */
+  readonly isoId: number;
+  /** The content's name of the building. */
+  readonly name: string;
+  /** The resource the building produces. */
+  readonly resource: string;
+  /** The active period, 1-based; the one-hour period until one is chosen. */
+  readonly period: number;
+  /** The server's cycle start, zero when the building has never accrued. */
+  readonly startedAt: number;
+  /** Seconds left by the server's timestamp; presentation only. */
+  readonly secondsRemaining: number;
+  /** Whether the server already considers this cycle complete. */
+  readonly due: boolean;
+  /** The four periods the content offers, in their content order. */
+  readonly options: readonly ProductionOption[];
+}
+
+const FALLBACK_MINUTES = [5, 60, 240, 480];
+const FALLBACK_MULTIPLIER = [0.25, 1, 2, 3];
+
+/** A tuple of positive numbers from a global, or the game's own tuple. */
+function positiveTuple(value: unknown, fallback: readonly number[]): number[] {
+  if (!Array.isArray(value) || value.length < fallback.length) return [...fallback];
+  const tuple = value.slice(0, fallback.length);
+  const valid = tuple.every(
+    (entry) => typeof entry === 'number' && Number.isFinite(entry) && entry > 0,
+  );
+  return valid ? (tuple as number[]) : [...fallback];
+}
+
+/**
+ * The server's payout formula (`packages/rules/src/economy.ts:collect`), for
+ * display only. The stored `collect` and `unitsInside` are the server's; the
+ * content base is used only when a fresh building has no stored amount yet.
+ * A building that cannot hold extra units gets no peasant bonus.
+ */
+function predictedAmount(
+  collect: number | null,
+  unitsInside: number | null,
+  unitCapacity: number | null,
+  contentCollect: number,
+  multiplier: number,
+): number {
+  const base = Math.floor(collect ?? contentCollect);
+  const extra =
+    unitCapacity !== null && unitCapacity > 1
+      ? Math.max(0, (unitsInside ?? 0) - 1)
+      : 0;
+  const raw = extra > 0 ? base + extra * base * MULTIPLIER_PEASANTS : base;
+  return Math.floor(Math.floor(raw) * multiplier);
+}
+
+/**
+ * A multi-collectable building's production panel.
+ *
+ * The **choices** are the content's (their durations and multipliers) and the
+ * **cycle** is the server's (`cp` and `lastAccruedAt` in the item's attribute
+ * bag). The countdown is a reading of the server's timestamp against the
+ * client's clock; it is presentation only, because the server decides when a
+ * collection is due. Nothing here can grant a resource or choose a multiplier.
+ */
+export function productionPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  isoId: number | null,
+  now: number,
+): ProductionPanelView | null {
+  if (isoId === null) return null;
+  const tuple = selectedItem(world, isoId);
+  if (!tuple) return null;
+  const item = (bundle.items ?? []).find((entry) => entry.id === Number(tuple[0]));
+  if (!item || item.type !== 'b') return null;
+  if (!item.collect_type || !(item.collect > 0)) return null;
+  if ((item.properties as Record<string, unknown> | undefined)?.multiCollectable !== 1) {
+    return null;
+  }
+
+  const minutes = positiveTuple(bundle.globals?.['COLLECT_MINUTES'], FALLBACK_MINUTES);
+  const multipliers = positiveTuple(
+    bundle.globals?.['COLLECT_MULTIPLIER'],
+    FALLBACK_MULTIPLIER,
+  );
+  const state = productionState(world, isoId);
+  if (!state) return null;
+  // buildingState() defaults cp to 1 on the server, so an unchosen period is
+  // the 5-minute cycle there. The display must mark that same option active.
+  const period = state.period !== null && minutes[state.period - 1] !== undefined
+    ? state.period
+    : 1;
+  const startedAt = state.startedAt !== null && state.startedAt > 0 ? state.startedAt : 0;
+  const secondsRemaining = startedAt > 0
+    ? Math.max(0, startedAt + minutes[period - 1]! * 60 - now)
+    : 0;
+
+  return {
+    isoId,
+    name: item.name,
+    resource: item.collect_type,
+    period,
+    startedAt,
+    secondsRemaining,
+    due: secondsRemaining === 0,
+    options: minutes.map((value, index) => ({
+      period: index + 1,
+      minutes: value,
+      multiplier: multipliers[index]!,
+      amount: predictedAmount(
+        state.collect,
+        state.unitsInside,
+        state.unitCapacity,
+        item.collect ?? 0,
+        multipliers[index]!,
+      ),
+      active: index + 1 === period,
+    })),
+  };
 }
 
 /**

@@ -7,7 +7,7 @@ import path from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
 
 import { PostgresPlayerStore } from './pgstore.ts';
-import { createApplier, localDayOfWeek } from './apply.ts';
+import { LAST_QUEST_REWARD_KEY, createApplier, localDayOfWeek } from './apply.ts';
 import { runMigrations } from './migrations.ts';
 import { SCHEMA_MIGRATIONS } from './schema.ts';
 import { isPremiumActive } from '@swl/rules';
@@ -189,6 +189,37 @@ describe('a restart', () => {
         args: [],
       });
       assert.equal(again.applied, true);
+      await second.db.close();
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it('keeps the last quest reward receipt', async () => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), 'swl-restart-'));
+    try {
+      const receipt = {
+        questId: '100000002',
+        rank: 2,
+        rewards: [
+          { resource: 'gold', amount: 4000 },
+          { resource: 'xp', amount: 100 },
+          { resource: 'oil', amount: 1400 },
+        ],
+      };
+      const first = await open(directory);
+      const saved = world();
+      saved.save.privateState[LAST_QUEST_REWARD_KEY] = receipt;
+      await first.store.add('p1', saved);
+      await first.db.close();
+
+      // The receipt is read straight back from the persisted save: a
+      // reconnecting client can rebuild the result screen without replaying
+      // the reward transaction.
+      const second = await open(directory);
+      const after = await second.store.get('p1');
+      assert.ok(after);
+      assert.deepEqual(after.world.save.privateState[LAST_QUEST_REWARD_KEY], receipt);
       await second.db.close();
     } finally {
       await rm(directory, { recursive: true, force: true });

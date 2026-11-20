@@ -7,6 +7,7 @@ import {
   dartsState,
   marketState,
   premiumState,
+  productionState,
   questState,
 } from './featurestate.ts';
 import type { WorldSnapshot } from './session.ts';
@@ -300,5 +301,71 @@ describe('activeQuestState', () => {
     const state = activeQuestState(world({ activeQuest: { questId: '100000002' } }));
     assert.ok(state);
     assert.equal(Object.keys(state!.elements).length, 0);
+  });
+});
+
+describe('productionState', () => {
+  const ATTRS = {
+    cp: 3,
+    lastAccruedAt: 1_700_000_000,
+    collect: 100,
+    unitCapacity: 5,
+    unitsInside: 2,
+    collectType: 'w',
+  };
+
+  function withAttrs(attrs: unknown): WorldSnapshot {
+    return world({}, { items: { '7': [2, 0, 0, 0, 0, [], attrs, 1] } });
+  }
+
+  it('reads the server-owned production attributes verbatim', () => {
+    assert.deepEqual(productionState(withAttrs(ATTRS), 7), {
+      period: 3,
+      startedAt: 1_700_000_000,
+      collect: 100,
+      unitCapacity: 5,
+      unitsInside: 2,
+      collectType: 'w',
+    });
+  });
+
+  it('reads an empty attribute bag as unset, never as an invented cycle', () => {
+    assert.deepEqual(productionState(withAttrs({}), 7), {
+      period: null,
+      startedAt: null,
+      collect: null,
+      unitCapacity: null,
+      unitsInside: null,
+      collectType: null,
+    });
+  });
+
+  it('ignores malformed attributes', () => {
+    assert.deepEqual(
+      productionState(
+        withAttrs({
+          cp: '4',
+          lastAccruedAt: Number.NaN,
+          collect: 'x',
+          unitCapacity: Number.POSITIVE_INFINITY,
+          unitsInside: '2',
+          collectType: 7,
+        }),
+        7,
+      ),
+      {
+        period: null,
+        startedAt: null,
+        collect: null,
+        unitCapacity: null,
+        unitsInside: null,
+        collectType: null,
+      },
+    );
+  });
+
+  it('is null when there is no selection or no such map item', () => {
+    assert.equal(productionState(world(), 7), null);
+    assert.equal(productionState(world(), null), null);
   });
 });
