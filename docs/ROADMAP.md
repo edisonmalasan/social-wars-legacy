@@ -1379,15 +1379,19 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Quests, goals, the darts minigame, the marketplace, premium and the weekly bonus are
       functional — darts, the market, goals, premium and the weekly bonus are each verified
       with a rules model, a server applier and a client request/model. **Assault quests are
-      only partly resolved:** `end_quest` does resolve a `destroyAll` quest with scripted
-      elements from the server-held `activeQuest` (`isQuestVictory` / `finishQuest` /
-      `awardQuest`, a content-derived reward paid once, the client's `win` / `loot` /
-      `difficulty` ignored, and empty-roster and recorded-loss wins refused), but the
-      applier has no path for `nearDeathQuestElement`, `defendersClearedQuestElement`,
-      `setQuestCounter` or `addQuestCounter`. Quests won by `nearDeathAll`,
-      `defendersClearedAll`, `countersAtLeast` or unarmed `countersZero` therefore cannot
-      resolve. The precise dependency — new event commands or a server map roster plus
-      positional simulator, and a scope decision — is in *Unimplemented layers*
+      still only partly resolved:** `end_quest` resolves wins that come from validated
+      scripted-element events. It dispatches each ref by `QuestElementSpec.trigger`, so
+      `destroyAll` (Q02, Q05, Q12, Q13), `nearDeathAll` (Q01, Q04) and `defendersClearedAll`
+      combinations (Q06, Q07, Q09) now win from the server-held `activeQuest`
+      (`isQuestVictory` / `finishQuest` / `awardQuest`, a content-derived reward paid once,
+      the client's `win` / `loot` / `difficulty` ignored, and empty-roster and recorded-loss
+      wins refused). Q08 Rocket is server-resolvable but client-unwinnable (`canDie: false`)
+      and stays flagged. **Counter-based quests still cannot resolve:** the weekly quest and
+      the eight hardcore quests have empty element rosters, Q03 Convoy has no truck-arrival
+      event, and Q10 / Q11 / Q14 use `countersZero` on counters no mutator seeds. The precise
+      dependency — build-time roster extraction from the vendored quest maps plus client
+      instrumentation, or new event commands (a scope decision, since the catalogue is
+      cross-checked) — is in *Unimplemented layers*
 - [x] **Magic and tech are functional** (`packages/rules/src/magic.ts`,
       `packages/server/src/apply.ts`, `packages/server/src/shim.ts`): the ten shipped spells
       are indexed from the content bundle with their mana cost, area, unlock level and
@@ -2139,7 +2143,7 @@ owner and a precise condition for closing it.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| G | Full authoritative positional combat (the residual quest dependency) | Chapters, goals, darts, the market, premium and the weekly bonus each have a rules model + server applier + client request/model. The quest applier resolves **only `destroyAll` wins with scripted elements**: it fills `script.destroyed` from validated kill reports, refuses empty-roster and recorded-loss wins, and owns the roster, win, rewards and once-only guard. There is no applier path for `nearDeathQuestElement`, `defendersClearedQuestElement`, `setQuestCounter` or `addQuestCounter`, so `nearDeathAll`, `defendersClearedAll`, `countersAtLeast` and unarmed `countersZero` wins cannot resolve; an assault quest also still trusts the client's report that an element died. This is in-repo work, not an external blocker | Either add commands carrying the missing near-death / defenders-cleared / counter events, or build a server map roster and a positional simulator from the decompiled client and drive quest events from server-simulated outcomes. Which to build needs a scope decision; until then the G4 quest item stays open |
+| G | Full authoritative positional combat (the residual quest dependency) | The quest applier now dispatches each validated element ref by `QuestElementSpec.trigger` instead of always calling `killQuestElement`. Wins that come from **scripted elements** resolve: `destroyAll` (Q02 Central Nuclear, Q05 Assault Convoy, Q12 TankBoss, Q13 Tyrannosaurus), `nearDeathAll` (Q01 Bazooka, Q04 Supertank) and `defendersClearedAll` combinations (Q06 Airstrike, Q07 Ship, Q09 Labs). `onNearDeath` feeds `script.nearDeath` and `onKillDefenders` feeds `script.defendersCleared`; `onKill` and `none` still go through `killQuestElement` for destruction, counters and key-element loss, and the three-channel vacuity guard still refuses empty-roster and recorded-loss wins. Q08 Rocket is server-resolvable but client-unwinnable (`canDie: false`) and stays flagged. The residual gap is **counter-based quests**: the weekly `100000049` needs `countersAtLeast botsKilled>=5` but has `elements: []`, so it needs a 5-GunBot (item 1061) roster and per-bot kill events; the eight hardcore quests (15-22) need `countersZero enemiesAlive` but have `elements: []`, so the guard correctly refuses their vacuous win; Q03 Convoy needs `trucksArrived>=3` but no command or `set_quest_var` key carries a truck-arrival event; Q10 Special Ops, Q11 Save Villages and Q14 Spy2 use `countersZero` on counters absent from `initialCounters`, so the `c in script.counters` check fails and no mutator seeds or decrements them. This is in-repo work, not an external blocker | Extract the quest rosters at **build time** from the vendored, read-only `upstream/socialwarriors/villages/quest/<id>.json` map snapshots (the weekly roster is in `100000049.json`: five unit id 1061) into the content bundle, and instrument the client to emit the missing counter / truck-arrival events — `upstream/` can never become a runtime dependency. Alternatively add commands carrying those events, but that changes the cross-checked 94-command catalogue and needs a scope decision. Until then the G4 quest item stays open |
 
 ---
 
@@ -2235,6 +2239,26 @@ reviewed without reconstructing the conversation that led to it.*
   layers*. Full gate green — `pnpm test` 1467 pass / 0 fail, `pnpm typecheck`,
   `pnpm lint`, `check-roadmap.mjs`, `check-report-sync.mjs`,
   `verify-command-catalogue.mjs` (94/94/94) all with exit 0
+- **2026-11-20 — quest trigger dispatch recorded; G4 quest item stays open.** Task 1 taught
+  the authoritative applier to dispatch each validated element ref by its
+  `QuestElementSpec.trigger` instead of always calling `killQuestElement`. `onNearDeath` now
+  feeds `script.nearDeath` and `onKillDefenders` feeds `script.defendersCleared`; `onKill`
+  and `none` still go through `killQuestElement` for destruction, counters and key-element
+  loss. The vacuity guard now requires at least one validated event in any of the three
+  channels, still refuses a recorded loss, and preserves the empty-roster `countersZero`
+  protection. *Rationale:* destroyAll, nearDeathAll and defendersClearedAll quests with
+  scripted elements now resolve, but counter-based quests still have no event source, so
+  the G4 "Quests, goals, … functional" item remains open rather than being ticked on a
+  partial win. The residual is in-repo (build-time roster extraction from the vendored quest
+  maps plus client instrumentation, or new commands needing a scope decision), not an
+  external blocker; the stale claim that near-death and defender wins cannot resolve was
+  corrected on that open item and in *Unimplemented layers*. *Evidence:* six new tests in
+  `apply.test.ts`'s "the active assault quest" block (Q01 nearDeath win, re-sent-ref
+  idempotency, key-element loss refusal, legacy replay, Q06 mixed defender/destroy win,
+  both-refs-required) — RED with 4 failures before the change, GREEN after — and a green
+  gate: `pnpm test` 1473 pass / 0 fail, `pnpm typecheck`, `pnpm lint`,
+  `check-roadmap.mjs` (401 items, Group G still 72 done / 9 open),
+  `check-report-sync.mjs` (4 claims), `verify-command-catalogue.mjs` (94/94/94)
 
 ---
 
