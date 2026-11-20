@@ -820,11 +820,15 @@ async function playThroughDom(page, serverPort, browserName) {
       console.log('  UI: reported a server-verified kill with the two-argument builder');
       continue;
     }
-    const hasStrike = await domValue(
+    // Quest gestures are guarded against duplicate in-flight requests, so the
+    // button is disabled until the previous strike settles. Wait for it rather
+    // than racing the guard; the server still decides every outcome.
+    await domWait(
       page,
-      "!!document.querySelector('#ui .swl-dialog button[data-swl-action=\"strike\"]:not([disabled])')",
+      "document.querySelectorAll('#ui .swl-dialog button[data-swl-action=\"strike\"]:not([disabled])').length",
+      (value) => value >= 1,
+      'an enabled Strike button after the previous request settled',
     );
-    if (!hasStrike) throw new Error('no enabled Strike button while the counter is short');
     await domClick(
       page,
       '#ui .swl-dialog button[data-swl-action="strike"]:not([disabled])',
