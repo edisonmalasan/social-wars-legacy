@@ -86,4 +86,34 @@ describe('the training queue', () => {
       readyToTake: false,
     });
   });
+
+  it('never claims a ready unit without a real server start timestamp', () => {
+    // A missing or malformed `ts` is not a start time the server gave us,
+    // even if the countdown has elapsed in the display.
+    assert.equal(trainingView({ nu: 1, ui: 1008 }, 20, 1000).readyToTake, false);
+    assert.equal(
+      trainingView({ nu: 1, ui: 1008, ts: 'not-a-time' }, 20, 1000).readyToTake,
+      false,
+    );
+    // The combination that used to fabricate a ready unit: no ts and no
+    // content duration.
+    assert.equal(trainingView({ nu: 1, ui: 1008 }, 0, 1000).readyToTake, false);
+  });
+
+  it('never claims a ready unit without a positive content training time', () => {
+    assert.equal(trainingView({ nu: 1, ts: 100, ui: 1008 }, 0, 1000).readyToTake, false);
+    assert.equal(
+      trainingView({ nu: 1, ts: 100, ui: 1008 }, Number.NaN, 1000).readyToTake,
+      false,
+    );
+    assert.equal(
+      trainingView({ nu: 1, ts: 100, ui: 1008 }, Number.POSITIVE_INFINITY, 1000)
+        .readyToTake,
+      false,
+    );
+  });
+
+  it('never claims a ready unit when the queue is empty', () => {
+    assert.equal(trainingView({ ts: 100, ui: 1008 }, 20, 1000).readyToTake, false);
+  });
 });

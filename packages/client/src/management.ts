@@ -98,10 +98,14 @@ function bagNumber(value: unknown, fallback: number): number {
  * attribute bag. `trainingTime` is the content's seconds for one unit and
  * `now` is the caller's unix second.
  *
- * When a queue exists but `ts` is missing or invalid, the safe default is
- * "just started": the countdown shows the full training time and the unit is
- * **not** claimed ready. Inventing a ready unit would offer a Take command
- * the server is certain to refuse.
+ * A unit is only ever shown as ready when **all** of these hold: the queue is
+ * non-empty, `ts` is present and finite (a real server start), the content's
+ * training time is positive, and the countdown has elapsed. A missing or
+ * malformed `ts` falls back to `now` only to keep the countdown display
+ * conservative; it is never a start time we can claim finished. Without a
+ * positive content duration a finished timestamp says nothing either. Both
+ * cases would fabricate a ready unit and offer a Take command the server is
+ * certain to refuse.
  */
 export function trainingView(
   attributes: Readonly<Record<string, unknown>> | null | undefined,
@@ -110,7 +114,14 @@ export function trainingView(
 ): TrainingView {
   const queued = bagNumber(attributes?.['nu'], 0);
   const unitItemId = bagNumber(attributes?.['ui'], 0);
-  const startedAt = bagNumber(attributes?.['ts'], now);
+  const rawStart = attributes?.['ts'];
+  const parsedStart = Number(rawStart);
+  const hasRealStart =
+    rawStart !== undefined && rawStart !== null && Number.isFinite(parsedStart);
+  // `now` is a display-only fallback: it keeps the countdown at its full
+  // length when the server has not given us a start, but it is not evidence
+  // that training finished.
+  const startedAt = hasRealStart ? parsedStart : now;
   const duration = Number.isFinite(trainingTime) && trainingTime > 0 ? trainingTime : 0;
   const elapsed = Math.max(0, now - startedAt);
   // No queue means no countdown to draw.
@@ -119,7 +130,7 @@ export function trainingView(
     queued,
     unitItemId,
     remainingSeconds: Math.ceil(remaining),
-    readyToTake: queued > 0 && remaining <= 0,
+    readyToTake: queued > 0 && hasRealStart && duration > 0 && remaining <= 0,
   };
 }
 
