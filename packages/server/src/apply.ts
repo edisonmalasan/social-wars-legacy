@@ -2102,7 +2102,7 @@ function setQuestVarCommand(
       if (!spec) return { applied: false, refused: 'unknown-quest', world };
       const ensured = ensureActiveQuest(world, questId, deps);
       if (!ensured.ok) return { applied: false, refused: ensured.reason, world };
-      const kills = applyQuestKills(ensured.state, value as string[], spec, deps);
+      const kills = applyQuestEvents(ensured.state, value as string[], spec, deps);
       if (!kills.ok) return { applied: false, refused: kills.reason, world };
       advanced = kills.state;
     }
@@ -2303,7 +2303,7 @@ function ensureActiveQuest(
  * `killQuestElement` would award its gold/XP again on a duplicate destroyed
  * ref.
  */
-function applyQuestKills(
+function applyQuestEvents(
   state: QuestState,
   refs: readonly string[],
   spec: QuestSpec,
@@ -2317,7 +2317,14 @@ function applyQuestKills(
   }
   let next = state;
   for (const ref of refs) {
-    switch (triggerByRef.get(ref)) {
+    const trigger = triggerByRef.get(ref);
+    // The roster is built 1:1 over spec.elements, so a validated ref always
+    // has a trigger. Fail loudly rather than consume it silently if that
+    // invariant ever breaks.
+    if (trigger === undefined) {
+      throw new Error(`unknown quest element trigger for ref: ${ref}`);
+    }
+    switch (trigger) {
       case 'onNearDeath':
         if (!next.script.nearDeath.includes(ref)) {
           next = nearDeathQuestElement(next, ref);
@@ -2335,6 +2342,12 @@ function applyQuestKills(
           next = killQuestElement(next, byRef.get(ref)!).state;
         }
         break;
+      default: {
+        // Exhaustive over QuestElementTrigger: a new trigger value cannot be
+        // added without this check failing at compile time.
+        const exhaustive: never = trigger;
+        throw new Error(`unhandled quest element trigger: ${String(exhaustive)}`);
+      }
     }
   }
   return { ok: true, state: next };
@@ -2416,7 +2429,7 @@ function endQuestCommand(
     // Only this quest's roster is replayed here; direct `set_quest_var` writes
     // still refuse any off-roster ref outright.
     const rosterRefs = new Set(questRoster(spec, deps.items).map((element) => element.ref));
-    const kills = applyQuestKills(
+    const kills = applyQuestEvents(
       ensured.state,
       refs.filter((ref) => rosterRefs.has(ref)),
       spec,
