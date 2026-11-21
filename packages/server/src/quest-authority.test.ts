@@ -511,6 +511,9 @@ describe('Q11 server-clock timer', () => {
     assert.equal(stamped.startedAt, 1000);
     assert.equal(stamped.lastTickAt, 1000);
     assert.equal(stamped.timeRemaining, 240);
+    // The endpoint's summary must carry the same countdown so the client can
+    // draw it without guessing a local timer.
+    assert.equal(started.summary.timeRemaining, 240);
 
     // Inside the window an action is accepted and the clock checkpoint moves.
     clock.value = 1000 + 239;
@@ -522,6 +525,7 @@ describe('Q11 server-clock timer', () => {
     if (!within.ok) return;
     assert.equal(active(within.world).lastTickAt, 1239);
     assert.equal(active(within.world).timeRemaining, 1);
+    assert.equal(within.summary.timeRemaining, 1);
 
     // One more second exhausts the timer: the quest is a loss and every later
     // action is refused with an unchanged save.

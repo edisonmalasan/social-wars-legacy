@@ -1025,6 +1025,7 @@ async function main(): Promise<void> {
           counters: result.body.counters,
           elements: result.body.elements,
           events: result.body.events,
+          timeRemaining: result.body.timeRemaining,
         },
         questViewOptions(content, questId),
       );

@@ -215,9 +215,9 @@ first means guessing at the rules being cloned.
       (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
       attack interval, the velocity, the life and the population
 - [ ] The panels and the popups are **rendered**, and the popups that are not
-      implemented are recorded as dropped. The screen inventory now reads **98
-      implemented / 52 dropped / 110 planned**; the counts are checked by
-      `packages/client/src/screens.test.ts`, and this item stays open while **110
+      implemented are recorded as dropped. The screen inventory now reads **99
+      implemented / 52 dropped / 109 planned**; the counts are checked by
+      `packages/client/src/screens.test.ts`, and this item stays open while **109
       screens are planned** - a `Deferred: ` reason records honest scope, not a
       rendered screen or a drop
 - [x] The authoritative **item id → delegate** map is extracted from
@@ -1188,21 +1188,21 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **98 implemented** - the clone models the screen's behaviour, and the decision
+      - **99 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **52 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **110 planned** - in scope, the client's behaviour is real, and not modelled
+      - **109 planned** - in scope, the client's behaviour is real, and not modelled
         yet; each now carries a `Deferred: ` reason saying what is missing or how it
         unblocks
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
       exists, every dropped one must say why, and every planned one must start with
       `Deferred: ` and say what is missing or how it unblocks. The counts above are
-      checked by the same test. **This item stays open while 110 screens are planned**:
+      checked by the same test. **This item stays open while 109 screens are planned**:
       a deferral reason is neither an implementation nor a drop, and the earlier
       106/23/131 breakdown was a factual error, not a hidden batch of finished work
 - [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
@@ -1239,6 +1239,12 @@ assault against the new server, and the cheat battery is fully rejected.
       button that is disabled when the mana is short. Casting sends `use_magic`;
       the server deducts the mana and counts the use. Tests pin the three-to-a-page
       paging, the level thresholds, the quest veto and the low-mana state
+- [x] The **mission countdown is drawn** from the server's own timer:
+      `activeQuestState` reads `timeRemaining`, `activeQuestView` carries it, and
+      the combat panel prints it while the quest runs. The client never runs a
+      local clock for it — the number is the server's answer, and it is rebuilt
+      on reload from the same save. This closes the countdown screen's deferral,
+      with its unreproduced "1 Enemy alive" variant recorded in the inventory
 - [x] The **daily and Monday bonus screens** are modelled
       (`packages/client/src/bonus.ts`): the cycle day, the readiness, the lapsed-streak
       flag, the wait to the next local day and the weekly bonus's state are all read

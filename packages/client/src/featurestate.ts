@@ -310,6 +310,8 @@ export interface ActiveQuestStateView {
   readonly events: readonly string[];
   /** The team the server bound to this quest, when one was accepted. */
   readonly team?: Army;
+  /** The server's remaining mission seconds, or null when the quest has no timer. */
+  readonly timeRemaining: number | null;
 }
 
 /**
@@ -333,8 +335,10 @@ export function activeQuestState(world: WorldSnapshot): ActiveQuestStateView | n
     }
   }
   const team = armyOf(stored['team']);
+  const remaining = number(stored['timeRemaining']);
   return {
     questId: typeof stored['questId'] === 'string' ? stored['questId'] : null,
+    timeRemaining: remaining === null ? null : Math.max(0, remaining),
     counters: script ? numbers(script['counters']) : {},
     elements: view,
     events: ledger ? strings(ledger['events']) : [],

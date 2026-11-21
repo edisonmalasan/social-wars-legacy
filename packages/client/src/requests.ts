@@ -263,6 +263,8 @@ export interface QuestLedgerSummary {
   readonly counters: Record<string, number>;
   readonly elements: Record<string, QuestLedgerElement>;
   readonly events: string[];
+  /** The server's remaining mission seconds, or null when the quest has no timer. */
+  readonly timeRemaining: number | null;
   /** The team bound to the active quest, as the server answered it. */
   readonly team?: Army;
 }
@@ -323,6 +325,16 @@ function optionalArmy(source: Record<string, unknown>): { team?: Army } | null {
   return army === null ? null : { team: army };
 }
 
+/**
+ * Read the server's remaining mission seconds. A missing, malformed or
+ * negative value is null — the client never fabricates a local timer.
+ */
+function optionalTimeRemaining(source: Record<string, unknown>): number | null {
+  const value = source['timeRemaining'];
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null;
+  return value;
+}
+
 /** Parse a ledger summary, returning null rather than fabricating one. */
 function questSummaryBody(value: unknown): QuestLedgerSummary | null {
   const source = questRecord(value);
@@ -348,6 +360,7 @@ function questSummaryBody(value: unknown): QuestLedgerSummary | null {
     counters,
     elements: parsedElements,
     events: source['events'].filter((event): event is string => typeof event === 'string'),
+    timeRemaining: optionalTimeRemaining(source),
     ...team,
   };
 }

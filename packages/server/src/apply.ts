@@ -326,6 +326,8 @@ export interface QuestLedgerSummary {
   counters: Readonly<Record<string, number>>;
   elements: Readonly<Record<string, QuestLedgerElement>>;
   events: readonly string[];
+  /** The server's remaining mission seconds, or null when the quest has no timer. */
+  timeRemaining: number | null;
   /** The team the server accepted, echoed so the client never guesses it. */
   team?: Army;
 }
@@ -2925,6 +2927,7 @@ function questSummary(state: ActiveQuestState): QuestLedgerSummary {
       Object.entries(state.ledger.elements).map(([ref, element]) => [ref, { ...element }]),
     ),
     events: [...state.ledger.events],
+    timeRemaining: state.timeRemaining,
     ...(state.team ? { team: state.team } : {}),
   };
 }
