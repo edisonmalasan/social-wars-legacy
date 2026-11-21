@@ -20,12 +20,14 @@
  */
 import { Application, Assets, Container, Rectangle, Sprite, Texture } from 'pixi.js';
 
-import type { CameraState, FrameManifest, Viewport } from '@swl/client';
+import type { CameraState, FrameManifest, Viewport, ViewportSize } from '@swl/client';
 
 import type { SceneSprite } from './scene.ts';
 import { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
-import { stageLayout, viewportOf, type StageLayout } from '@swl/client';
+import { viewportOf, type StageLayout } from '@swl/client';
 import { initialCamera } from '@swl/client';
+import { fitStage } from './viewport.ts';
+import { TouchGestureGuard, type TouchPoint } from './touch.ts';
 
 export { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
 
@@ -90,15 +92,63 @@ export class WorldRenderer {
 
     const renderer = new WorldRenderer(app, options);
 
+    // The gesture guard. A mouse click keeps the original, immediate path;
+    // touch is deferred to release so a pinch or the second tap of a double
+    // tap cannot fire a second command. The guard only decides *whether to
+    // ask* — the server still decides what happens (see touch.ts).
+    const touchGuard = new TouchGestureGuard();
+    const isTouch = (event: PointerEvent): boolean =>
+      event.pointerType === 'touch' || event.pointerType === 'pen';
+
     // The click, in the canvas's own pixels. The stage is scaled by a
     // CSS transform, so the position is taken back into the canvas's
     // coordinates rather than the window's.
-    app.canvas.addEventListener('pointerdown', (event) => {
+    const pointOf = (event: PointerEvent): TouchPoint | null => {
       const rect = app.canvas.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
-      const x = ((event.clientX - rect.left) / rect.width) * app.canvas.width;
-      const y = ((event.clientY - rect.top) / rect.height) * app.canvas.height;
-      renderer.onClick?.(x, y);
+      if (rect.width === 0 || rect.height === 0) return null;
+      return {
+        x: ((event.clientX - rect.left) / rect.width) * app.canvas.width,
+        y: ((event.clientY - rect.top) / rect.height) * app.canvas.height,
+      };
+    };
+
+    app.canvas.addEventListener('pointerdown', (event) => {
+      const point = pointOf(event);
+      if (!point) return;
+      if (!isTouch(event)) {
+        renderer.onClick?.(point.x, point.y);
+        return;
+      }
+      // Capture so a release just outside the canvas still arrives. A
+      // synthetic event has no active pointer to capture, so ignore that.
+      try {
+        app.canvas.setPointerCapture(event.pointerId);
+      } catch {
+        /* synthetic pointer — no capture needed */
+      }
+      touchGuard.down(event.pointerId, point);
+    });
+
+    app.canvas.addEventListener('pointermove', (event) => {
+      if (!isTouch(event)) return;
+      const point = pointOf(event);
+      if (point) touchGuard.move(event.pointerId, point);
+    });
+
+    app.canvas.addEventListener('pointerup', (event) => {
+      if (!isTouch(event)) return;
+      const point = pointOf(event);
+      if (!point) {
+        touchGuard.cancel();
+        return;
+      }
+      if (touchGuard.up(event.pointerId, event.timeStamp, point)) {
+        renderer.onClick?.(point.x, point.y);
+      }
+    });
+
+    app.canvas.addEventListener('pointercancel', (event) => {
+      if (isTouch(event)) touchGuard.cancel();
     });
 
     return renderer;
@@ -235,11 +285,12 @@ export class WorldRenderer {
    * would put the panels on top of each other. The scale is a **whole
    * number** where it can be, so the pixel art stays sharp.
    */
-  fit(element: HTMLElement): StageLayout {
-    const layout = stageLayout({
-      width: element.clientWidth || window.innerWidth,
-      height: element.clientHeight || window.innerHeight,
-    });
+  fit(element: HTMLElement, viewport: ViewportSize): StageLayout {
+    // The element is a fixed 760x600, so its own clientWidth/clientHeight
+    // describe the stage and would give a scale of 1 everywhere. Fit to the
+    // window instead, and apply only the scale to the element (its internal
+    // 760x600 coordinate space is unchanged).
+    const layout = fitStage(element, viewport);
     element.style.transform = `translate(-50%, -50%) scale(${layout.scale})`;
     return layout;
   }

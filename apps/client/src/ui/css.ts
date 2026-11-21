@@ -49,6 +49,20 @@ export function uiCss(): string {
   pointer-events: auto;
 }
 
+/*
+ * Panels that can be long scroll **inside** the 760x600 stage instead of
+ * clipping or pushing their tabs out of it. touch-action: pan-y tells a
+ * touch browser the panel owns vertical panning (the canvas has
+ * touch-action: none), so a finger scrolls the list rather than the page.
+ * The font-scale variables below are deliberately untouched.
+ */
+.swl-inventory-scroll,
+.swl-build-list,
+.swl-dialog-body {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* --- The account form -------------------------------------------------- */
 
 .swl-auth-modes {
@@ -316,12 +330,17 @@ export function uiCss(): string {
 
 /* --- The inventory panel ---------------------------------------------- */
 
+/* The chapter strip above ends at about y=144, so the inventory starts
+   below it. The maximum height is reduced by the same amount: the panel
+   keeps its old bottom edge and scrolls its contents rather than covering
+   the chapter buttons. This holds at every viewport because the whole stage
+   is scaled uniformly, never reflowed. */
 .swl-inventory {
   position: absolute;
   right: 8px;
-  top: 104px;
+  top: 152px;
   width: 220px;
-  max-height: 240px;
+  max-height: 192px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

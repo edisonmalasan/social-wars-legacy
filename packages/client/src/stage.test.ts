@@ -44,6 +44,15 @@ describe('the stage scale', () => {
   it('never goes above 1, because the layout is not fluid', () => {
     assert.equal(stageScale({ width: 4000, height: 3000 }), 1);
   });
+
+  it('scales to real phone viewports', () => {
+    // A portrait phone is narrower than the stage, so the width decides.
+    // Device pixel ratio is irrelevant: the model works in CSS pixels.
+    assert.equal(stageScale({ width: 390, height: 844 }), 0.51);
+    assert.equal(stageScale({ width: 360, height: 640 }), 0.5);
+    // A landscape phone is shorter than the stage, so the height decides.
+    assert.equal(stageScale({ width: 640, height: 360 }), 0.6);
+  });
 });
 
 describe('the stage layout', () => {
@@ -74,5 +83,22 @@ describe('the stage layout', () => {
   it('says when the text is too small to read', () => {
     assert.equal(stageLayout({ width: 800, height: 600 }).tooSmall, false);
     assert.equal(stageLayout({ width: 200, height: 150 }).tooSmall, true);
+  });
+
+  it('lays out real phone viewports', () => {
+    const portrait = stageLayout({ width: 390, height: 844 });
+    assert.equal(portrait.scale, 0.51);
+    assert.equal(portrait.portrait, true);
+    assert.equal(portrait.tooSmall, false);
+
+    const narrow = stageLayout({ width: 360, height: 640 });
+    assert.equal(narrow.scale, 0.5);
+    assert.equal(narrow.portrait, true);
+    assert.equal(narrow.tooSmall, true);
+
+    const landscape = stageLayout({ width: 640, height: 360 });
+    assert.equal(landscape.scale, 0.6);
+    assert.equal(landscape.portrait, false);
+    assert.equal(landscape.tooSmall, false);
   });
 });

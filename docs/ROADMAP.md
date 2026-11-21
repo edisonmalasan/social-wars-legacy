@@ -1788,6 +1788,102 @@ pricing remain server-side.
 
 ---
 
+## Phone-Ready Shared Client — partial, emulated-browser verified
+
+*Status: **partial**. This outcome is recorded here, **outside** the
+`## Group X` sections above, so `node scripts/check-roadmap.mjs` still counts
+the same **401** items (Group G: 81 items, 73 done / 8 open) and the
+device-dependent Group G5 boxes stay open. The G5.1, G5.2 and expansion
+records above are preserved unchanged. Every browser result below is
+**EMULATION** in a real Chromium browser — never physical-device verification,
+never an Android or iOS build, and never a Firefox or Safari run.*
+
+**Implemented and verified by EMULATION (not by device):**
+
+- **The real viewport drives the stage scale.** The one shared client feeds
+  `window.innerWidth/innerHeight` into the tested `stage.ts` model and applies
+  its scale as a CSS transform to the fixed 760 × 600 stage. At **390 × 844 CSS
+  pixels @dpr 2**, in **Chrome and Edge**, `node scripts/e2e-mobile-layout.mjs`
+  reported `EMULATION chrome: 390x844 @dpr 2; #stage scale 0.51 =
+  stageScale({390,844}) 0.51` (and the same line for edge). The emulation uses
+  `Emulation.setDeviceMetricsOverride` and
+  `Emulation.setTouchEmulationEnabled`, with `mobile: false` deliberately:
+  headless Chromium's mobile mode reports an `innerWidth` inconsistent with
+  the layout viewport (575/690 instead of 390), which would make the client
+  fit to the wrong size. No second renderer and no platform-specific screen.
+- **The panels stay inside the stage and do not overlap.** In both browsers
+  the HUD, goals, inventory and chapter panels were measured inside the
+  transformed stage `(1.2, 269.0)` to `(388.8, 575.0)` with no pairwise
+  overlap. The strict assertion first exposed a **pre-existing** 40 px overlap
+  between the chapter strip and the inventory at the original desktop layout
+  too (chapters bottom y=144, inventory top y=104): it was a real defect, not
+  an emulation artefact. `apps/client/src/ui/css.ts` now starts the inventory
+  at y=152 with a 192 px maximum height — the same bottom edge as before, with
+  the contents scrolling — and `apps/client/src/touch.test.ts` guards the
+  placement. No assertion was weakened and the desktop e2e still passes.
+- **The town is drawn and touch selects.** `window.__swl.visibleSprites()`
+  reported one visible sprite in each emulated browser. A touch `pointerdown`
+  followed by `pointerup` (`pointerType: 'touch'`) on the canvas selected
+  building item 26 in both browsers; the bare `pointerdown` selected nothing,
+  because the shared client defers touch to release as the duplicate-command
+  guard requires. The emulated client signed in with a token issued by the
+  real server (`status started`), and the selected town was read from that
+  server's save. Touch still only decides *whether to ask*; the server decides
+  every outcome.
+- **Browsers run versus not run.** The script ended with `the browsers that
+  ran: chrome, edge`. A browser that is not installed is reported as `NOT RUN`,
+  never as a failure, and the run fails only if a drivable browser fails or
+  none runs. Firefox and Safari were **not run**: they are not on this host and
+  these CDP harnesses cannot drive them.
+- **The Capacitor shell is scaffolded, not built.** `apps/mobile/` carries a
+  config-only `capacitor.config.ts`, a dependency-free `package.json`, a README
+  with the exact prerequisites and commands, and an empty lockfile importer.
+  No native project, `cap add`, `cap sync`, JDK, Android SDK, Xcode, APK, IPA
+  or signing was produced.
+
+**Gates (all run on the final tree; none skipped):**
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Unit tests | `pnpm test` | **PASS** — 1730 tests, 1730 pass, 0 fail |
+| Integration tests | `pnpm test:integration` | **PASS** — 64 pass, 0 fail |
+| Typecheck | `pnpm typecheck` | **PASS** |
+| Lint | `pnpm lint` | **PASS** — 141 browser modules, none needs node |
+| Content build / check | `pnpm build:content`, `pnpm check:content` | **PASS** — build id `63e067bd…` |
+| Command catalogue | `node scripts/verify-command-catalogue.mjs` | **PASS** — 94 commands |
+| Roadmap counts | `node scripts/check-roadmap.mjs` | **PASS** — 401 items |
+| Report sync | `node scripts/check-report-sync.mjs` | **PASS** — 4 claims |
+| Cheat battery | `node scripts/run-cheat-battery.mjs` | **PASS** — 11 attacks had no effect |
+| Golden master | `node scripts/golden-master.mjs` | **PASS** — 50 scenarios, 0 differences |
+| Coverage | `node scripts/check-coverage.mjs` | **PASS** — 97.61 % lines / 85.53 % functions / 95.54 % branches |
+| Upstream | `node scripts/verify-upstream.mjs` | **PASS** — 3292 files, 0 mismatched |
+| Licensing / no-Flash | `node scripts/check-licensing.mjs`, `node scripts/check-no-flash.mjs` | **PASS** — run before the client build, with `apps/client/dist` absent, as in CI |
+| Client build | `pnpm --filter @swl/app-client build` | **PASS** — only the pre-existing chunk-size warning |
+| Desktop e2e | `node scripts/e2e-test.mjs` | **PASS** — `browsers that ran: chrome, edge`; full play session and restart |
+| Emulated phone | `node scripts/e2e-mobile-layout.mjs` | **PASS (EMULATION)** — chrome and edge at 390 × 844 @dpr 2 |
+
+**Externally blocked — the device boxes are deliberately NOT ticked:**
+
+- The mobile build (Capacitor) runs on Android and iOS: no Android SDK, JDK,
+  Xcode or Capacitor CLI on this host, so no native project was generated.
+- The game is played on an actual phone with touch controls: no device or
+  emulator is available; emulated touch in a desktop browser is not a device
+  run.
+- Firefox and Safari: absent from this host and not drivable by a CDP harness.
+
+**Explicit non-claims:** no device verification, no physical phone, no
+Android/iOS build, no emulator, no Firefox/Safari run, no native touch
+gesture, no new runtime dependency and no proprietary asset. Nothing in this
+increment weakens server authority, the 94-command catalogue, the strict
+two-argument `set_quest_var`, or the licensing/no-Flash ordering.
+
+**Remaining gaps:** the three device-dependent Group G5 boxes above remain
+open; the two licensing/no-Flash checks must still be run before the client
+build or on a cleaned tree; and the four level-40 team quests need a
+legitimately high-level save for a browser happy-path run.
+
+---
+
 ## Group H — Desktop Shell & Release
 
 *Outcome: a standalone, signed, updatable desktop executable.*

@@ -1,0 +1,14 @@
+{
+  "name": "@swl/app-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Config-only Capacitor wrapper for the shared web client (ADR 6). No native projects are generated here.",
+  "scripts": {
+    "sync": "cap sync",
+    "add:android": "cap add android",
+    "add:ios": "cap add ios",
+    "open:android": "cap open android",
+    "open:ios": "cap open ios"
+  }
+}

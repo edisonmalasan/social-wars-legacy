@@ -228,6 +228,8 @@ importers:
         specifier: ^6.0.0
         version: 6.4.4(@types/node@22.20.5)
 
+  apps/mobile: {}
+
   apps/server:
     dependencies:
       '@swl/protocol':
