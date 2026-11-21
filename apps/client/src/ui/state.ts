@@ -25,11 +25,16 @@ import type {
   HudRules,
   ItemPopulation,
   NativeCommand,
+  QuestBriefing,
+  QuestChoice,
+  QuestResultOptions,
+  QuestResultView,
   QuestViewOptions,
   SpecialAttackChargeView,
   StoredItemView,
   RecruitView,
   ResourcePanel,
+  TutorialStep,
   UnitCard,
   UnitPanel,
   WorldSnapshot,
@@ -39,11 +44,14 @@ import {
   assaultCountdown,
   assaultHistory,
   battleOptions,
+  briefingView,
   buildingInfoView,
   completeGoal,
   expand,
   lastAssaultResult,
+  questResultActionChoice,
   specialAttackHud,
+  tutorialLiteral,
   itemType,
   levelOf,
   magicBook,
@@ -892,4 +900,183 @@ export function assaultDialog(kind: AssaultPanelKind): DialogContent {
     hud: 'combat',
   };
   return { id: `assault-${kind}`, kind: dialogKinds[kind], title: titles[kind] };
+}
+
+/* -------------------------------------------------------------------------
+ * Onboarding, mission information and confirmation
+ *
+ * These are the client's own panels for things the server already owns: the
+ * tutorial's steps, a quest's briefing, the server's next-mission reading and
+ * a yes/no gate on a request. Every row below is a *reading* of the client's
+ * tutorial model or of the authoritative quest models — no copy is invented
+ * here, and nothing here starts, finishes or scores a mission.
+ * ---------------------------------------------------------------------- */
+
+/** One tutorial step as the intro/help panel reads it. */
+export interface TutorialHelpStep {
+  /** The step's identifying number, from the client's own step list. */
+  readonly step: number;
+  /** Its one-based place in this player's visible list. */
+  readonly position: number;
+  /** The client's own literal title. */
+  readonly title: string;
+  /** The client's own literal lesson. */
+  readonly lesson: string;
+  /** Whether the client allows this step to be skipped. */
+  readonly skippable: boolean;
+  /** Whether the tutorial is currently pointing at this step. */
+  readonly current: boolean;
+}
+
+/** The intro/help panel's body. */
+export interface TutorialHelpView {
+  /** How many steps this player sees. */
+  readonly total: number;
+  /** The current step's one-based place, or 0 when there is none. */
+  readonly currentPosition: number;
+  /** The steps, in the client's own order. */
+  readonly steps: readonly TutorialHelpStep[];
+}
+
+/**
+ * The tutorial's steps as the intro/help panel shows them.
+ *
+ * The text comes from `tutorialLiteral` on the extracted steps, so it is the
+ * client's own wording and never a paraphrase written for this panel. The
+ * order is the state machine's order, and the current flag is the step number
+ * the `Tutorial` instance says it is on. The player can only see a step whose
+ * gate the tutorial model opened.
+ */
+export function tutorialHelpView(
+  visible: readonly TutorialStep[],
+  current: TutorialStep | null,
+): TutorialHelpView {
+  const currentStep = current?.step ?? null;
+  const steps = visible.map((step, index) => ({
+    step: step.step,
+    position: index + 1,
+    title: tutorialLiteral(step.title),
+    lesson: tutorialLiteral(step.lesson),
+    skippable: step.skippable === true,
+    current: currentStep !== null && step.step === currentStep,
+  }));
+  return {
+    total: steps.length,
+    currentPosition: steps.findIndex((entry) => entry.step === currentStep) + 1,
+    steps,
+  };
+}
+
+/**
+ * The mission-info panel's body: the same briefing the quest dialog draws.
+ *
+ * The title and subtitle are the content's and the rules', the army is the
+ * server's save, and the difficulty is the player's own gesture. This bridge
+ * only feeds `briefingView`; it never decides whether a mission may start.
+ */
+export function missionInfoPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  choice: QuestChoice,
+  difficulty: unknown,
+  now: number,
+): QuestBriefing {
+  return briefingView(choice, difficulty, armyPanel(bundle, world, now));
+}
+
+/** The next-mission panel's body, from the server's own answered result. */
+export interface NextMissionView {
+  /** The server's one-based play index for the offered mission. */
+  readonly index: number;
+  /** The authoritative quest id. */
+  readonly questId: string;
+  /** The rules' display title. */
+  readonly title: string;
+  /** Whether the server says the mission can be started now. */
+  readonly available: boolean;
+  /** The win the server answered, shown as context and never re-decided. */
+  readonly won: boolean;
+  /** The rank the server recorded, when it answered a win. */
+  readonly rank: number | null;
+  /** The exact reward rows the server paid. */
+  readonly rewards: QuestResultView['rewards'];
+}
+
+/**
+ * Offer the next mission only when the server's result still does.
+ *
+ * `questResultActionChoice` recomputes the same rank-and-unlock gate the
+ * result dialog's Next button used. A result with no next mission, or one
+ * whose availability has since changed, fails closed: the panel is not drawn
+ * rather than offering a mission the server would refuse.
+ */
+export function nextMissionPanel(
+  result: QuestResultView,
+  options: QuestResultOptions,
+): NextMissionView | null {
+  const next = result.next;
+  if (!next) return null;
+  const choice = questResultActionChoice(result, next.questId, 'next', options);
+  if (!choice) return null;
+  return {
+    index: choice.index,
+    questId: choice.questId,
+    title: choice.title,
+    available: next.available && choice.unlocked,
+    won: result.won,
+    rank: result.rank,
+    rewards: result.rewards,
+  };
+}
+
+/** The client's own confirmation button texts, from `popups/PopupConfirm.as`. */
+export const CONFIRM_YES = 'YES';
+export const CONFIRM_NO = 'NO';
+/** The client's own headings for the intro, help and confirmation panels. */
+export const INTRO_TITLE = 'Welcome to Social Wars';
+export const HELP_TITLE = 'HELP!';
+export const CONFIRM_TITLE = 'Are you sure?';
+
+/** The confirmation panel's body. */
+export interface ConfirmView {
+  /** The question, naming the request the player is being asked to send. */
+  readonly message: string;
+  /** The client's own affirmative label. */
+  readonly yes: string;
+  /** The client's own negative label. */
+  readonly no: string;
+}
+
+/** A yes/no panel using the client's own button texts. */
+export function confirmPanel(message: string): ConfirmView {
+  return { message, yes: CONFIRM_YES, no: CONFIRM_NO };
+}
+
+/** The body hosted by the one dialog for the onboarding family. */
+export type OnboardingPanelView =
+  | { readonly kind: 'intro'; readonly view: TutorialHelpView }
+  | { readonly kind: 'help'; readonly view: TutorialHelpView }
+  | { readonly kind: 'mission'; readonly view: QuestBriefing }
+  | { readonly kind: 'next'; readonly view: NextMissionView }
+  | { readonly kind: 'confirm'; readonly view: ConfirmView };
+
+/** Each onboarding screen has its own gesture and its own dialog id. */
+export type OnboardingPanelKind = 'intro' | 'help' | 'mission' | 'next' | 'confirm';
+
+/**
+ * The one dialog's descriptor for an onboarding panel.
+ *
+ * Ids are distinct so a host can open each screen with its own gesture, but
+ * the slot is still the single one in `dialogmodel.ts`: opening another panel
+ * replaces this one, and no second overlay is ever created.
+ */
+export function onboardingDialog(kind: OnboardingPanelKind, title: string): DialogContent {
+  const kinds: Record<OnboardingPanelKind, DialogContent['kind']> = {
+    intro: 'alert',
+    help: 'alert',
+    mission: 'briefing',
+    next: 'result',
+    confirm: 'confirm',
+  };
+  return { id: `onboarding-${kind}`, kind: kinds[kind], title };
 }

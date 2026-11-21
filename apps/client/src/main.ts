@@ -16,7 +16,7 @@ import {
   Tutorial,
   type TutorialStep,
 } from '@swl/client';
-import { tutorialState, type Army } from '@swl/rules';
+import { questTitle, tutorialState, type Army } from '@swl/rules';
 
 import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH } from './renderer.ts';
@@ -56,6 +56,7 @@ import {
   combatDialog,
   endQuest,
   questActionOnServer,
+  questChoices,
   questDifficulty,
   levelOf,
   lastQuestReward,
@@ -81,14 +82,25 @@ import { uiCss } from './ui/css.ts';
 import type { TutorialOverlayProps } from './ui/tutorial.tsx';
 import type { QuestPanelView } from './ui/quests.tsx';
 import {
+  CONFIRM_TITLE,
+  HELP_TITLE,
+  INTRO_TITLE,
   armyPanel,
   assaultDialog,
+  confirmPanel,
+  missionInfoPanel,
+  nextMissionPanel,
+  onboardingDialog,
   productionPanel,
   questMinLevels,
   questRanks,
   questViewOptions,
+  tutorialHelpView,
   type AssaultPanelKind,
+  type OnboardingPanelKind,
+  type OnboardingPanelView,
 } from './ui/state.ts';
+import { setOnboardingHost } from './ui/onboarding.tsx';
 import { PRODUCTION_DIALOG_ID } from './ui/info.tsx';
 import {
   CLOSED_DIALOG,
@@ -283,6 +295,19 @@ export interface ClientHandle {
    * The panel's gestures use the client's one command transport.
    */
   showAssaultPanel?: (kind: AssaultPanelKind) => void;
+  /**
+   * Open one of the onboarding family's panels through the one dialog.
+   *
+   * Each kind is a distinct host gesture; the body is derived from the
+   * client's tutorial model or the server's quest state, never invented here.
+   */
+  showOnboarding?: (kind: OnboardingPanelKind) => void;
+  /** Shorthands for the five gestures above, for driving the client. */
+  showIntro?: () => void;
+  showHelp?: () => void;
+  showMissionInfo?: () => void;
+  showNextMission?: () => void;
+  showConfirmation?: () => void;
   /**
    * The client's own request builders.
    *
@@ -556,6 +581,13 @@ async function main(): Promise<void> {
   let dialogState: DialogState = CLOSED_DIALOG;
   let feedback: readonly FeedbackMessage[] = [];
   /**
+   * The onboarding panel and the pending confirmation. Both are client UI
+   * state, not game state: the YES of a confirmation only sends the request
+   * the host chose, and the server still owns every outcome.
+   */
+  let onboarding: OnboardingPanelView | null = null;
+  let confirmAction: (() => void) | null = null;
+  /**
    * The quest panel in the one dialog, and the difficulty the player chose.
    * Neither is a game outcome: the first is a reading of the server's active
    * quest or answer, the second is only sent to the server with the start and
@@ -584,6 +616,9 @@ async function main(): Promise<void> {
       onDialogDismiss: () => {
         dialogState = closeDialog(dialogState);
         questPanel = null;
+        onboarding = null;
+        confirmAction = null;
+        publishOnboarding();
         drawInterface();
       },
       onPlaceStored,
@@ -649,6 +684,7 @@ async function main(): Promise<void> {
 
   /** Open the shared dialog on the server's authoritative active quest. */
   function openCombat(questId: string): void {
+    clearOnboarding();
     const view = activeQuestFromWorld(world, questViewOptions(content, questId));
     if (!view) {
       gestureRefusal('the server has no active quest');
@@ -662,6 +698,7 @@ async function main(): Promise<void> {
 
   /** A chapter slot is a gesture: brief an unplayed quest or resume an active one. */
   function openQuestSlot(choice: QuestChoice): void {
+    clearOnboarding();
     if (choice.active) {
       openCombat(choice.questId);
       return;
@@ -823,6 +860,124 @@ async function main(): Promise<void> {
     drawInterface();
   }
 
+  /* ---------------------------------------------------------------------
+   * The onboarding family's host gestures
+   *
+   * Each panel is opened through the one dialog path: a distinct id and a
+   * body derived from the client's tutorial model or the server's quest
+   * state. No panel here decides an outcome; every control is a gesture that
+   * calls one of the request paths already used by the game.
+   * ------------------------------------------------------------------- */
+
+  /** Hand the current onboarding body and confirmation gesture to the view. */
+  function publishOnboarding(): void {
+    setOnboardingHost({
+      view: onboarding,
+      confirm: confirmAction ? confirmYes : null,
+    });
+  }
+
+  /** Drop an onboarding body when the dialog hands over to a quest panel. */
+  function clearOnboarding(): void {
+    if (!onboarding && !confirmAction) return;
+    onboarding = null;
+    confirmAction = null;
+    publishOnboarding();
+  }
+
+  /** Host a yes/no gate in the one dialog; the action is the host's request. */
+  function openConfirm(message: string, action: () => void): void {
+    confirmAction = action;
+    onboarding = { kind: 'confirm', view: confirmPanel(message) };
+    const panel = onboardingDialog('confirm', CONFIRM_TITLE);
+    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    publishOnboarding();
+    drawInterface();
+  }
+
+  /** The confirmation panel's YES: run the chosen request, never decide one. */
+  function confirmYes(): void {
+    const action = confirmAction;
+    confirmAction = null;
+    onboarding = null;
+    dialogState = closeDialog(dialogState);
+    publishOnboarding();
+    action?.();
+  }
+
+  /** Open one onboarding panel with its own gesture and dialog id. */
+  function openOnboarding(kind: OnboardingPanelKind): void {
+    if (kind === 'intro' || kind === 'help') {
+      // The steps and their wording are the client's own; only the heading
+      // differs between the introduction and the help screen.
+      confirmAction = null;
+      onboarding = {
+        kind,
+        view: tutorialHelpView(tutorial.visible, tutorial.current),
+      };
+      const panel = onboardingDialog(kind, kind === 'intro' ? INTRO_TITLE : HELP_TITLE);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+      publishOnboarding();
+      drawInterface();
+      return;
+    }
+    if (kind === 'mission') {
+      const activeId = activeQuestState(world)?.questId ?? null;
+      const choices = questChoices(
+        questRanks(world),
+        questMinLevels(content),
+        levelOf(world),
+        activeId,
+      );
+      const choice = choices.find((entry) => entry.unlocked && !entry.active) ?? null;
+      if (!choice) {
+        gestureRefusal('the server has no mission available to brief');
+        return;
+      }
+      const briefing = missionInfoPanel(
+        content,
+        world,
+        choice,
+        chosenDifficulty,
+        Math.floor(Date.now() / 1000),
+      );
+      confirmAction = null;
+      onboarding = { kind: 'mission', view: briefing };
+      const panel = onboardingDialog('mission', briefing.title);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+      publishOnboarding();
+      drawInterface();
+      return;
+    }
+    if (kind === 'next') {
+      const receipt = lastQuestReward(world);
+      if (!receipt) {
+        gestureRefusal('the server has no finished mission to offer');
+        return;
+      }
+      const options = resultQuestOptions();
+      const result = questResultFromReceipt(receipt, options);
+      const view = nextMissionPanel(result, options);
+      if (!view) {
+        gestureRefusal('the server has no next mission available');
+        return;
+      }
+      // Keep the authoritative result beside the panel: the Next gesture
+      // re-checks the same rank gate that made the button possible.
+      questPanel = { kind: 'result', result };
+      confirmAction = null;
+      onboarding = { kind: 'next', view };
+      const panel = onboardingDialog('next', view.title);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+      publishOnboarding();
+      drawInterface();
+      return;
+    }
+    openConfirm('Skip the tutorial?', () => {
+      void skipTutorial();
+    });
+  }
+
   /** Upgrade the selected building. The server checks the level, tiles and cost. */
   function onUpgrade(): void {
     const gesture = interaction.upgradeSelected();
@@ -897,6 +1052,22 @@ async function main(): Promise<void> {
       dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
     }
   }
+
+  // Publish the onboarding gestures once. The view reads the panel body from
+  // this same store; opening a panel publishes the new body through it.
+  setOnboardingHost({
+    open: (kind) => openOnboarding(kind),
+    start: (questId, difficulty, team) =>
+      openConfirm(`Start ${questTitle(questId) ?? questId}?`, () => {
+        void beginQuest(questId, difficulty, team);
+      }),
+    next: (questId) => openResultQuest(questId, 'next'),
+    skip: () =>
+      openConfirm('Skip the tutorial?', () => {
+        void skipTutorial();
+      }),
+    confirm: confirmYes,
+  });
 
   const ui = UI ? mountUi(UI, content, onPick, onCollect, onCommand) : null;
   drawInterface();
@@ -1118,6 +1289,7 @@ async function main(): Promise<void> {
       const result = await run([endQuest(questId, chosenDifficulty)]);
       // The world has been refreshed by `run`, so the ranks here are the
       // server's post-quest ones — the base for the next-mission action.
+      clearOnboarding();
       const view = questResultView(questId, result.outcome ?? null, undefined, resultQuestOptions());
       questPanel = { kind: 'result', result: view };
       const panel = resultDialog(questId, view);
@@ -1150,6 +1322,7 @@ async function main(): Promise<void> {
     showLastReward: () => {
       const receipt = lastQuestReward(world);
       if (!receipt) return false;
+      clearOnboarding();
       const view = questResultFromReceipt(receipt, resultQuestOptions());
       questPanel = { kind: 'result', result: view };
       const panel = resultDialog(view.questId, view);
@@ -1162,6 +1335,12 @@ async function main(): Promise<void> {
       dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
       drawInterface();
     },
+    showOnboarding: (kind) => openOnboarding(kind),
+    showIntro: () => openOnboarding('intro'),
+    showHelp: () => openOnboarding('help'),
+    showMissionInfo: () => openOnboarding('mission'),
+    showNextMission: () => openOnboarding('next'),
+    showConfirmation: () => openOnboarding('confirm'),
     claimDailyBonus,
     buy,
     expand,

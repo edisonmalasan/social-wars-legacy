@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 108,
+      implemented: 114,
       dropped: 52,
-      planned: 100,
+      planned: 94,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -449,5 +449,40 @@ describe('the assault screen family decisions', () => {
     assert.ok(roster);
     assert.equal(roster!.decision, 'implemented');
     assert.match(roster!.decisionNote, /`packages\/client\/src\/army\.ts`/);
+  });
+});
+
+describe('the onboarding screen family decisions', () => {
+  // These six deferrals said the behaviour was already modelled but not
+  // rendered. They are reclassified only because a real panel now draws it.
+  const ONBOARDING_SCREENS = [
+    'PopupIntroMC.as',
+    'PopupHelpIslandMC.as',
+    'PopupMissionInfoMC.as',
+    'popups/PopupNextMission.as',
+    'PopupConfirmMC.as',
+    'popups/PopupConfirm.as',
+  ];
+
+  it('records each rendered screen as implemented against its panel', async () => {
+    const all = await screens();
+    for (const path of ONBOARDING_SCREENS) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/onboarding\.tsx`/);
+    }
+  });
+
+  it('leaves the purely cosmetic quest-loading animation planned', async () => {
+    // There is no behaviour to model here: the briefing already hands over
+    // to the server-owned combat panel, and the original's only extra is a
+    // full-screen loading animation behind Zynga's art licence. Flipping it
+    // would grow the count without modelling anything.
+    const all = await screens();
+    const loading = all.find((entry) => entry.path === 'popups/PopupLoadingQuest.as');
+    assert.ok(loading);
+    assert.equal(loading!.decision, 'planned');
+    assert.match(loading!.decisionNote, /^Deferred: .*cosmetic/);
   });
 });
