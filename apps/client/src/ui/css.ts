@@ -1344,6 +1344,257 @@ export function uiCss(): string {
 .swl-quest-buttons .swl-quest-primary { border-color: var(--swl-accent); color: var(--swl-accent); }
 .swl-quest-buttons button:focus-visible { outline: 2px solid var(--swl-accent); outline-offset: 1px; }
 
+/* --- The assault result, history and combat HUD ------------------------- */
+
+/* These panels live in the one shared dialog, so they reuse its surface and
+   tokens. Nothing here is a second overlay, and nothing is drawn from an
+   original's art: the portraits are text tiles with a charge bar. */
+.swl-assault-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--swl-gap);
+}
+
+.swl-assault-won,
+.swl-assault-lost {
+  margin: 0;
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(15px * var(--swl-font-scale-display, 1));
+  text-transform: uppercase;
+}
+
+.swl-assault-won { color: var(--swl-success); }
+.swl-assault-lost { color: var(--swl-danger); }
+
+.swl-assault-heading {
+  margin: 0;
+  color: var(--swl-ink-muted);
+}
+
+.swl-assault-note {
+  margin: 0;
+  color: var(--swl-ink-muted);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-assault-muted { color: var(--swl-ink-muted); }
+
+.swl-assault-loot,
+.swl-assault-roster,
+.swl-assault-specials {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swl-assault-loot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--swl-gap);
+}
+
+.swl-assault-loot li {
+  padding: 3px 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface);
+  color: var(--swl-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.swl-assault-counts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--swl-gap);
+  margin: 0;
+}
+
+.swl-assault-count {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--swl-gap);
+  padding: 4px 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface);
+}
+
+.swl-assault-count dt { color: var(--swl-ink-muted); }
+.swl-assault-count dd { margin: 0; color: var(--swl-accent); font-weight: 700; }
+
+.swl-assault-opponent { margin: 0; color: var(--swl-ink-muted); }
+
+.swl-assault-army {
+  margin-top: var(--swl-gap);
+  padding-top: var(--swl-gap);
+  border-top: 1px solid var(--swl-border);
+}
+
+.swl-assault-army h4 {
+  margin: 0 0 4px;
+  color: var(--swl-accent);
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(12px * var(--swl-font-scale-display, 1));
+  text-transform: uppercase;
+}
+
+.swl-assault-roster {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.swl-assault-roster-row {
+  display: flex;
+  gap: var(--swl-gap);
+  color: var(--swl-ink);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-assault-roster-row span:nth-child(2) { margin-left: auto; color: var(--swl-accent); }
+
+.swl-assault-countdown {
+  margin: 0;
+  color: var(--swl-accent);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.swl-assault-tabs {
+  display: flex;
+  gap: var(--swl-gap);
+}
+
+.swl-assault-tabs button {
+  padding: 4px 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  color: var(--swl-ink-muted);
+}
+
+.swl-assault-tabs .swl-assault-tab-active {
+  border-color: var(--swl-accent);
+  color: var(--swl-accent);
+}
+
+.swl-assault-history {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-assault-history th,
+.swl-assault-history td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--swl-border);
+  text-align: left;
+}
+
+.swl-assault-history th { color: var(--swl-ink-muted); font-weight: 400; }
+.swl-assault-history td { color: var(--swl-ink); }
+
+.swl-assault-strategies {
+  display: flex;
+  flex-direction: column;
+  gap: var(--swl-gap);
+  margin: 0;
+  padding: var(--swl-gap);
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+}
+
+.swl-assault-strategies legend { padding: 0 4px; color: var(--swl-ink-muted); }
+
+.swl-assault-strategy {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px var(--swl-gap);
+  color: var(--swl-ink);
+}
+
+.swl-assault-strategy input { grid-row: span 2; }
+
+.swl-assault-strategy-name { font-weight: 700; }
+
+.swl-assault-strategy-note {
+  color: var(--swl-ink-muted);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  line-height: 1.3;
+}
+
+.swl-assault-specials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--swl-gap);
+}
+
+.swl-assault-special {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--swl-gap);
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface);
+}
+
+.swl-assault-special-idle { border-color: var(--swl-danger); }
+
+.swl-assault-special-name {
+  color: var(--swl-ink);
+  font-weight: 700;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  overflow-wrap: anywhere;
+}
+
+.swl-assault-special-shape,
+.swl-assault-special-state {
+  color: var(--swl-ink-muted);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+.swl-assault-special-idle .swl-assault-special-state { color: var(--swl-danger); }
+
+/* The casting mask is the server's charge fraction, never a local animation. */
+.swl-assault-special-track {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  background: #10151d;
+}
+
+.swl-assault-special-mask {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #7fb3d5, var(--swl-accent));
+}
+
+.swl-assault-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--swl-gap);
+  margin-top: var(--swl-gap);
+}
+
+.swl-assault-buttons button {
+  padding: 5px 10px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+
+.swl-assault-buttons button:hover:not(:disabled) { border-color: var(--swl-accent); }
+
+.swl-assault-buttons button:disabled { color: var(--swl-ink-muted); cursor: not-allowed; }
+
+.swl-assault-buttons .swl-assault-primary {
+  border-color: var(--swl-accent);
+  color: var(--swl-accent);
+}
+
 /* --- The feedback channel ---------------------------------------------- */
 
 .swl-feedback {

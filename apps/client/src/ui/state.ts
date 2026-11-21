@@ -15,13 +15,18 @@
  */
 import type {
   ArmyUnitView,
+  AssaultCountdownView,
+  AssaultHistoryView,
+  AssaultResultView,
   BuildingInfoView,
   BuildMenuItem,
+  DialogContent,
   HudInput,
   HudRules,
   ItemPopulation,
   NativeCommand,
   QuestViewOptions,
+  SpecialAttackChargeView,
   StoredItemView,
   RecruitView,
   ResourcePanel,
@@ -31,9 +36,14 @@ import type {
 } from '@swl/client';
 import {
   armyView,
+  assaultCountdown,
+  assaultHistory,
+  battleOptions,
   buildingInfoView,
   completeGoal,
   expand,
+  lastAssaultResult,
+  specialAttackHud,
   itemType,
   levelOf,
   magicBook,
@@ -746,4 +756,140 @@ export function magicBookPanel(
     disabledSpells,
   );
   return magicBook(input, page);
+}
+
+/* -------------------------------------------------------------------------
+ * Assault result, history and the combat HUD
+ *
+ * The selectors in `packages/client/src/featurestate.ts` copy the server's
+ * answer; these bridges add only the content's names, the client's own text
+ * and the command a gesture sends. Nothing here settles a fight, prices loot,
+ * writes a history row or decides that a special attack is charged.
+ * ---------------------------------------------------------------------- */
+
+/** The result popup's body: the server's answer and the player's army. */
+export interface AssaultResultPanelView {
+  /** The last outcome and the loot rows, if any, the server persisted. */
+  readonly result: AssaultResultView;
+  /** The roster the server's save accounts for, named by the content. */
+  readonly army: readonly ArmyUnitView[];
+}
+
+/** Build the result popup's view, or null when the server answered no assault. */
+export function assaultResultPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  now: number,
+): AssaultResultPanelView | null {
+  const result = lastAssaultResult(world);
+  if (!result) return null;
+  return { result, army: armyPanel(bundle, world, now) };
+}
+
+/** The history popup's body. */
+export interface AssaultHistoryPanelView {
+  /** The attacks the server actually answered. */
+  readonly history: AssaultHistoryView;
+  /** The countdown to the server's attack reset, when it published one. */
+  readonly countdown: AssaultCountdownView | null;
+}
+
+/** Build the history popup's view, or null when the save has no history keys. */
+export function assaultHistoryPanel(
+  world: WorldSnapshot,
+  now: number,
+): AssaultHistoryPanelView | null {
+  const history = assaultHistory(world);
+  if (!history) return null;
+  return { history, countdown: assaultCountdown(world, now) };
+}
+
+/** One defensive strategy the player can ask the server to adopt. */
+export interface BattleStrategyOption {
+  /** The 1-based wire value of the `set_strategy` command. */
+  readonly strategy: number;
+  /** The client's own label for the strategy. */
+  readonly name: string;
+  /** The client's own explanation, from the original's battle-options text. */
+  readonly description: string;
+  /** The request a click sends; the server decides whether it applies. */
+  readonly command: NativeCommand;
+}
+
+/** The battle-options popup's body. */
+export interface BattleOptionsPanelView {
+  /** The server's choice, or null when the save has none to read. */
+  readonly selected: number | null;
+  /** The four strategies, in the original's order. */
+  readonly options: readonly BattleStrategyOption[];
+}
+
+/**
+ * The four defensive strategies and the server's chosen one.
+ *
+ * The names and descriptions are the client's text, not game state. The
+ * selected strategy and the effect of a click are the server's: this bridge
+ * only builds the `set_strategy` request from the command catalogue.
+ */
+export function battleOptionsPanel(world: WorldSnapshot): BattleOptionsPanelView {
+  const descriptions: readonly string[] = [
+    'All your units will hold position until approached. They will stop chasing the enemy and return to their original position in a while after the clash.',
+    'All your units will hold position until a siege engine hits, then all ranged units will go and crush it.',
+    'All your units will hold positions until the enemy hits. Then part of your army that equals to the enemy troops will go and chase them.',
+    'All your units will attack the siege engines right from the start and will return to the empire only when all are destroyed.',
+  ];
+  const names: readonly string[] = [
+    'Defensive',
+    'Mid Defensive',
+    'Mid Aggressive',
+    'Aggressive',
+  ];
+  return {
+    selected: battleOptions(world)?.selected ?? null,
+    options: descriptions.map((description, index) => {
+      const strategy = index + 1;
+      return {
+        strategy,
+        name: names[index]!,
+        description,
+        command: { map: 0, name: 'set_strategy', args: [strategy] },
+      };
+    }),
+  };
+}
+
+/** The combat HUD's body: the server-owned timer and charge records. */
+export interface AssaultHudPanelView {
+  /** Countdown to the server's attack reset, when it published one. */
+  readonly countdown: AssaultCountdownView | null;
+  /** Only the special attacks whose charge the server published. */
+  readonly specialAttacks: readonly SpecialAttackChargeView[];
+}
+
+/** Build the combat HUD's view from the server's charge and reset state. */
+export function assaultHudPanel(world: WorldSnapshot, now: number): AssaultHudPanelView {
+  return {
+    countdown: assaultCountdown(world, now),
+    specialAttacks: specialAttackHud(world),
+  };
+}
+
+/** The four panels the shared dialog can host for the assault family. */
+export type AssaultPanelKind = 'result' | 'history' | 'options' | 'hud';
+
+/** A dialog descriptor for one assault panel, for the host's one dialog slot. */
+export function assaultDialog(kind: AssaultPanelKind): DialogContent {
+  const titles: Record<AssaultPanelKind, string> = {
+    result: 'Battle Result',
+    history: 'Battle Results',
+    options: 'OPTIONS',
+    hud: 'Combat',
+  };
+  const dialogKinds: Record<AssaultPanelKind, DialogContent['kind']> = {
+    result: 'result',
+    history: 'alert',
+    options: 'confirm',
+    hud: 'combat',
+  };
+  return { id: `assault-${kind}`, kind: dialogKinds[kind], title: titles[kind] };
 }
