@@ -12,6 +12,7 @@ export * from './army.ts';
 export * from './inventory.ts';
 export * from './featurestate.ts';
 export * from './bonus.ts';
+export * from './store.ts';
 export * from './buildmenu.ts';
 export * from './management.ts';
 export * from './magic.ts';
