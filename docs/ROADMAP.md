@@ -2776,7 +2776,7 @@ next group. The per-group **Status:** lines state which items are outstanding.*
 | F | Authoritative Server | 54 / 0 | Complete |
 | G | Modern Client | 72 / 9 | In progress — remaining platforms and feature parity |
 | H | Desktop Shell & Release | 14 / 4 | In progress — installers, signing, auto-update |
-| I | Production Readiness | 99 / 10 | In progress — the first production release |
+| I | Production Readiness | 99 / 5 | In progress - the first production release |
 
 ### Critical path
 
@@ -3127,6 +3127,12 @@ reviewed without reconstructing the conversation that led to it.*
 ---
 
 ## Maintenance
+
+- The last group's items were once over-counted: `groupCounts()` kept the group
+  open past its section, so the five items under *Deferred / Future Work* were
+  counted as Group I (109 instead of 104). The parser now closes a group at the
+  next level-two heading, the floor is 104, and the Group I summary reads 99 / 5.
+  The duplicate frame-rate item and the other open Group I items remain open.
 
 - Revisit this roadmap when scope or priorities change.
 - Update statuses only after verification; distinguish untested from failed.

@@ -36,6 +36,10 @@ export function groupCounts(text: string): Record<string, GroupCount> {
       groups[current] ??= { items: 0, done: 0, open: 0 };
       continue;
     }
+    // A group ends at the next level-two heading. Without this, the last
+    // group swallows every later section — the five items under
+    // "Deferred / Future Work" were counted as Group I.
+    if (/^## /.test(line)) current = null;
     if (!current) continue;
     if (/^\s*- \[x\]/.test(line)) {
       groups[current]!.items += 1;

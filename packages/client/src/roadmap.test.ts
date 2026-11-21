@@ -30,6 +30,21 @@ async function floor(): Promise<Record<string, number>> {
 }
 
 describe('the roadmap', () => {
+  it('ends a group at the next level-two heading', () => {
+    const counts = groupCounts(
+      [
+        '## Group A',
+        '- [x] one',
+        '## Deferred / Future Work',
+        '- [ ] not a group A item',
+        '## Group B',
+        '- [x] two',
+      ].join('\n'),
+    );
+    assert.deepEqual(counts['A'], { items: 1, done: 1, open: 0 });
+    assert.deepEqual(counts['B'], { items: 1, done: 1, open: 0 });
+  });
+
   it('has not lost an item', async () => {
     // An item that is silently swallowed is worse than one that is
     // visibly unfinished, and it happened here. The floor is the number
