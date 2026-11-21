@@ -2,20 +2,22 @@
 /**
  * Prepare the desktop shell's build inputs.
  *
- * It writes the shell's **icons** and the **placeholder** the web view
- * loads in development, because Tauri's build needs a `frontendDist` to
- * exist before it will compile, and a Windows build needs an `.ico`
- * besides the `.png`.
+ * It writes the shell's **icons** (Tauri needs them for a Windows build)
+ * and copies the **built web client** into `frontendDist`, so the shell
+ * ships the real game rather than an empty page.
  *
  * The icon is the project's own: a dark square with a lighter diagonal,
  * drawn here rather than shipped as a binary nobody can regenerate. The
  * Windows `.ico` is a container whose entry is a PNG, which is what
  * Vista and later read.
  *
+ * `--icons-only` writes just the icons. CI uses it before it builds the
+ * client, and calls this script again afterwards to copy the real page.
+ *
  * Usage:
- *   node scripts/prepare-desktop.mjs
+ *   node scripts/prepare-desktop.mjs [--icons-only]
  */
-import { mkdir, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -24,6 +26,8 @@ import { encodePng } from './lib/png.mjs';
 const ROOT = process.cwd();
 const ICONS = path.join(ROOT, 'apps/desktop/src-tauri/icons');
 const DIST = path.join(ROOT, 'apps/desktop/dist');
+const CLIENT_DIST = path.join(ROOT, 'apps/client/dist');
+const ICONS_ONLY = process.argv.includes('--icons-only');
 
 /** The icon, at a size. */
 function icon(size) {
@@ -75,6 +79,45 @@ function ico(png, size) {
   return Buffer.concat([header, entry, png]);
 }
 
+/** The real client's page, rather than the old placeholder. */
+async function assertRealClient(index) {
+  const html = await readFile(index, 'utf8');
+  const problems = [];
+  if (!/<script\b/i.test(html)) {
+    problems.push('there is no script tag: this is the placeholder, not the built client');
+  }
+  if (!/src\s*=\s*["']\.?\/?assets\//i.test(html)) {
+    problems.push('the page does not load the built client from ./assets/');
+  }
+  if (problems.length > 0) {
+    throw new Error(
+      `the copied client is not the built web client:\n  ${problems.join('\n  ')}\n` +
+        'Run: pnpm --filter @swl/app-client build',
+    );
+  }
+}
+
+/** Replace the shell's frontend with the built client. */
+async function copyClient() {
+  const entry = path.join(CLIENT_DIST, 'index.html');
+  let present = false;
+  try {
+    present = (await stat(entry)).isFile();
+  } catch {
+    present = false;
+  }
+  if (!present) {
+    throw new Error(
+      'the web client has not been built, so the shell would ship a placeholder.\n' +
+        'Run: pnpm --filter @swl/app-client build',
+    );
+  }
+  // A fresh copy, so a removed asset from an earlier build cannot ship.
+  await rm(DIST, { recursive: true, force: true });
+  await cp(CLIENT_DIST, DIST, { recursive: true });
+  await assertRealClient(path.join(DIST, 'index.html'));
+}
+
 async function main() {
   await mkdir(ICONS, { recursive: true });
 
@@ -83,28 +126,17 @@ async function main() {
   await writeFile(path.join(ICONS, '32x32.png'), encodePng(icon(32)));
   await writeFile(path.join(ICONS, '128x128.png'), encodePng(icon(128)));
 
-  // The placeholder the web view loads until the client is built. The
-  // real client replaces it.
-  await mkdir(DIST, { recursive: true });
-  await writeFile(
-    path.join(DIST, 'index.html'),
-    [
-      '<!doctype html>',
-      '<html>',
-      '  <head>',
-      '    <meta charset="utf-8" />',
-      '    <title>Social Wars Legacy</title>',
-      '  </head>',
-      '  <body>',
-      '    <div id="game"></div>',
-      '  </body>',
-      '</html>',
-      '',
-    ].join('\n'),
-    'utf8',
-  );
+  if (ICONS_ONLY) {
+    // Tauri needs a frontendDist to compile even before the client is
+    // built. This mode is for that early CI step only; the real copy
+    // happens once the client exists.
+    await mkdir(DIST, { recursive: true });
+    console.log('wrote the desktop icons (client copy skipped)');
+    return;
+  }
 
-  console.log('wrote the desktop icons and the placeholder');
+  await copyClient();
+  console.log('wrote the desktop icons and copied the built web client');
 }
 
 main().catch((error) => {

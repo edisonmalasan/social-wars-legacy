@@ -91,7 +91,9 @@ Group G5.**
 | Build the client's manifest        | `node scripts/build-client-manifest.mjs` | Working | Group I — 118 MB becomes 3.9 MB |
 | Check the test coverage          | `node scripts/check-coverage.mjs` | Working | Group I — fails below the floors |
 | Check the golden-master corpus | `node scripts/golden-master.mjs` | Working | Group E4 — fails on any difference |
-| Prepare the desktop shell's inputs | `node scripts/prepare-desktop.mjs` | Working | Group H — the icons and the placeholder |
+| Prepare the desktop shell's inputs | `node scripts/prepare-desktop.mjs` | Working | Group H — the icons and the real built client; `--icons-only` writes just the icons |
+| Build the desktop server sidecar | `node scripts/build-desktop-server.mjs` | Working | Group H — the bundled Node runtime and the self-contained server |
+| Check the desktop frontend | `node scripts/check-desktop-dist.mjs` | Working | Group H — fails on the placeholder |
 | Check the backups are current    | `node scripts/check-backups.mjs --out <dir>` | Working | Group I — fails when the newest is too old |
 | Check the report set               | `node scripts/check-report-sync.mjs` | Working | Group I — the report against the code |
 | Lint the project's own rules    | `node scripts/lint-project.mjs` | Working | Group I — the browser must not need node |

@@ -27,7 +27,8 @@
     "active": true,
     "targets": ["msi", "nsis", "dmg", "appimage", "deb"],
     "icon": ["icons/icon.png"],
-    "resources": ["server/**/*"],
+    "resources": ["server/runtime/**/*"],
+    "externalBin": ["binaries/swl-server"],
     "copyright": "See docs/LICENSING.md",
     "shortDescription": "A preservation of the 2012 game Social Wars."
   }
