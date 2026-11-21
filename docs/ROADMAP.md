@@ -2739,7 +2739,7 @@ product.*
       (`AtlasIndex.animationFrames`)
 - [ ] The frame rate is measured on a **real GPU** with the **largest documented battle**,
       which is not the same thing as a headless browser's throttled frames
-- [ ] The client holds a stable frame rate on the largest documented battle
+- [ ] The client holds a stable frame rate on the largest documented battle (a duplicate of the requirement earlier in this group; both clear together)
 - [x] The **asset bundle size is measured and minimised**
       (`node scripts/build-client-manifest.mjs`). The asset pipeline's manifest holds
       **every** image the client's SWFs contain - 254 155 images and 41 198 symbols,
@@ -2809,7 +2809,7 @@ next group. The per-group **Status:** lines state which items are outstanding.*
 | D | Asset Pipeline | 32 / 0 | Complete |
 | E | Rules Engine | 37 / 1 | In progress — differential test vs the Flash client |
 | F | Authoritative Server | 54 / 0 | Complete |
-| G | Modern Client | 72 / 9 | In progress — remaining platforms and feature parity |
+| G | Modern Client | 78 / 8 | In progress — remaining platforms and feature parity |
 | H | Desktop Shell & Release | 14 / 4 | In progress — installers, signing, auto-update |
 | I | Production Readiness | 99 / 5 | In progress - the first production release |
 
@@ -2849,7 +2849,7 @@ be mistaken for unfinished work.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 118 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 118; the art gate applies to the drawn ones |
+| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 109 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 109; the art gate applies to the drawn ones |
 | B | PvP `end_attack` payload captured live | Needs a live second player and the original Flash client driven over CDP | A Flash test rig with two live accounts |
 | B | `attack_player` / `spy_player` payloads captured live | Same as above | The same Flash test rig |
 | B | Premium purchase flow captured live | Needs a real-money account, which the preservation project must not use | A funded test account and explicit approval |
@@ -2861,14 +2861,14 @@ be mistaken for unfinished work.*
 |---|---|---|---|
 | G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout, or a licensing decision |
 | G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented | Licence or re-create the art (I6) |
-| G | Every B6 screen implemented or explicitly dropped | 118 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 118 |
-| G | Client runs in Firefox and Safari | Neither browser is installed here, and the harness speaks Chrome DevTools Protocol only | Install both browsers and use a harness that can drive them |
-| G | Desktop build runs on Windows, macOS and Linux | Only Windows is available; macOS/Linux need their own build hosts | CI runners for all three platforms |
+| G | Every B6 screen implemented or explicitly dropped | 109 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 109 |
+| G | Client runs in Firefox and Safari | **Firefox is verified**: a full rendered gameplay session ran under Gecko via `scripts/e2e-test-firefox.py` (Playwright's Firefox build, driven over Juggler/BiDi). WebKit/Safari has not been run, but WebKit can be provisioned as a test tool with Playwright; branded Safari has not been tested | Provision WebKit with Playwright and run the same session under it; this box closes once both browsers pass |
+| G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux CI exists** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` and installs `libwebkit2gtk-4.1-dev` — but bundling is not yet wired there; macOS genuinely needs a host | Wire Linux bundling into CI and add a macOS runner; this box closes once all three platforms are produced |
 | G | Mobile build runs on Android and iOS | No Capacitor, Android SDK or Xcode on this machine | Install the Capacitor toolchain and SDKs |
 | G | Playable at the original resolutions and phone scales | The stage model exists; real-device verification does not | Test on the target devices |
 | G | Played on an actual phone with touch controls | No device here | A phone and touch-control implementation |
 | H | A player with no server cannot play | **Non-goal** — the product is pure online (ADR 19) | A reversal of ADR 19 |
-| H | Installers for Windows, macOS and Linux | **Unsigned Windows NSIS** (`Social Wars Legacy_0.1.0_x64-setup.exe`, 33.27 MiB) and **unsigned Windows MSI** (`Social Wars Legacy_0.1.0_x64_en-US.msi`, 49.88 MiB) were both built on this host with the npm Tauri CLI 2.12.3. The first MSI attempt failed on a config gap (`bundle.icon` listed only the PNG; the existing `icons/icon.ico` was not referenced); adding the `.ico` and retrying produced the MSI. NSIS 3.13 is cached, WiX 3.14.1 auto-downloads and hash-verifies, and WebView2 is present. macOS/Linux have no build hosts here | Signed artefacts plus macOS and Linux CI runners; this row stays open until all three platforms are produced |
+| H | Installers for Windows, macOS and Linux | **Unsigned Windows NSIS** (`Social Wars Legacy_0.1.0_x64-setup.exe`, 33.27 MiB) and **unsigned Windows MSI** (`Social Wars Legacy_0.1.0_x64_en-US.msi`, 49.88 MiB) were both built on this host with the npm Tauri CLI 2.12.3. The first MSI attempt failed on a config gap (`bundle.icon` listed only the PNG; the existing `icons/icon.ico` was not referenced); adding the `.ico` and retrying produced the MSI. NSIS 3.13 is cached, WiX 3.14.1 auto-downloads and hash-verifies, and WebView2 is present. Linux CI exists on `ubuntu-latest` in `.github/workflows/ci.yml` (bundling is not yet wired there); macOS genuinely needs a host | Signed artefacts, Linux bundling in CI and a macOS CI runner; this row stays open until all three platforms are produced |
 | H | Code-signed binaries, notarised macOS build | No code-signing certificate or Apple developer account exists; the one built installer is unsigned | Obtain the credentials |
 | H | Auto-update with clean rollback | The pure decision/rollback logic exists and is mock-tested, but there is no signed release stream, HTTPS endpoint, installer hook or rollback executor | A signed release stream, endpoint and a real install/rollback layer |
 | I | A corrections request actually received and honoured | No rights holder has made a request; the policy and log exist | A real request through `docs/CORRECTIONS.md` |
