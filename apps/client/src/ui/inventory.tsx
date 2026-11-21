@@ -21,6 +21,8 @@ import {
   type ArmyUnitView,
 } from '@swl/client';
 
+import { useRoster } from './roster.tsx';
+
 /** The inventory panel's props. */
 export interface InventoryProps {
   /** The stored items, derived from the server's answer. */
@@ -48,11 +50,24 @@ export function Inventory({
   // Fall back to All so an invisible filter never hides the remaining items.
   const active = tab !== null && groups.some((group) => group.id === tab) ? tab : null;
   const visible = itemsForCategory(items, active);
+  // The roster is a gesture that opens the one shared dialog from this head;
+  // opening a panel never changes the world.
+  const roster = useRoster();
 
   return (
     <div className="swl-inventory" aria-label="Stored items">
       <div className="swl-inventory-head">
         <div className="swl-inventory-title">Storage</div>
+        {roster.open ? (
+          <button
+            type="button"
+            className="swl-inventory-roster"
+            data-swl-roster-open=""
+            onClick={roster.open}
+          >
+            Roster
+          </button>
+        ) : null}
         {groups.length > 1 ? (
           <nav className="swl-inventory-tabs" aria-label="Storage categories">
             <button

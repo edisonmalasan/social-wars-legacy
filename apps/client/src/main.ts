@@ -95,12 +95,14 @@ import {
   questMinLevels,
   questRanks,
   questViewOptions,
+  rosterDialog,
   tutorialHelpView,
   type AssaultPanelKind,
   type OnboardingPanelKind,
   type OnboardingPanelView,
 } from './ui/state.ts';
 import { setOnboardingHost } from './ui/onboarding.tsx';
+import { setRosterHost } from './ui/roster.tsx';
 import { PRODUCTION_DIALOG_ID } from './ui/info.tsx';
 import {
   CLOSED_DIALOG,
@@ -302,6 +304,8 @@ export interface ClientHandle {
    * client's tutorial model or the server's quest state, never invented here.
    */
   showOnboarding?: (kind: OnboardingPanelKind) => void;
+  /** Open the army roster, team thumbnails and unit XP in the one dialog. */
+  showRoster?: () => void;
   /** Shorthands for the five gestures above, for driving the client. */
   showIntro?: () => void;
   showHelp?: () => void;
@@ -978,6 +982,42 @@ async function main(): Promise<void> {
     });
   }
 
+  /* ---------------------------------------------------------------------
+   * The roster family's host gestures
+   *
+   * The panel is a reading of the server's army and its active quest; opening
+   * it changes no game state. Its one game gesture hands a candidate team to
+   * a real quest-start request, so the server still decides which units, if
+   * any, it accepts.
+   * ------------------------------------------------------------------- */
+
+  /** Open the roster, the team thumbnails and the XP card in the one dialog. */
+  function openRoster(): void {
+    clearOnboarding();
+    questPanel = null;
+    const panel = rosterDialog();
+    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    drawInterface();
+  }
+
+  /** Send the composed team with the next mission the server has opened. */
+  function submitRosterTeam(team: Army): void {
+    if (questBusy) return;
+    const choices = questChoices(
+      questRanks(world),
+      questMinLevels(content),
+      levelOf(world),
+      activeQuestState(world)?.questId ?? null,
+    );
+    const choice = choices.find((entry) => entry.unlocked && !entry.active) ?? null;
+    if (!choice) {
+      gestureRefusal('the server has no mission available for this team');
+      return;
+    }
+    dialogState = closeDialog(dialogState);
+    void beginQuest(choice.questId, chosenDifficulty, team);
+  }
+
   /** Upgrade the selected building. The server checks the level, tiles and cost. */
   function onUpgrade(): void {
     const gesture = interaction.upgradeSelected();
@@ -1068,6 +1108,9 @@ async function main(): Promise<void> {
       }),
     confirm: confirmYes,
   });
+  // The roster's launcher and its one team gesture use the same one dialog;
+  // publishing them here keeps the panel free of its own transport.
+  setRosterHost({ open: openRoster, submitTeam: submitRosterTeam });
 
   const ui = UI ? mountUi(UI, content, onPick, onCollect, onCommand) : null;
   drawInterface();
@@ -1336,6 +1379,7 @@ async function main(): Promise<void> {
       drawInterface();
     },
     showOnboarding: (kind) => openOnboarding(kind),
+    showRoster: () => openRoster(),
     showIntro: () => openOnboarding('intro'),
     showHelp: () => openOnboarding('help'),
     showMissionInfo: () => openOnboarding('mission'),

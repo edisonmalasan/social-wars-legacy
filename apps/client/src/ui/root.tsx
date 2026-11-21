@@ -51,6 +51,7 @@ import { Neighbours } from './neighbours.tsx';
 import { OnboardingLauncher, OnboardingPanel, useOnboarding } from './onboarding.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
 import { RecruitPanel } from './recruit.tsx';
+import { RosterPanel, useRoster } from './roster.tsx';
 import { SpellBook } from './spellbook.tsx';
 import { Store } from './store.tsx';
 import { TutorialOverlay, type TutorialOverlayProps } from './tutorial.tsx';
@@ -71,6 +72,8 @@ import {
   questMinLevels,
   questRanks,
   recruitView,
+  ROSTER_DIALOG_ID,
+  rosterPanel,
   unitInfoPanel,
 } from './state.ts';
 
@@ -186,6 +189,7 @@ export function Root({
   // The onboarding family is UI-only state published by the host; the panels
   // it draws are readings of the tutorial and quest models, never decisions.
   const onboarding = useOnboarding();
+  const roster = useRoster();
   const state = hudState(hudInput(bundle, world));
   const bonus = useMemo(
     () => bonusPanel(world, now, tzOffsetHours),
@@ -222,6 +226,14 @@ export function Root({
   const recruit = useMemo(
     () => recruitView(bundle, world, selectedIso, now),
     [bundle, world, selectedIso, now],
+  );
+  // The roster, the team thumbnails and the XP cards are one reading of the
+  // same answer. The team is only passed in when the server bound one to the
+  // active quest, so the strip never claims a team the server did not accept.
+  const activeTeam = activeQuestState(world)?.team ?? null;
+  const rosterView = useMemo(
+    () => rosterPanel(bundle, world, now, activeTeam),
+    [bundle, world, now, activeTeam],
   );
 
   // The dialog's id selects which of the four assault-family screens to host.
@@ -285,7 +297,7 @@ export function Root({
         state={dialog ?? CLOSED_DIALOG}
         onDismiss={onDialogDismiss ?? (() => {})}
       >
-        {!onboarding.view && !dialogId?.startsWith('assault-') && questPanel && onQuestStart && onQuestAction ? (
+        {!onboarding.view && !dialogId?.startsWith('assault-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
             key={
               questPanel.kind === 'briefing'
@@ -300,6 +312,14 @@ export function Root({
             onAction={onQuestAction}
             onRetry={onQuestRetry}
             onNext={onQuestNext}
+            onCancel={onDialogDismiss ?? (() => {})}
+          />
+        ) : null}
+        {!onboarding.view && dialogId === ROSTER_DIALOG_ID && rosterView ? (
+          <RosterPanel
+            key="roster-army"
+            view={rosterView}
+            onSubmit={roster.submitTeam ?? undefined}
             onCancel={onDialogDismiss ?? (() => {})}
           />
         ) : null}

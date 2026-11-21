@@ -380,6 +380,16 @@ export function uiCss(): string {
   margin-top: 5px;
 }
 
+/* The roster opens the one dialog from this head, beside the section title. */
+.swl-inventory-roster {
+  float: right;
+  padding: 0 4px;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  color: var(--swl-accent);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
 .swl-inventory-scroll {
   min-height: 0;
   overflow-y: auto;
@@ -1730,5 +1740,170 @@ export function uiCss(): string {
 .swl-feedback-success .swl-feedback-mark { color: var(--swl-success); }
 .swl-feedback-error .swl-feedback-mark { color: var(--swl-danger); }
 .swl-feedback-text { white-space: pre-line; }
+
+/* --- The army roster, team thumbnails and unit XP ----------------------- */
+
+.swl-roster-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: var(--swl-gap-lg);
+}
+
+.swl-roster-heading {
+  margin: 0 0 4px;
+  color: var(--swl-accent);
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(13px * var(--swl-font-scale-display, 1));
+  text-transform: uppercase;
+}
+
+.swl-roster-note {
+  margin: 2px 0;
+  color: var(--swl-ink-muted);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-roster-units,
+.swl-roster-thumbs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swl-roster-unit {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  border-bottom: 1px solid #38445a80;
+}
+
+.swl-roster-inspect {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 3px 4px;
+  border-radius: 3px;
+  text-align: left;
+}
+
+.swl-roster-inspect:hover,
+.swl-roster-inspect-active {
+  background: #27324a;
+}
+
+.swl-roster-unit-name {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.swl-roster-unit-qty { color: var(--swl-accent); }
+.swl-roster-unit-level { color: var(--swl-accent); font-size: calc(10px * var(--swl-font-scale-body, 1)); }
+
+.swl-roster-unit input[type='number'] {
+  width: 3.5rem;
+  flex: none;
+  background: var(--swl-surface);
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  color: var(--swl-ink);
+}
+
+.swl-roster-team { margin-top: var(--swl-gap-lg); }
+
+.swl-roster-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swl-roster-thumb {
+  display: flex;
+  flex-direction: column;
+  min-width: 84px;
+  padding: 5px 7px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface);
+  color: var(--swl-ink-muted);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-roster-thumb-active {
+  border-color: var(--swl-accent);
+  color: var(--swl-ink);
+  box-shadow: inset 0 1px 0 #f5c54255;
+}
+
+.swl-roster-thumb-name { font-weight: 700; }
+.swl-roster-thumb-state { color: var(--swl-ink-muted); }
+
+.swl-roster-xp {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--swl-gap);
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface);
+}
+
+.swl-roster-xp-title,
+.swl-roster-xp-level {
+  margin: 0;
+  color: var(--swl-accent);
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(13px * var(--swl-font-scale-display, 1));
+  letter-spacing: 0.04em;
+}
+
+.swl-roster-xp-name {
+  margin: 0;
+  color: var(--swl-ink);
+  font-weight: 700;
+}
+
+.swl-roster-stars {
+  margin: 0;
+  color: var(--swl-accent);
+  font-size: calc(16px * var(--swl-font-scale-body, 1));
+  letter-spacing: 2px;
+}
+
+.swl-roster-xp-progress,
+.swl-roster-xp-bonus,
+.swl-roster-xp-hint {
+  margin: 0;
+  color: var(--swl-ink-muted);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-roster-xp-hint { color: var(--swl-accent); }
+
+.swl-roster-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--swl-gap);
+  margin-top: var(--swl-gap-lg);
+}
+
+.swl-roster-actions button {
+  padding: 5px 12px;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+}
+
+.swl-roster-actions .swl-roster-primary {
+  border-color: var(--swl-accent);
+  background: var(--swl-accent);
+  color: #10151d;
+  font-weight: 700;
+}
+
+.swl-roster-actions button:disabled { opacity: 0.5; cursor: default; }
 `.trim();
 }

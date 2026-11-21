@@ -67,7 +67,18 @@ import {
   unitPanel,
 } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
-import { MULTIPLIER_PEASANTS, QUEST_IDS, getQuestSpec } from '@swl/rules';
+import {
+  MULTIPLIER_PEASANTS,
+  QUEST_IDS,
+  bonusesForLevel,
+  getQuestSpec,
+  levelForXp,
+  maxLevel,
+  parseXpTable,
+  xpForLevel,
+  type Army,
+  type XpLevelRow,
+} from '@swl/rules';
 
 /** The categories, as the build menu's tabs read them. */
 export type Categories = Record<
@@ -1079,4 +1090,191 @@ export function onboardingDialog(kind: OnboardingPanelKind, title: string): Dial
     confirm: 'confirm',
   };
   return { id: `onboarding-${kind}`, kind: kinds[kind], title };
+}
+
+/* -------------------------------------------------------------------------
+ * The army roster, the team thumbnails and the unit-XP display
+ *
+ * These three readings share one subject: the units the server's save
+ * accounts for. The roster lists them (`armyView`), the thumbnails echo the
+ * team the server bound to the active quest, and the XP card reads the xp the
+ * server stored on a placed unit through the rules' XP table. Nothing here
+ * grants, levels or fields a unit locally.
+ * ---------------------------------------------------------------------- */
+
+/** The client's own literals on `GUI/UnitXPLevelInfoDisplay.as`. */
+export const UNIT_XP_LEVEL_UP = 'LEVEL UP';
+export const UNIT_XP_LABEL = 'Unit Level';
+export const UNIT_XP_HINT = 'Defeat enemies to level up your unit!!';
+
+/** The XP table from the content globals, or an empty table when malformed. */
+function xpTable(bundle: ContentBundle): XpLevelRow[] {
+  try {
+    return parseXpTable(bundle.globals?.['UNIT_XP_LEVELS_MULTIPLIERS_10']);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * The xp the server recorded on each placed unit type, by content id.
+ *
+ * A unit's accumulated xp is an attribute key the world sends verbatim. When
+ * more than one unit of a type is placed, the highest value is the level the
+ * server has actually reached for that type; summing them would invent a
+ * level no single unit owns.
+ */
+export function unitXpByItem(world: WorldSnapshot): Map<number, number> {
+  const out = new Map<number, number>();
+  for (const tuple of Object.values(world.maps[0]?.items ?? {})) {
+    if (!Array.isArray(tuple)) continue;
+    const itemId = Number(tuple[0]);
+    const attrs = tuple[6];
+    if (!Number.isInteger(itemId) || itemId <= 0) continue;
+    if (!attrs || typeof attrs !== 'object' || Array.isArray(attrs)) continue;
+    const xp = Number((attrs as Record<string, unknown>)['xp']);
+    if (!Number.isFinite(xp) || xp <= 0) continue;
+    out.set(itemId, Math.max(out.get(itemId) ?? 0, Math.trunc(xp)));
+  }
+  return out;
+}
+
+/** One unit's XP card: the client's words and the rules' own level. */
+export interface UnitXpView {
+  readonly itemId: number;
+  readonly name: string;
+  /** The xp the server stored on the unit. */
+  readonly xp: number;
+  readonly level: number;
+  readonly maxLevel: number;
+  /** One filled star per earned level, then the empty ones. */
+  readonly stars: string;
+  readonly attackBonus: number;
+  readonly lifeBonusPercent: number;
+  /** XP the next level needs, or null once the unit is at the maximum. */
+  readonly nextLevelXp: number | null;
+  readonly title: string;
+  readonly label: string;
+  readonly hint: string;
+}
+
+/** Build a unit's XP card from the content and the server's xp, or null. */
+export function unitXpPanel(
+  bundle: ContentBundle,
+  itemId: number,
+  xp: number,
+): UnitXpView | null {
+  const item = (bundle.items ?? []).find((entry) => entry.id === itemId);
+  if (!item || item.type !== 'u') return null;
+  const table = xpTable(bundle);
+  const life = Number.isFinite(item.life) && item.life > 0 ? item.life : 0;
+  const earned = Number.isFinite(xp) && xp > 0 ? Math.trunc(xp) : 0;
+  const highest = table.length > 1 ? maxLevel(table) : 0;
+  // With no table or no base life the rules cannot compute a level, so the
+  // card shows level zero rather than inventing one.
+  const level = life > 0 && table.length > 1 ? levelForXp(table, life, earned) : 0;
+  const bonuses = level > 0 ? bonusesForLevel(table, life, level) : null;
+  const next = level < highest ? level + 1 : null;
+  return {
+    itemId,
+    name: item.name,
+    xp: earned,
+    level,
+    maxLevel: highest,
+    stars: '★'.repeat(level) + '☆'.repeat(Math.max(0, highest - level)),
+    attackBonus: bonuses?.extraAttack ?? 0,
+    lifeBonusPercent: bonuses?.extraLifePercent ?? 0,
+    nextLevelXp: next !== null && next < table.length ? xpForLevel(table, life, next) : null,
+    title: UNIT_XP_LEVEL_UP,
+    label: UNIT_XP_LABEL,
+    hint: UNIT_XP_HINT,
+  };
+}
+
+/** One roster row: the server's unit, named by content and levelled by rules. */
+export interface RosterUnitView extends ArmyUnitView {
+  /** The xp the server stored for this unit type. */
+  readonly xp: number;
+  /** The level the rules derive from that xp. */
+  readonly level: number;
+  /** The XP card drawn when this row is inspected. */
+  readonly card: UnitXpView;
+}
+
+/** One thumbnail: the activate/deactivate state the original toggles. */
+export interface TeamThumbView {
+  readonly itemId: number;
+  readonly name: string;
+  readonly level: number;
+  /** The count the server accepted; zero for a deactivated thumbnail. */
+  readonly count: number;
+  readonly active: boolean;
+}
+
+/**
+ * The thumbnails for the team the server bound to the active quest.
+ *
+ * Every roster unit gets one: units in the accepted team are active and carry
+ * the server's count, the rest are deactivated and carry zero. A world with no
+ * active team produces no thumbnails at all — the client never claims a team
+ * the server did not accept.
+ */
+export function teamThumbnails(
+  roster: readonly RosterUnitView[],
+  team: Army | null | undefined,
+): TeamThumbView[] {
+  if (!team || team.length === 0) return [];
+  const accepted = new Map<number, number>();
+  for (const entry of team) {
+    if (!Number.isInteger(entry.unitId) || entry.unitId <= 0) continue;
+    const count = Number(entry.count);
+    if (!Number.isFinite(count) || count <= 0) continue;
+    accepted.set(entry.unitId, Math.max(0, Math.trunc(count)));
+  }
+  if (accepted.size === 0) return [];
+  return roster.map((unit) => ({
+    itemId: unit.itemId,
+    name: unit.name,
+    level: unit.level,
+    count: accepted.get(unit.itemId) ?? 0,
+    active: (accepted.get(unit.itemId) ?? 0) > 0,
+  }));
+}
+
+/** The roster panel's whole body, read from the server and the content. */
+export interface RosterPanelView {
+  readonly units: readonly RosterUnitView[];
+  readonly thumbnails: readonly TeamThumbView[];
+  /** True when the server has actually accepted a team to show. */
+  readonly teamAccepted: boolean;
+}
+
+/** Build the roster, its thumbnails and every unit's XP card. */
+export function rosterPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  now: number,
+  team: Army | null | undefined = null,
+  excludedGroupTypes: readonly string[] = [],
+): RosterPanelView {
+  const xpByItem = unitXpByItem(world);
+  const units: RosterUnitView[] = [];
+  for (const unit of armyPanel(bundle, world, now, excludedGroupTypes)) {
+    const xp = xpByItem.get(unit.itemId) ?? 0;
+    const card = unitXpPanel(bundle, unit.itemId, xp);
+    // armyView only names content units, so a missing card means malformed
+    // content. Skip it rather than draw a level the rules cannot support.
+    if (!card) continue;
+    units.push({ ...unit, xp, level: card.level, card });
+  }
+  const thumbnails = teamThumbnails(units, team);
+  return { units, thumbnails, teamAccepted: thumbnails.length > 0 };
+}
+
+/** The one dialog's id for the roster panel. */
+export const ROSTER_DIALOG_ID = 'roster-army';
+
+/** The one dialog's descriptor for the roster panel. */
+export function rosterDialog(): DialogContent {
+  return { id: ROSTER_DIALOG_ID, kind: 'alert', title: 'Your Army' };
 }
