@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 134,
+   "implemented": 138,
    "dropped": 52,
-   "planned": 74
+   "planned": 70
   }
  },
  "screens": [
@@ -455,7 +455,7 @@
    "overrides": [],
    "bytes": 6386,
    "decision": "implemented",
-   "decisionNote": "Implemented: the purchase gesture is modelled by `apps/client/src/ui/state.ts`, which prices the next tile from the content row at the server-owned ordinal, and `apps/client/src/ui/expansion.tsx`, which sends `expand(tileId)` through the one command transport and draws the server's answer in the shared Feedback region. The original's separate gold/cash buttons, slot picker, neighbour (`neighbors`) and inventory (`inventory_qte`) gates, and the post-purchase popup are not modelled; the tile id is an identifier the server validates, not a grid-placement rule."
+   "decisionNote": "Implemented: the purchase gesture is modelled by `apps/client/src/ui/state.ts`, which prices the next tile from the content row at the server-owned ordinal, and `apps/client/src/ui/expansion.tsx`, which sends `expand(tileId)` through the one command transport and draws the server's answer in the shared Feedback region. The original's separate gold/cash buttons and slot picker are still not modelled; the post-purchase growth result and the buy-for/requirement prompts are now drawn inline by the same panel, and the `neighbors`/`inventory_qte` columns remain display-only rather than enforced gates. The tile id is an identifier the server validates, not a grid-placement rule."
   },
   {
    "class": "ExtendedPortraitPopupButton",
@@ -781,8 +781,8 @@
    ],
    "overrides": [],
    "bytes": 4901,
-   "decision": "planned",
-   "decisionNote": "Deferred: the expansion item button's buy-for prompt and cash/gold/neighbour expansion messages are not modelled; unblock when base expansion is rendered in the client and the art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/state.ts` and `apps/client/src/ui/expansion.tsx` draw the expansion button's buy-for prompt and the cash/gold/neighbour requirement literals, shown only when the server's own wallet or neighbour count is short. They are display prompts, not gates: the one expand request is the only gesture and the server decides. The original's separate art is excluded; the neighbours/inventory columns are still not enforced."
   },
   {
    "class": "ItemButtonLargeResources",
@@ -2633,8 +2633,8 @@
    ],
    "overrides": [],
    "bytes": 576,
-   "decision": "planned",
-   "decisionNote": "Deferred: the expansion popup has no client-side expansion model; unblock when base expansion is rendered and the popup art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the expansion popup's behaviour is drawn inline by `apps/client/src/ui/expansion.tsx`, which hosts the growth result from two of the server's owned-expansion answers in the one control. The original's `/_assets/assets.swf` artwork stays excluded, but the screen's behaviour is really modelled and rendered."
   },
   {
    "class": null,
@@ -3732,8 +3732,8 @@
    ],
    "overrides": [],
    "bytes": 3353,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P2) collections are a later catalogue feature, not needed to place or collect stored items."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the collections catalogue is drawn as a tab of the storage panel by `apps/client/src/ui/collections.tsx` from the content's ten collection rows and the server's `maps[0].store` / `privateState.collections`, bridged by `apps/client/src/ui/state.ts`. It is read-only: prize text is never claimed locally and no second popup opens."
   },
   {
    "class": "InventoryTabItems",
@@ -3752,7 +3752,7 @@
    "overrides": [],
    "bytes": 3548,
    "decision": "implemented",
-   "decisionNote": "Implemented in G5.2: the storage panel's category tabs filter the server's stored items through inventoryCategories/itemsForCategory (`packages/client/src/inventory.ts`, apps/client/src/ui/inventory.tsx). The original's separate collections-content popup, with its reloadCollections behaviour, is still planned."
+   "decisionNote": "Implemented in G5.2: the storage panel's category tabs filter the server's stored items through inventoryCategories/itemsForCategory (`packages/client/src/inventory.ts`, apps/client/src/ui/inventory.tsx). The original's collections-content tab is now drawn by `apps/client/src/ui/collections.tsx` from the content's collection rows and the server's store, with no local prize claim."
   },
   {
    "class": "MondayBonusPopUp",
@@ -4317,8 +4317,8 @@
    ],
    "overrides": [],
    "bytes": 4890,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P1) the post-purchase 'Your empire has GROWN!' celebration and share popup is not modelled. The purchase and its content-derived pricing are implemented separately; only the celebration remains deferred."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the post-purchase celebration is drawn inline by `apps/client/src/ui/expansion.tsx` from the server's before/after expansion lists and the content's price, with the client's own 'Congratulations!' / 'Your empire has GROWN!' literals from `apps/client/src/ui/state.ts`. No purchase or tile is fabricated and no second modal is opened; the proprietary `expGen.png` art and the Share! social popup (no server behaviour in this clone) stay excluded."
   },
   {
    "class": "PopupGenericUnitSelector",

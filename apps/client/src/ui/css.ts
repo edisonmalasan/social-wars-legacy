@@ -497,7 +497,14 @@ export function uiCss(): string {
   left: 8px;
   top: 168px;
   width: 300px;
+  max-height: 210px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   padding: 6px 8px;
   border: 1px solid #38445a;
   border-radius: 4px;
@@ -534,6 +541,85 @@ export function uiCss(): string {
 .swl-expansion-gold { color: #f2d67a; }
 
 .swl-expansion-cash { color: #9fd3a0; }
+
+.swl-expansion-buyfor {
+  color: #8d97a8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+/* The original's requirement literals, shown only when the server's own
+   wallet or neighbour count is short. They are hints, never enforced gates. */
+.swl-expansion-prompt {
+  margin: 0;
+  color: #e0a33c;
+  white-space: pre-line;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  line-height: 1.25;
+}
+
+/* The post-purchase growth result, inline in the same panel — no second
+   overlay, no proprietary art. Its words and price are content/client text;
+   the tiles and the count are the server's answer. */
+.swl-expansion-result {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 7px;
+  border: 1px solid var(--swl-success);
+  border-radius: 3px;
+  background: #1d2a22;
+}
+
+.swl-expansion-result-head {
+  margin: 0;
+  color: var(--swl-success);
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(13px * var(--swl-font-scale-display, 1));
+  text-transform: uppercase;
+}
+
+.swl-expansion-result-message {
+  margin: 0;
+  color: var(--swl-ink);
+  font-weight: 700;
+}
+
+.swl-expansion-result-detail,
+.swl-expansion-result-price {
+  margin: 0;
+  color: var(--swl-ink-muted);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  font-variant-numeric: tabular-nums;
+}
+
+.swl-ui button.swl-expansion-result-dismiss {
+  align-self: flex-end;
+  padding: 2px 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  color: var(--swl-ink-muted);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+.swl-ui button.swl-expansion-result-dismiss:hover { border-color: var(--swl-accent); }
+
+/* --- The collections tab ----------------------------------------------- */
+
+.swl-collections { padding-top: 3px; }
+.swl-collections-empty { margin: 0; color: var(--swl-ink-muted); font-size: calc(11px * var(--swl-font-scale-body, 1)); }
+.swl-collections-list { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.swl-collection { padding: 4px 0; border-top: 1px solid var(--swl-border); }
+.swl-collection-head { display: flex; align-items: baseline; gap: 6px; }
+.swl-collection-name { flex: 1; color: var(--swl-ink); font-weight: 700; }
+.swl-collection-progress { color: var(--swl-accent); font-variant-numeric: tabular-nums; }
+.swl-collection-done { color: var(--swl-success); font-size: calc(10px * var(--swl-font-scale-body, 1)); }
+.swl-collection-description { margin: 2px 0; color: var(--swl-ink-muted); font-size: calc(10px * var(--swl-font-scale-body, 1)); }
+.swl-collection-items { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.swl-collection-item { padding: 1px 4px; border: 1px solid var(--swl-border); border-radius: 3px; color: var(--swl-ink); font-size: calc(10px * var(--swl-font-scale-body, 1)); }
+.swl-collection-item.is-missing { color: var(--swl-ink-muted); border-style: dashed; }
+.swl-collection-item-qty { color: var(--swl-accent); }
+.swl-collection-prize,
+.swl-collection-price { margin: 3px 0 0; color: var(--swl-ink-muted); font-size: calc(10px * var(--swl-font-scale-body, 1)); }
 
 /* --- The info panel ---------------------------------------------------- */
 

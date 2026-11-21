@@ -64,6 +64,7 @@ import {
   buildingInfo,
   buildItems,
   categories,
+  collectionsPanel,
   expansionPanel,
   goalList,
   hudInput,
@@ -208,8 +209,14 @@ export function Root({
     return items.find((item) => item.id === placing)?.name ?? null;
   }, [items, placing]);
   const goals = useMemo(() => goalList(bundle, world), [bundle, world]);
-  const expansion = useMemo(() => expansionPanel(bundle, world), [bundle, world]);
+  // The neighbour count is the server's own list length, passed in when the
+  // host has fetched it; without it no neighbour prompt is drawn.
+  const expansion = useMemo(
+    () => expansionPanel(bundle, world, neighbours.length),
+    [bundle, world, neighbours],
+  );
   const stored = useMemo(() => inventoryItems(bundle, world), [bundle, world]);
+  const collections = useMemo(() => collectionsPanel(bundle, world), [bundle, world]);
   const ranks = useMemo(() => questRanks(world), [world]);
   const minLevels = useMemo(() => questMinLevels(bundle), [bundle]);
   // The chapter slots are gestures: a slot the server has opened can be
@@ -268,6 +275,7 @@ export function Root({
       <Inventory
         items={stored}
         categories={tabs}
+        collections={collections}
         army={army}
         onPlace={onPlaceStored}
       />

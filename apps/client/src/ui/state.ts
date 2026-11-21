@@ -720,12 +720,51 @@ export interface ExpansionPanelView {
   readonly tileId: number;
   /** The native command a click sends; the server decides acceptance. */
   readonly command: NativeCommand;
+  /** The client's own "buy for" prompt, from `GUI/ItemButtonLargeExpand2.as`. */
+  readonly buyFor: string;
+  /**
+   * Display-only requirement prompts named by the content row.
+   *
+   * Each is the original's own literal, shown only when the server's own
+   * wallet or neighbour count is short; they are **not** gates. The
+   * `neighbors` and `inventory_qte` columns remain deferred server-side, and
+   * the one button always sends the same expand request.
+   */
+  readonly prompts: readonly ExpansionPrompt[];
 }
 
-/** The expansion view, from the server's owned count and the content's prices. */
+/** The client's own literals on `GUI/ItemButtonLargeExpand2.as`. */
+export const EXPANSION_BUY_FOR = 'buy for';
+export const EXPANSION_CASH_PROMPT =
+  "Oh no! You don't have enough cash! Would you like to get some more?";
+export const EXPANSION_NEIGHBOURS_PROMPT =
+  'You need more neighbours to expand your base.\nWanna get some more?\n Easy, invite your friends!';
+export const EXPANSION_GOLD_PROMPT =
+  'You need more gold to expand your base.\n Wanna get some now?';
+
+/** One unmet requirement the content's expansion row names, shown as a prompt. */
+export interface ExpansionPrompt {
+  /** Which content column names the requirement. */
+  readonly kind: 'cash' | 'gold' | 'neighbours';
+  /** The amount the content row names; never a client-side gate. */
+  readonly needed: number;
+  /** The server's own count that was compared and found short. */
+  readonly have: number;
+  /** The client's own literal, never a server-written message. */
+  readonly text: string;
+}
+
+/**
+ * The expansion view, from the server's owned count and the content's prices.
+ *
+ * `neighbourCount` is the server's own neighbour list length when the host has
+ * fetched it; a caller that does not have it passes null and no neighbour
+ * prompt is drawn, because the client must not guess a count it cannot read.
+ */
 export function expansionPanel(
   bundle: ContentBundle,
   world: WorldSnapshot,
+  neighbourCount: number | null = null,
 ): ExpansionPanelView | null {
   const owned = ownedExpansions(world);
   const row = recordOrNull((bundle.expansionPrices ?? [])[owned.length]);
@@ -734,13 +773,262 @@ export function expansionPanel(
   const cash = finite(row['cash']);
   if (coins === null || cash === null) return null;
   const tileId = Math.floor(Math.max(0, ...owned)) + 1;
+  const prompts: ExpansionPrompt[] = [];
+  const gold = finite(world.resources?.['g']);
+  const playerCash = finite(world.resources?.['c']);
+  const short = (needed: number, have: number | null): boolean =>
+    have !== null && have < needed;
+  if (short(cash, playerCash) && playerCash !== null) {
+    prompts.push({ kind: 'cash', needed: cash, have: playerCash, text: EXPANSION_CASH_PROMPT });
+  }
+  if (short(coins, gold) && gold !== null) {
+    prompts.push({ kind: 'gold', needed: coins, have: gold, text: EXPANSION_GOLD_PROMPT });
+  }
+  const neighbours = finite(row['neighbors']);
+  if (neighbours !== null && neighbours > 0 && short(neighbours, neighbourCount) && neighbourCount !== null) {
+    prompts.push({
+      kind: 'neighbours',
+      needed: neighbours,
+      have: neighbourCount,
+      text: EXPANSION_NEIGHBOURS_PROMPT,
+    });
+  }
   return {
     owned: owned.length,
     coins,
     cash,
     tileId,
     command: expand(tileId),
+    buyFor: EXPANSION_BUY_FOR,
+    prompts,
   };
+}
+
+/* -------------------------------------------------------------------------
+ * The post-purchase growth result
+ *
+ * The celebration is a reading of **two** server answers: the owned-expansion
+ * list before the request and the one the server returned after it. It is
+ * drawn only when the list actually grew, and the new tile ids are the tail
+ * of the server's own list. Nothing here grants a tile, decides a purchase or
+ * opens a second modal — the result is an inline extension of the expansion
+ * control. The original's `expGen.png` art and its Share! popup are excluded.
+ * ---------------------------------------------------------------------- */
+
+/** The client's own celebration literals on `popups/PopupExpand.as`. */
+export const EXPANSION_CELEBRATION_HEADING = 'Congratulations!';
+export const EXPANSION_CELEBRATION_MESSAGE = 'Your empire has GROWN!';
+
+/** The stable id of the inline growth-result region in the expansion control. */
+export const EXPANSION_RESULT_ID = 'expansion-result';
+
+/** The growth the server answered, with only values it actually published. */
+export interface ExpansionResultView {
+  /** The count before the accepted request, as the server had it. */
+  readonly before: number;
+  /** The count in the server's answer. */
+  readonly after: number;
+  /** The tiles the server added, in its own list order. */
+  readonly tiles: readonly number[];
+  /** The content price at the ordinal that was bought; display only. */
+  readonly coins: number | null;
+  readonly cash: number | null;
+  /** The client's own celebration literals. */
+  readonly heading: string;
+  readonly message: string;
+}
+
+/**
+ * Read the growth result, or null when the server answered no growth.
+ *
+ * `before` is the owned count from the world the command was sent with. A
+ * refused or replayed expansion leaves the count unchanged, so no celebration
+ * is drawn. A malformed new tile is dropped rather than claimed. This is a
+ * reading of the server's list, never a purchase made locally.
+ */
+export function expansionResultPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  before: number,
+): ExpansionResultView | null {
+  if (!Number.isInteger(before) || before < 0) return null;
+  const owned = ownedExpansions(world);
+  if (owned.length <= before) return null;
+  const tiles = owned.slice(before);
+  if (tiles.some((tile) => !Number.isInteger(tile) || tile <= 0)) return null;
+  const row = recordOrNull((bundle.expansionPrices ?? [])[before]);
+  return {
+    before,
+    after: owned.length,
+    tiles,
+    coins: row ? finite(row['coins']) : null,
+    cash: row ? finite(row['cash']) : null,
+    heading: EXPANSION_CELEBRATION_HEADING,
+    message: EXPANSION_CELEBRATION_MESSAGE,
+  };
+}
+
+/* -------------------------------------------------------------------------
+ * Collections
+ *
+ * The catalogue is the content's ten collection rows; the progress and the
+ * completion state are the server's (`maps[0].store` and
+ * `privateState.collections`). The prize is shown as content text only. There
+ * is no claim gesture: awarding a collection prize is the server's job, and
+ * this panel never pretends to have done it.
+ * ---------------------------------------------------------------------- */
+
+/** One required unit in a collection, named by content and present in the store. */
+export interface CollectionItemView {
+  /** The content id of the required item. */
+  readonly itemId: number;
+  /** The content's name, or the id when the content names none. */
+  readonly name: string;
+  /** The quantity the server's store holds; zero when it holds none. */
+  readonly quantity: number;
+}
+
+/** One collection row as the tab draws it. */
+export interface CollectionEntryView {
+  /** The content's one-based collection id. */
+  readonly id: number;
+  readonly name: string;
+  readonly description: string;
+  /** The content's cash price, or null when it is not a finite number. */
+  readonly cashPrice: number | null;
+  /** The content's required items, with the server's held quantities. */
+  readonly items: readonly CollectionItemView[];
+  /** How many required items the server's store holds. */
+  readonly held: number;
+  /** Whether the server's `collections` list names this id. */
+  readonly completed: boolean;
+  /** The content's prize, rendered as text. Never a granted reward. */
+  readonly prize: string;
+}
+
+/** The collections tab's body. */
+export interface CollectionsPanelView {
+  readonly entries: readonly CollectionEntryView[];
+}
+
+/** An integer id from the content's string-or-number fields, or null. */
+function contentId(value: unknown): number | null {
+  if (typeof value === 'number') {
+    return Number.isInteger(value) && value > 0 ? value : null;
+  }
+  if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
+    const id = Number(value.trim());
+    return Number.isInteger(id) && id > 0 ? id : null;
+  }
+  return null;
+}
+
+/** Parse a content field that holds a JSON array, or an empty array. */
+function jsonIds(value: unknown): number[] {
+  if (typeof value !== 'string') return [];
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  const out: number[] = [];
+  for (const entry of parsed) {
+    const id = contentId(entry);
+    if (id !== null) out.push(id);
+  }
+  return out;
+}
+
+/** The items the server's store holds, by content id. */
+function storedQuantities(world: WorldSnapshot): Map<number, number> {
+  const out = new Map<number, number>();
+  const store = world.maps[0]?.store;
+  if (!store || typeof store !== 'object' || Array.isArray(store)) return out;
+  for (const [key, value] of Object.entries(store)) {
+    const id = contentId(key);
+    const quantity = finite(value);
+    if (id !== null && quantity !== null && quantity > 0) out.set(id, Math.trunc(quantity));
+  }
+  return out;
+}
+
+/** Render the content's prize record as names, without granting anything. */
+function prizeText(
+  value: unknown,
+  names: Map<number, string>,
+): string {
+  if (typeof value !== 'string') return '';
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    return '';
+  }
+  const record = recordOrNull(parsed);
+  if (!record) return '';
+  const rows: string[] = [];
+  for (const [key, amount] of Object.entries(record)) {
+    const id = contentId(key);
+    const quantity = finite(amount);
+    if (id === null || quantity === null || quantity <= 0) continue;
+    rows.push(`${names.get(id) ?? `item ${id}`} ×${Math.trunc(quantity)}`);
+  }
+  return rows.join(', ');
+}
+
+/**
+ * The content's collections and the server's progress, in content order.
+ *
+ * Names, descriptions, prices, required items and prize text are the
+ * content's; quantities and the completed ids are the server's. A malformed
+ * content row is skipped rather than drawn as a fabricated collection, and a
+ * prize is only ever rendered as text.
+ */
+export function collectionsPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+): CollectionsPanelView {
+  const names = new Map<number, string>();
+  for (const item of bundle.items ?? []) names.set(item.id, item.name);
+  const quantities = storedQuantities(world);
+  const completed = new Set<number>();
+  const rawCompleted = world.privateState?.['collections'];
+  if (Array.isArray(rawCompleted)) {
+    for (const entry of rawCompleted) {
+      const id = contentId(entry);
+      if (id !== null) completed.add(id);
+    }
+  }
+  const entries: CollectionEntryView[] = [];
+  for (const raw of bundle.collections ?? []) {
+    const row = recordOrNull(raw);
+    if (!row) continue;
+    const id = contentId(row['id']);
+    if (id === null || typeof row['name'] !== 'string') continue;
+    const itemIds = jsonIds(row['item_ids']);
+    if (itemIds.length === 0) continue;
+    const items = itemIds.map((itemId) => ({
+      itemId,
+      name: names.get(itemId) ?? `item ${itemId}`,
+      quantity: quantities.get(itemId) ?? 0,
+    }));
+    const cash = typeof row['cashPrice'] === 'string'
+      ? contentId(row['cashPrice'])
+      : finite(row['cashPrice']);
+    entries.push({
+      id,
+      name: row['name'],
+      description: typeof row['description'] === 'string' ? row['description'] : '',
+      cashPrice: cash,
+      items,
+      held: items.filter((entry) => entry.quantity > 0).length,
+      completed: completed.has(id),
+      prize: prizeText(row['prize'], names),
+    });
+  }
+  return { entries };
 }
 
 /**
