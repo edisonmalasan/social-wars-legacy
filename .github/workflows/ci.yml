@@ -244,6 +244,100 @@ jobs:
         working-directory: apps/desktop/src-tauri
         run: cargo fmt --check
 
+  # Unsigned Linux installers. This is a **separate, non-required** job on
+  # purpose: bundling compiles a full release and downloads the AppImage
+  # toolchain, and the four checks above must stay as fast as they are. It
+  # reuses the same web-view libraries the desktop job already installs, and
+  # nothing here signs, notarises or publishes anything - the two artefacts
+  # are uploaded for inspection and labelled UNSIGNED.
+  linux-bundle:
+    name: Unsigned Linux bundles (informational)
+    runs-on: ubuntu-latest
+    # A bound, so a stuck bundle download cannot hold the run open all day.
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      # The same web-view libraries the desktop job installs. No new system
+      # dependency is needed to produce a .deb or an .AppImage.
+      - name: The web view's libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The same inputs the desktop job prepares, in the same order: the
+      # content bundle, the server sidecar the shell bundles, and the real
+      # client in `frontendDist` (the shell must not ship the placeholder).
+      - name: Build the content bundle
+        run: pnpm build:content
+
+      - name: Build the desktop server sidecar
+        run: node scripts/build-desktop-server.mjs
+
+      - name: Build the client's manifest
+        run: pnpm build:client
+
+      - name: Build the web client
+        run: pnpm --filter @swl/app-client build
+
+      - name: Prepare the desktop shell
+        run: node scripts/prepare-desktop.mjs
+
+      - name: The shell's frontend is the real client
+        run: node scripts/check-desktop-dist.mjs
+
+      # Pinned to the npm Tauri CLI used for the Windows bundles. Only the
+      # two Linux targets are requested; there is no signing identity, no
+      # notarisation and no publisher credential anywhere in this job.
+      - name: Build the unsigned .deb and .AppImage
+        working-directory: apps/desktop/src-tauri
+        run: npx --yes --package @tauri-apps/cli@2.12.3 tauri build --bundles deb,appimage
+
+      - name: Confirm and label the unsigned bundles
+        run: |
+          set -eu
+          deb=(apps/desktop/src-tauri/target/release/bundle/deb/*.deb)
+          appimage=(apps/desktop/src-tauri/target/release/bundle/appimage/*.AppImage)
+          test -f "${deb[0]}"
+          test -f "${appimage[0]}"
+          echo "UNSIGNED Linux bundles (for inspection only):"
+          echo "  deb:       ${deb[0]}"
+          echo "  AppImage:  ${appimage[0]}"
+          printf '%s\n' \
+            'UNSIGNED - FOR INSPECTION ONLY' \
+            'These Linux bundles carry no code signature and no notarisation,' \
+            'and were not published to any repository or store.' \
+            "deb: ${deb[0]}" \
+            "AppImage: ${appimage[0]}" \
+            > apps/desktop/src-tauri/target/release/bundle/UNSIGNED.txt
+
+      - name: Upload the unsigned Linux bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-bundles-UNSIGNED
+          path: |
+            apps/desktop/src-tauri/target/release/bundle/deb/*.deb
+            apps/desktop/src-tauri/target/release/bundle/appimage/*.AppImage
+            apps/desktop/src-tauri/target/release/bundle/UNSIGNED.txt
+          if-no-files-found: error
+          retention-days: 7
+
   assets:
     name: Assets
     runs-on: ubuntu-latest
