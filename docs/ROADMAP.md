@@ -2066,6 +2066,112 @@ or on a cleaned tree, as in CI.
 
 ---
 
+## Firefox end-to-end — the full gameplay loop plays under Gecko (session verified)
+
+*Status: **session verified**. This outcome is recorded here, **outside** the
+`## Group X` sections above, so `node scripts/check-roadmap.mjs` still counts
+the same **401** items (Group G: 81 items, 73 done / 8 open) and the G5
+"client is run in **Firefox and Safari**" checkbox above **stays open** (Safari
+has still not been run). The smoke, G5.1, G5.2, expansion, phone-ready and Q11
+records above are preserved unchanged. This is a Firefox **play session**, not
+a Safari/WebKit run and not a device run.*
+
+**What was implemented and verified:**
+
+- **A separate Python Playwright end-to-end harness** (`scripts/e2e-test-firefox.py`)
+  drives Gecko, which speaks Juggler/BiDi rather than the Chrome DevTools
+  Protocol. It starts the real server (`apps/server/src/main.ts`) on a free
+  port with a temporary PGlite directory, waits for `/health`, serves the built
+  client plus `apps/client/public` and `.work/frames`, and proxies `/api/*`
+  (including `Authorization`) to the real server. The child server's stdout is
+  drained continuously, so the pipe cannot fill and block the server — the
+  cause of an earlier real failure, fixed at its source.
+- **Every act is a rendered control; nothing is fabricated.** A fresh player is
+  registered through the rendered `#signin` form (Register mode → credentials
+  → `requestSubmit`); the tutorial is dismissed with its rendered Skip button;
+  a building is picked from `.swl-build-menu` and placed on the `#game canvas`
+  through the client's own pointer gesture at the projection's tile pixel; a
+  Wood Factory is placed, selected and collected through rendered buttons (the
+  server's `not-due` refusal and unchanged wood are the assertion); a unit is
+  trained through `.swl-recruit`; the weekly quest is opened from
+  `.swl-chapter:first-child`, fought with the rendered Strike and Report-kill
+  buttons, and finished with the rendered Finish button; its reward rows are
+  checked against the wallet delta and the persisted receipt; a replay through
+  the same buttons is refused with `already-awarded` and pays no second reward;
+  a client reload restores the active quest; and a full server restart over
+  the same database, followed by a fresh sign-in, still finds the award and the
+  same receipt. The selectors are the exact ones in `scripts/e2e-test.mjs`.
+  `window.__swl` is **never** used to send a command or grant anything.
+- **Exact final output (exit 0):**
+  `firefox: UI: registered "e2e-ui-firefox" through the rendered form`;
+  `UI: skipped the tutorial with its rendered button`;
+  `UI: at 760x600 the HUD ends at y=199 and the inventory starts at y=302 (no overlap)`;
+  `UI: picked a build-menu item and placed it on a tile through the canvas`;
+  `UI: the rendered Collect button asked the server, which refused an undue cycle ("!Command 0 was refused (command-failed): not-due") and granted no wood`;
+  `UI: trained a unit (Training · 5s left (1 queued))`;
+  `UI: opened the weekly quest from the chapter map (5 roster rows)`;
+  `UI: reported a server-verified kill with the two-argument builder`;
+  `UI: strikes on 5 rendered roster rows moved the kill counter`;
+  the result dialog `The server completed Weekly Mission!... gold +0 xp +0 cash +5`;
+  `UI: 3 reward row(s) match the wallet delta and the persisted receipt (gold +0, xp +0, cash +5)`;
+  `UI: replay refused with "command-failed: already-awarded" and paid no second reward`;
+  `UI: after a client reload the active quest and the server award are still there`;
+  `the server was restarted with the same database`;
+  `e2e-ui-firefox signed in again and 100000049 was still awarded, with the same receipt`;
+  `console/page errors: none`;
+  `browsers run: firefox (Playwright, Gecko)`;
+  `browsers not run: WebKit/Safari (not provisioned), Chrome/Edge (covered by scripts/e2e-test.mjs and scripts/smoke-test-client.mjs), real devices`;
+  `scope: full Firefox gameplay session; Safari/WebKit and devices NOT RUN`;
+  `OK: a player registered, played and signed in again after a server restart in Firefox.`
+  A 1280 × 900 screenshot was written to
+  `C:\Users\Edison\AppData\Local\Temp\opencode\sdd-ff-e2e\firefox-e2e.png`.
+- **Browsers run versus not run.** Ran: **firefox** (Gecko, headless, real
+  server). Not run: **WebKit/Safari** (not provisioned), Chrome/Edge in this
+  script (they are covered by `scripts/e2e-test.mjs` and
+  `scripts/smoke-test-client.mjs`, both still green), and real devices. The
+  script prints these distinctions explicitly.
+
+**Gates (all run on the final tree; none weakened or disabled):**
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Unit tests | `pnpm test` | **PASS** — 1742 tests, 1742 pass, 0 fail |
+| Integration tests | `pnpm test:integration` | **PASS** — 64 pass, 0 fail |
+| Typecheck / Lint | `pnpm typecheck`, `pnpm lint` | **PASS** — the browser reaches 141 module(s), none needs node |
+| Content build / check | `pnpm build:content`, `pnpm check:content` | **PASS** — build id `63e067bd…` |
+| Command catalogue | `node scripts/verify-command-catalogue.mjs` | **PASS** — 94 commands |
+| Roadmap counts | `node scripts/check-roadmap.mjs` | **PASS** — 401 items |
+| Report sync | `node scripts/check-report-sync.mjs` | **PASS** — 4 claims |
+| Cheat battery | `node scripts/run-cheat-battery.mjs` | **PASS** — all 11 attacks had no effect |
+| Golden master | `node scripts/golden-master.mjs` | **PASS** — 50 scenarios, 0 differences |
+| Coverage | `node scripts/check-coverage.mjs` | **PASS** — 97.62 % lines / 85.71 % functions / 95.55 % branches |
+| Upstream | `node scripts/verify-upstream.mjs` | **PASS** — 3292 files, 0 mismatched |
+| Licensing / no-Flash | `node scripts/check-licensing.mjs`, `node scripts/check-no-flash.mjs` | **PASS** in the CI-equivalent clean ordering (all three generated trees — `apps/client/dist`, `apps/desktop/dist` and `apps/desktop/src-tauri/server/runtime` — moved outside the scanned paths and restored): `the shipped trees carry no Zynga media (3 trees)` / `OK: the licensing position holds`; `the shipped trees: 3 (2 absent)`, `the files scanned: 1`, `OK: nothing that ships needs Flash`. With a built tree present they flag only the documented false positives — `.swf`-named asset identifiers in generated JSON and the OFL substitute-font filenames — as in G5.2. No checker changed. |
+| Existing smoke | `node scripts/smoke-test-client.mjs` | **PASS** — chrome and edge started |
+| Chrome/Edge e2e | `node scripts/e2e-test.mjs` | **PASS** — full session and restart in chrome and edge |
+| Firefox smoke | `python scripts/smoke-test-client-firefox.py` | **PASS** — Firefox boots, WebGL2 render and DOM layout verified |
+| Firefox e2e | `python scripts/e2e-test-firefox.py` | **PASS** — full rendered session, reward, refused replay, reload and server restart |
+| Supplementary doc checks | `build-licence-report.mjs --check`, `check-adrs.mjs`, `check-security-review.mjs`, `check-corrections.mjs`, `check-release.mjs` | **PASS** |
+
+**Explicit non-claims:** no Safari/WebKit run, no device or emulator run, no
+signed build or release, no proprietary asset, no client or protocol change,
+no use of `window.__swl` to issue commands, no weakening of the server's
+authority, and no revert of the CDP harnesses. The extra G5.2 / hook-driven
+assertions in `scripts/e2e-test.mjs` that are outside this increment's scope —
+the deterministic-clock collection-period cycle, the expansion purchase, the
+army panel, the forged-team refusal, the Q11 timer and the after-reload
+receipt rebuild — were **not run in the Firefox e2e**; they remain verified by
+the Chrome/Edge e2e and the unit suite. The Firefox/Safari G5 box stays open.
+The 94-command catalogue, the strict two-argument `set_quest_var`, the
+licensing/no-Flash checks and the 401-item accounting are untouched.
+
+**Remaining gaps:** the G5 Firefox/Safari box above remains open until a full
+session is also played in Safari; Safari/WebKit was not provisioned or run;
+and the two licensing/no-Flash checks must still be run before the client build
+or on a cleaned tree, as in CI.
+
+---
+
 ## Group H — Desktop Shell & Release
 
 *Outcome: a standalone, signed, updatable desktop executable.*
