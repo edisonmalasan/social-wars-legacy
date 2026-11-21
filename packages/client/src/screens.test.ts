@@ -22,17 +22,42 @@ interface Screen {
   decisionNote: string;
 }
 
-async function screens(): Promise<Screen[]> {
-  const manifest = JSON.parse(
+interface ScreenInventory {
+  counts: { total: number; byDecision: Record<string, number> };
+  screens: Screen[];
+}
+
+async function inventory(): Promise<ScreenInventory> {
+  return JSON.parse(
     await readFile(path.join(repoRoot(), 're/data/ui-screens.json'), 'utf8'),
-  ) as { screens: Screen[] };
-  return manifest.screens;
+  ) as ScreenInventory;
+}
+
+async function screens(): Promise<Screen[]> {
+  return (await inventory()).screens;
 }
 
 describe('the screen inventory', () => {
   it('lists the client 260 screens', async () => {
     const all = await screens();
     assert.equal(all.length, 260);
+  });
+
+  it('checks the recorded decision counts against the screens', async () => {
+    // The roadmap quotes these counts, so the header and the records must
+    // agree and a hand-edit of either one must fail a test.
+    const { counts, screens: all } = await inventory();
+    assert.equal(counts.total, 260);
+    assert.deepEqual(counts.byDecision, {
+      implemented: 90,
+      dropped: 52,
+      planned: 118,
+    });
+    const recomputed: Record<string, number> = {};
+    for (const screen of all) {
+      recomputed[screen.decision] = (recomputed[screen.decision] ?? 0) + 1;
+    }
+    assert.deepEqual(recomputed, counts.byDecision);
   });
 
   it('gives every screen a decision', async () => {
