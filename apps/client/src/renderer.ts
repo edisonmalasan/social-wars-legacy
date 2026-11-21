@@ -20,12 +20,13 @@
  */
 import { Application, Assets, Container, Rectangle, Sprite, Texture } from 'pixi.js';
 
-import type { CameraState, FrameManifest, Viewport } from '@swl/client';
+import type { CameraState, FrameManifest, Viewport, ViewportSize } from '@swl/client';
 
 import type { SceneSprite } from './scene.ts';
 import { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
-import { stageLayout, viewportOf, type StageLayout } from '@swl/client';
+import { viewportOf, type StageLayout } from '@swl/client';
 import { initialCamera } from '@swl/client';
+import { fitStage } from './viewport.ts';
 
 export { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
 
@@ -235,11 +236,12 @@ export class WorldRenderer {
    * would put the panels on top of each other. The scale is a **whole
    * number** where it can be, so the pixel art stays sharp.
    */
-  fit(element: HTMLElement): StageLayout {
-    const layout = stageLayout({
-      width: element.clientWidth || window.innerWidth,
-      height: element.clientHeight || window.innerHeight,
-    });
+  fit(element: HTMLElement, viewport: ViewportSize): StageLayout {
+    // The element is a fixed 760x600, so its own clientWidth/clientHeight
+    // describe the stage and would give a scale of 1 everywhere. Fit to the
+    // window instead, and apply only the scale to the element (its internal
+    // 760x600 coordinate space is unchanged).
+    const layout = fitStage(element, viewport);
     element.style.transform = `translate(-50%, -50%) scale(${layout.scale})`;
     return layout;
   }

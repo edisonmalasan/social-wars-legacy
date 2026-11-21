@@ -1182,7 +1182,10 @@ async function main(): Promise<void> {
   // The stage is scaled to fit the window, and it is scaled again when
   // the window changes.
   const fit = () => {
-    const layout = renderer.fit(STAGE!);
+    const layout = renderer.fit(STAGE!, {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
     if (layout.tooSmall) {
       // Better to say so than to ship a game nobody can read.
       status('started', 'the window is too small for the text to be readable');
