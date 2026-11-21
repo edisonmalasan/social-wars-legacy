@@ -188,6 +188,14 @@ jobs:
       - name: Build the content bundle
         run: pnpm build:content
 
+      # `tauri_build::build()` copies external binaries and resources at
+      # COMPILE time, with no development guard. `cargo check/test` below
+      # cannot compile on a fresh checkout unless the sidecar and its
+      # runtime tree exist. The build needs the content bundle above and
+      # the installed pnpm workspace (for PGlite).
+      - name: Build the desktop server sidecar
+        run: node scripts/build-desktop-server.mjs
+
       # The client's manifest is **measured and minimised**: the asset
       # pipeline's is 118 MB, and the browser cannot be sent that.
       - name: The client's manifest
