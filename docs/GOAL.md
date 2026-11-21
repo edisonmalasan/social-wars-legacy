@@ -504,39 +504,48 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main:** `3228d0e` — PR #34 (`feat: draw the Research LAB from
-  the existing spell model`) merged with all four CI checks green, after PR #33
-  (`2d273be`) and PR #32 (`d303cba`). The prior `social-wars-legacy-main`
-  session ended at `1a6a89e` (PR #31) when its context filled during compaction,
-  not because the roadmap was finished.
+- **Last verified `main`:** `b4aea12` — PR #35 (`feat: draw the battle spell book
+  from the existing model`) merged with all four CI checks green, after PR #34
+  (`3228d0e`), PR #33 (`2d273be`) and PR #32 (`d303cba`). The prior
+  `social-wars-legacy-main` session ended at `1a6a89e` (PR #31) when its context
+  filled during compaction, not because the roadmap was finished.
 - **Where that session stopped:** it had merged nine increments (#23–#31) and
   classified the remaining open items. Most are genuine blockers (Flash live
   captures, licence-gated art, missing platform hosts/devices, rights-holder
   response, signing credentials, production release). The one actionable area
   it identified is Group B3/G3's screen backlog, which it left at 90 implemented
-  / 52 dropped / 118 planned.
+  / 52 dropped / 118 planned. That historical classification is preserved here;
+  the blockers in section 5 are not rewritten or assumed resolved.
 - **Completed this session:** the daily/Monday bonus screens (PR #32), the
-  offer-pack store screens (PR #33), and the Research LAB interface (PR #34) —
-  all merged with green CI.
-- **Next task selected:** drawing the battle spell book. Its learned-only list,
-  three-to-a-page paging, spell levels and mana state were modelled in `magic.ts`
-  but no interface drew them, and casting had no button anywhere in the client.
-- **Active branch / PR:** the spell-book increment adds
-  `apps/client/src/ui/spellbook.tsx` and a tested `magicBookPanel` bridge. It
-  does **not** change the screen counts: the spell-book screens were already
-  `implemented` as models. Locally verified: `pnpm test` 1766/1766,
-  `pnpm typecheck` clean, coverage/command-catalogue/report-sync gates passed,
-  and the real-browser e2e in Chrome and Edge — all passed.
-- **Environment note:** `node scripts/check-no-flash.mjs` fails locally on stale
-  built `dist/content-bundle.json` and `dist/frame-manifest.json` files (SWF
-  string references); this is a local build-artefact condition, not a source
-  change from this session. CI's Scan check passes.
-- **Verification run for PR #32:** 1754/1754 tests, clean typecheck, golden master
-  50/50 with 0 differences, cheat battery 11/11, report sync, roadmap check, and
-  the real-browser e2e in Chrome and Edge — all passed; CI's four checks passed.
-- **Remaining applicable tasks:** continue reducing the 110 planned screens in
-  coherent, player-facing families; re-audit the blockers in section 5 before
-  treating any as final; do not claim the frame-rate, platform or release items
-  without their actual evidence.
-- **On resume:** re-read this file and `docs/ROADMAP.md`, check `git status` and
-  `gh pr checks`, then continue from PR #32's outcome.
+  offer-pack store screens (PR #33), the Research LAB interface (PR #34), and
+  the battle spell book (PR #35) — all merged with green CI. The spell book draws
+  the learned-only, three-to-a-page model from `magic.ts` with spell levels,
+  mana state and a cast button, without changing the screen counts (those
+  screens were already `implemented` as models).
+- **Verified roadmap state:** `node scripts/check-roadmap.mjs` reports 400 items,
+  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is 99 implemented /
+  52 dropped / 109 planned. This checkpoint documents state only — it does not
+  modify `docs/ROADMAP.md` or `re/data/ui-screens.json`.
+- **Preserved WIP (mission timer):** the in-flight mission-timer changes are not
+  lost. They were saved as a patch at
+  `C:\Users\Edison\AppData\Local\Temp\opencode\mission-timer.patch` (13,682 bytes,
+  10 files) and verified to apply cleanly to `b4aea12` with `git apply --3way` in
+  a throwaway worktree, and remain as `stash@{0}` on the orchestrator checkout.
+  They are now owned by worker thread [Mission timer wiring](t3-thread://v2/1e103b76-04b0-4a8b-906e-1586e707da69/thread:delegated-task:command%3Amcp%3A7440c1fc-8080-43e5-8030-33e464b7a159%3Adelegate-task%3A92be84c0-9e0e-4b83-9c94-73ee93c16f59)
+  on branch `feat/server-mission-countdown`.
+- **Active orchestration:** parallel worktree workers cover the mission timer,
+  a blocker audit ([audit thread](t3-thread://v2/1e103b76-04b0-4a8b-906e-1586e707da69/thread:delegated-task:command%3Amcp%3A7440c1fc-8080-43e5-8030-33e464b7a159%3Adelegate-task%3A90c92235-6012-460e-b7da-091c18c88911)),
+  and a read-only review of stale PR #10. Only the orchestrator merges; no
+  worker merges its own branch.
+- **Next:** on worker wake, review each diff and its evidence, reconcile the
+  worktrees with `main`, merge in dependency order, then dispatch the next task
+  from the audit ranking. Continue reducing the planned screens in coherent,
+  player-facing families and re-audit the section 5 blockers before treating any
+  as final; do not claim frame-rate, platform or release items without evidence.
+- **Environment note (historical):** `node scripts/check-no-flash.mjs` failed
+  locally during the PR #32 verification on stale built `dist/content-bundle.json`
+  and `dist/frame-manifest.json` files (SWF string references); this was a local
+  build-artefact condition, not a source change. CI's Scan check passed.
+- **On resume:** re-read this file and `docs/ROADMAP.md`, check `git status`,
+  `git stash list`, `git worktree list` and `gh pr checks`, then continue from the
+  verified `b4aea12` state and the active worker results above.
