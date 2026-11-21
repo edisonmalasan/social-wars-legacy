@@ -42,6 +42,7 @@ import type {
   UnitPanel,
   WorldSnapshot,
 } from '@swl/client';
+import { DAMAGE_CLASSES } from '@swl/rules';
 import {
   armyView,
   assaultCountdown,
@@ -1893,4 +1894,221 @@ export function dismissPopup(slot: ChromePopupSlot): ChromePopupSlot {
 /** The one dialog's descriptor for a chrome popup. */
 export function chromePopupDialog(request: ChromePopupRequest): DialogContent {
   return { id: request.id, kind: 'alert', title: request.title };
+}
+
+/* -------------------------------------------------------------------------
+ * Character setup, late-era recovery and the attack-symbol tooltip
+ *
+ * Three survivors of the late-era UI that have real content behind them. The
+ * gender-choice popups are deliberately NOT here: the new server has neither
+ * a `hasSex` save field (see `PrivateState` and `PlayerInfo` in
+ * `@swl/protocol`) nor a `set_sex_player` command — that is an upstream PHP
+ * endpoint, not one of the 94 catalogue commands — so a choice panel would
+ * invent a client-only character rule.
+ *
+ * The hospital panel below reads the server's `deadHeroes` and the content's
+ * unit names and syringe costs. Its only gesture is the catalogue's existing
+ * `resurrect_hero` request; a refusal or an acceptance is drawn from the
+ * server's answer through the one feedback channel, never decided locally.
+ *
+ * The attack-symbol legend is built from the client's own `RecuadroInfo`
+ * literals and the rules' own ten damage classes. Neither panel claims the
+ * proprietary art, and neither keeps an outcome of its own.
+ * ---------------------------------------------------------------------- */
+
+/** The client's own literals on `popups/PopupHospital.as`. */
+export const HOSPITAL_TITLE = 'Hospital';
+export const HOSPITAL_DESCRIPTION =
+  'This building allows you to recover units lost in battle';
+export const HOSPITAL_HELP =
+  "If you lose units during a combat, you can resurrect them at the Graveyard!\\n\\n A portrait of your dead units and their number is displayed.\\n Resurrecting dead units costs half of their original price.\\n Click on the right button below the portrait of the unit to resurrect it using gold, food or cash.\\n You can also resurrect units with syringes.\\n Ask your friends to send you syringes using the \\'Ask For\\' button at the lower right!";
+export const HOSPITAL_SYRINGES = 'Syringes';
+export const HOSPITAL_AVAILABLE = 'Available';
+export const HOSPITAL_RESURRECT_FOR = 'Resurrect for';
+export const HOSPITAL_RESURRECT = 'Resurrect';
+export const HOSPITAL_MAX_UNITS = 'Max units reached';
+export const HOSPITAL_ASK = 'Ask for more';
+export const HOSPITAL_HELP_BUTTON = 'HELP!';
+
+/**
+ * `INVENTORY_ITEM_SYRINGE` from the original's `Constants.as` (35). The
+ * server keeps the count in the town's store under that item id; the client
+ * only reads it for display.
+ */
+export const SYRINGE_ITEM_ID = 35;
+
+/** A non-negative integer from a content field, or null when it is not one. */
+function contentCount(value: unknown): number | null {
+  if (typeof value === 'number') {
+    return Number.isInteger(value) && value >= 0 ? value : null;
+  }
+  if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
+    return Number(value.trim());
+  }
+  return null;
+}
+
+/** One dead unit the server's save accounts for, named by the content. */
+export interface DeadUnitView {
+  /** The content id the server's `deadHeroes` key names. */
+  readonly itemId: number;
+  /** The content's name for that id. */
+  readonly name: string;
+  /** How many the server says are waiting; never a client counter. */
+  readonly count: number;
+  /** The content's syringe cost for one resurrection, display only. */
+  readonly syringes: number;
+  /** The catalogue's `resurrect_hero` request for the resource-cost gesture. */
+  readonly resurrect: NativeCommand;
+  /** The same request with a syringe, or null when no cost is named. */
+  readonly resurrectWithSyringe: NativeCommand | null;
+}
+
+/** The hospital panel's body. */
+export interface HospitalPanelView {
+  /** Only the rows the server's `deadHeroes` names. */
+  readonly dead: readonly DeadUnitView[];
+  /** The server's own syringe count from the store. */
+  readonly syringesAvailable: number;
+  /** The client's own literals. */
+  readonly title: string;
+  readonly description: string;
+  readonly help: string;
+  readonly syringesLabel: string;
+  readonly availableLabel: string;
+  readonly resurrectForLabel: string;
+  readonly resurrectLabel: string;
+  readonly maxUnitsLabel: string;
+  readonly askLabel: string;
+  readonly helpButtonLabel: string;
+}
+
+/**
+ * Read the hospital's body from the server's save and the content.
+ *
+ * `deadHeroes` is one of the server's own privateState keys (a documented
+ * `Record<string, number>`), and the store's syringe count is its too. The
+ * names and costs are the content's. A click builds the existing
+ * `resurrect_hero` command with a fresh, deterministic iso id and neutral
+ * coordinates — proposals the server validates — so no unit is revived here
+ * and no resource is spent locally. Malformed rows are skipped rather than
+ * shown as units the server does not own.
+ */
+export function hospitalPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+): HospitalPanelView {
+  const names = new Map<number, string>();
+  const syringeCosts = new Map<number, number>();
+  for (const item of bundle.items ?? []) {
+    names.set(item.id, item.name);
+    syringeCosts.set(item.id, contentCount(item.extra?.['syringes']) ?? 0);
+  }
+
+  let nextIsoId = 1;
+  for (const key of Object.keys(world.maps[0]?.items ?? {})) {
+    const id = Number(key);
+    if (Number.isInteger(id) && id >= nextIsoId) nextIsoId = id + 1;
+  }
+
+  const dead: DeadUnitView[] = [];
+  const raw = recordOrNull(world.privateState?.['deadHeroes']);
+  if (raw) {
+    for (const [key, value] of Object.entries(raw)) {
+      const itemId = contentId(key);
+      const count = finite(value);
+      // A key the content cannot name has no honest name or syringe cost to
+      // draw, so it is skipped rather than shown as a fabricated unit.
+      if (itemId === null || count === null || count < 1 || !names.has(itemId)) continue;
+      const isoId = nextIsoId++;
+      const args = (usedSyringe: number): unknown[] => [isoId, itemId, 0, 0, usedSyringe];
+      const syringes = syringeCosts.get(itemId) ?? 0;
+      dead.push({
+        itemId,
+        name: names.get(itemId)!,
+        count: Math.trunc(count),
+        syringes,
+        resurrect: { map: 0, name: 'resurrect_hero', args: args(0) },
+        resurrectWithSyringe:
+          syringes > 0
+            ? { map: 0, name: 'resurrect_hero', args: args(1) }
+            : null,
+      });
+    }
+  }
+
+  const store = recordOrNull(world.maps[0]?.store);
+  const stored = store ? finite(store[String(SYRINGE_ITEM_ID)]) : null;
+
+  return {
+    dead,
+    syringesAvailable: stored === null ? 0 : Math.max(0, Math.trunc(stored)),
+    title: HOSPITAL_TITLE,
+    description: HOSPITAL_DESCRIPTION,
+    help: HOSPITAL_HELP,
+    syringesLabel: HOSPITAL_SYRINGES,
+    availableLabel: HOSPITAL_AVAILABLE,
+    resurrectForLabel: HOSPITAL_RESURRECT_FOR,
+    resurrectLabel: HOSPITAL_RESURRECT,
+    maxUnitsLabel: HOSPITAL_MAX_UNITS,
+    askLabel: HOSPITAL_ASK,
+    helpButtonLabel: HOSPITAL_HELP_BUTTON,
+  };
+}
+
+/** The client's own literals on `GUI/RecuadroInfo.as` for the attack stats. */
+export const ATTACK_SYMBOL_DAMAGE = 'How hard the unit attacks with each hit';
+export const ATTACK_SYMBOL_SPEED = 'How fast the unit attacks';
+export const ATTACK_SYMBOL_RANGE = 'How far can the unit attack';
+export const ATTACK_SYMBOL_VELOCITY = 'How fast the unit is';
+
+/** One attack symbol: the client's own field name and its own sentence. */
+export interface AttackSymbolView {
+  /** The client's own field name, from `GUI/UnitTooltip.as`. */
+  readonly symbol: string;
+  /** The client's own explanatory literal. */
+  readonly label: string;
+}
+
+/** The attack-symbol tooltip's body. */
+export interface AttackSymbolsPanelView {
+  /** The stat symbols and their client-owned sentences. */
+  readonly stats: readonly AttackSymbolView[];
+  /** The rules' own ten damage classes, verbatim. */
+  readonly damageClasses: readonly string[];
+  /** A neutral panel heading; no game copy is invented for the body. */
+  readonly heading: string;
+}
+
+/**
+ * Build the attack-symbol legend from the client's literals and the rules'
+ * damage classes.
+ *
+ * There is no server state to read and no outcome to decide: this is the
+ * vocabulary the rules already define and the sentences the client already
+ * says. The original's symbol artwork is excluded; only the legend is drawn.
+ */
+export function attackSymbolsPanel(): AttackSymbolsPanelView {
+  return {
+    stats: [
+      { symbol: 'uiAttack', label: ATTACK_SYMBOL_DAMAGE },
+      { symbol: 'attack_interval', label: ATTACK_SYMBOL_SPEED },
+      { symbol: 'attack_range', label: ATTACK_SYMBOL_RANGE },
+      { symbol: 'velocity', label: ATTACK_SYMBOL_VELOCITY },
+    ],
+    damageClasses: [...DAMAGE_CLASSES],
+    heading: 'Attack symbols',
+  };
+}
+
+/** The two panels hosted by the one shared dialog. */
+export type CharacterSetupPanelKind = 'hospital' | 'attack-symbols';
+
+/** The one dialog's descriptor for a character-setup-family panel. */
+export function characterSetupDialog(kind: CharacterSetupPanelKind): DialogContent {
+  const titles: Record<CharacterSetupPanelKind, string> = {
+    hospital: HOSPITAL_TITLE,
+    'attack-symbols': 'Attack symbols',
+  };
+  return { id: `charactersetup-${kind}`, kind: 'alert', title: titles[kind] };
 }

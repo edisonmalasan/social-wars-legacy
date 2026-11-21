@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 138,
+   "implemented": 141,
    "dropped": 52,
-   "planned": 70
+   "planned": 67
   }
  },
  "screens": [
@@ -2550,7 +2550,7 @@
    "overrides": [],
    "bytes": 450,
    "decision": "planned",
-   "decisionNote": "Deferred: the gender-choice popup has no client model; unblock when character setup is rendered and the artwork is available."
+   "decisionNote": "Deferred: the gender choice has no server behaviour to render — `hasSex` is not a field in the new save (`privateState` or `playerInfo`), and `set_sex_player.php` is an upstream endpoint absent from the 94-command catalogue and the new server. A male/female panel would invent a client-only character rule. Unblock when the server stores a character-setup field and exposes a command to set it; the artwork is excluded independently, as for every rendered screen."
   },
   {
    "class": null,
@@ -2822,8 +2822,8 @@
    ],
    "overrides": [],
    "bytes": 1226,
-   "decision": "planned",
-   "decisionNote": "Deferred: the hospital popup has no client-side healing model; unblock when unit recovery is rendered and the artwork is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/state.ts` and `apps/client/src/ui/charactersetup.tsx` draw the hospital from the server's own `privateState.deadHeroes` and store syringe count, with the content's unit names and syringe costs and the client's own literals. Each Resurrect is the catalogue's existing `resurrect_hero` request through the one command transport; the server's answer, including a refusal, is drawn in the shared feedback channel and no unit is revived locally. The proprietary hospital art stays excluded; only the server-owned data and the request gesture are claimed."
   },
   {
    "class": null,
@@ -3683,8 +3683,8 @@
    ],
    "overrides": [],
    "bytes": 367,
-   "decision": "planned",
-   "decisionNote": "Deferred: the attack-symbol tooltip has no rendered model; unblock when attack stats are explained in the UI and the art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/state.ts` and `apps/client/src/ui/charactersetup.tsx` render the attack-symbol legend in the one shared dialog from the client's own `GUI/RecuadroInfo.as` literals (verified verbatim in `apps/client/src/ui/charactersetup.test.ts`) and the rules' ten `DAMAGE_CLASSES` from `packages/rules/src/damage.ts`. It is a presentation of that vocabulary, not a game rule or an outcome. The proprietary symbol art stays excluded; only the client's text and the rules' class names are claimed."
   },
   {
    "class": "ButtonMarket",
@@ -4178,7 +4178,7 @@
    "overrides": [],
    "bytes": 1717,
    "decision": "planned",
-   "decisionNote": "Deferred: the gender-choice popup has the literal \"Are you man or woman?\" but no rendered model; unblock when character setup is implemented and the art is available."
+   "decisionNote": "Deferred: the gender-choice popup has the literal \"Are you man or woman?\" but no server behaviour to render — the new save has no `hasSex`/sex field and `set_sex_player.php` is not one of the 94 commands or a new-server endpoint. A choice would invent a client-only character rule; unblock when the server records a setup field and exposes a command. The artwork is excluded independently, as for every rendered screen."
   },
   {
    "class": "PopupCollect",
@@ -4567,8 +4567,8 @@
    ],
    "overrides": [],
    "bytes": 17590,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P2) a late-era army-recovery screen outside the G5.1 playable slice."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/state.ts` and `apps/client/src/ui/charactersetup.tsx` draw the recovery list from the server's `deadHeroes` (the field the migration seeds), its store syringes and the content's names/costs, with the client's own HELP/description literals. The two gestures send the catalogue's `resurrect_hero` command with a proposed iso id and neutral tile; the server owns acceptance and every outcome is read from its answer. No local revival and no proprietary art are claimed."
   },
   {
    "class": "PopupHurryup",

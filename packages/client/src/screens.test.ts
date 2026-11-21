@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 138,
+      implemented: 141,
       dropped: 52,
-      planned: 70,
+      planned: 67,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -651,6 +651,46 @@ describe('the expansion and collections screen family decisions', () => {
       assert.ok(screen, `${path} is not in the inventory`);
       assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
       assert.match(screen!.decisionNote, /^Deferred: /);
+    }
+  });
+});
+
+describe('the character-setup, recovery and attack-tooltip screen family decisions', () => {
+  // Three deferrals had real content behind them: the server owns
+  // `deadHeroes` and the syringe count, the content owns the unit names and
+  // costs, and the rules own the ten damage classes. They are reclassified
+  // only because a real panel now draws those readings in the one dialog.
+  const RECLASSIFIED = [
+    'PopupHospitalMC.as',
+    'popups/PopupHospital.as',
+    'TooltipSimbolosAtaqueMC.as',
+  ];
+
+  it('records each rendered screen as implemented against the new panel', async () => {
+    const all = await screens();
+    for (const path of RECLASSIFIED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/charactersetup\.tsx`/);
+      assert.match(screen!.decisionNote, /art|proprietary/i);
+    }
+  });
+
+  it('leaves the gender-choice popups planned with the precise gate', async () => {
+    // `hasSex` is not in the new save and `set_sex_player.php` is not a
+    // command or a new-server endpoint. A male/female panel would have no
+    // server field to read and no request to send, so flipping either would
+    // invent a client-only character rule rather than model the game.
+    const LEFT_PLANNED = ['PopupChooseGenderMC.as', 'popups/PopupChooseGender.as'];
+    const all = await screens();
+    for (const path of LEFT_PLANNED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
+      assert.match(screen!.decisionNote, /^Deferred: /);
+      assert.match(screen!.decisionNote, /set_sex_player\.php/);
+      assert.match(screen!.decisionNote, /no .*field|not a field/i);
     }
   });
 });
