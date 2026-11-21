@@ -215,9 +215,9 @@ first means guessing at the rules being cloned.
       (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
       attack interval, the velocity, the life and the population
 - [ ] The panels and the popups are **rendered**, and the popups that are not
-      implemented are recorded as dropped. The screen inventory now reads **99
-      implemented / 52 dropped / 109 planned**; the counts are checked by
-      `packages/client/src/screens.test.ts`, and this item stays open while **109
+      implemented are recorded as dropped. The screen inventory now reads **108
+      implemented / 52 dropped / 100 planned**; the counts are checked by
+      `packages/client/src/screens.test.ts`, and this item stays open while **100
       screens are planned** - a `Deferred: ` reason records honest scope, not a
       rendered screen or a drop
 - [x] The authoritative **item id → delegate** map is extracted from
@@ -1188,21 +1188,21 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **99 implemented** - the clone models the screen's behaviour, and the decision
+      - **108 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **52 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **109 planned** - in scope, the client's behaviour is real, and not modelled
+      - **100 planned** - in scope, the client's behaviour is real, and not modelled
         yet; each now carries a `Deferred: ` reason saying what is missing or how it
         unblocks
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
       exists, every dropped one must say why, and every planned one must start with
       `Deferred: ` and say what is missing or how it unblocks. The counts above are
-      checked by the same test. **This item stays open while 109 screens are planned**:
+      checked by the same test. **This item stays open while 100 screens are planned**:
       a deferral reason is neither an implementation nor a drop, and the earlier
       106/23/131 breakdown was a factual error, not a hidden batch of finished work
 - [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
@@ -1505,6 +1505,13 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] The desktop build (Tauri) runs on Windows, macOS and Linux
 - [ ] The mobile build (Capacitor) runs on Android and iOS
 - [ ] The game is playable at the original resolutions and scales cleanly to phone screens
+
+  **Linux bundling note (PR #40, `0053306`):** the `linux-bundle` job in
+  `.github/workflows/ci.yml` now runs on `ubuntu-latest` and produces **unsigned**
+  `.deb` and `.AppImage` artefacts; it is **informational and non-required**, not
+  one of the four protected checks. The desktop and installer boxes stay
+  **unticked**: there is still no macOS build host and no code signing.
+
 - [x] The **stage's layout is a model** (`packages/client/src/stage.ts`): the stage is the
       client's own **760 by 600**, and it is **scaled** to fit rather than reflowed,
       because the game's layout is not fluid and reflowing it would put the panels on
@@ -1591,6 +1598,20 @@ model that exists):**
 - Screen inventory decisions added for eight screens genuinely modelled here
   (the quest map, inventory panel, recruitment panel, alert and mission-info
   popups): 260 screens now read **85 implemented, 52 dropped, 123 planned**.
+- [x] **The assault family (Group G3 UI), recorded here so the 401-item accounting
+  stays intact.** PR #43 (`8de433a`) added pure, server-owned selectors in
+  `packages/client/src/featurestate.ts` — the last assault result and its optional
+  persisted receipt, the attack history, the `tsAttacksReset` countdown, the
+  selected defensive battle strategy and the special-attack HUD — with matching
+  panels in `apps/client/src/ui/assault.tsx`. PR #44 (`013d57c`) mounted them in
+  the **one** shared `Dialog` through `showAssaultPanel(kind)`. The selectors read
+  only the server's answers; malformed or absent fields yield no row, never an
+  invented outcome or loot, so the client decides nothing. Nine screens were
+  honestly reclassified in `re/data/ui-screens.json` (**108 implemented / 52
+  dropped / 100 planned**); the assault screens that need Zynga's art remain
+  **planned** behind the licence gate. Verification: **31/31** focused assault
+  tests, **1786/1786** tests in the serial full suite, `pnpm typecheck`, and a
+  full end-to-end session in **Chrome and Edge**.
 
 **P1 — partial or deferred, not counted as complete:**
 
@@ -1844,21 +1865,27 @@ never an Android or iOS build, and never a Firefox or Safari run.*
 
 **Implemented and verified by EMULATION (not by device):**
 
-- **The real viewport drives the stage scale.** The one shared client feeds
-  `window.innerWidth/innerHeight` into the tested `stage.ts` model and applies
-  its scale as a CSS transform to the fixed 760 × 600 stage. At **390 × 844 CSS
-  pixels @dpr 2**, in **Chrome and Edge**, `node scripts/e2e-mobile-layout.mjs`
-  reported `EMULATION chrome: 390x844 @dpr 2; #stage scale 0.51 =
-  stageScale({390,844}) 0.51` (and the same line for edge). The emulation uses
+- **The real viewport drives the stage scale, now across a five-viewport matrix.**
+  The one shared client feeds `window.innerWidth/innerHeight` into the tested
+  `stage.ts` model and applies its scale as a CSS transform to the fixed 760 × 600
+  stage. PR #42 (`cf9941d`) extended `node scripts/e2e-mobile-layout.mjs` from a
+  single viewport to **390x844@dpr2, 360x640@dpr2, 414x896@dpr3, 320x568@dpr2 and
+  760x600@dpr1** (the last is the game's original stage), each in **Chrome and
+  Edge**, with free ports chosen for the runs. Every entry prints an explicit
+  `EMULATION` line, and the applied scale is checked against
+  `stageScale({width,height})` — for example
+  `EMULATION chrome: 390x844 @dpr 2; #stage scale 0.51 =
+  stageScale({390,844}) 0.51`. The emulation uses
   `Emulation.setDeviceMetricsOverride` and
   `Emulation.setTouchEmulationEnabled`, with `mobile: false` deliberately:
   headless Chromium's mobile mode reports an `innerWidth` inconsistent with
   the layout viewport (575/690 instead of 390), which would make the client
   fit to the wrong size. No second renderer and no platform-specific screen.
-- **The panels stay inside the stage and do not overlap.** In both browsers
-  the HUD, goals, inventory and chapter panels were measured inside the
-  transformed stage `(1.2, 269.0)` to `(388.8, 575.0)` with no pairwise
-  overlap. The strict assertion first exposed a **pre-existing** 40 px overlap
+- **The panels stay inside the stage and do not overlap.** In both browsers and
+  across all five viewports, the HUD, goals, inventory and chapter panels were
+  measured inside the transformed stage with no pairwise overlap (the original
+  390 × 844 @dpr 2 run's rect was `(1.2, 269.0)` to `(388.8, 575.0)`). The strict
+  assertion first exposed a **pre-existing** 40 px overlap
   between the chapter strip and the inventory at the original desktop layout
   too (chapters bottom y=144, inventory top y=104): it was a real defect, not
   an emulation artefact. `apps/client/src/ui/css.ts` now starts the inventory
@@ -1866,9 +1893,10 @@ never an Android or iOS build, and never a Firefox or Safari run.*
   the contents scrolling — and `apps/client/src/touch.test.ts` guards the
   placement. No assertion was weakened and the desktop e2e still passes.
 - **The town is drawn and touch selects.** `window.__swl.visibleSprites()`
-  reported one visible sprite in each emulated browser. A touch `pointerdown`
-  followed by `pointerup` (`pointerType: 'touch'`) on the canvas selected
-  building item 26 in both browsers; the bare `pointerdown` selected nothing,
+  reported one visible sprite in each emulated browser and viewport. A touch
+  `pointerdown` followed by `pointerup` (`pointerType: 'touch'`) on the canvas
+  selected building item 26 in both browsers at every viewport (each entry gets
+  its own server-issued session); the bare `pointerdown` selected nothing,
   because the shared client defers touch to release as the duplicate-command
   guard requires. The emulated client signed in with a token issued by the
   real server (`status started`), and the selected town was read from that
@@ -1904,7 +1932,7 @@ never an Android or iOS build, and never a Firefox or Safari run.*
 | Licensing / no-Flash | `node scripts/check-licensing.mjs`, `node scripts/check-no-flash.mjs` | **PASS** — run before the client build, with `apps/client/dist` absent, as in CI |
 | Client build | `pnpm --filter @swl/app-client build` | **PASS** — only the pre-existing chunk-size warning |
 | Desktop e2e | `node scripts/e2e-test.mjs` | **PASS** — `browsers that ran: chrome, edge`; full play session and restart |
-| Emulated phone | `node scripts/e2e-mobile-layout.mjs` | **PASS (EMULATION)** — chrome and edge at 390 × 844 @dpr 2 |
+| Emulated phone | `node scripts/e2e-mobile-layout.mjs` | **PASS (EMULATION)** — five-viewport matrix (390x844@dpr2, 360x640@dpr2, 414x896@dpr3, 320x568@dpr2, 760x600@dpr1) in chrome and edge; synthetic touch, no device or phone build claimed |
 
 **Externally blocked — the device boxes are deliberately NOT ticked:**
 
@@ -2354,6 +2382,12 @@ cleaned tree, as in CI.
       check that it does not trust the client
 - [ ] Installers are produced for Windows (`.msi` + `.exe`), macOS (`.dmg`) and Linux
       (`.deb`/`.AppImage`)
+
+  **PR #40 (`0053306`) note:** Linux `.deb`/`.AppImage` bundling now runs in CI on
+  `ubuntu-latest` as an **informational, non-required** `linux-bundle` job, and the
+  artefacts are **unsigned**. This box stays **unticked**: there is still no macOS
+  runner and no signing, and the four required checks are unchanged.
+
 - [ ] The binaries are code-signed, and the macOS build is notarised
 - [ ] Auto-update is configured, and a failed update rolls back cleanly
 - [x] The shipped client contains **no** Adobe Flash Player component and no SWF
@@ -2931,7 +2965,7 @@ be mistaken for unfinished work.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 109 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 109; the art gate applies to the drawn ones |
+| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 100 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 100; the art gate applies to the drawn ones |
 | B | PvP `end_attack` payload captured live | Needs a live second player and the original Flash client driven over CDP | A Flash test rig with two live accounts |
 | B | `attack_player` / `spy_player` payloads captured live | Same as above | The same Flash test rig |
 | B | Premium purchase flow captured live | Needs a real-money account, which the preservation project must not use | A funded test account and explicit approval |
@@ -2943,14 +2977,14 @@ be mistaken for unfinished work.*
 |---|---|---|---|
 | G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout, or a licensing decision |
 | G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented | Licence or re-create the art (I6) |
-| G | Every B6 screen implemented or explicitly dropped | 109 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 109 |
+| G | Every B6 screen implemented or explicitly dropped | 100 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 100 |
 | G | Client runs in Firefox and Safari | **Firefox and WebKit (Playwright) are verified**: full rendered gameplay sessions ran under Gecko via `scripts/e2e-test-firefox.py` and under WebKit via `scripts/e2e-test-webkit.py` (both Playwright engines, driven over Juggler/BiDi). Branded Safari and real devices have not been run — Playwright's WebKit is an engine test, not Safari | Play the same session in branded Safari and on real devices; this box closes once Safari passes |
-| G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux CI exists** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` and installs `libwebkit2gtk-4.1-dev` — but bundling is not yet wired there; macOS genuinely needs a host | Wire Linux bundling into CI and add a macOS runner; this box closes once all three platforms are produced |
+| G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux bundling is now in CI, unsigned** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` with `libwebkit2gtk-4.1-dev`, and its informational, non-required `linux-bundle` job produces unsigned `.deb`/`.AppImage` artefacts; macOS genuinely needs a host | Add a macOS runner and signed artefacts (Linux bundling is already in CI); this box closes once all three platforms are produced |
 | G | Mobile build runs on Android and iOS | No Capacitor, Android SDK or Xcode on this machine | Install the Capacitor toolchain and SDKs |
 | G | Playable at the original resolutions and phone scales | The stage model exists; real-device verification does not | Test on the target devices |
 | G | Played on an actual phone with touch controls | No device here | A phone and touch-control implementation |
 | H | A player with no server cannot play | **Non-goal** — the product is pure online (ADR 19) | A reversal of ADR 19 |
-| H | Installers for Windows, macOS and Linux | **Unsigned Windows NSIS** (`Social Wars Legacy_0.1.0_x64-setup.exe`, 33.27 MiB) and **unsigned Windows MSI** (`Social Wars Legacy_0.1.0_x64_en-US.msi`, 49.88 MiB) were both built on this host with the npm Tauri CLI 2.12.3. The first MSI attempt failed on a config gap (`bundle.icon` listed only the PNG; the existing `icons/icon.ico` was not referenced); adding the `.ico` and retrying produced the MSI. NSIS 3.13 is cached, WiX 3.14.1 auto-downloads and hash-verifies, and WebView2 is present. Linux CI exists on `ubuntu-latest` in `.github/workflows/ci.yml` (bundling is not yet wired there); macOS genuinely needs a host | Signed artefacts, Linux bundling in CI and a macOS CI runner; this row stays open until all three platforms are produced |
+| H | Installers for Windows, macOS and Linux | **Unsigned Windows NSIS** (`Social Wars Legacy_0.1.0_x64-setup.exe`, 33.27 MiB) and **unsigned Windows MSI** (`Social Wars Legacy_0.1.0_x64_en-US.msi`, 49.88 MiB) were both built on this host with the npm Tauri CLI 2.12.3. The first MSI attempt failed on a config gap (`bundle.icon` listed only the PNG; the existing `icons/icon.ico` was not referenced); adding the `.ico` and retrying produced the MSI. NSIS 3.13 is cached, WiX 3.14.1 auto-downloads and hash-verifies, and WebView2 is present. Linux `.deb`/`.AppImage` bundling is now in CI on `ubuntu-latest` as an informational, non-required `linux-bundle` job producing **unsigned** artefacts; macOS genuinely needs a host | Signed artefacts and a macOS CI runner (Linux bundling is already in CI, unsigned); this row stays open until all three platforms are produced |
 | H | Code-signed binaries, notarised macOS build | No code-signing certificate or Apple developer account exists; the one built installer is unsigned | Obtain the credentials |
 | H | Auto-update with clean rollback | The pure decision/rollback logic exists and is mock-tested, but there is no signed release stream, HTTPS endpoint, installer hook or rollback executor | A signed release stream, endpoint and a real install/rollback layer |
 | I | A corrections request actually received and honoured | No rights holder has made a request; the policy and log exist | A real request through `docs/CORRECTIONS.md` |
@@ -3240,6 +3274,19 @@ reviewed without reconstructing the conversation that led to it.*
   configured; full gate green — `pnpm test` 1742 pass / 0 fail, `pnpm typecheck`,
   `pnpm lint`, `cargo test --locked`, `cargo fmt --check` and `check-roadmap.mjs`
   (401 items) all exit 0.
+- **2026-11-22 — unsigned Linux bundling now runs in CI (PR #40, `0053306`).**
+  `.github/workflows/ci.yml` gained a separate `linux-bundle` job named
+  *Unsigned Linux bundles (informational)*, on `ubuntu-latest` with a 45-minute
+  bound, reusing the desktop job's web-view libraries. It builds **unsigned**
+  `.deb` and `.AppImage` artefacts and uploads them as `linux-bundles-UNSIGNED`
+  for inspection. The job is deliberately **informational and non-required**:
+  the four protected checks (**Verify**, **The desktop shell**, **Assets** and
+  **Scan**) are unchanged. It passed on its first real CI run. *Rationale:* a
+  full release bundle is slower than the four checks, so Linux artefacts are
+  attested without slowing or weakening the gate. *Still blocked:* macOS (no
+  build host), code signing and notarisation, and publication; the desktop and
+  installer boxes stay **unticked**. *Evidence:* the job definition in
+  `.github/workflows/ci.yml` and its first green run on PR #40.
 
 ---
 

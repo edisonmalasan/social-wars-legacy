@@ -504,13 +504,18 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main`:** `9026017` — PR #39 (`docs: correct verified roadmap
-  drift`) merged with all four CI checks green. The merge chain since the prior
-  checkpoint is PR #32 (`d303cba`), PR #33 (`2d273be`), PR #34 (`3228d0e`),
-  PR #35 (`b4aea12`), PR #36 (`1689882`), PR #10 (`a0befef`), PR #37
-  (`6e084e7`), PR #38 (`31b6834`) and PR #39 (`9026017`). The prior
-  `social-wars-legacy-main` session ended at `1a6a89e` (PR #31) when its context
-  filled during compaction, not because the roadmap was finished.
+- **Last verified `main`:** `013d57c` — PR #44 (`feat/mount-assault-panels`)
+  merged with all four CI checks green. The merge chain since the prior
+  checkpoint (`9026017`) is PR #40 (`0053306`, unsigned Linux CI bundles),
+  PR #41 (`fa92150`, WebKit evidence + checkpoint), PR #42 (`cf9941d`,
+  multi-resolution phone matrix), PR #43 (`8de433a`, assault result/history/HUD
+  selectors and panels) and PR #44 (`013d57c`, mounting those panels in the one
+  shared dialog). The earlier chain that ended at `9026017` was PR #32
+  (`d303cba`), PR #33 (`2d273be`), PR #34 (`3228d0e`), PR #35 (`b4aea12`),
+  PR #36 (`1689882`), PR #10 (`a0befef`), PR #37 (`6e084e7`), PR #38 (`31b6834`)
+  and PR #39 (`9026017`). The prior `social-wars-legacy-main` session ended at
+  `1a6a89e` (PR #31) when its context filled during compaction, not because the
+  roadmap was finished.
 - **Where that earlier session stopped:** it had merged nine increments (#23–#31)
   and classified the remaining open items. Most are genuine blockers (Flash live
   captures, licence-gated art, missing platform hosts/devices, rights-holder
@@ -535,12 +540,30 @@ verified checkpoint, not at every tool call.
   and the roadmap-drift corrections (PR #39). Firefox was re-run after the
   shared-harness change and stayed green (`browsers run: firefox (Playwright,
   Gecko)`, exit 0, no console errors).
+  Since `9026017` the session also merged: PR #40's **informational,
+  non-required `linux-bundle` CI job** (`ubuntu-latest`, unsigned `.deb` and
+  `.AppImage`, green on its first real run; the four protected checks are
+  unchanged); PR #41's **WebKit end-to-end evidence and checkpoint record**
+  (already on `main`, not repeated here); PR #42's **five-viewport emulated-phone
+  matrix** in `scripts/e2e-mobile-layout.mjs` (390x844@dpr2, 360x640@dpr2,
+  414x896@dpr3, 320x568@dpr2, 760x600@dpr1, free ports, all original assertions,
+  explicit `EMULATION` output — no device claim); PR #43's **pure server-owned
+  assault selectors** in `packages/client/src/featurestate.ts` and panels in
+  `apps/client/src/ui/assault.tsx`; and PR #44's mounting of those panels in the
+  one shared `Dialog` via `showAssaultPanel(kind)` (31/31 focused tests,
+  1786/1786 serial full suite, typecheck, e2e in Chrome and Edge). Nine screens
+  were honestly reclassified as implemented: the inventory now reads **108
+  implemented / 52 dropped / 100 planned**, with art-licence-blocked assault
+  screens still planned.
 - **Verified roadmap state:** `node scripts/check-roadmap.mjs` reports 401 items,
-  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is 99 implemented /
-  52 dropped / 109 planned. The Status Summary still reads G 78/8 and the G5
-  blocker row now records Firefox and WebKit as verified, with branded Safari
-  and real devices the only unrun browsers. This checkpoint documents state
-  only — it does not modify `docs/ROADMAP.md` or `re/data/ui-screens.json`.
+  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **108 implemented /
+  52 dropped / 100 planned**. The Status Summary still reads G 78/8. The G5
+  blocker row records Firefox and WebKit as verified, with branded Safari and
+  real devices the only unrun browsers; the desktop and installer rows now
+  record **Linux bundling in CI, unsigned** while staying open for macOS and
+  signing. This checkpoint refresh records that state: the accompanying
+  documentation increment updates `docs/ROADMAP.md` to the same verified counts
+  and does not touch `re/data/ui-screens.json` or any code.
 - **Preserved WIP (mission timer):** the in-flight mission-timer changes are not
   lost, and have now landed. They were saved as a patch at
   `C:\Users\Edison\AppData\Local\Temp\opencode\mission-timer.patch` (13,682 bytes,
@@ -554,14 +577,21 @@ verified checkpoint, not at every tool call.
   have all delivered on `main`: [Mission timer wiring](t3-thread://v2/1e103b76-04b0-4a8b-906e-1586e707da69/thread:delegated-task:command%3Amcp%3A7440c1fc-8080-43e5-8030-33e464b7a159%3Adelegate-task%3A92be84c0-9e0e-4b83-9c94-73ee93c16f59)
   → PR #37; the blocker audit ([audit thread](t3-thread://v2/1e103b76-04b0-4a8b-906e-1586e707da69/thread:delegated-task:command%3Amcp%3A7440c1fc-8080-43e5-8030-33e464b7a159%3Adelegate-task%3A90c92235-6012-460e-b7da-091c18c88911))
   → the count and blocker corrections in PR #39; and the read-only review of
-  stale PR #10 → PR #10. Only the orchestrator merges; no worker merges its own
-  branch. This checkpoint refresh is a documentation-only increment prepared on
-  its own task branch for review, not a merge.
+  stale PR #10 → PR #10. The later increments were delivered on their own
+  branches too — `ci/add-linux-desktop-bundles` (#40),
+  `docs/webkit-e2e-checkpoint` (#41), `feat/mobile-layout-matrix` (#42),
+  `feat/assault-history-hud` (#43) and `feat/mount-assault-panels` (#44) — and
+  all five are on `main`; no new thread links were recorded for them. Only the
+  orchestrator merges; no worker merges its own branch. This checkpoint refresh
+  is a documentation-only increment prepared on its own task branch for review,
+  not a merge.
 - **Next, from the audit ranking:** re-audit the section 5 blockers before
-  treating any as final, and keep reducing the 109 planned B6 screens in
-  coherent, player-facing families. The remaining platform and release items
-  should be advanced only with evidence: branded Safari and real devices, signed
-  installers, Linux bundling in CI and a macOS runner, the Flash live captures
+  treating any as final, and keep reducing the 100 planned B6 screens in
+  coherent, player-facing families — the assault family is the latest, and the
+  screens that need Zynga's art stay planned behind the licence gate. The
+  remaining platform and release items should be advanced only with evidence:
+  branded Safari and real devices, signed installers and a macOS runner (Linux
+  bundling is now in CI but unsigned and informational), the Flash live captures
   and the differential test. Do not claim frame-rate, platform or release items
   without evidence, and do not reopen the Firefox/WebKit verdicts recorded in
   `docs/ROADMAP.md`.
@@ -571,4 +601,4 @@ verified checkpoint, not at every tool call.
   build-artefact condition, not a source change. CI's Scan check passed.
 - **On resume:** re-read this file and `docs/ROADMAP.md`, check `git status`,
   `git stash list`, `git worktree list` and `gh pr checks`, then continue from the
-  verified `9026017` state and the worker results above.
+  verified `013d57c` state and the worker results above.
