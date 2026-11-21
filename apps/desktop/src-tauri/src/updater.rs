@@ -287,6 +287,30 @@ mod tests {
         }
     }
 
+    /// The one operation a future rollback executor would have to perform,
+    /// kept in the test module so the production API stays a pure decision.
+    ///
+    /// Before changing anything it checks the plan against the live state:
+    /// the plan must start from the running version and target the
+    /// known-good one. That makes the seam independently verifiable — a
+    /// stale or wrongly targeted plan is rejected here instead of silently
+    /// installing an older build. Nothing is fetched or restarted.
+    fn execute_rollback(state: &mut UpdateState, plan: &RollbackPlan) {
+        assert_ne!(
+            plan.from, plan.to,
+            "a rollback must actually change the running version"
+        );
+        assert_eq!(
+            plan.from, state.current,
+            "the plan must start from the running version"
+        );
+        assert_eq!(
+            plan.to, state.last_known_good,
+            "the plan must restore the known-good version"
+        );
+        state.current = plan.to.clone();
+    }
+
     const TWO_RELEASES: &str = r#"{
       "releases": [
         {"version":"0.1.0","url":"https://releases.example/0.1.0.exe","signature":"sig-1"},
@@ -436,5 +460,82 @@ mod tests {
         let mut state = UpdateState::new(v("0.1.0"));
         state.record(InstallAttempt::failed(v("0.1.0"), v("0.1.0"), "network"));
         assert_eq!(plan_rollback(&state), None);
+    }
+
+    #[test]
+    fn a_failing_update_rolls_back_and_restores_the_known_good_version() {
+        let mut state = UpdateState::new(v("0.1.0"));
+
+        // An update was applied, but its build has not been confirmed good.
+        state.record(InstallAttempt::succeeded(v("0.1.0"), v("0.2.0")));
+        assert_eq!(
+            plan_rollback(&state),
+            None,
+            "a success alone needs no rollback"
+        );
+
+        // The next update fails while 0.2.0 is still unconfirmed.
+        state.record(InstallAttempt::failed(
+            v("0.2.0"),
+            v("0.3.0"),
+            "install failed",
+        ));
+
+        let plan =
+            plan_rollback(&state).expect("a failed, unconfirmed update must plan a rollback");
+        assert_eq!(
+            plan,
+            RollbackPlan {
+                from: v("0.2.0"),
+                to: v("0.1.0"),
+            }
+        );
+
+        // Carry the plan out through the test-side seam. The state must end
+        // restored and stable, so a second pass cannot roll back again.
+        execute_rollback(&mut state, &plan);
+        assert_eq!(state.current, v("0.1.0"));
+        assert_eq!(state.current, state.last_known_good);
+        assert_eq!(plan_rollback(&state), None);
+        // The history survives, so the failed update can still be audited.
+        assert_eq!(state.attempts.len(), 2);
+        assert!(matches!(
+            &state.attempts[1].outcome,
+            InstallOutcome::Failed { reason } if reason == "install failed"
+        ));
+    }
+
+    #[test]
+    fn no_update_applied_means_no_rollback() {
+        // A fresh install has no history and nothing to roll back from.
+        let fresh = UpdateState::new(v("0.1.0"));
+        assert_eq!(plan_rollback(&fresh), None);
+
+        // An attempt whose failure never moved `current` is the same case:
+        // there is no newer, unconfirmed version to go back from.
+        let mut state = UpdateState::new(v("0.1.0"));
+        state.record(InstallAttempt::failed(v("0.1.0"), v("0.2.0"), "network"));
+        assert_eq!(state.current, v("0.1.0"));
+        assert_eq!(state.current, state.last_known_good);
+        assert_eq!(plan_rollback(&state), None);
+    }
+
+    #[test]
+    fn repeated_failures_keep_the_same_known_good_target() {
+        let mut state = UpdateState::new(v("0.1.0"));
+        state.record(InstallAttempt::succeeded(v("0.1.0"), v("0.2.0")));
+        state.record(InstallAttempt::failed(v("0.2.0"), v("0.3.0"), "first"));
+        state.record(InstallAttempt::failed(v("0.2.0"), v("0.4.0"), "second"));
+
+        // The plan comes from the live state, not from a failed candidate's
+        // `to`: neither rejected target can become the rollback destination.
+        let plan = plan_rollback(&state).expect("repeated failures still need a rollback");
+        assert_eq!(plan.from, v("0.2.0"));
+        assert_eq!(plan.to, v("0.1.0"));
+
+        execute_rollback(&mut state, &plan);
+        assert_eq!(state.current, v("0.1.0"));
+        assert_eq!(plan_rollback(&state), None);
+        assert_eq!(state.attempts.len(), 3);
     }
 }
