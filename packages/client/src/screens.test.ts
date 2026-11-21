@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 114,
+      implemented: 120,
       dropped: 52,
-      planned: 94,
+      planned: 88,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -484,5 +484,55 @@ describe('the onboarding screen family decisions', () => {
     assert.ok(loading);
     assert.equal(loading!.decision, 'planned');
     assert.match(loading!.decisionNote, /^Deferred: .*cosmetic/);
+  });
+});
+
+describe('the roster, team-thumbnail and unit-XP screen family decisions', () => {
+  // These six deferrals said the behaviour had no rendered model. They are
+  // reclassified only because the one dialog now really draws that behaviour
+  // from the server's army, its accepted team and the rules' XP table. The
+  // proprietary portraits stay excluded; only the behaviour is claimed.
+  const ROSTER_SCREENS = [
+    'PopupAllUnitsMC.as',
+    'PopupGenericUnitSelectorMC.as',
+    'popups/PopupGenericUnitSelector.as',
+    'GUI/UnitXPLevelInfoDisplay.as',
+    'popups/teamSelection/ThumbSelectedUnit.as',
+    'popups/teamSelection/ThumbUnit.as',
+  ];
+
+  it('records each rendered screen as implemented against the roster panel', async () => {
+    const all = await screens();
+    for (const path of ROSTER_SCREENS) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/roster\.tsx`/);
+      assert.match(screen!.decisionNote, /art|portrait|asset/i);
+    }
+  });
+
+  it('leaves the all-units roster as already implemented against armyView', async () => {
+    // This one was reclassified in G5.6: the result popup already draws the
+    // army section. It is not flipped again — the new panel is a second
+    // reading of the same model, not a new behaviour for this screen.
+    const all = await screens();
+    const screen = all.find((entry) => entry.path === 'popups/PopupAllUnits.as');
+    assert.ok(screen);
+    assert.equal(screen!.decision, 'implemented');
+    assert.match(screen!.decisionNote, /`packages\/client\/src\/army\.ts`/);
+  });
+
+  it('leaves the portrait-licence screens planned', async () => {
+    // Their only remaining content is Zynga's portrait artwork: the clone
+    // draws text rows and state, so flipping these would claim art it does
+    // not render and model no new behaviour.
+    const all = await screens();
+    for (const path of ['GUI/PortraitAssault.as', 'GUI/PortraitTrainQueue.as']) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
+      assert.match(screen!.decisionNote, /licensed|portraits/i);
+    }
   });
 });

@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "planned": 94,
+   "planned": 88,
    "dropped": 52,
-   "implemented": 114
+   "implemented": 120
   }
  },
  "screens": [
@@ -1242,8 +1242,8 @@
    ],
    "overrides": [],
    "bytes": 7436,
-   "decision": "planned",
-   "decisionNote": "Deferred: the unit-XP display's LEVEL UP / Unit Level / 'Defeat enemies to level up your unit!!' literals have no rendered model; unblock when unit progression is surfaced in the client."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the one dialog's roster panel (`apps/client/src/ui/roster.tsx`) draws the unit-XP display from `packages/rules/src/xp.ts` over the server's stored xp, with the client's own LEVEL UP / Unit Level / 'Defeat enemies to level up your unit!!' literals and one star per earned level. The proprietary portrait art stays excluded; only the display behaviour is claimed."
   },
   {
    "class": "ZoomSlider",
@@ -2318,8 +2318,8 @@
    ],
    "overrides": [],
    "bytes": 688,
-   "decision": "planned",
-   "decisionNote": "Deferred: the all-units popup has no roster model in the client; unit state is server-owned, so unblock when a roster is rendered and the art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the full army roster is drawn by `apps/client/src/ui/roster.tsx` from `packages/client/src/army.ts` over the server's store, placed units and finished queues, with names and levels from the content and the rules. The popup's proprietary art stays excluded, but its all-units behaviour is really modelled and rendered."
   },
   {
    "class": null,
@@ -2654,8 +2654,8 @@
    ],
    "overrides": [],
    "bytes": 529,
-   "decision": "planned",
-   "decisionNote": "Deferred: the generic unit selector has no roster-backed model; unblock when a unit list is rendered and the selector art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the unit selector is drawn by `apps/client/src/ui/roster.tsx` as a roster of the server's units with a bounded team-count gesture reusing `packages/client/src/army.ts`; the candidate counts are only sent with a request, never treated as an accepted team. The selector art stays excluded; only the behaviour is claimed."
   },
   {
    "class": null,
@@ -4337,8 +4337,8 @@
    ],
    "overrides": [],
    "bytes": 4201,
-   "decision": "planned",
-   "decisionNote": "Deferred: the generic unit selector's init path has no roster-backed model; unblock when a unit list is rendered in the client."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the selector's init reading is drawn by `apps/client/src/ui/roster.tsx` from the server's save and the content, seeding its counts with the team-picker model in `packages/client/src/army.ts`. Every game gesture hands the team to the host's request; the server decides what it accepts. The selector art stays excluded; only the behaviour is claimed."
   },
   {
    "class": "PopupGetEnergy",
@@ -6269,8 +6269,8 @@
    ],
    "overrides": [],
    "bytes": 1988,
-   "decision": "planned",
-   "decisionNote": "Deferred: the selected-team thumbnail has no activate/deactivate state model; unblock when a team-selection screen is rendered and the art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the selected-team thumbnail's activate/deactivate state is drawn by `apps/client/src/ui/roster.tsx` from the team the server bound to the active quest via `apps/client/src/ui/state.ts`; a unit outside that team is deactivated and carries no client claim. The thumbnail art stays excluded; only the state behaviour is claimed."
   },
   {
    "class": "ThumbUnit",
@@ -6290,8 +6290,8 @@
    ],
    "overrides": [],
    "bytes": 3570,
-   "decision": "planned",
-   "decisionNote": "Deferred: the team thumbnail has no activate/deactivate state model in the client; unblock when team selection is drawn and the art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the team thumbnail's activate/deactivate state is drawn by `apps/client/src/ui/roster.tsx` for every roster unit, active only when the server's accepted team names it (`apps/client/src/ui/state.ts`). The licensed thumbnail art stays excluded; only the state behaviour is claimed."
   }
  ]
 }
