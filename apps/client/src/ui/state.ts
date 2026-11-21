@@ -36,8 +36,10 @@ import {
   expand,
   itemType,
   levelOf,
+  magicBook,
   magicInputFromWorld,
   magicLab,
+  type MagicBookPage,
   type MagicLabPage,
   ownedExpansions,
   productionState,
@@ -722,4 +724,26 @@ export function magicLabPanel(
     bundle.globals ?? {},
   );
   return magicLab(input, page);
+}
+
+/**
+ * The battle spell book's page, from the server's save and the content.
+ *
+ * The quest's veto is passed in by the host, which owns the active quest. The
+ * model decides nothing: it only lists the learned spells, their levels and
+ * what the server-issued mana can pay for.
+ */
+export function magicBookPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  page: number,
+  disabledSpells: readonly number[] = [],
+): MagicBookPage {
+  const input = magicInputFromWorld(
+    world,
+    bundle.magics ?? [],
+    bundle.globals ?? {},
+    disabledSpells,
+  );
+  return magicBook(input, page);
 }
