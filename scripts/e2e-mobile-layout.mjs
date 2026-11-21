@@ -1,18 +1,20 @@
 #!/usr/bin/env node
 /**
- * Emulated-phone layout verification.
+ * Multi-resolution emulated-phone layout verification.
  *
  * **This is EMULATION, not device verification.** A real Chromium browser is
  * driven over the DevTools protocol with `Emulation.setDeviceMetricsOverride`
- * (390x844 CSS pixels @dpr 2) and `Emulation.setTouchEmulationEnabled`. No
+ * (a matrix of CSS-pixel phone viewports plus the original 760x600 stage, each
+ * at its own device pixel ratio) and `Emulation.setTouchEmulationEnabled`. No
  * Android/iOS build, emulator, real phone, Firefox or Safari is involved, and
- * nothing here claims any of them ran.
+ * nothing here claims any of them ran. No physical touch device is used: the
+ * "touch" is a CDP-enabled synthetic `pointerType: 'touch'` gesture.
  *
- * The assertions are deliberately the phone ones that cannot be made at the
- * desktop viewport:
+ * Every viewport in the matrix gets the same assertions as the original
+ * single-viewport harness:
  *
  * 1. the client's own status is `started`;
- * 2. the `#stage` transform scale equals `stageScale({390,844})` from the
+ * 2. the `#stage` transform scale equals `stageScale({width,height})` from the
  *    shared model, read from the running page;
  * 3. the HUD, goals, inventory and chapter panels are inside the stage and do
  *    not overlap one another;
@@ -57,9 +59,18 @@ async function removeTemp(directory) {
   }
 }
 
-/** The emulated phone: CSS pixels, at a phone's device pixel ratio. */
-const PHONE = { width: 390, height: 844, deviceScaleFactor: 2 };
-const EXPECTED_SCALE = stageScale({ width: PHONE.width, height: PHONE.height });
+/**
+ * The emulated viewports: several phone sizes plus the game's original
+ * 760x600 stage. Each entry is EMULATED in a real browser — never a device.
+ * `slug` is used to give each viewport its own server-issued session.
+ */
+const VIEWPORTS = [
+  { name: '390x844 @dpr2', slug: '390x844-2', width: 390, height: 844, deviceScaleFactor: 2 },
+  { name: '360x640 @dpr2', slug: '360x640-2', width: 360, height: 640, deviceScaleFactor: 2 },
+  { name: '414x896 @dpr3', slug: '414x896-3', width: 414, height: 896, deviceScaleFactor: 3 },
+  { name: '320x568 @dpr2', slug: '320x568-2', width: 320, height: 568, deviceScaleFactor: 2 },
+  { name: '760x600 @dpr1', slug: '760x600-1', width: 760, height: 600, deviceScaleFactor: 1 },
+];
 
 /** The panels whose layout is checked inside the stage. */
 const PANELS = [
@@ -116,6 +127,25 @@ function findBrowser(name) {
     if (existsSync(candidate)) return candidate;
   }
   return null;
+}
+
+/**
+ * Take a currently-free localhost port. Nothing about a run is on a fixed
+ * port (the old harness hardcoded DevTools to 9544): the server, the client
+ * proxy and each browser's debugging endpoint get their own, so concurrent
+ * browser runs — and the other harnesses — cannot collide.
+ */
+const usedPorts = new Set();
+async function nextPort() {
+  for (;;) {
+    const probe = createServer();
+    await new Promise((resolve) => probe.listen(0, '127.0.0.1', resolve));
+    const address = probe.address();
+    await new Promise((resolve) => probe.close(resolve));
+    if (!address || typeof address === 'string' || usedPorts.has(address.port)) continue;
+    usedPorts.add(address.port);
+    return address.port;
+  }
 }
 
 /** Static files for the client, with the API proxied to the real server. */
@@ -364,10 +394,12 @@ async function readGeometry(page) {
   );
 }
 
-/** All the phone assertions for one drivable browser. */
-async function verifyEmulatedPhone(page, name, serverPort, session, failures) {
+/** All the phone assertions for one drivable browser and one emulated viewport. */
+async function verifyEmulatedPhone(page, name, serverPort, session, failures, viewport) {
+  const label = `${name} ${viewport.name}`;
+  const expectedScale = stageScale({ width: viewport.width, height: viewport.height });
   const fail = (message) => {
-    failures.push(`${name}: ${message}`);
+    failures.push(`${label}: ${message}`);
     console.log(`  FAILED (${message})`);
   };
 
@@ -390,7 +422,7 @@ async function verifyEmulatedPhone(page, name, serverPort, session, failures) {
     fail(`the client said "${state}" (${detail})`);
     return;
   }
-  console.log(`  EMULATION ${name}: client status started (${detail})`);
+  console.log(`  EMULATION ${label}: client status started (${detail})`);
 
   // The fresh player's tutorial is closed through its rendered button, so
   // the layout measured below is the ordinary play layout, not the overlay.
@@ -419,29 +451,29 @@ async function verifyEmulatedPhone(page, name, serverPort, session, failures) {
   //    shared model's answer for it. The scale is the `a` term of the CSS
   //    matrix the renderer wrote; the model is imported from stage.ts.
   const geometry = await readGeometry(page);
-  if (geometry?.innerWidth !== PHONE.width || geometry?.innerHeight !== PHONE.height) {
+  if (geometry?.innerWidth !== viewport.width || geometry?.innerHeight !== viewport.height) {
     fail(
       `the browser reported ${geometry?.innerWidth}x${geometry?.innerHeight}, ` +
-        `not ${PHONE.width}x${PHONE.height}`,
+        `not ${viewport.width}x${viewport.height}`,
     );
     return;
   }
-  if (Number(geometry.dpr) !== PHONE.deviceScaleFactor) {
-    fail(`the browser reported dpr ${geometry.dpr}, not ${PHONE.deviceScaleFactor}`);
+  if (Number(geometry.dpr) !== viewport.deviceScaleFactor) {
+    fail(`the browser reported dpr ${geometry.dpr}, not ${viewport.deviceScaleFactor}`);
     return;
   }
   const match = /matrix\(\s*([-\d.]+)/.exec(String(geometry.transform ?? ''));
   const applied = match ? Number(match[1]) : NaN;
-  if (!Number.isFinite(applied) || Math.abs(applied - EXPECTED_SCALE) > 0.001) {
+  if (!Number.isFinite(applied) || Math.abs(applied - expectedScale) > 0.001) {
     fail(
       `the #stage transform scale is ${String(geometry.transform)}, ` +
-        `but stageScale({${PHONE.width},${PHONE.height}}) is ${EXPECTED_SCALE}`,
+        `but stageScale({${viewport.width},${viewport.height}}) is ${expectedScale}`,
     );
     return;
   }
   console.log(
-    `  EMULATION ${name}: ${geometry.innerWidth}x${geometry.innerHeight} @dpr ${geometry.dpr}; ` +
-      `#stage scale ${applied} = stageScale({${PHONE.width},${PHONE.height}}) ${EXPECTED_SCALE}`,
+    `  EMULATION ${label}: ${geometry.innerWidth}x${geometry.innerHeight} @dpr ${geometry.dpr}; ` +
+      `#stage scale ${applied} = stageScale({${viewport.width},${viewport.height}}) ${expectedScale}`,
   );
 
   // 3. Every named panel is inside the transformed stage and the four do not
@@ -452,10 +484,10 @@ async function verifyEmulatedPhone(page, name, serverPort, session, failures) {
     return;
   }
   const rects = [];
-  for (const [label, selector] of PANELS) {
-    const rect = geometry.panels?.[label];
+  for (const [panel, selector] of PANELS) {
+    const rect = geometry.panels?.[panel];
     if (!rect) {
-      fail(`the ${label} panel is missing`);
+      fail(`the ${panel} panel is missing`);
       return;
     }
     if (
@@ -464,10 +496,10 @@ async function verifyEmulatedPhone(page, name, serverPort, session, failures) {
       rect.right > geometry.stage.right + 0.5 ||
       rect.bottom > geometry.stage.bottom + 0.5
     ) {
-      fail(`the ${label} panel falls outside the stage: ${JSON.stringify(rect)}`);
+      fail(`the ${panel} panel falls outside the stage: ${JSON.stringify(rect)}`);
       return;
     }
-    rects.push([label, rect]);
+    rects.push([panel, rect]);
   }
   for (let i = 0; i < rects.length; i++) {
     for (let j = i + 1; j < rects.length; j++) {
@@ -481,12 +513,12 @@ async function verifyEmulatedPhone(page, name, serverPort, session, failures) {
     }
   }
   console.log(
-    `  EMULATION ${name}: hud/goals/inventory/chapters are inside the stage ` +
+    `  EMULATION ${label}: hud/goals/inventory/chapters are inside the stage ` +
       `(${geometry.stage.left.toFixed(1)},${geometry.stage.top.toFixed(1)} to ` +
       `${geometry.stage.right.toFixed(1)},${geometry.stage.bottom.toFixed(1)}) and do not overlap`,
   );
 
-  // 4. The town is drawn on the screen at the phone viewport.
+  // 4. The town is drawn on the screen at the emulated viewport.
   const visible = await page.evaluate(
     '(() => { const h = window.__swl; return h ? h.visibleSprites() : 0; })()',
   );
@@ -494,7 +526,7 @@ async function verifyEmulatedPhone(page, name, serverPort, session, failures) {
     fail(`the town is not on the screen (${visible} visible sprite(s))`);
     return;
   }
-  console.log(`  EMULATION ${name}: ${visible} sprite(s) visible on the emulated screen`);
+  console.log(`  EMULATION ${label}: ${visible} sprite(s) visible on the emulated screen`);
 
   // 5. A touch tap on the canvas selects a building. Touch input is deferred
   //    to release by the shared client's gesture guard, so a real tap is a
@@ -534,7 +566,7 @@ async function verifyEmulatedPhone(page, name, serverPort, session, failures) {
     return;
   }
   console.log(
-    `  EMULATION ${name}: a touch pointerdown+pointerup selected building item ` +
+    `  EMULATION ${label}: a touch pointerdown+pointerup selected building item ` +
       `${picked.afterUp} (the pointerdown alone selected ${JSON.stringify(picked.afterDown)})`,
   );
 
@@ -547,7 +579,7 @@ async function verifyEmulatedPhone(page, name, serverPort, session, failures) {
     fail('the server did not own the town the emulated client rendered');
     return;
   }
-  console.log(`  EMULATION ${name}: the selected town came from the real server's save`);
+  console.log(`  EMULATION ${label}: the selected town came from the real server's save`);
 }
 
 async function main() {
@@ -561,11 +593,11 @@ async function main() {
     process.exit(2);
   }
 
-  const dataDir = await mkdtemp(path.join(os.tmpdir(), 'swl-mobile-'));
-  const base = 8300 + Math.floor(Math.random() * 200);
-  const serverPort = base;
-  const clientPort = base + 200;
-  const devToolsPort = 9544;
+  // A distinct temp-data prefix and no fixed ports, so concurrent browser
+  // runs (and the other CDP harnesses) cannot collide.
+  const dataDir = await mkdtemp(path.join(os.tmpdir(), 'swl-mobile-matrix-'));
+  const serverPort = await nextPort();
+  const clientPort = await nextPort();
   const server = await startServer(dataDir, serverPort);
   const client = await serve(clientPort, serverPort);
 
@@ -575,10 +607,15 @@ async function main() {
   const profiles = [];
   const browsers = [];
 
-  console.log(
-    `  EMULATION: ${PHONE.width}x${PHONE.height} CSS pixels @dpr ${PHONE.deviceScaleFactor}; ` +
-      `expected #stage scale ${EXPECTED_SCALE} from packages/client/src/stage.ts`,
-  );
+  console.log('  EMULATION: multi-resolution matrix (CDP device-metrics override, never a device):');
+  for (const viewport of VIEWPORTS) {
+    console.log(
+      `    ${viewport.name}: ${viewport.width}x${viewport.height} CSS pixels ` +
+        `@dpr ${viewport.deviceScaleFactor}; expected #stage scale ` +
+        `${stageScale({ width: viewport.width, height: viewport.height })} ` +
+        `from packages/client/src/stage.ts`,
+    );
+  }
 
   try {
     for (const entry of BROWSERS) {
@@ -590,9 +627,9 @@ async function main() {
       }
       console.log(`  EMULATION ${entry.name}:`);
       ran.push(entry.name);
-      const session = await register(serverPort, `mobile-${entry.name.toLowerCase()}`);
-      const profile = mkdtempSync(path.join(os.tmpdir(), 'swl-mobile-profile-'));
+      const profile = mkdtempSync(path.join(os.tmpdir(), 'swl-mobile-matrix-profile-'));
       profiles.push(profile);
+      const devToolsPort = await nextPort();
       const child = spawn(
         browser,
         [
@@ -610,34 +647,46 @@ async function main() {
       );
       browsers.push(child);
       let page = null;
+      let currentLabel = entry.name;
       try {
         await waitForDevTools(devToolsPort);
         page = await Page.openBlank(devToolsPort);
-        // The CDP emulation. These two calls are the whole device story:
-        // everything below ran in a real browser at a phone viewport. Apply
-        // them before navigation, so the client's viewport meta tag is
-        // parsed against the emulated phone from the first layout.
-        // `mobile: false` is deliberate. In headless Chromium, `mobile: true`
-        // makes `window.innerWidth` disagree with the layout viewport (it
-        // reported 575/690 instead of 390), which would drive the client's
-        // fit to the wrong size and make the assertion meaningless. Without
-        // mobile mode the CSS viewport is exactly 390x844 @dpr 2; touch is
-        // still enabled by the next call, so the gestures are real touch.
-        await page.send('Emulation.setDeviceMetricsOverride', {
-          width: PHONE.width,
-          height: PHONE.height,
-          deviceScaleFactor: PHONE.deviceScaleFactor,
-          mobile: false,
-        });
-        await page.send('Emulation.setTouchEmulationEnabled', {
-          enabled: true,
-          maxTouchPoints: 1,
-        });
-        await page.send('Page.navigate', { url: `http://127.0.0.1:${clientPort}/` });
-        await page.waitForLoad();
-        await verifyEmulatedPhone(page, entry.name, serverPort, session, failures);
+        for (const viewport of VIEWPORTS) {
+          currentLabel = `${entry.name} ${viewport.name}`;
+          console.log(`  EMULATION ${currentLabel}:`);
+          // Each viewport gets its own server-issued session, so a fresh
+          // player/tutorial is measured exactly as in the original harness.
+          const session = await register(
+            serverPort,
+            `mobile-${entry.name.toLowerCase()}-${viewport.slug}`,
+          );
+          // The CDP emulation. These two calls are the whole device story:
+          // everything below ran in a real browser at an emulated viewport.
+          // Apply them before navigation, so the client's viewport meta tag
+          // is parsed against the emulated phone from the first layout.
+          // `mobile: false` is deliberate. In headless Chromium, `mobile: true`
+          // makes `window.innerWidth` disagree with the layout viewport (it
+          // reported 575/690 instead of 390 at the first phone size), which
+          // would drive the client's fit to the wrong size and make the
+          // assertion meaningless. Without mobile mode the CSS viewport is
+          // exactly the emulated size; touch is still enabled by the next
+          // call, so the gestures are emulated touch, not a device.
+          await page.send('Emulation.setDeviceMetricsOverride', {
+            width: viewport.width,
+            height: viewport.height,
+            deviceScaleFactor: viewport.deviceScaleFactor,
+            mobile: false,
+          });
+          await page.send('Emulation.setTouchEmulationEnabled', {
+            enabled: true,
+            maxTouchPoints: 1,
+          });
+          await page.send('Page.navigate', { url: `http://127.0.0.1:${clientPort}/` });
+          await page.waitForLoad();
+          await verifyEmulatedPhone(page, entry.name, serverPort, session, failures, viewport);
+        }
       } catch (error) {
-        failures.push(`${entry.name}: ${error?.message ?? String(error)}`);
+        failures.push(`${currentLabel}: ${error?.message ?? String(error)}`);
         console.log(`  FAILED (${error?.message ?? String(error)})`);
       } finally {
         if (page) await page.close(devToolsPort);
@@ -668,8 +717,11 @@ async function main() {
     process.exit(2);
   }
   console.log(
-    'OK: the phone layout was verified by EMULATION in a real browser at 390x844 @dpr 2. ' +
-      'No device, Android/iOS build, emulator, Firefox or Safari was used or claimed.',
+    `OK: the ${VIEWPORTS.length}-viewport layout matrix ` +
+      `(${VIEWPORTS.map((viewport) => viewport.name).join(', ')}) was verified by ` +
+      'EMULATION in a real Chromium browser. No device, Android/iOS build, emulator, ' +
+      'Firefox or Safari was used or claimed, and the touch gesture was a CDP-enabled ' +
+      'synthetic pointer event, not a physical touch device.',
   );
 }
 
