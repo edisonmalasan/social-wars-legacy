@@ -504,25 +504,28 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main:** `1a6a89e` — PR #31 (`fix: stop the last roadmap group
-  swallowing later sections`) merged. The prior `social-wars-legacy-main`
-  session ended here when its context filled during compaction, not because the
-  roadmap was finished.
+- **Last verified `main:** `d303cba` — PR #32 (`feat: model the bonus screens and
+  honour a lapsed streak`) merged with all four CI checks green. The prior
+  `social-wars-legacy-main` session ended at `1a6a89e` (PR #31) when its context
+  filled during compaction, not because the roadmap was finished.
 - **Where that session stopped:** it had merged nine increments (#23–#31) and
   classified the remaining open items. Most are genuine blockers (Flash live
   captures, licence-gated art, missing platform hosts/devices, rights-holder
   response, signing credentials, production release). The one actionable area
   it identified is Group B3/G3's screen backlog, which it left at 90 implemented
   / 52 dropped / 118 planned.
-- **Next task selected:** the daily/Monday bonus screens, because the server
-  already owns both cycles and the only recorded deferral was a missing client
-  surface.
-- **Active branch / PR:** `feat/bonus-screens` → PR #32, pushed as `0488ab0`,
-  awaiting CI. It adds the pure bonus model and HUD read-out, closes four screens
-  (now 94 / 52 / 114), and fixes the server ignoring the lapsed-streak flag.
-- **Verification already run locally:** `pnpm test` 1754/1754, `pnpm typecheck`
-  clean, golden master 50/50 with 0 differences, cheat battery 11/11, report
-  sync, roadmap check, and the real-browser e2e in Chrome and Edge — all passed.
+- **Completed this session:** the daily/Monday bonus screens (PR #32, merged).
+- **Next task selected:** the offer-pack store screens, because their prices,
+  shapes, tiers and rewards are already modelled in `@swl/rules` and the only
+  recorded deferral was a missing pack-picker surface.
+- **Active branch / PR:** the offer-pack store increment adds a pure model in
+  `packages/client/src/store.ts`, a store panel in the interface, and closes the
+  four pack screens (now **98 implemented / 52 dropped / 110 planned**). Locally
+  verified: `pnpm test` 1762/1762, `pnpm typecheck` clean, report sync, roadmap
+  check and the real-browser e2e in Chrome and Edge — all passed.
+- **Verification run for PR #32:** 1754/1754 tests, clean typecheck, golden master
+  50/50 with 0 differences, cheat battery 11/11, report sync, roadmap check, and
+  the real-browser e2e in Chrome and Edge — all passed; CI's four checks passed.
 - **Remaining applicable tasks:** continue reducing the 114 planned screens in
   coherent, player-facing families; re-audit the blockers in section 5 before
   treating any as final; do not claim the frame-rate, platform or release items
