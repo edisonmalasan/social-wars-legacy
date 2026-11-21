@@ -504,22 +504,24 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main`:** `6954a19` — PR #46 (`test/updater-rollback-seam`,
-  a test-only rollback-executor seam in the updater) merged with all four CI
-  checks green. The merge chain since the prior checkpoint (`9026017`) is
-  PR #40 (`0053306`, unsigned Linux CI bundles), PR #41 (`fa92150`, WebKit
-  evidence + checkpoint), PR #42 (`cf9941d`, multi-resolution phone matrix),
-  PR #43 (`8de433a`, assault result/history/HUD selectors and panels),
-  PR #44 (`013d57c`, mounting those panels in the one shared dialog), PR #45
-  (`bbb7ff9`, docs: record the #40–#44 batch and refresh the checkpoint) and
-  PR #46 (`6954a19`, test: pin the rollback decision path with a test-side
-  executor seam — test coverage only, no real executor or installer hook).
-  The earlier chain that ended at `9026017` was PR #32
-  (`d303cba`), PR #33 (`2d273be`), PR #34 (`3228d0e`), PR #35 (`b4aea12`),
-  PR #36 (`1689882`), PR #10 (`a0befef`), PR #37 (`6e084e7`), PR #38 (`31b6834`)
-  and PR #39 (`9026017`). The prior `social-wars-legacy-main` session ended at
-  `1a6a89e` (PR #31) when its context filled during compaction, not because the
-  roadmap was finished.
+- **Last verified `main`:** `e11cbca` — PR #49
+  (`feat/check-mobile-capacitor-config`, the read-only mobile-config check)
+  merged. The merge chain since the prior checkpoint (`6954a19`) is PR #47
+  (`f4b4e69`, docs: update the verified state), PR #48 (`608d940`, read-only
+  Flash-differential evidence audit) and PR #49 (`e11cbca`, mobile Capacitor
+  config check with a 10-case tamper self-test). Before that, the chain ending
+  at `6954a19` was PR #32 (`d303cba`), PR #33 (`2d273be`), PR #34 (`3228d0e`),
+  PR #35 (`b4aea12`), PR #36 (`1689882`), PR #10 (`a0befef`), PR #37 (`6e084e7`),
+  PR #38 (`31b6834`), PR #39 (`9026017`), PR #40 (`0053306`, unsigned Linux CI
+  bundles), PR #41 (`fa92150`, WebKit evidence + checkpoint), PR #42
+  (`cf9941d`, multi-resolution phone matrix), PR #43 (`8de433a`, assault
+  result/history/HUD selectors and panels), PR #44 (`013d57c`, mounting those
+  panels in the one shared dialog), PR #45 (`bbb7ff9`, docs: record the #40–#44
+  batch and refresh the checkpoint) and PR #46 (`6954a19`, test: pin the
+  rollback decision path with a test-side executor seam — test coverage only,
+  no real executor or installer hook). The prior `social-wars-legacy-main`
+  session ended at `1a6a89e` (PR #31) when its context filled during compaction,
+  not because the roadmap was finished.
 - **Where that earlier session stopped:** it had merged nine increments (#23–#31)
   and classified the remaining open items. Most are genuine blockers (Flash live
   captures, licence-gated art, missing platform hosts/devices, rights-holder
@@ -558,7 +560,19 @@ verified checkpoint, not at every tool call.
   1786/1786 serial full suite, typecheck, e2e in Chrome and Edge). Nine screens
   were honestly reclassified as implemented: the inventory now reads **108
   implemented / 52 dropped / 100 planned**, with art-licence-blocked assault
-  screens still planned.
+  screens still planned. Three further increments are on `main`: PR #47
+  (`f4b4e69`) refreshed the verified-state documentation for the `6954a19`
+  checkpoint; PR #48 (`608d940`) added `scripts/flash-differential.mjs`, a
+  read-only evidence audit of the sole captured `end_quest` payload — it exits
+  0 with `insufficient evidence — E4 stays blocked` because that capture has no
+  seed, roster, wallet snapshot, clock or authoritative outcome, so no Flash
+  parity is claimed, the E4 box stays open and the golden-master corpus remains
+  50 scenarios, 0 differences; PR #49 (`e11cbca`) added
+  `scripts/check-mobile-config.mjs`, which independently validates
+  `capacitor.config.ts` against the `apps/client` build output with a 10-case
+  tamper self-test and reports `native Android/iOS builds NOT RUN — no
+  JDK/Android SDK/Xcode` — the config is coherent, but no native build or device
+  run was performed. Neither script changes the item accounting.
 - **Verified roadmap state:** `node scripts/check-roadmap.mjs` reports 401 items,
   22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **108 implemented /
   52 dropped / 100 planned**. The Status Summary still reads G 78/8. The G5
@@ -605,4 +619,4 @@ verified checkpoint, not at every tool call.
   build-artefact condition, not a source change. CI's Scan check passed.
 - **On resume:** re-read this file and `docs/ROADMAP.md`, check `git status`,
   `git stash list`, `git worktree list` and `gh pr checks`, then continue from the
-  verified `6954a19` state and the worker results above.
+  verified `e11cbca` state and the worker results above.

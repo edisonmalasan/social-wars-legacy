@@ -699,6 +699,16 @@ client's observable behaviour.*
 - [ ] The harness diffs the rules engine against the **original Flash client** — the
       differential test needs the client to be driven through the same scenarios, which
       is the last part of E4
+
+  **E4 evidence gap (PR #48, `608d940`):** a real Flash differential is not possible
+  from the captured evidence. The sole captured `end_quest` payload records only the
+  client-declared `res`/`win`/`units` delta, which the upstream applied verbatim; it has
+  no seed, roster, wallet snapshot, clock or authoritative outcome to compare a
+  re-simulation against. `scripts/flash-differential.mjs` is therefore a **read-only
+  evidence audit**, not a parity test: it exits 0 with
+  `insufficient evidence — E4 stays blocked`. The golden-master corpus is unchanged at
+  **50 scenarios, 0 differences**. This box stays unchecked — no Flash parity is claimed.
+
 - [x] The simulation is deterministic given a seed; the same seed and inputs produce the
       same outcome on any machine. The claim is **provable by construction**, not merely
       untested:
@@ -1911,7 +1921,11 @@ never an Android or iOS build, and never a Firefox or Safari run.*
   config-only `capacitor.config.ts`, a dependency-free `package.json`, a README
   with the exact prerequisites and commands, and an empty lockfile importer.
   No native project, `cap add`, `cap sync`, JDK, Android SDK, Xcode, APK, IPA
-  or signing was produced.
+  or signing was produced. `scripts/check-mobile-config.mjs` (PR #49) now
+  independently validates `capacitor.config.ts` against `apps/client`'s build
+  output, with a 10-case tamper self-test proving the check detects drift; it
+  reports `native Android/iOS builds NOT RUN — no JDK/Android SDK/Xcode`. The
+  config is coherent, but this is not a native build or a device run.
 
 **Gates (all run on the final tree; none skipped):**
 
@@ -1933,6 +1947,7 @@ never an Android or iOS build, and never a Firefox or Safari run.*
 | Client build | `pnpm --filter @swl/app-client build` | **PASS** — only the pre-existing chunk-size warning |
 | Desktop e2e | `node scripts/e2e-test.mjs` | **PASS** — `browsers that ran: chrome, edge`; full play session and restart |
 | Emulated phone | `node scripts/e2e-mobile-layout.mjs` | **PASS (EMULATION)** — five-viewport matrix (390x844@dpr2, 360x640@dpr2, 414x896@dpr3, 320x568@dpr2, 760x600@dpr1) in chrome and edge; synthetic touch, no device or phone build claimed |
+| Mobile config | `node scripts/check-mobile-config.mjs` | **PASS** — config coherent; native builds NOT RUN |
 
 **Externally blocked — the device boxes are deliberately NOT ticked:**
 
