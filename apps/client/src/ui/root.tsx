@@ -19,6 +19,7 @@ import {
   type ArmyUnitView,
   hudState,
   levelOf,
+  storePacks,
   questChoices,
   type DialogState,
   type FeedbackMessage,
@@ -46,6 +47,7 @@ import { Inventory } from './inventory.tsx';
 import { Neighbours } from './neighbours.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
 import { RecruitPanel } from './recruit.tsx';
+import { Store } from './store.tsx';
 import { TutorialOverlay, type TutorialOverlayProps } from './tutorial.tsx';
 import {
   buildingInfo,
@@ -170,6 +172,10 @@ export function Root({
   onActivate,
 }: RootProps): React.JSX.Element {
   const state = hudState(hudInput(bundle, world));
+  const store = useMemo(
+    () => storePacks(bundle.offerPacks ?? [], state.cash),
+    [bundle, state.cash],
+  );
   const items = useMemo(() => buildItems(bundle), [bundle]);
   const tabs = useMemo(() => categories(bundle), [bundle]);
   const placingName = useMemo(() => {
@@ -227,6 +233,7 @@ export function Root({
         onOpenProduction={onOpenProduction}
       />
       <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
+      <Store packs={store} onCommand={onCommand} />
       <Neighbours neighbours={neighbours} />
       {tutorial ? <TutorialOverlay {...tutorial} /> : null}
       <Feedback messages={feedback} />

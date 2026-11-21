@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 90,
+   "planned": 114,
    "dropped": 52,
-   "planned": 118
+   "implemented": 94
   }
  },
  "screens": [
@@ -2696,8 +2696,8 @@
    ],
    "overrides": [],
    "bytes": 647,
-   "decision": "planned",
-   "decisionNote": "Deferred: the offer packs are priced by the cost table already, but the pack-picker popup has no client model."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/store.ts` — the content-owned packs, their server-side price and tier rules, and the buy request; drawn as the store panel. The premium pack, which opens a real-money flow, stays excluded."
   },
   {
    "class": null,
@@ -2759,8 +2759,8 @@
    ],
    "overrides": [],
    "bytes": 594,
-   "decision": "planned",
-   "decisionNote": "Deferred: the offer packs are priced by the cost table already, but the pack-picker popup has no client model."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/store.ts` — the content-owned packs, their server-side price and tier rules, and the buy request; drawn as the store panel. The premium pack, which opens a real-money flow, stays excluded."
   },
   {
    "class": null,
@@ -4386,8 +4386,8 @@
    ],
    "overrides": [],
    "bytes": 2216,
-   "decision": "planned",
-   "decisionNote": "Deferred: the offer packs are priced by the cost table already, but the pack-picker popup has no client model."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/store.ts` — the content-owned packs, their server-side price and tier rules, and the buy request; drawn as the store panel. The premium pack, which opens a real-money flow, stays excluded."
   },
   {
    "class": "PopupGoalComplete",
@@ -4483,8 +4483,8 @@
    ],
    "overrides": [],
    "bytes": 1576,
-   "decision": "planned",
-   "decisionNote": "Deferred: the offer packs are priced by the cost table already, but the pack-picker popup has no client model."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/store.ts` — the content-owned packs, their server-side price and tier rules, and the buy request; drawn as the store panel. The premium pack, which opens a real-money flow, stays excluded."
   },
   {
    "class": "PopupHelpIsland",
