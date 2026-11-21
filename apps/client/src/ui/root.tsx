@@ -49,6 +49,7 @@ import { MagicLab } from './magiclab.tsx';
 import { Neighbours } from './neighbours.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
 import { RecruitPanel } from './recruit.tsx';
+import { SpellBook } from './spellbook.tsx';
 import { Store } from './store.tsx';
 import { TutorialOverlay, type TutorialOverlayProps } from './tutorial.tsx';
 import {
@@ -244,6 +245,7 @@ export function Root({
       <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
       <Store packs={store} onCommand={onCommand} />
       <MagicLab bundle={bundle} world={world} onCommand={onCommand} />
+      <SpellBook bundle={bundle} world={world} onCommand={onCommand} />
       <Neighbours neighbours={neighbours} />
       {tutorial ? <TutorialOverlay {...tutorial} /> : null}
       <Feedback messages={feedback} />

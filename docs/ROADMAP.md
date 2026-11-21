@@ -1233,6 +1233,12 @@ assault against the new server, and the cheat battery is fully rejected.
       pack and the page arrows. Buying still sends `buy_magic` / `buy_mana_new`
       and the server prices and grants. The bridge is tested with a reversed and
       over-long spell list so the model's order and paging are proved
+- [x] The **battle spell book is drawn** (`apps/client/src/ui/spellbook.tsx`)
+      from the same model, bridged by `magicBookPanel`: only learned spells,
+      three to a page, with their levels, the server-owned mana and a cast
+      button that is disabled when the mana is short. Casting sends `use_magic`;
+      the server deducts the mana and counts the use. Tests pin the three-to-a-page
+      paging, the level thresholds, the quest veto and the low-mana state
 - [x] The **daily and Monday bonus screens** are modelled
       (`packages/client/src/bonus.ts`): the cycle day, the readiness, the lapsed-streak
       flag, the wait to the next local day and the weekly bonus's state are all read
