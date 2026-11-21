@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "planned": 88,
+   "implemented": 134,
    "dropped": 52,
-   "implemented": 120
+   "planned": 74
   }
  },
  "screens": [
@@ -137,8 +137,8 @@
    ],
    "overrides": [],
    "bytes": 538,
-   "decision": "planned",
-   "decisionNote": "Deferred: the iconless speed-up button is not wired to any hurry-up action in the clone; unblock when the hurry-up command is surfaced in the UI and the art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws the iconless hurry-up button, enabled only while the server and content say a build is in progress; its click sends the click-based `finish_building` request, not a local completion and not the dropped pay-cash popup. The button art stays excluded; only the request gesture is claimed."
   },
   {
    "class": null,
@@ -158,8 +158,8 @@
    ],
    "overrides": [],
    "bytes": 631,
-   "decision": "planned",
-   "decisionNote": "Deferred: the wide speed-up button has no click handler in the clone; unblock when the hurry-up flow is rendered and the drawn button is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws the wide hurry-up button with the same server-gated request path as the iconless one, sending `finish_building` through the one command transport. The drawn button art stays excluded; only the click gesture is claimed."
   },
   {
    "class": null,
@@ -179,8 +179,8 @@
    ],
    "overrides": [],
    "bytes": 594,
-   "decision": "planned",
-   "decisionNote": "Deferred: the tab button has no selection state or click wiring in the clone; unblock when a tabbed panel that uses it is modelled and the art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws the build-category tab buttons with the one selection slot and hover state from `apps/client/src/ui/state.ts` (`tabStrip`/`tabViews`); a click selects the tab and filters the content catalogue. The original's drawn tab art stays excluded; only the behaviour is claimed."
   },
   {
    "class": "AdminButton",
@@ -1126,8 +1126,8 @@
    ],
    "overrides": [],
    "bytes": 3487,
-   "decision": "planned",
-   "decisionNote": "Deferred: the speaker box has no client model for its OK acknowledgement; unblock when a notice is surfaced in the UI and the box art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws a speaker box for the server's latest feedback message; its OK is a real acknowledgement recorded by `acknowledgeNotice`/`noticeVisible` in `apps/client/src/ui/state.ts`, not a local rewrite of the answer. The box art stays excluded; only the acknowledgement is claimed."
   },
   {
    "class": "SpellButton",
@@ -1174,8 +1174,8 @@
    ],
    "overrides": [],
    "bytes": 4442,
-   "decision": "planned",
-   "decisionNote": "Deferred: the sub-category pill's seleccionar/deseleccionar and overPastilla/outPastilla hover colours are not modelled; unblock when a category-filtered list is rendered."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws the sub-category pills with the original's `seleccionar`/`deseleccionar` and `overPastilla`/`outPastilla` states as `aria-selected` and hover classes, bridged by `tabStrip`/`tabViews` in `apps/client/src/ui/state.ts`. The pill art stays excluded; only the state behaviour is claimed."
   },
   {
    "class": "Tab",
@@ -1197,8 +1197,8 @@
    ],
    "overrides": [],
    "bytes": 2783,
-   "decision": "planned",
-   "decisionNote": "Deferred: the tab has no highlightTab/fadeTab selection-state model in the client; unblock when a tabbed window is rendered and the tab art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws the tab with `highlightTab`/`fadeTab` selection state from `tabStrip`/`tabViews` (`apps/client/src/ui/state.ts`); the click filters a content-derived catalogue. The tab art stays excluded; only the selection behaviour is claimed."
   },
   {
    "class": "UnitTooltip",
@@ -1266,8 +1266,8 @@
    ],
    "overrides": [],
    "bytes": 4378,
-   "decision": "planned",
-   "decisionNote": "Deferred: the zoom slider has no setValue/setItem model in the client; unblock when the isometric view exposes a zoom control and the slider art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws a zoom slider whose setValue reads and writes the real camera through `zoomView`/`zoomFromPercent` (`apps/client/src/ui/state.ts`, `packages/client/src/camera.ts`); the host applies it to the renderer, clamped to the client's own bounds. The slider art stays excluded; only the camera binding is claimed."
   },
   {
    "class": "AttachableArrow",
@@ -1312,8 +1312,8 @@
    ],
    "overrides": [],
    "bytes": 1857,
-   "decision": "planned",
-   "decisionNote": "Deferred: the attachable visual element has no attachTo/dettach/isAttached lifecycle in the client; unblock when a screen needs world-space UI attached to a unit."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws one world-space marker with the `attachTo`/`dettach`/`isAttachedTo` lifecycle in `apps/client/src/ui/state.ts`, anchored to a tile the server actually published and projected with the client's own `tileToPixel` and live camera. The attachable art stays excluded; only the lifecycle and placement are claimed."
   },
   {
    "class": "InfoButtonBarrack",
@@ -1604,8 +1604,8 @@
    ],
    "overrides": [],
    "bytes": 264,
-   "decision": "planned",
-   "decisionNote": "Deferred: the GUI cover movieclip has no rendered dimming layer; unblock when a modal popup is drawn and the cover art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` provides the reusable `Cover` — a dimming, click-to-dismiss layer drawn for the chrome's popover. The one dialog keeps its own backdrop, so this is not a second modal stack. The original cover art stays excluded; only the cover behaviour is claimed."
   },
   {
    "class": null,
@@ -1688,8 +1688,8 @@
    ],
    "overrides": [],
    "bytes": 409,
-   "decision": "planned",
-   "decisionNote": "Deferred: the collect icon has no click or hover wiring; unblock when a collectable is rendered in the client and the icon art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws the collect affordance enabled only when the server's production cycle is due; its click calls the host's collect request and the answer redraws the world. The icon is a text glyph, not the original's proprietary art; only the gesture is claimed."
   },
   {
    "class": null,
@@ -2276,8 +2276,8 @@
    ],
    "overrides": [],
    "bytes": 631,
-   "decision": "planned",
-   "decisionNote": "Deferred: the pop-over movieclip has no rendered model; unblock when a pop-over is drawn and its art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws the pop-over with an `aria-expanded` trigger, Escape dismissal and the shared `Cover` for outside clicks; its contents are a reading of the camera model. The original pop-over art stays excluded; only the behaviour is claimed."
   },
   {
    "class": null,
@@ -3641,8 +3641,8 @@
    ],
    "overrides": [],
    "bytes": 300,
-   "decision": "planned",
-   "decisionNote": "Deferred: the tab movieclip has no selection-state model; unblock when a tabbed window is rendered and the art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws the tab movieclip's one selection state through `tabStrip`/`tabViews` in `apps/client/src/ui/state.ts`, with click and hover wired. The art stays excluded; only the selection behaviour is claimed."
   },
   {
    "class": null,
@@ -3798,8 +3798,8 @@
    ],
    "overrides": [],
    "bytes": 5658,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P2) hover explanations are covered by the HUD popovers; a separate popover system is not needed for the alpha."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws the setContents-style pop-over from the client's own camera reading and text, with an accessible trigger, Escape and cover dismissal, reusing the one dialog pattern rather than a second overlay system. The proprietary art stays excluded; only the pop-over behaviour is claimed."
   },
   {
    "class": "PopUpBattleOptions",
@@ -4986,8 +4986,8 @@
    ],
    "overrides": [],
    "bytes": 2224,
-   "decision": "planned",
-   "decisionNote": "Deferred: the shared PopupObject modal-stack base has no client implementation; unblock when the priority-ordered stack is ported and the first popup is drawn."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` draws the popup body hosted by the existing one dialog, with the priority-ordered one-slot queue `requestPopup`/`dismissPopup` in `apps/client/src/ui/state.ts`; a second request waits instead of opening a second modal stack. The original chrome art stays excluded; only the priority-ordered single slot is claimed."
   },
   {
    "class": "PopupPlayerProfile",

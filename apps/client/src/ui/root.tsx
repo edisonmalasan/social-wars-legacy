@@ -39,6 +39,7 @@ import type { ContentBundle } from '@swl/content';
 import { AssaultPanel, type AssaultPanelView } from './assault.tsx';
 import { BuildMenu } from './buildmenu.tsx';
 import { Chapters } from './chapters.tsx';
+import { ChromeDock, ChromePopupBody, useChrome } from './chrome.tsx';
 import { Dialog } from './dialog.tsx';
 import { Expansion } from './expansion.tsx';
 import { Feedback } from './feedback.tsx';
@@ -186,9 +187,10 @@ export function Root({
   onOpenProduction,
   onActivate,
 }: RootProps): React.JSX.Element {
-  // The onboarding family is UI-only state published by the host; the panels
-  // it draws are readings of the tutorial and quest models, never decisions.
+  // The onboarding family and the chrome are UI-only state published by the
+  // host; the panels they draw are readings of models, never decisions.
   const onboarding = useOnboarding();
+  const chrome = useChrome();
   const roster = useRoster();
   const state = hudState(hudInput(bundle, world));
   const bonus = useMemo(
@@ -349,7 +351,28 @@ export function Root({
             onConfirm={onboarding.confirm ?? undefined}
           />
         ) : null}
+        {chrome.popup && dialogId === chrome.popup.id ? (
+          <ChromePopupBody
+            key={`chrome:${chrome.popup.id}`}
+            request={chrome.popup}
+            onAcknowledge={chrome.dismissNotice ?? undefined}
+          />
+        ) : null}
       </Dialog>
+      <ChromeDock
+        world={world}
+        bundle={bundle}
+        categories={tabs}
+        items={items}
+        playerLevel={state.level}
+        feedback={feedback}
+        building={building}
+        production={production}
+        selectedIso={selectedIso}
+        onCollect={onCollect}
+        onFinish={onFinish}
+        onPick={onPick ? (entryId, type) => onPick(entryId, type) : undefined}
+      />
       <BuildMenu
         items={items}
         categories={tabs}
