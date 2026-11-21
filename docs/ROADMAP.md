@@ -2186,6 +2186,7 @@ a Safari/WebKit run and not a device run.*
 | Chrome/Edge e2e | `node scripts/e2e-test.mjs` | **PASS** — full session and restart in chrome and edge |
 | Firefox smoke | `python scripts/smoke-test-client-firefox.py` | **PASS** — Firefox boots, WebGL2 render and DOM layout verified |
 | Firefox e2e | `python scripts/e2e-test-firefox.py` | **PASS** — full rendered session, reward, refused replay, reload and server restart |
+| Webkit e2e | python scripts/e2e-test-webkit.py | PASS — full rendered session, reward, refused replay, reload and server restart (Playwright WebKit) |
 | Supplementary doc checks | `build-licence-report.mjs --check`, `check-adrs.mjs`, `check-security-review.mjs`, `check-corrections.mjs`, `check-release.mjs` | **PASS** |
 
 **Explicit non-claims:** no Safari/WebKit run, no device or emulator run, no
@@ -2201,9 +2202,90 @@ The 94-command catalogue, the strict two-argument `set_quest_var`, the
 licensing/no-Flash checks and the 401-item accounting are untouched.
 
 **Remaining gaps:** the G5 Firefox/Safari box above remains open until a full
-session is also played in Safari; Safari/WebKit was not provisioned or run;
-and the two licensing/no-Flash checks must still be run before the client build
-or on a cleaned tree, as in CI.
+session is also played in branded Safari; WebKit under Playwright *has* since
+been provisioned and a full session played (see the WebKit record below), but
+Playwright's WebKit is not branded Safari and no real device has been run. The
+two licensing/no-Flash checks must still be run before the client build or on a
+cleaned tree, as in CI.
+
+---
+
+## WebKit end-to-end — the full gameplay loop plays under WebKit (Playwright)
+
+*Status: **session verified**. This outcome is recorded here, **outside** the
+`## Group X` sections above, so `node scripts/check-roadmap.mjs` still counts
+**401** items in all (Group G: 86 items, 78 done / 8 open) and the G5
+"client is run in **Firefox and Safari**" checkbox above **stays open** (branded
+Safari has still not been run). The Firefox smoke, the Firefox end-to-end
+record and the WebKit gate row above are preserved unchanged. This is a
+**WebKit (Playwright) play session**, not a branded Safari run and not a device
+run.*
+
+**What was implemented and verified:**
+
+- **A new entry point drives the shared Playwright harness in WebKit.**
+  `scripts/e2e-test-webkit.py` loads the same harness as
+  `scripts/e2e-test-firefox.py`; the harness was parameterised into an `ENGINES`
+  config keyed by engine, so both entry points run exactly the same code with
+  only the engine changed. WebKit does not speak the Chrome DevTools Protocol,
+  so Python Playwright drives it (`playwright.webkit.launch(headless=True)`).
+  WebKit owns its player (`e2e-ui-webkit`), its temporary data prefix
+  (`swl-wk-e2e-`) and its own screenshot (`swl-webkit-e2e.png`), so it cannot
+  collide with the Firefox run. No new runtime dependency, no client or server
+  source change, and no Flash.
+- **Provisioning was a test tool, not a shipped dependency.**
+  `python -m playwright install webkit` fetched **WebKit 26.4 (playwright webkit
+  v2287)**; the session ran on **Playwright for Python 1.60.0**.
+- **Every act is a rendered control; nothing is fabricated.** A fresh player is
+  registered through the rendered `#signin` form; the tutorial is dismissed
+  with its Skip button; a building is picked from the build menu and placed on
+  the `#game canvas` through the client's own pointer gesture; a Wood Factory
+  is placed and the server's `not-due` refusal is asserted against unchanged
+  wood; a unit is trained through the recruitment panel; the weekly quest is
+  opened from the chapter map, fought with rendered Strike and Report-kill
+  buttons and finished with the rendered Finish button; its reward rows are
+  checked against the wallet delta and the persisted receipt; a replay is
+  refused with `already-awarded` and pays no second reward; a client reload
+  restores the active quest; and a **full server restart** over the same
+  database, followed by a fresh sign-in, still finds the award and the same
+  receipt. `window.__swl` is **never** used to send a command or grant anything.
+  Console/page errors: **none**. Exit 0.
+- **Exact final lines (exit 0):**
+  `browsers run: webkit (Playwright, WebKit)`;
+  `browsers not run: branded Safari (NOT RUN - this run uses Playwright's WebKit engine, not Safari), Firefox (covered by scripts/e2e-test-firefox.py), Chrome/Edge (covered by scripts/e2e-test.mjs and scripts/smoke-test-client.mjs), real devices`;
+  `scope: full WebKit (Playwright) gameplay session; branded Safari and devices NOT RUN`;
+  `OK: a player registered, played and signed in again after a server restart in WebKit (Playwright).`
+  The run wrote its own screenshot (`swl-webkit-e2e.png`), distinct from the
+  Firefox proof image.
+- **Browsers run versus not run.** Ran: **webkit** (Playwright WebKit, headless,
+  real server). Not run: **branded Safari** (this is Playwright's WebKit, not
+  Safari), Firefox and Chrome/Edge in this script (covered by
+  `scripts/e2e-test-firefox.py`, `scripts/e2e-test.mjs` and
+  `scripts/smoke-test-client.mjs`, all still green), and real devices.
+- **Firefox regression after the shared-harness change.** Re-running
+  `python scripts/e2e-test-firefox.py` after the harness was parameterised into
+  `ENGINES` still exited 0, printed `browsers run: firefox (Playwright, Gecko)`
+  and reported no console errors. The refactor changed only the harness's
+  engine selection; no assertion was weakened.
+
+**Gates (all run on the final tree; none weakened or disabled):**
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Webkit e2e | python scripts/e2e-test-webkit.py | PASS — full rendered session, reward, refused replay, reload and full server restart |
+| Firefox e2e regression | `python scripts/e2e-test-firefox.py` | **PASS** — exit 0 after the shared-harness change; `browsers run: firefox (Playwright, Gecko)`; no console errors |
+| Roadmap counts | `node scripts/check-roadmap.mjs` | **PASS** — 401 items, unchanged |
+
+**Explicit non-claims:** no branded Safari run, no real-device or emulator run,
+no signed build or release, no proprietary asset, no client, server or protocol
+change, no new runtime dependency, no use of `window.__swl` to issue commands,
+and no Flash. Playwright's WebKit is an engine test, not a Safari verification.
+The G5 Firefox/Safari checkbox stays open.
+
+**Remaining gaps:** the G5 Firefox/Safari box above remains open until a full
+session is played in **branded Safari**; real devices remain unrun. The
+licensing/no-Flash checks must still be run before the client build or on a
+cleaned tree, as in CI.
 
 ---
 
@@ -2862,7 +2944,7 @@ be mistaken for unfinished work.*
 | G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout, or a licensing decision |
 | G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented | Licence or re-create the art (I6) |
 | G | Every B6 screen implemented or explicitly dropped | 109 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 109 |
-| G | Client runs in Firefox and Safari | **Firefox is verified**: a full rendered gameplay session ran under Gecko via `scripts/e2e-test-firefox.py` (Playwright's Firefox build, driven over Juggler/BiDi). WebKit/Safari has not been run, but WebKit can be provisioned as a test tool with Playwright; branded Safari has not been tested | Provision WebKit with Playwright and run the same session under it; this box closes once both browsers pass |
+| G | Client runs in Firefox and Safari | **Firefox and WebKit (Playwright) are verified**: full rendered gameplay sessions ran under Gecko via `scripts/e2e-test-firefox.py` and under WebKit via `scripts/e2e-test-webkit.py` (both Playwright engines, driven over Juggler/BiDi). Branded Safari and real devices have not been run — Playwright's WebKit is an engine test, not Safari | Play the same session in branded Safari and on real devices; this box closes once Safari passes |
 | G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux CI exists** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` and installs `libwebkit2gtk-4.1-dev` — but bundling is not yet wired there; macOS genuinely needs a host | Wire Linux bundling into CI and add a macOS runner; this box closes once all three platforms are produced |
 | G | Mobile build runs on Android and iOS | No Capacitor, Android SDK or Xcode on this machine | Install the Capacitor toolchain and SDKs |
 | G | Playable at the original resolutions and phone scales | The stage model exists; real-device verification does not | Test on the target devices |

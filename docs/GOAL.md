@@ -504,13 +504,15 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main`:** `b4aea12` — PR #35 (`feat: draw the battle spell book
-  from the existing model`) merged with all four CI checks green, after PR #34
-  (`3228d0e`), PR #33 (`2d273be`) and PR #32 (`d303cba`). The prior
+- **Last verified `main`:** `9026017` — PR #39 (`docs: correct verified roadmap
+  drift`) merged with all four CI checks green. The merge chain since the prior
+  checkpoint is PR #32 (`d303cba`), PR #33 (`2d273be`), PR #34 (`3228d0e`),
+  PR #35 (`b4aea12`), PR #36 (`1689882`), PR #10 (`a0befef`), PR #37
+  (`6e084e7`), PR #38 (`31b6834`) and PR #39 (`9026017`). The prior
   `social-wars-legacy-main` session ended at `1a6a89e` (PR #31) when its context
   filled during compaction, not because the roadmap was finished.
-- **Where that session stopped:** it had merged nine increments (#23–#31) and
-  classified the remaining open items. Most are genuine blockers (Flash live
+- **Where that earlier session stopped:** it had merged nine increments (#23–#31)
+  and classified the remaining open items. Most are genuine blockers (Flash live
   captures, licence-gated art, missing platform hosts/devices, rights-holder
   response, signing credentials, production release). The one actionable area
   it identified is Group B3/G3's screen backlog, which it left at 90 implemented
@@ -521,31 +523,52 @@ verified checkpoint, not at every tool call.
   the battle spell book (PR #35) — all merged with green CI. The spell book draws
   the learned-only, three-to-a-page model from `magic.ts` with spell levels,
   mana state and a cast button, without changing the screen counts (those
-  screens were already `implemented` as models).
-- **Verified roadmap state:** `node scripts/check-roadmap.mjs` reports 400 items,
+  screens were already `implemented` as models). Since the `b4aea12` checkpoint
+  the session also merged: the refreshed checkpoint (PR #36); the B7 premium and
+  offer-pack purchase-flow specification in
+  `re/docs/03-commands-quests-economy.md` (PR #10); the **server-owned mission
+  countdown** (PR #37), which is the landed form of the preserved mission-timer
+  WIP below; the **full WebKit (Playwright) end-to-end session** (PR #38) —
+  `scripts/e2e-test-webkit.py` driving the shared harness parameterised into an
+  `ENGINES` config, with player `e2e-ui-webkit`, data prefix `swl-wk-e2e-` and
+  its own screenshot, exit 0, no console errors and no `window.__swl` commands;
+  and the roadmap-drift corrections (PR #39). Firefox was re-run after the
+  shared-harness change and stayed green (`browsers run: firefox (Playwright,
+  Gecko)`, exit 0, no console errors).
+- **Verified roadmap state:** `node scripts/check-roadmap.mjs` reports 401 items,
   22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is 99 implemented /
-  52 dropped / 109 planned. This checkpoint documents state only — it does not
-  modify `docs/ROADMAP.md` or `re/data/ui-screens.json`.
+  52 dropped / 109 planned. The Status Summary still reads G 78/8 and the G5
+  blocker row now records Firefox and WebKit as verified, with branded Safari
+  and real devices the only unrun browsers. This checkpoint documents state
+  only — it does not modify `docs/ROADMAP.md` or `re/data/ui-screens.json`.
 - **Preserved WIP (mission timer):** the in-flight mission-timer changes are not
-  lost. They were saved as a patch at
+  lost, and have now landed. They were saved as a patch at
   `C:\Users\Edison\AppData\Local\Temp\opencode\mission-timer.patch` (13,682 bytes,
-  10 files) and verified to apply cleanly to `b4aea12` with `git apply --3way` in
-  a throwaway worktree, and remain as `stash@{0}` on the orchestrator checkout.
-  They are now owned by worker thread [Mission timer wiring](t3-thread://v2/1e103b76-04b0-4a8b-906e-1586e707da69/thread:delegated-task:command%3Amcp%3A7440c1fc-8080-43e5-8030-33e464b7a159%3Adelegate-task%3A92be84c0-9e0e-4b83-9c94-73ee93c16f59)
-  on branch `feat/server-mission-countdown`.
-- **Active orchestration:** parallel worktree workers cover the mission timer,
-  a blocker audit ([audit thread](t3-thread://v2/1e103b76-04b0-4a8b-906e-1586e707da69/thread:delegated-task:command%3Amcp%3A7440c1fc-8080-43e5-8030-33e464b7a159%3Adelegate-task%3A90c92235-6012-460e-b7da-091c18c88911)),
-  and a read-only review of stale PR #10. Only the orchestrator merges; no
-  worker merges its own branch.
-- **Next:** on worker wake, review each diff and its evidence, reconcile the
-  worktrees with `main`, merge in dependency order, then dispatch the next task
-  from the audit ranking. Continue reducing the planned screens in coherent,
-  player-facing families and re-audit the section 5 blockers before treating any
-  as final; do not claim frame-rate, platform or release items without evidence.
+  10 files), verified to apply cleanly to `b4aea12` with `git apply --3way` in a
+  throwaway worktree, and remained as `stash@{0}` on the orchestrator checkout.
+  The work was owned by worker thread [Mission timer wiring](t3-thread://v2/1e103b76-04b0-4a8b-906e-1586e707da69/thread:delegated-task:command%3Amcp%3A7440c1fc-8080-43e5-8030-33e464b7a159%3Adelegate-task%3A92be84c0-9e0e-4b83-9c94-73ee93c16f59)
+  on branch `feat/server-mission-countdown` and merged as PR #37 (`6e084e7`),
+  drawing the server-owned mission countdown. The patch history is preserved
+  here for audit.
+- **Worker threads:** the three threads carried over from the prior checkpoint
+  have all delivered on `main`: [Mission timer wiring](t3-thread://v2/1e103b76-04b0-4a8b-906e-1586e707da69/thread:delegated-task:command%3Amcp%3A7440c1fc-8080-43e5-8030-33e464b7a159%3Adelegate-task%3A92be84c0-9e0e-4b83-9c94-73ee93c16f59)
+  → PR #37; the blocker audit ([audit thread](t3-thread://v2/1e103b76-04b0-4a8b-906e-1586e707da69/thread:delegated-task:command%3Amcp%3A7440c1fc-8080-43e5-8030-33e464b7a159%3Adelegate-task%3A90c92235-6012-460e-b7da-091c18c88911))
+  → the count and blocker corrections in PR #39; and the read-only review of
+  stale PR #10 → PR #10. Only the orchestrator merges; no worker merges its own
+  branch. This checkpoint refresh is a documentation-only increment prepared on
+  its own task branch for review, not a merge.
+- **Next, from the audit ranking:** re-audit the section 5 blockers before
+  treating any as final, and keep reducing the 109 planned B6 screens in
+  coherent, player-facing families. The remaining platform and release items
+  should be advanced only with evidence: branded Safari and real devices, signed
+  installers, Linux bundling in CI and a macOS runner, the Flash live captures
+  and the differential test. Do not claim frame-rate, platform or release items
+  without evidence, and do not reopen the Firefox/WebKit verdicts recorded in
+  `docs/ROADMAP.md`.
 - **Environment note (historical):** `node scripts/check-no-flash.mjs` failed
   locally during the PR #32 verification on stale built `dist/content-bundle.json`
   and `dist/frame-manifest.json` files (SWF string references); this was a local
   build-artefact condition, not a source change. CI's Scan check passed.
 - **On resume:** re-read this file and `docs/ROADMAP.md`, check `git status`,
   `git stash list`, `git worktree list` and `gh pr checks`, then continue from the
-  verified `b4aea12` state and the active worker results above.
+  verified `9026017` state and the worker results above.
