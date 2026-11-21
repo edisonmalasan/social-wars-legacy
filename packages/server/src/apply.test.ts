@@ -970,6 +970,162 @@ describe('the commands whose cost the server computes', () => {
   });
 });
 
+describe('expanding the town', () => {
+  // The content's expansion price table: the first four tiles are free, the
+  // fifth costs 2500 gold + 5 cash, the sixth 5000 + 8. The neighbours and
+  // inventory columns exist in the content but their inputs are not
+  // server-owned here, so the applier must not enforce them.
+  const prices = [
+    { coins: 0, cash: 0, neighbors: 0, inventory_qte: 0 },
+    { coins: 0, cash: 0, neighbors: 0, inventory_qte: 0 },
+    { coins: 0, cash: 0, neighbors: 0, inventory_qte: 0 },
+    { coins: 0, cash: 0, neighbors: 0, inventory_qte: 0 },
+    { coins: 2500, cash: 5, neighbors: 1, inventory_qte: 1 },
+    { coins: 5000, cash: 8, neighbors: 2, inventory_qte: 2 },
+  ];
+  const expansionDeps = (over: Partial<ApplierDeps> = {}): ApplierDeps =>
+    deps({ expansionPrices: prices, ...over });
+  const rich = (): ShimWorld['resources'] => purse({ g: 100_000, c: 100_000 });
+
+  /** A save with the given owned tiles; omitting them models an older save. */
+  function expansionWorld(
+    expansions?: number[],
+    resources: ShimWorld['resources'] = rich(),
+  ): ShimWorld {
+    const map: Record<string, unknown> = { id: 0, items: {}, store: {} };
+    if (expansions !== undefined) map['expansions'] = [...expansions];
+    return {
+      save: { playerInfo: {}, maps: [map], privateState: {} },
+      resources,
+      nextCommandNumber: 1,
+    };
+  }
+  const owned = (world: ShimWorld): unknown =>
+    (world.save.maps[0] as Record<string, unknown>)['expansions'];
+
+  it('charges the content price at the owned ordinal, ignoring declared values', () => {
+    const applier = createApplier(expansionDeps());
+    // Four tiles are already owned, so this is the fifth: 2500g + 5c. The
+    // client's price and type arguments are claims and change nothing.
+    const outcome = applier(expansionWorld([35, 36, 45, 46]), {
+      name: 'expand',
+      args: [47, 1, 'free'],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 100_000 - 2500);
+    assert.equal(outcome.world.resources['c'], 100_000 - 5);
+    assert.deepEqual(owned(outcome.world), [35, 36, 45, 46, 47]);
+  });
+
+  it('prices the next tile by the owned count, not by the tile id', () => {
+    const applier = createApplier(expansionDeps());
+    const first = applier(expansionWorld([35, 36, 45, 46]), {
+      name: 'expand',
+      args: [999],
+    });
+    assert.equal(first.applied, true);
+    assert.equal(first.world.resources['g'], 100_000 - 2500);
+    assert.equal(first.world.resources['c'], 100_000 - 5);
+
+    // Now five tiles are owned: the next is ordinal 5, whatever its tile id.
+    const second = applier(first.world, { name: 'expand', args: [123] });
+    assert.equal(second.applied, true);
+    assert.equal(second.world.resources['g'], 100_000 - 2500 - 5000);
+    assert.equal(second.world.resources['c'], 100_000 - 5 - 8);
+    assert.deepEqual(owned(second.world), [35, 36, 45, 46, 999, 123]);
+  });
+
+  it('refuses a tile id that is not a positive integer', () => {
+    const applier = createApplier(expansionDeps());
+    for (const bad of [0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, 'abc', undefined]) {
+      const outcome = applier(expansionWorld([35, 36, 45, 46]), {
+        name: 'expand',
+        args: [bad],
+      });
+      assert.equal(outcome.applied, false, `tile ${String(bad)}`);
+      assert.equal(outcome.world.resources['g'], 100_000);
+      assert.deepEqual(owned(outcome.world), [35, 36, 45, 46]);
+    }
+  });
+
+  it('refuses a tile that is already owned', () => {
+    const applier = createApplier(expansionDeps());
+    const outcome = applier(expansionWorld([35, 36, 45, 46]), {
+      name: 'expand',
+      args: [36],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'already-owned');
+    assert.equal(outcome.world.resources['g'], 100_000);
+    assert.deepEqual(owned(outcome.world), [35, 36, 45, 46]);
+  });
+
+  it('refuses an expansion past the end of the content table', () => {
+    const applier = createApplier(expansionDeps());
+    // Six owned tiles; ordinal 6 is past the six-row table.
+    const outcome = applier(expansionWorld([35, 36, 45, 46, 47, 48]), {
+      name: 'expand',
+      args: [49],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'expansion-limit');
+    assert.equal(outcome.world.resources['g'], 100_000);
+    assert.deepEqual(owned(outcome.world), [35, 36, 45, 46, 47, 48]);
+  });
+
+  it('refuses an unaffordable expansion without touching the wallet or the save', () => {
+    const applier = createApplier(expansionDeps());
+    const outcome = applier(
+      expansionWorld([35, 36, 45, 46], purse({ g: 2499, c: 100 })),
+      { name: 'expand', args: [47] },
+    );
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'insufficient-resources');
+    assert.equal(outcome.world.resources['g'], 2499);
+    assert.equal(outcome.world.resources['c'], 100);
+    assert.deepEqual(owned(outcome.world), [35, 36, 45, 46]);
+  });
+
+  it('defaults to no owned tiles when the save has no expansions field', () => {
+    const applier = createApplier(expansionDeps());
+    const outcome = applier(expansionWorld(), { name: 'expand', args: [47] });
+    assert.equal(outcome.applied, true);
+    // Ordinal 0 is free in the content table; no charge, no crash.
+    assert.equal(outcome.world.resources['g'], 100_000);
+    assert.equal(outcome.world.resources['c'], 100_000);
+    assert.deepEqual(owned(outcome.world), [47]);
+  });
+
+  it('refuses a replayed tile without charging twice or appending twice', () => {
+    const applier = createApplier(expansionDeps());
+    const first = applier(expansionWorld([35, 36, 45, 46]), {
+      name: 'expand',
+      args: [47],
+    });
+    assert.equal(first.applied, true);
+    const goldAfterFirst = first.world.resources['g'];
+    const replay = applier(first.world, { name: 'expand', args: [47] });
+    assert.equal(replay.applied, false);
+    assert.equal(replay.refused, 'already-owned');
+    assert.equal(replay.world.resources['g'], goldAfterFirst);
+    assert.deepEqual(owned(replay.world), [35, 36, 45, 46, 47]);
+  });
+
+  it('stays payable after the world is serialized and restored', () => {
+    const applier = createApplier(expansionDeps());
+    const first = applier(expansionWorld([35, 36, 45, 46]), {
+      name: 'expand',
+      args: [47],
+    });
+    const restored = JSON.parse(JSON.stringify(first.world)) as ShimWorld;
+    const second = applier(restored, { name: 'expand', args: [48] });
+    assert.equal(second.applied, true);
+    assert.equal(second.world.resources['g'], 100_000 - 2500 - 5000);
+    assert.equal(second.world.resources['c'], 100_000 - 5 - 8);
+    assert.deepEqual(owned(second.world), [35, 36, 45, 46, 47, 48]);
+  });
+});
+
 describe('the training queue', () => {
   const academy = () => item({ id: 30, trainsIds: [1007], trainingTime: 60 });
   const soldier = () =>

@@ -167,11 +167,14 @@ describe('computing a cost', () => {
     });
   });
 
-  it('prices an expansion from the price table, not from the argument', async () => {
+  it('leaves an expansion unpriced for the applier to charge', async () => {
     const c = await content();
-    // The fifth expansion costs 2500 gold and 5 cash.
+    // args[0] is a TILE ID, not an owned ordinal; only the applier knows how
+    // many tiles the server's save says are owned. Like a darts shot, the
+    // expansion is charged inside the applier, never from the client's price.
     const cost = computeCommandCost(c, 'expand', [4, 999999, 0]);
-    assert.deepEqual(cost?.cost, { g: 2500, c: 5 });
+    assert.deepEqual(cost?.cost, {});
+    assert.deepEqual(cost?.gain, {});
   });
 
   it('prices an attack at 30 energy and a spy at 15', async () => {
