@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "planned": 109,
+   "planned": 100,
    "dropped": 52,
-   "implemented": 99
+   "implemented": 108
   }
  },
  "screens": [
@@ -317,8 +317,8 @@
    ],
    "overrides": [],
    "bytes": 2675,
-   "decision": "planned",
-   "decisionNote": "Deferred: the assault countdown's init/finish/stopCountdown lifecycle has no client counterpart; unblock when an assault screen renders a server-owned timer."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.6: `apps/client/src/ui/assault.tsx` draws assaultCountdown (`packages/client/src/featurestate.ts`), a presentation of the server's tsAttacksReset against the client clock; the client never decides when attacks reset."
   },
   {
    "class": "BuildingWindow",
@@ -926,8 +926,8 @@
     "UpdateImage"
    ],
    "bytes": 9580,
-   "decision": "planned",
-   "decisionNote": "Deferred: the special-attack portrait's startCastingMask and 'Not ready yet!' state are not modelled; unblock when a combat HUD renders special attacks."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.6: the combat HUD (`apps/client/src/ui/assault.tsx`) draws a special-attack portrait for each server-published charge via specialAttackHud (`packages/client/src/featurestate.ts`); the 15 classes and shapes come from `packages/rules/src/specialattacks.ts`. 'Not ready yet!' is shown only when the server says the attack is not ready."
   },
   {
    "class": "PortraitSpecialAttackLimit",
@@ -955,8 +955,8 @@
     "update"
    ],
    "bytes": 4328,
-   "decision": "planned",
-   "decisionNote": "Deferred: the charge-limit portrait's 'not charged yet' state has no client model; unblock when special-attack charging is rendered in the combat HUD."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.6: the limit portrait (`apps/client/src/ui/assault.tsx`) reads specialAttackHud (`packages/client/src/featurestate.ts`), showing 'not charged yet' only when the server publishes a charge record with no ready attack; the casting mask is a presentation of the server's own fraction, never a client-rolled charge."
   },
   {
    "class": "PortraitTrainQueue",
@@ -2381,8 +2381,8 @@
    ],
    "overrides": [],
    "bytes": 1244,
-   "decision": "planned",
-   "decisionNote": "Deferred: the battle simulation is already modelled, but the assault-history popup has no client screen."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.6: the assault-history popup is drawn by `apps/client/src/ui/assault.tsx` from assaultHistory (`packages/client/src/featurestate.ts`), which copies the server's attacksSent/attacksReceived/tsAttacksReset verbatim; the simulation in `packages/rules/src/simulate.ts` is never re-run in the client."
   },
   {
    "class": null,
@@ -2402,8 +2402,8 @@
    ],
    "overrides": [],
    "bytes": 1649,
-   "decision": "planned",
-   "decisionNote": "Deferred: the assault loot is already modelled, but the attack-result popup has no client screen."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.6: the attack-result popup is drawn by `apps/client/src/ui/assault.tsx` from lastAssaultResult (`packages/client/src/featurestate.ts`); loot rows appear only for entries the server persisted in its receipt, and `packages/rules/src/loot.ts` is the vocabulary, never a client-side payout."
   },
   {
    "class": null,
@@ -3838,8 +3838,8 @@
    ],
    "overrides": [],
    "bytes": 7956,
-   "decision": "planned",
-   "decisionNote": "Deferred: the battle-options popup's four defensive strategies and their descriptions have no client model; unblock when defensive selection is rendered from server state."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.6: the options popup (`apps/client/src/ui/assault.tsx`) renders the four defensive strategies from battleOptions (`packages/client/src/featurestate.ts`), reading privateState.strategy as the server's choice; the descriptions are the client's own text and each gesture sends set_strategy, one of the 94 catalogue commands."
   },
   {
    "class": "PopUpLost",
@@ -3930,8 +3930,8 @@
    ],
    "overrides": [],
    "bytes": 18894,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P1) a full unit roster is not required to train units or play the weekly quest from the chapter map."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.6: the all-units roster is drawn as the result popup's 'Your Army' section, using armyView (`packages/client/src/army.ts`) over the server's store and boughtUnits; the collection-reward art is not claimed, only the roster list the screen shares with `apps/client/src/ui/assault.tsx`."
   },
   {
    "class": "PopupAssaultHistory",
@@ -3972,8 +3972,8 @@
    ],
    "overrides": [],
    "bytes": 7082,
-   "decision": "planned",
-   "decisionNote": "Deferred: the battle simulation is already modelled, but the assault-history popup has no client screen."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.6: the assault-history popup is drawn by `apps/client/src/ui/assault.tsx` from assaultHistory (`packages/client/src/featurestate.ts`), which copies the server's attacksSent/attacksReceived/tsAttacksReset verbatim; the simulation in `packages/rules/src/simulate.ts` is never re-run in the client."
   },
   {
    "class": "PopupAttackFinished",
@@ -4027,8 +4027,8 @@
    ],
    "overrides": [],
    "bytes": 23865,
-   "decision": "planned",
-   "decisionNote": "Deferred: the assault loot is already modelled, but the attack-result popup has no client screen."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.6: the attack-result popup is drawn by `apps/client/src/ui/assault.tsx` from lastAssaultResult (`packages/client/src/featurestate.ts`); loot rows appear only for entries the server persisted in its receipt, and `packages/rules/src/loot.ts` is the vocabulary, never a client-side payout."
   },
   {
    "class": "PopupBuilding",

@@ -5,6 +5,14 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { buildMenu } from './buildmenu.ts';
+import {
+  assaultCountdown,
+  assaultHistory,
+  battleOptions,
+  lastAssaultResult,
+  specialAttackHud,
+} from './featurestate.ts';
+import type { WorldSnapshot } from './session.ts';
 
 function repoRoot(): string {
   let dir = process.cwd();
@@ -49,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 99,
+      implemented: 108,
       dropped: 52,
-      planned: 109,
+      planned: 100,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -236,5 +244,210 @@ describe('the screens the clone has modelled', () => {
       },
     ];
     assert.equal(buildMenu(items, 10).length, 1);
+  });
+});
+
+/**
+ * A save with the fields every world has. Assault selectors must read only
+ * the server's own keys: a world with none of them is an older save, not a
+ * source of invented outcomes, loot, history, charges or countdowns.
+ */
+function world(privateState: Record<string, unknown> = {}): WorldSnapshot {
+  return {
+    maps: [{ id: 0, items: {} }],
+    resources: { g: 0, w: 0, o: 0, s: 0, c: 0, e: 0, x: 0, m: 0 },
+    privateState,
+  } as unknown as WorldSnapshot;
+}
+
+describe('the assault result receipt', () => {
+  it('reads the server-owned win flag without inventing loot', () => {
+    const view = lastAssaultResult(world({ lastAssaultWon: true }))!;
+    assert.equal(view.won, true);
+    assert.equal(view.settled, false);
+    assert.deepEqual(view.loot, []);
+    assert.equal(view.unitsAlive, null);
+    assert.equal(view.unitsDead, null);
+    assert.equal(view.opponent, null);
+    assert.equal(view.recordedAt, null);
+  });
+
+  it('reads the exact loot rows and army counts the server persisted', () => {
+    const view = lastAssaultResult(world({
+      lastAssaultWon: true,
+      lastAssaultResult: {
+        won: true,
+        rewards: [{ resource: 'gold', amount: 1200 }, { resource: 'xp', amount: 60 }],
+        unitsAlive: 14,
+        unitsDead: 3,
+        opponent: 'village-9',
+        recordedAt: 1_700_000_000,
+      },
+    }))!;
+    assert.equal(view.won, true);
+    assert.equal(view.settled, true);
+    assert.deepEqual(view.loot, [
+      { resource: 'gold', amount: 1200 },
+      { resource: 'xp', amount: 60 },
+    ]);
+    assert.equal(view.unitsAlive, 14);
+    assert.equal(view.unitsDead, 3);
+    assert.equal(view.opponent, 'village-9');
+    assert.equal(view.recordedAt, 1_700_000_000);
+  });
+
+  it('ignores malformed rows rather than paying a resource the server did not', () => {
+    const view = lastAssaultResult(world({
+      lastAssaultWon: false,
+      lastAssaultResult: {
+        won: false,
+        rewards: [
+          { resource: 'gold', amount: 10 },
+          { resource: 'not-a-resource', amount: 50 },
+          { resource: 'xp', amount: 'sixty' },
+          null,
+        ],
+        unitsAlive: Number.NaN,
+        unitsDead: -1,
+        opponent: 42,
+        recordedAt: 'later',
+      },
+    }))!;
+    assert.equal(view.won, false);
+    assert.deepEqual(view.loot, [{ resource: 'gold', amount: 10 }]);
+    assert.equal(view.unitsAlive, null);
+    assert.equal(view.unitsDead, -1);
+    assert.equal(view.opponent, null);
+    assert.equal(view.recordedAt, null);
+  });
+
+  it('is null when the server has answered no assault at all', () => {
+    assert.equal(lastAssaultResult(world()), null);
+  });
+});
+
+describe('the assault battle history', () => {
+  it('reads the sent and received lists the server actually answered', () => {
+    const view = assaultHistory(world({
+      attacksSent: [
+        { opponent: 'village-9', won: true, gold: 1200, at: 1_700_000_000 },
+        { opponent: 'village-3', won: false, gold: 0, at: 1_699_990_000 },
+      ],
+      attacksReceived: [{ opponent: 'village-7', won: false, gold: 30, at: 1_699_980_000 }],
+      tsAttacksReset: 1_700_360_000,
+    }))!;
+    assert.equal(view.sent.length, 2);
+    assert.deepEqual(view.sent[0], {
+      opponent: 'village-9', won: true, gold: 1200, at: 1_700_000_000,
+    });
+    assert.equal(view.received.length, 1);
+    assert.equal(view.received[0]!.opponent, 'village-7');
+    assert.equal(view.resetAt, 1_700_360_000);
+  });
+
+  it('skips malformed rows instead of inventing a battle', () => {
+    const view = assaultHistory(world({
+      attacksSent: [null, 'battle', {}, { opponent: 7, won: 'yes', gold: [], at: 'now' }],
+    }))!;
+    assert.deepEqual(view.sent, []);
+    assert.equal(view.received.length, 0);
+    assert.equal(view.resetAt, null);
+  });
+
+  it('is null when the save has no history keys', () => {
+    assert.equal(assaultHistory(world()), null);
+  });
+});
+
+describe('the assault countdown', () => {
+  it('counts down from the server reset timestamp', () => {
+    assert.deepEqual(assaultCountdown(world({ tsAttacksReset: 1_700_010_000 }), 1_700_000_000), {
+      endsAt: 1_700_010_000,
+      secondsRemaining: 10_000,
+    });
+  });
+
+  it('never shows a negative countdown', () => {
+    const view = assaultCountdown(world({ tsAttacksReset: 1_700_000_000 }), 1_700_000_001)!;
+    assert.equal(view.secondsRemaining, 0);
+  });
+
+  it('is null when the server published no reset timestamp', () => {
+    assert.equal(assaultCountdown(world(), 0), null);
+    assert.equal(assaultCountdown(world({ tsAttacksReset: 'soon' }), 0), null);
+  });
+});
+
+describe('the defensive battle options', () => {
+  it('reads the strategy the server owns', () => {
+    assert.deepEqual(battleOptions(world({ strategy: 3 })), { selected: 3 });
+  });
+
+  it('is null when the server published no usable strategy', () => {
+    for (const raw of [undefined, 0, 5, 'defensive', Number.NaN]) {
+      assert.equal(battleOptions(world({ strategy: raw })), null, String(raw));
+    }
+  });
+});
+
+describe('the special-attack charge HUD', () => {
+  it('lists only the classes the server publishes, with the rules shape', () => {
+    const view = specialAttackHud(world({
+      specialAttackCharges: {
+        ChargeAttack: { ready: true, charge: 1 },
+        VortexSpecialAttack: { ready: false, charge: 0.25, limit: true },
+      },
+    }));
+    assert.deepEqual(view, [
+      { id: 'ChargeAttack', shape: 'movement', ready: true, charge: 1, limit: false },
+      { id: 'VortexSpecialAttack', shape: 'pulse', ready: false, charge: 0.25, limit: true },
+    ]);
+  });
+
+  it('ignores unknown classes and never invents a charge', () => {
+    const view = specialAttackHud(world({
+      specialAttackCharges: {
+        MadeUpAttack: { ready: true, charge: 1 },
+        MeleeSpecialAttack: { ready: 'yes', charge: Number.NaN },
+      },
+    }));
+    assert.deepEqual(view, [
+      { id: 'MeleeSpecialAttack', shape: 'single', ready: null, charge: null, limit: false },
+    ]);
+  });
+
+  it('is empty when the server publishes no charge state', () => {
+    assert.deepEqual(specialAttackHud(world()), []);
+  });
+});
+
+describe('the assault screen family decisions', () => {
+  const ASSAULT_SCREENS = [
+    'PopupAssaultHistoryMC.as',
+    'popups/PopupAssaultHistory.as',
+    'PopupAttackFinishedMC.as',
+    'popups/PopupAttackFinished.as',
+    'GUI/AssaultCountdown.as',
+    'GUI/PortraitSpecialAttack.as',
+    'GUI/PortraitSpecialAttackLimit.as',
+    'popups/PopUpBattleOptions.as',
+  ];
+
+  it('records each screen as implemented against a model that exists', async () => {
+    const all = await screens();
+    for (const path of ASSAULT_SCREENS) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`packages\/client\/src\/featurestate\.ts`/);
+    }
+  });
+
+  it('records the army roster behind the result screen against its model', async () => {
+    const all = await screens();
+    const roster = all.find((entry) => entry.path === 'popups/PopupAllUnits.as');
+    assert.ok(roster);
+    assert.equal(roster!.decision, 'implemented');
+    assert.match(roster!.decisionNote, /`packages\/client\/src\/army\.ts`/);
   });
 });

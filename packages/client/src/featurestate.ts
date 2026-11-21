@@ -15,7 +15,13 @@
  * `PrivateState` interfaces).
  */
 import { RESOURCE_ORDER, type Reward } from '@swl/protocol';
-import type { Army } from '@swl/rules';
+import {
+  SPECIAL_ATTACKS,
+  SPECIAL_ATTACK_CLASSES,
+  type SpecialAttackClass,
+  type SpecialAttackShape,
+  type Army,
+} from '@swl/rules';
 
 import type { WorldSnapshot } from './session.ts';
 
@@ -454,4 +460,218 @@ export function productionState(
 export function ownedExpansions(world: WorldSnapshot): number[] {
   const map = record(world.maps[0]);
   return map ? numberList(map['expansions']) : [];
+}
+
+/* -------------------------------------------------------------------------
+ * Assault result, battle history and the combat HUD
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The server's answer to the last assault, as a view of the save.
+ *
+ * The outcome is the `lastAssaultWon` flag the applier writes when it settles
+ * `end_attack`. A richer `lastAssaultResult` receipt may carry the exact loot
+ * rows and army counts the server paid; the client reads them when present and
+ * draws **no** loot row at all when the server did not write one. This is a
+ * reading of a past answer, never a second result authority: nothing pays
+ * from it, and re-opening the popup cannot grant a resource.
+ */
+export interface AssaultResultView {
+  /** Whether the server says the assault was won. */
+  readonly won: boolean;
+  /** Whether the server wrote a structured receipt, not only the win flag. */
+  readonly settled: boolean;
+  /** The exact rows the server recorded, in the wire's resource vocabulary. */
+  readonly loot: readonly Reward[];
+  /** The server's surviving unit count, or null when it did not publish one. */
+  readonly unitsAlive: number | null;
+  /** The server's lost unit count, or null when it did not publish one. */
+  readonly unitsDead: number | null;
+  /** The opponent the server named, or null when it did not. */
+  readonly opponent: string | null;
+  /** When the server settled the attack, or null when it did not say. */
+  readonly recordedAt: number | null;
+}
+
+/**
+ * Read the last assault result, or `null` when the save has no answer at all.
+ *
+ * A bare win flag is an honest, if thin, answer: it reads as unsettled with no
+ * loot rather than as a fabricated receipt. Malformed rows are dropped, never
+ * guessed at.
+ */
+export function lastAssaultResult(world: WorldSnapshot): AssaultResultView | null {
+  const state = world.privateState;
+  const stored = record(state['lastAssaultResult']);
+  if (!stored && !has(state, 'lastAssaultWon')) return null;
+  const win = stored && typeof stored['won'] === 'boolean'
+    ? stored['won']
+    : flag(state['lastAssaultWon']);
+
+  const allowed = new Set<string>(RESOURCE_ORDER);
+  const loot: Reward[] = [];
+  if (Array.isArray(stored?.['rewards'])) {
+    for (const entry of stored!['rewards'] as unknown[]) {
+      const row = record(entry);
+      const resource = row?.['resource'];
+      const amount = row ? number(row['amount']) : null;
+      if (!row || typeof resource !== 'string' || !allowed.has(resource) || amount === null) {
+        continue;
+      }
+      loot.push({ resource: resource as Reward['resource'], amount });
+    }
+  }
+
+  return {
+    won: win,
+    settled: stored !== null,
+    loot,
+    unitsAlive: stored ? number(stored['unitsAlive']) : null,
+    unitsDead: stored ? number(stored['unitsDead']) : null,
+    opponent: stored && typeof stored['opponent'] === 'string' ? stored['opponent'] : null,
+    recordedAt: stored ? number(stored['recordedAt']) : null,
+  };
+}
+
+/** One row of the battle history, with only the fields the server wrote. */
+export interface AssaultHistoryEntry {
+  /** The opponent, when the server named one. */
+  readonly opponent: string | null;
+  /** The outcome, when the server recorded one. */
+  readonly won: boolean | null;
+  /** The gold, when the server recorded an amount. */
+  readonly gold: number | null;
+  /** When the server recorded the battle, when it said. */
+  readonly at: number | null;
+}
+
+/** The server's battle history and attack-reset timestamp. */
+export interface AssaultHistoryView {
+  /** The attacks the player sent. */
+  readonly sent: readonly AssaultHistoryEntry[];
+  /** The attacks the player received. */
+  readonly received: readonly AssaultHistoryEntry[];
+  /** The server's attack-reset timestamp, or null when it has none. */
+  readonly resetAt: number | null;
+}
+
+/** Copy only rows that carry at least one readable, server-owned field. */
+function historyRows(value: unknown): AssaultHistoryEntry[] {
+  if (!Array.isArray(value)) return [];
+  const out: AssaultHistoryEntry[] = [];
+  for (const raw of value) {
+    const row = record(raw);
+    if (!row) continue;
+    const opponent = typeof row['opponent'] === 'string' ? row['opponent'] : null;
+    const won = typeof row['won'] === 'boolean' ? row['won'] : null;
+    const gold = number(row['gold']);
+    const at = number(row['at']);
+    if (opponent === null && won === null && gold === null && at === null) continue;
+    out.push({ opponent, won, gold, at });
+  }
+  return out;
+}
+
+/**
+ * Read the battle history, or `null` when the save has no history keys.
+ *
+ * The lists are the server's (`attacksSent` and `attacksReceived` in
+ * `privateState`); this selector only copies the finite and typed fields out
+ * of them. An unreadable row is skipped rather than turned into an invented
+ * battle.
+ */
+export function assaultHistory(world: WorldSnapshot): AssaultHistoryView | null {
+  const state = world.privateState;
+  const present =
+    has(state, 'attacksSent') || has(state, 'attacksReceived') || has(state, 'tsAttacksReset');
+  if (!present) return null;
+  return {
+    sent: historyRows(state['attacksSent']),
+    received: historyRows(state['attacksReceived']),
+    resetAt: number(state['tsAttacksReset']),
+  };
+}
+
+/**
+ * The assault countdown, from the server's `tsAttacksReset`.
+ *
+ * The remaining seconds are a presentation of the server's timestamp against
+ * the caller's clock; the server decides when the attacks actually reset.
+ */
+export interface AssaultCountdownView {
+  /** The server's reset timestamp. */
+  readonly endsAt: number;
+  /** Whole seconds left, clamped at zero. Presentation only. */
+  readonly secondsRemaining: number;
+}
+
+/** Read the assault countdown, or `null` when the server published no reset. */
+export function assaultCountdown(
+  world: WorldSnapshot,
+  now: number,
+): AssaultCountdownView | null {
+  const endsAt = number(world.privateState['tsAttacksReset']);
+  if (endsAt === null) return null;
+  return { endsAt, secondsRemaining: Math.max(0, endsAt - now) };
+}
+
+/** The defensive strategy the server owns. */
+export interface BattleOptionsView {
+  /** The 1-based strategy from `privateState.strategy`. */
+  readonly selected: number;
+}
+
+/**
+ * Read the selected defensive strategy, or `null` when the server published
+ * no usable one. The four strategy names and descriptions are the client's own
+ * text; the **choice** is entirely the server's.
+ */
+export function battleOptions(world: WorldSnapshot): BattleOptionsView | null {
+  const selected = number(world.privateState['strategy']);
+  if (selected === null || !Number.isInteger(selected) || selected < 1 || selected > 4) {
+    return null;
+  }
+  return { selected };
+}
+
+/** One special-attack portrait's charge and ready state, as the server owns it. */
+export interface SpecialAttackChargeView {
+  /** The rules model's class name, which names the portrait. */
+  readonly id: SpecialAttackClass;
+  /** The rules model's shape, used only to describe the portrait. */
+  readonly shape: SpecialAttackShape;
+  /** The server's ready flag, or null when it published none. */
+  readonly ready: boolean | null;
+  /** The server's charge fraction, or null when it published none. */
+  readonly charge: number | null;
+  /** Whether the server marked this as the limit-gated portrait. */
+  readonly limit: boolean;
+}
+
+/**
+ * Read the special-attack charge HUD, in the rules' own class order.
+ *
+ * Only classes the server actually reports are listed, and only its own
+ * ready/charge values are copied. The rules model supplies the vocabulary
+ * (class and shape); it is never run here to invent a charge or a "ready"
+ * state. A save with no charge record yields an empty HUD, not a full set of
+ * fabricated portraits.
+ */
+export function specialAttackHud(world: WorldSnapshot): SpecialAttackChargeView[] {
+  const charges = record(world.privateState['specialAttackCharges']);
+  if (!charges) return [];
+  const out: SpecialAttackChargeView[] = [];
+  for (const id of SPECIAL_ATTACK_CLASSES) {
+    const row = record(charges[id]);
+    if (!row) continue;
+    const raw = number(row['charge']);
+    out.push({
+      id,
+      shape: SPECIAL_ATTACKS[id].shape,
+      ready: typeof row['ready'] === 'boolean' ? row['ready'] : null,
+      charge: raw === null ? null : Math.min(1, Math.max(0, raw)),
+      limit: flag(row['limit']),
+    });
+  }
+  return out;
 }
