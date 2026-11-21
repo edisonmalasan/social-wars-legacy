@@ -215,7 +215,11 @@ first means guessing at the rules being cloned.
       (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
       attack interval, the velocity, the life and the population
 - [ ] The panels and the popups are **rendered**, and the popups that are not
-      implemented are recorded as dropped
+      implemented are recorded as dropped. The screen inventory now reads **90
+      implemented / 52 dropped / 118 planned**; the counts are checked by
+      `packages/client/src/screens.test.ts`, and this item stays open while **118
+      screens are planned** - a `Deferred: ` reason records honest scope, not a
+      rendered screen or a drop
 - [x] The authoritative **item id → delegate** map is extracted from
       `DelegatesManager.registerDelegate()` and `core/Constants.as`, covering **679 of the
       724** client item ids ([`../re/data/item-delegate-map.json`](../re/data/item-delegate-map.json))
@@ -1182,18 +1186,23 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **106 implemented** - the clone models the screen's behaviour, and the decision
+      - **90 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
-      - **23 dropped**, each with its reason: the upstream's administrative panel (a
+      - **52 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **131 planned** - in scope, the client's behaviour is real, and not modelled
-        yet
+      - **118 planned** - in scope, the client's behaviour is real, and not modelled
+        yet; each now carries a `Deferred: ` reason saying what is missing or how it
+        unblocks
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
-      exists, and every dropped one must say why
+      exists, every dropped one must say why, and every planned one must start with
+      `Deferred: ` and say what is missing or how it unblocks. The counts above are
+      checked by the same test. **This item stays open while 118 screens are planned**:
+      a deferral reason is neither an implementation nor a drop, and the earlier
+      106/23/131 breakdown was a factual error, not a hidden batch of finished work
 - [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
       the level, the population and the energy, and every popover's text — the
       client's own literals, including the "Build more Silos to get more space"
@@ -2699,7 +2708,7 @@ be mistaken for unfinished work.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 131 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 131; the art gate applies to the drawn ones |
+| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 118 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 118; the art gate applies to the drawn ones |
 | B | PvP `end_attack` payload captured live | Needs a live second player and the original Flash client driven over CDP | A Flash test rig with two live accounts |
 | B | `attack_player` / `spy_player` payloads captured live | Same as above | The same Flash test rig |
 | B | Premium purchase flow captured live | Needs a real-money account, which the preservation project must not use | A funded test account and explicit approval |
@@ -2711,7 +2720,7 @@ be mistaken for unfinished work.*
 |---|---|---|---|
 | G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout, or a licensing decision |
 | G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented | Licence or re-create the art (I6) |
-| G | Every B6 screen implemented or explicitly dropped | 131 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 131 |
+| G | Every B6 screen implemented or explicitly dropped | 118 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 118 |
 | G | Client runs in Firefox and Safari | Neither browser is installed here, and the harness speaks Chrome DevTools Protocol only | Install both browsers and use a harness that can drive them |
 | G | Desktop build runs on Windows, macOS and Linux | Only Windows is available; macOS/Linux need their own build hosts | CI runners for all three platforms |
 | G | Mobile build runs on Android and iOS | No Capacitor, Android SDK or Xcode on this machine | Install the Capacitor toolchain and SDKs |

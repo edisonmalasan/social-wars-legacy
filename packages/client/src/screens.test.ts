@@ -76,6 +76,25 @@ describe('the screen inventory', () => {
     }
   });
 
+  it('gives every planned screen a checked deferral reason', async () => {
+    // A planned screen is in-scope work, not a finished one. Its note must
+    // say what is missing or what unblocks it, so deferrals stay testable
+    // rather than being a synonym for "we never got round to it".
+    const all = await screens();
+    const planned = all.filter((screen) => screen.decision === 'planned');
+    assert.ok(planned.length > 0, 'nothing is planned');
+    for (const screen of planned) {
+      assert.ok(
+        screen.decisionNote.startsWith('Deferred: '),
+        `${screen.path} is planned without a "Deferred: " reason`,
+      );
+      assert.ok(
+        screen.decisionNote.length > 40,
+        `${screen.path} is planned without saying what is missing or how it unblocks`,
+      );
+    }
+  });
+
   it('drops the upstream administrative panel', async () => {
     // The clone has no administrative interface: a panel that could edit
     // the rules would be the `flash_debug` hole again.
