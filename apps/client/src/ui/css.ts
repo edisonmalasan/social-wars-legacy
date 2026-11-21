@@ -1595,6 +1595,98 @@ export function uiCss(): string {
   color: var(--swl-accent);
 }
 
+/* --- The onboarding family ---------------------------------------------- */
+
+/* The launcher is a narrow strip between the goals and the chapter map. It
+   holds gestures only: opening a panel never changes the world. */
+.swl-onboarding-launcher {
+  position: absolute;
+  left: 316px;
+  top: 58px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  pointer-events: auto;
+}
+
+.swl-onboarding-launcher button {
+  padding: 3px 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  background: var(--swl-surface);
+  color: var(--swl-ink-muted);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  text-align: left;
+  white-space: nowrap;
+}
+
+.swl-onboarding-launcher button:hover,
+.swl-onboarding-launcher button:focus-visible {
+  border-color: var(--swl-accent);
+  color: var(--swl-accent);
+}
+
+/* The help body reuses the tutorial overlay's type, so the panel reads as the
+   same tutorial the arrow is pointing through. */
+.swl-onboarding-help,
+.swl-onboarding-next,
+.swl-onboarding-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--swl-gap);
+}
+
+.swl-onboarding-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--swl-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swl-onboarding-steps li {
+  padding: var(--swl-gap);
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface);
+}
+
+.swl-onboarding-steps .swl-onboarding-step-current {
+  border-color: var(--swl-accent);
+}
+
+.swl-onboarding-empty,
+.swl-onboarding-note {
+  margin: 0;
+  color: var(--swl-ink-muted);
+}
+
+.swl-onboarding-confirm-message {
+  margin: 0;
+  color: var(--swl-ink);
+}
+
+.swl-onboarding-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--swl-gap);
+}
+
+.swl-onboarding-actions button {
+  padding: 5px 10px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+
+.swl-onboarding-actions button:hover:not(:disabled) { border-color: var(--swl-accent); }
+.swl-onboarding-actions button:disabled { color: var(--swl-ink-muted); cursor: not-allowed; }
+.swl-onboarding-actions .swl-onboarding-primary {
+  border-color: var(--swl-accent);
+  color: var(--swl-accent);
+}
+
 /* --- The feedback channel ---------------------------------------------- */
 
 .swl-feedback {

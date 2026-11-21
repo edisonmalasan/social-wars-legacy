@@ -48,6 +48,7 @@ import { InfoPanel, ProductionSelector, PRODUCTION_DIALOG_ID } from './info.tsx'
 import { Inventory } from './inventory.tsx';
 import { MagicLab } from './magiclab.tsx';
 import { Neighbours } from './neighbours.tsx';
+import { OnboardingLauncher, OnboardingPanel, useOnboarding } from './onboarding.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
 import { RecruitPanel } from './recruit.tsx';
 import { SpellBook } from './spellbook.tsx';
@@ -182,6 +183,9 @@ export function Root({
   onOpenProduction,
   onActivate,
 }: RootProps): React.JSX.Element {
+  // The onboarding family is UI-only state published by the host; the panels
+  // it draws are readings of the tutorial and quest models, never decisions.
+  const onboarding = useOnboarding();
   const state = hudState(hudInput(bundle, world));
   const bonus = useMemo(
     () => bonusPanel(world, now, tzOffsetHours),
@@ -274,13 +278,14 @@ export function Root({
       <MagicLab bundle={bundle} world={world} onCommand={onCommand} />
       <SpellBook bundle={bundle} world={world} onCommand={onCommand} />
       <Neighbours neighbours={neighbours} />
+      <OnboardingLauncher onOpen={onboarding.open ?? undefined} />
       {tutorial ? <TutorialOverlay {...tutorial} /> : null}
       <Feedback messages={feedback} />
       <Dialog
         state={dialog ?? CLOSED_DIALOG}
         onDismiss={onDialogDismiss ?? (() => {})}
       >
-        {!dialogId?.startsWith('assault-') && questPanel && onQuestStart && onQuestAction ? (
+        {!onboarding.view && !dialogId?.startsWith('assault-') && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
             key={
               questPanel.kind === 'briefing'
@@ -298,10 +303,10 @@ export function Root({
             onCancel={onDialogDismiss ?? (() => {})}
           />
         ) : null}
-        {dialog?.dialog?.id === PRODUCTION_DIALOG_ID && production && onActivate ? (
+        {!onboarding.view && dialog?.dialog?.id === PRODUCTION_DIALOG_ID && production && onActivate ? (
           <ProductionSelector view={production} onActivate={onActivate} />
         ) : null}
-        {assaultPanel ? (
+        {!onboarding.view && assaultPanel ? (
           <AssaultPanel
             key={dialogId ?? undefined}
             panel={assaultPanel}
@@ -311,6 +316,17 @@ export function Root({
             busy={false}
             onCommand={onCommand}
             onCancel={onDialogDismiss ?? (() => {})}
+          />
+        ) : null}
+        {onboarding.view ? (
+          <OnboardingPanel
+            key={`onboarding:${onboarding.view.kind}:${dialogId ?? ''}`}
+            view={onboarding.view}
+            onCancel={onDialogDismiss ?? (() => {})}
+            onStart={onboarding.start ?? undefined}
+            onNext={onboarding.next ?? undefined}
+            onSkip={onboarding.skip ?? undefined}
+            onConfirm={onboarding.confirm ?? undefined}
           />
         ) : null}
       </Dialog>

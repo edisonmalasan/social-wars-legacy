@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "planned": 100,
+   "planned": 94,
    "dropped": 52,
-   "implemented": 108
+   "implemented": 114
   }
  },
  "screens": [
@@ -2591,8 +2591,8 @@
    ],
    "overrides": [],
    "bytes": 478,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P1) the shared dialog covers briefing, combat and result; a separate confirmation asset is not part of the playable alpha."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the shared dialog (`apps/client/src/ui/onboarding.tsx`) hosts a dedicated yes/no confirmation body with the client's own button texts from `apps/client/src/ui/state.ts` and the one-slot model in `packages/client/src/dialogmodel.ts`. The choice only sends the host's pre-chosen, server-owned request; there is still one modal and no second asset."
   },
   {
    "class": null,
@@ -2780,8 +2780,8 @@
    ],
    "overrides": [],
    "bytes": 506,
-   "decision": "planned",
-   "decisionNote": "Deferred: the tutorial's steps are already extracted and modelled, but the help-island screen is not rendered."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the help panel (`apps/client/src/ui/onboarding.tsx`) draws the client's own tutorial steps from `packages/client/src/tutorial.ts`, bridged by `apps/client/src/ui/state.ts`, in the one shared dialog. The proprietary island artwork stays excluded, but the screen's behaviour is really modelled and rendered."
   },
   {
    "class": null,
@@ -2864,8 +2864,8 @@
    ],
    "overrides": [],
    "bytes": 572,
-   "decision": "planned",
-   "decisionNote": "Deferred: the tutorial's steps are already extracted and modelled, but the introduction screen is not rendered."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the intro panel (`apps/client/src/ui/onboarding.tsx`) draws the client's own tutorial steps from `packages/client/src/tutorial.ts`, bridged by `apps/client/src/ui/state.ts`, in the one shared dialog. The proprietary intro artwork stays excluded, but the screen's behaviour is really modelled and rendered."
   },
   {
    "class": null,
@@ -3074,8 +3074,8 @@
    ],
    "overrides": [],
    "bytes": 757,
-   "decision": "planned",
-   "decisionNote": "Deferred: the mission-info popup has no client model; unblock when a mission briefing is rendered from server content and the art is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the mission-info panel (`apps/client/src/ui/onboarding.tsx`) draws the authoritative briefing from `packages/client/src/questview.ts`, bridged by `apps/client/src/ui/state.ts`, with the client's own team, difficulty and start gestures. The proprietary mission artwork stays excluded, but the briefing is rendered from server/content state."
   },
   {
    "class": null,
@@ -4229,8 +4229,8 @@
    ],
    "overrides": [],
    "bytes": 2062,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P1) the one accessible dialog hosts the game's panels, but a dedicated yes/no confirmation popup with the client's own button texts is not needed for the G5.1 loop."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the one accessible dialog (`apps/client/src/ui/onboarding.tsx`) hosts a dedicated yes/no panel with the client's own YES and NO texts from `apps/client/src/ui/state.ts`; the choice only sends the host's pre-chosen, server-owned request and never decides an outcome locally."
   },
   {
    "class": "PopupCrossDCi",
@@ -4967,8 +4967,8 @@
    ],
    "overrides": [],
    "bytes": 1532,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P1) the shared result dialog shows the server's end_quest outcome; a bespoke next-mission offer is not modelled."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the one dialog (`apps/client/src/ui/onboarding.tsx`) hosts a dedicated next-mission offer read from the server's answered result and ranks through `packages/client/src/questview.ts` and `apps/client/src/ui/state.ts`. Its gesture re-checks the same rank gate before asking the server to open the mission; no mission is granted locally."
   },
   {
    "class": "PopupObject",
