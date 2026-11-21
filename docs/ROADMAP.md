@@ -1226,6 +1226,13 @@ assault against the new server, and the cheat battery is fully rejected.
       does not**; the **battle spell book** lists the learned spells, three to a page,
       with the quest's veto and the mana check separate. The buy, mana and cast
       actions are requests (`buy_magic`, `buy_mana_new`, `use_magic`)
+- [x] The **Research LAB is drawn** (`apps/client/src/ui/magiclab.tsx`) from that
+      model, bridged by `magicLabPanel` (`apps/client/src/ui/state.ts`): the ten
+      spells in unlock-level order, six to a page, the learned stars, the gold
+      button hidden below the unlock level while cash stays live, the fixed mana
+      pack and the page arrows. Buying still sends `buy_magic` / `buy_mana_new`
+      and the server prices and grants. The bridge is tested with a reversed and
+      over-long spell list so the model's order and paging are proved
 - [x] The **daily and Monday bonus screens** are modelled
       (`packages/client/src/bonus.ts`): the cycle day, the readiness, the lapsed-streak
       flag, the wait to the next local day and the weekly bonus's state are all read

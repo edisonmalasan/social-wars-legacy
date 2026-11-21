@@ -504,25 +504,28 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main:** `d303cba` — PR #32 (`feat: model the bonus screens and
-  honour a lapsed streak`) merged with all four CI checks green. The prior
-  `social-wars-legacy-main` session ended at `1a6a89e` (PR #31) when its context
-  filled during compaction, not because the roadmap was finished.
+- **Last verified `main:** `2d273be` — PR #33 (`feat: model the offer-pack store
+  screens`) merged with all four CI checks green, after PR #32 (`d303cba`). The
+  prior `social-wars-legacy-main` session ended at `1a6a89e` (PR #31) when its
+  context filled during compaction, not because the roadmap was finished.
 - **Where that session stopped:** it had merged nine increments (#23–#31) and
   classified the remaining open items. Most are genuine blockers (Flash live
   captures, licence-gated art, missing platform hosts/devices, rights-holder
   response, signing credentials, production release). The one actionable area
   it identified is Group B3/G3's screen backlog, which it left at 90 implemented
   / 52 dropped / 118 planned.
-- **Completed this session:** the daily/Monday bonus screens (PR #32, merged).
-- **Next task selected:** the offer-pack store screens, because their prices,
-  shapes, tiers and rewards are already modelled in `@swl/rules` and the only
-  recorded deferral was a missing pack-picker surface.
-- **Active branch / PR:** the offer-pack store increment adds a pure model in
-  `packages/client/src/store.ts`, a store panel in the interface, and closes the
-  four pack screens (now **98 implemented / 52 dropped / 110 planned**). Locally
-  verified: `pnpm test` 1762/1762, `pnpm typecheck` clean, report sync, roadmap
-  check and the real-browser e2e in Chrome and Edge — all passed.
+- **Completed this session:** the daily/Monday bonus screens (PR #32), the
+  offer-pack store screens (PR #33) — both merged with green CI.
+- **Next task selected:** drawing the Research LAB. Its 10 spells, paging,
+  learned/blocked states and cash-unlock quirk were fully modelled in
+  `magic.ts` but no interface drew them, so this is player-facing functionality
+  rather than a checklist reclassification.
+- **Active branch / PR:** `feat/magic-lab-ui` adds `apps/client/src/ui/magiclab.tsx`
+  and a tested bridge in `state.ts`. It does **not** change the screen counts:
+  the LAB screens were already `implemented` as models and the research-centre
+  pair is a different, late-era robot feature whose deferral stays honest.
+  Locally verified: `pnpm test` 1764/1764, `pnpm typecheck` clean, and the
+  real-browser e2e in Chrome and Edge — all passed.
 - **Verification run for PR #32:** 1754/1754 tests, clean typecheck, golden master
   50/50 with 0 differences, cheat battery 11/11, report sync, roadmap check, and
   the real-browser e2e in Chrome and Edge — all passed; CI's four checks passed.
