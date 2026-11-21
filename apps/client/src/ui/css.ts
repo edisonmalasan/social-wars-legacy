@@ -794,6 +794,55 @@ export function uiCss(): string {
   cursor: not-allowed;
 }
 
+/* --- The Research LAB --------------------------------------------------- */
+
+.swl-magiclab {
+  position: absolute;
+  right: 340px;
+  bottom: 8px;
+  max-width: 360px;
+  max-height: 60vh;
+  overflow: auto;
+  padding: 6px 8px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: rgba(16, 21, 29, 0.92);
+  color: #f2e6c8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  pointer-events: auto;
+}
+
+.swl-magiclab-summary { cursor: pointer; color: #a9d7ff; font-weight: 700; }
+.swl-magiclab-body { margin-top: 6px; }
+.swl-magic-entries { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.swl-magic-entry { border-top: 1px solid #38445a; padding-top: 4px; }
+.swl-magic-entry-head { display: flex; gap: 6px; align-items: baseline; }
+.swl-magic-name { font-weight: 700; }
+.swl-magic-stars { color: #f5c542; }
+.swl-magic-status { color: #9fb3d1; }
+.swl-magic-description { margin: 2px 0; color: #b9c6da; }
+.swl-magic-costs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.swl-magic-unlock { color: #f0a5a5; }
+
+.swl-ui button.swl-magic-buy {
+  padding: 3px 6px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: #f2e6c8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+.swl-ui button.swl-magic-buy:disabled {
+  border-color: #38445a;
+  background: #1d2430;
+  color: #5c6678;
+  cursor: not-allowed;
+}
+
+.swl-magic-packs { display: flex; gap: 4px; margin-top: 8px; }
+.swl-magic-pages { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+
 /* --- The neighbour strip ----------------------------------------------- */
 
 .swl-neighbours {

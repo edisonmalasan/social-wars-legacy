@@ -45,6 +45,7 @@ import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
 import { InfoPanel, ProductionSelector, PRODUCTION_DIALOG_ID } from './info.tsx';
 import { Inventory } from './inventory.tsx';
+import { MagicLab } from './magiclab.tsx';
 import { Neighbours } from './neighbours.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
 import { RecruitPanel } from './recruit.tsx';
@@ -242,6 +243,7 @@ export function Root({
       />
       <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
       <Store packs={store} onCommand={onCommand} />
+      <MagicLab bundle={bundle} world={world} onCommand={onCommand} />
       <Neighbours neighbours={neighbours} />
       {tutorial ? <TutorialOverlay {...tutorial} /> : null}
       <Feedback messages={feedback} />

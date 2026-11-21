@@ -16,6 +16,7 @@ import {
   hudRules,
   infoPanel,
   inventoryItems,
+  magicLabPanel,
   populationItems,
   productionPanel,
   questMinLevels,
@@ -677,5 +678,51 @@ describe('the expansion panel', () => {
     ]) {
       assert.equal(expansionPanel(prices([row]), noneOwned), null, JSON.stringify(row));
     }
+  });
+});
+
+describe('the Research LAB panel', () => {
+  const spells = Array.from({ length: 7 }, (_, i) => ({
+    id: i + 1,
+    name: `Spell ${i + 1}`,
+    description: 'does a thing',
+    mana: 10,
+    // Deliberately the reverse of the content order to prove the model sorts.
+    level: 7 - i,
+    gold: 100,
+    cash: 5,
+    area: [1, 2, 3],
+    target: 2,
+    imgName: `spell${i + 1}`,
+  }));
+  const withSpells = bundle({
+    magics: spells,
+    globals: { MANA_PER_PURCHASE: 5, COST_MANA_CASH: 2, COST_MANA_GOLD: 500 },
+  });
+  const world7 = {
+    maps: [{ id: 0, items: {}, level: 7 }],
+    resources: { g: 1000, c: 20, w: 0, o: 0, s: 0, e: 30, x: 0, m: 0 },
+    privateState: { mana: 12 },
+  } as unknown as WorldSnapshot;
+
+  it('pages the content spells by unlock level and reads the server-owned mana', () => {
+    const first = magicLabPanel(withSpells, world7, 0);
+    assert.equal(first.pageCount, 2);
+    assert.equal(first.items.length, 6);
+    assert.deepEqual(first.items.map((entry) => entry.unlockLevel), [1, 2, 3, 4, 5, 6]);
+    assert.equal(first.mana, 12);
+    assert.equal(first.canNext, true);
+    assert.equal(first.canPrev, false);
+    const second = magicLabPanel(withSpells, world7, 1);
+    assert.equal(second.items.length, 1);
+    assert.equal(second.items[0]!.unlockLevel, 7);
+  });
+
+  it('hides the gold mana price the wallet cannot pay', () => {
+    const view = magicLabPanel(withSpells, world7, 0);
+    assert.deepEqual(view.pack, { amount: 5, price: { c: 2, g: 500 } });
+    assert.deepEqual(view.canBuyMana, { c: true, g: true });
+    const poor = magicLabPanel(withSpells, { ...world7, resources: { ...world7.resources, c: 0, g: 0 } }, 0);
+    assert.deepEqual(poor.canBuyMana, { c: false, g: false });
   });
 });

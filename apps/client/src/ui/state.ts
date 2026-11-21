@@ -36,6 +36,9 @@ import {
   expand,
   itemType,
   levelOf,
+  magicInputFromWorld,
+  magicLab,
+  type MagicLabPage,
   ownedExpansions,
   productionState,
   resourcePanel,
@@ -699,4 +702,24 @@ export function expansionPanel(
     tileId,
     command: expand(tileId),
   };
+}
+
+/**
+ * The Research LAB's page, from the server's save and the content's spells.
+ *
+ * The bridge only feeds the model the two sources it needs. Ordering, paging,
+ * the learned/available/blocked labels and what can be afforded are the
+ * model's, and buying is a request the server answers.
+ */
+export function magicLabPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  page: number,
+): MagicLabPage {
+  const input = magicInputFromWorld(
+    world,
+    bundle.magics ?? [],
+    bundle.globals ?? {},
+  );
+  return magicLab(input, page);
 }
