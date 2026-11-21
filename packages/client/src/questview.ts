@@ -211,6 +211,8 @@ export interface ActiveQuestView {
   readonly actions: readonly QuestActionChoice[];
   /** The team the server bound to this quest, echoed straight from the save. */
   readonly team?: Army;
+  /** The server's remaining mission seconds, or null when the quest has no timer. */
+  readonly timeRemaining: number | null;
 }
 
 /** Read one event channel's action from the server's counters and dedupe keys. */
@@ -326,6 +328,7 @@ export function activeQuestView(
       .sort((a, b) => a.ref.localeCompare(b.ref)),
     events: [...active.events],
     actions: questActions(active, options),
+    timeRemaining: active.timeRemaining,
     ...(active.team !== undefined ? { team: active.team } : {}),
   };
 }

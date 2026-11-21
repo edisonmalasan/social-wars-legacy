@@ -238,6 +238,7 @@ describe('activeQuestState', () => {
   const ACTIVE = {
     questId: '100000002',
     phase: 'started',
+    timeRemaining: 90,
     // The counters live under `script` in the save; the endpoint's summary
     // flattens them. The selector reads where the save actually writes them.
     script: {
@@ -257,6 +258,7 @@ describe('activeQuestState', () => {
   it('reads the quest id, the server-owned counters and the ledger verbatim', () => {
     assert.deepEqual(activeQuestState(world({ activeQuest: ACTIVE })), {
       questId: '100000002',
+      timeRemaining: 90,
       counters: { enemiesAlive: 3, trucksArrived: 0 },
       elements: {
         commandCenter: { hp: 0, alive: false },
@@ -276,6 +278,7 @@ describe('activeQuestState', () => {
     assert.deepEqual(state.counters, {});
     assert.deepEqual(state.elements, {});
     assert.deepEqual(state.events, []);
+    assert.equal(state.timeRemaining, null);
   });
 
   it('ignores malformed values rather than guessing a ledger', () => {

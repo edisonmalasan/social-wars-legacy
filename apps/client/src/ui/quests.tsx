@@ -153,6 +153,13 @@ function Briefing({
 }
 
 /** The authoritative ledger, as the server last answered it. */
+/** The server's remaining mission seconds, in words. Presentation only. */
+function missionTime(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return `${minutes}:${String(rest).padStart(2, '0')}`;
+}
+
 function Combat({
   active,
   busy,
@@ -167,6 +174,11 @@ function Combat({
       {active.team && active.team.length > 0 ? (
         <p className="swl-quest-team-echo" data-swl-team="">
           Team: {active.team.map((entry) => `${entry.unitId} ×${entry.count}`).join(', ')}
+        </p>
+      ) : null}
+      {active.timeRemaining !== null && active.timeRemaining !== undefined ? (
+        <p className="swl-quest-timer" role="timer">
+          Time remaining: {missionTime(active.timeRemaining)}
         </p>
       ) : null}
       <dl className="swl-quest-counters">

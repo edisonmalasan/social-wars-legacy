@@ -50,6 +50,7 @@ function active(
     counters: {},
     elements: {},
     events: [],
+    timeRemaining: null,
     ...overrides,
   };
 }
@@ -60,6 +61,7 @@ function stored(activeState: ActiveQuestStateView): Record<string, unknown> {
     questId: activeState.questId,
     script: { counters: activeState.counters },
     ledger: { elements: activeState.elements, events: activeState.events },
+    timeRemaining: activeState.timeRemaining,
   };
 }
 
@@ -171,6 +173,16 @@ describe('active quest view', () => {
       { ref: 'goodBoy', hp: 3, alive: true, key: true, label: 'goodBoy' },
     ]);
     assert.deepEqual(view.events, ['arrival:item:1013:1']);
+    assert.equal(view.timeRemaining, null);
+  });
+
+  it('carries the server-owned mission countdown into the combat panel', () => {
+    const view = activeQuestView(active(Q02, { timeRemaining: 90 }), {})!;
+    assert.equal(view.timeRemaining, 90);
+    const restored = activeQuestFromWorld(
+      world({ activeQuest: stored(active(Q02, { timeRemaining: 45 })) }),
+    )!;
+    assert.equal(restored.timeRemaining, 45);
   });
 
   it('never invents a quest from a bare seed', () => {

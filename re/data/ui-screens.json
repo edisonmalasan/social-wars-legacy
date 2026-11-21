@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "planned": 110,
+   "planned": 109,
    "dropped": 52,
-   "implemented": 98
+   "implemented": 99
   }
  },
  "screens": [
@@ -377,8 +377,8 @@
    ],
    "overrides": [],
    "bytes": 15504,
-   "decision": "planned",
-   "decisionNote": "Deferred: the countdown timer's setTimerOgres/onCompleteOgres/setTextAssault variants and its '1 Enemy alive' text are not rendered; unblock when a combat screen needs a server-owned countdown."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/questview.ts` — the server-owned mission timeRemaining is carried into the combat panel and drawn as a countdown (apps/client/src/ui/quests.tsx). The original's \"1 Enemy alive\" variant text is not reproduced."
   },
   {
    "class": "CrossDCiViralIcon",

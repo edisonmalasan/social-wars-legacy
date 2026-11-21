@@ -49,9 +49,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 98,
+      implemented: 99,
       dropped: 52,
-      planned: 110,
+      planned: 109,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -191,6 +191,14 @@ describe('the screens the clone has modelled', () => {
       assert.equal(screen!.decision, 'implemented', `${path} is not modelled`);
       assert.match(screen!.decisionNote, /`packages\/client\/src\/bonus\.ts`/);
     }
+  });
+
+  it('models the mission countdown from the server timer', async () => {
+    const all = await screens();
+    const timer = all.find((entry) => entry.path === 'GUI/CountdownTimer.as');
+    assert.ok(timer);
+    assert.equal(timer!.decision, 'implemented');
+    assert.match(timer!.decisionNote, /`packages\/client\/src\/questview\.ts`/);
   });
 
   it('models the offer-pack store screens from the content and wallet', async () => {

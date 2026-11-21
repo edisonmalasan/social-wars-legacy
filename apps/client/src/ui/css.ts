@@ -1269,6 +1269,14 @@ export function uiCss(): string {
   color: var(--swl-ink-muted);
 }
 
+/* The mission timer is the server's remaining seconds, not a local clock. */
+.swl-quest-timer {
+  margin: 0;
+  color: #f5c542;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
 .swl-quest-star {
   display: inline-flex;
   align-items: center;

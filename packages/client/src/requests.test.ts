@@ -366,6 +366,7 @@ describe('the authoritative quest requests', () => {
       counters: { enemiesAlive: 3 },
       elements: { commandCenter: { hp: 0, alive: false } },
       events: ['strike:commandCenter:3'],
+      timeRemaining: null,
     };
     const { calls, fetchImpl } = capture(200, summary);
     const result = await questActionOnServer(SESSION, '100000002', {
@@ -496,5 +497,36 @@ describe('the authoritative quest requests', () => {
     }, fetchImpl);
     assert.equal(result.ok, true);
     assert.deepEqual(result.body?.team, team);
+  });
+
+  it('questActionOnServer reads only the server-own mission timer', async () => {
+    const base = {
+      questId: '100000002',
+      phase: 'started',
+      counters: {},
+      elements: {},
+      events: [],
+    };
+    const read = async (extra: Record<string, unknown>): Promise<number | null> => {
+      const { fetchImpl } = capture(200, { ...base, ...extra });
+      const result = await questActionOnServer(SESSION, '100000002', {
+        type: 'strike',
+        ref: 'x',
+      }, fetchImpl);
+      assert.equal(result.ok, true);
+      return result.body!.timeRemaining;
+    };
+
+    // A finite, non-negative value is the server's own answer, carried verbatim.
+    assert.equal(await read({ timeRemaining: 240 }), 240);
+    assert.equal(await read({ timeRemaining: 1 }), 1);
+    assert.equal(await read({ timeRemaining: 0 }), 0);
+
+    // Missing, negative or malformed values never become a fabricated timer.
+    assert.equal(await read({}), null);
+    assert.equal(await read({ timeRemaining: -1 }), null);
+    assert.equal(await read({ timeRemaining: '90' }), null);
+    assert.equal(await read({ timeRemaining: Number.NaN }), null);
+    assert.equal(await read({ timeRemaining: null }), null);
   });
 });
