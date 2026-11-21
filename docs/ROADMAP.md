@@ -3231,8 +3231,11 @@ reviewed without reconstructing the conversation that led to it.*
   path selects it through `!tauri::is_dev()` while development keeps
   `node apps/server/src/main.ts`. The generated sidecar answered a real `/health`
   request with HTTP 200. Updater and rollback **decisions** are pure and
-  mock-tested in `apps/desktop/src-tauri/src/updater.rs` (15 tests, with an
-  injectable `ReleaseVerifier` fake); there is no key, endpoint, install or
+  mock-tested in `apps/desktop/src-tauri/src/updater.rs` (18 tests, with an
+  injectable `ReleaseVerifier` fake and a **test-side** rollback-executor seam
+  whose precondition checks require a plan to start from the running version,
+  target the last known good, and actually change the version — the seam is a
+  test helper, not a shipped executor); there is no key, endpoint, install or
   rollback executor. A **bounded, single unsigned Windows NSIS build** was also
   attempted from `apps/desktop/src-tauri` with `tauri build --bundles nsis`:
   exit 0, producing
@@ -3252,8 +3255,10 @@ reviewed without reconstructing the conversation that led to it.*
   `verify-upstream.mjs`, `check-no-flash.mjs` and `check-licensing.mjs` (run on a
   clean tree, as CI's Scan job does — generated client/sidecar artefacts make
   them flag `.swf` data strings in the content bundle and substitute-font
-  filenames), `e2e-test.mjs` (Chrome + Edge), `cargo test --locked` (39 Rust
-  tests), `cargo fmt --check` and `check-desktop-dist.mjs`, plus the bounded
+  filenames), `e2e-test.mjs` (Chrome + Edge), `cargo test --locked` (42 Rust
+  tests, updater::tests 18/18; a local cargo run needs the normal
+  content/server/icons build prerequisites in place), `cargo fmt --check` and
+  `check-desktop-dist.mjs`, plus the bounded
    `tauri build --bundles nsis` (exit 0) and the sidecar health probe above.
 - **2026-11-21 — unsigned Windows MSI produced; installer item stays open (Group H).**
   A first bounded `tauri build --bundles msi` (npm Tauri CLI 2.12.3) compiled
