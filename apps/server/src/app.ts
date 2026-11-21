@@ -132,6 +132,7 @@ export const ERROR_CODES = {
   'quest-already-active': 'a quest is already active',
   'quest-not-active': 'the named quest is not the active quest',
   'quest-refused': 'the server refused the quest action',
+  'quest-lost': 'the quest has already been lost',
   'quest-team-invalid': 'the team is missing, malformed, duplicated or too large',
   'quest-team-not-supported': 'this quest does not accept a team',
   'quest-team-unit-unavailable': 'the team names a unit the server does not own in that quantity',
@@ -677,6 +678,8 @@ export function createApp(
       case 'no-active-quest':
       case 'quest-mismatch':
         return fail(409, 'quest-not-active');
+      case 'quest-lost':
+        return fail(409, 'quest-lost');
       case 'team-invalid':
       case 'team-duplicate':
       case 'team-too-large':

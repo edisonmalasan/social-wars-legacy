@@ -2073,6 +2073,12 @@ export function isQuestVictory(state: QuestState): boolean {
  * Pure predicate over the state; it does not mutate anything.
  */
 export function isQuestDefeat(state: QuestState): boolean {
+  // A quest already resolved as a win is not also a defeat. Q11's immediate
+  // army-wipe resolution can set `result = 'win'` while `armyWipedOut` is true
+  // (quest/Quest11SaveVillages.as:388-391); without this guard the same state
+  // would report a win and a defeat at once. No other quest records a win in
+  // `result`, so this changes no other quest's win/fail behaviour.
+  if (state.result === 'win') return false;
   const questSpec = getQuestSpec(state.questId);
   if (!questSpec) return false;
   for (const condition of questSpec.defeat) {

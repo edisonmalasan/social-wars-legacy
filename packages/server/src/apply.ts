@@ -86,6 +86,8 @@ import {
   type Army,
   type ArmyEntry,
   isQuestVictory,
+  isQuestDefeat,
+  tickQuest,
   finishQuest,
   applyQuestVar,
   readChapterStatus,
@@ -268,7 +270,42 @@ export type ActiveQuestState = QuestState & {
   ledger: QuestLedger;
   /** The army the server accepted for a team quest, bound to this quest id. */
   team?: Army;
+  /** Server clock (seconds) at which the quest was started. Never client-set. */
+  readonly startedAt: number;
+  /** Server clock (seconds) of the last authoritative timer checkpoint. */
+  readonly lastTickAt: number;
 };
+
+/**
+ * Advance a quest's clock by the server's elapsed time.
+ *
+ * Pure: the caller supplies `now` from `deps.now()` (seconds), and a quest's
+ * time is moved only by the difference since its last checkpoint. There is no
+ * background timer and no client clock. `delta` is clamped at zero, so a
+ * backwards or replayed clock can never rewind a countdown or double-count a
+ * tick. When time has not moved the same state is returned unchanged.
+ */
+function advanceQuestClock(state: ActiveQuestState, now: number): ActiveQuestState {
+  if (state.result !== null || !Number.isFinite(state.lastTickAt)) return state;
+  const delta = Math.max(0, now - state.lastTickAt);
+  if (delta <= 0) return state;
+  const advanced = tickQuest(state, delta) as ActiveQuestState;
+  return { ...advanced, lastTickAt: now };
+}
+
+/**
+ * Whether the quest's own defeat list includes the mission timer.
+ *
+ * `isQuestDefeat` is a predicate over raw conditions, and some are transient —
+ * an army wipe arms a 3-second loss rather than losing at once. A blanket
+ * refusal on it would reject still-live quests (and changes quests this task
+ * does not touch). Only a timer-declaring quest may be refused on the raw
+ * predicate; `result === 'loss'` remains the recorded-outcome refusal for all.
+ */
+function hasTimerDefeat(questId: string): boolean {
+  const spec = getQuestSpec(questId);
+  return spec?.defeat.some((condition) => condition.kind === 'timerExpired') ?? false;
+}
 
 /** One authoritative action a client asks the server to apply to a quest. */
 export type QuestAction =
@@ -3005,9 +3042,15 @@ export function createQuestHelpers(deps: ApplierDeps): {
     }
     state = { ...state, script: { ...state.script, counters } };
 
+    // The quest's clock is stamped from the server's own time, never from the
+    // start request. It is the single basis for the timer enforced on actions
+    // and end_quest; no client value can move it.
+    const startedAt = deps.now();
     const activeState: ActiveQuestState = {
       ...state,
       ledger: { elements, events: [], strikes: {} },
+      startedAt,
+      lastTickAt: startedAt,
       ...(acceptedTeam !== undefined ? { team: acceptedTeam } : {}),
     };
     const nextWorld: ShimWorld = {
@@ -3024,10 +3067,20 @@ export function createQuestHelpers(deps: ApplierDeps): {
     const stored = readFullActiveQuest(world.save.privateState);
     if (!stored) return { ok: false, reason: 'no-active-quest' };
     if (stored.questId !== questId) return { ok: false, reason: 'quest-mismatch' };
-    if (stored.phase !== 'map-loaded' && stored.phase !== 'started') {
+
+    // Advance the mission clock from the server's own time before trusting any
+    // client action. An expired (or otherwise lost) quest refuses everything
+    // and leaves the save untouched — the ticked state is persisted only when
+    // the action itself succeeds.
+    const ticked = advanceQuestClock(stored, deps.now());
+    if (ticked.result === 'loss' || (hasTimerDefeat(questId) && isQuestDefeat(ticked))) {
+      return { ok: false, reason: 'quest-lost', world };
+    }
+
+    if (ticked.phase !== 'map-loaded' && ticked.phase !== 'started') {
       return { ok: false, reason: 'invalid-phase' };
     }
-    if (stored.result !== null) return { ok: false, reason: 'invalid-phase' };
+    if (ticked.result !== null) return { ok: false, reason: 'invalid-phase' };
     if (
       !action ||
       typeof action !== 'object' ||
@@ -3042,7 +3095,7 @@ export function createQuestHelpers(deps: ApplierDeps): {
     const rosterRefs = new Set(
       questRoster(spec, deps.items, deps.questRosters).map((element) => element.ref),
     );
-    let next = stored;
+    let next = ticked;
 
     switch (action.type) {
       case 'strike': {
@@ -3229,7 +3282,19 @@ function endQuestCommand(
   const stored = readFullActiveQuest(privateState);
   if (!stored) return { applied: false, refused: 'no-active-quest', world };
   if (stored.questId !== questId) return { applied: false, refused: 'quest-mismatch', world };
-  const state: QuestState = stored;
+
+  // Advance the mission clock from the server's own time before reading the
+  // outcome. A timer that expired since the last authoritative action is a
+  // loss: refuse it with a typed reason before any wallet or save write, and
+  // without persisting the ticked state (the next call re-derives the same
+  // loss). A loss already recorded by an action keeps `no-victory` below.
+  const state: QuestState = advanceQuestClock(stored, deps.now());
+  if (
+    stored.result === null &&
+    (state.result === 'loss' || (hasTimerDefeat(questId) && isQuestDefeat(state)))
+  ) {
+    return { applied: false, refused: 'quest-lost', world };
+  }
 
   // An empty roster would satisfy a `countersZero` win with zero events
   // (loadQuestMap seeds enemiesAlive = 0), minting currency for no work. A
