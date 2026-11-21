@@ -6,7 +6,8 @@ You are the autonomous engineering orchestrator responsible for continuing the d
 
 **Repository:** https://github.com/edisonmalasan/social-wars-legacy
 
-**Current verified baseline:** `main` at `60b12e6` — G5.2, PR #22 merged.
+**Current verified baseline:** `main` at `1a6a89e` — PR #31 merged; see the live
+checkpoint in section 12 below for the in-flight increment.
 
 **Primary source of truth:** `docs/ROADMAP.md`
 
@@ -495,3 +496,36 @@ If a task is blocked, continue independent work.
 Preserve a verifiable checkpoint if execution must be interrupted.
 
 **Your assignment is continuous, evidence-driven advancement of Social Wars Legacy's approved roadmap—not completion of one isolated milestone.**
+
+---
+
+## 12. Execution checkpoint (maintained as work proceeds)
+
+This is the resume point for an interrupted session. It is updated at each
+verified checkpoint, not at every tool call.
+
+- **Last verified `main:** `1a6a89e` — PR #31 (`fix: stop the last roadmap group
+  swallowing later sections`) merged. The prior `social-wars-legacy-main`
+  session ended here when its context filled during compaction, not because the
+  roadmap was finished.
+- **Where that session stopped:** it had merged nine increments (#23–#31) and
+  classified the remaining open items. Most are genuine blockers (Flash live
+  captures, licence-gated art, missing platform hosts/devices, rights-holder
+  response, signing credentials, production release). The one actionable area
+  it identified is Group B3/G3's screen backlog, which it left at 90 implemented
+  / 52 dropped / 118 planned.
+- **Next task selected:** the daily/Monday bonus screens, because the server
+  already owns both cycles and the only recorded deferral was a missing client
+  surface.
+- **Active branch / PR:** `feat/bonus-screens` → PR #32, pushed as `0488ab0`,
+  awaiting CI. It adds the pure bonus model and HUD read-out, closes four screens
+  (now 94 / 52 / 114), and fixes the server ignoring the lapsed-streak flag.
+- **Verification already run locally:** `pnpm test` 1754/1754, `pnpm typecheck`
+  clean, golden master 50/50 with 0 differences, cheat battery 11/11, report
+  sync, roadmap check, and the real-browser e2e in Chrome and Edge — all passed.
+- **Remaining applicable tasks:** continue reducing the 114 planned screens in
+  coherent, player-facing families; re-audit the blockers in section 5 before
+  treating any as final; do not claim the frame-rate, platform or release items
+  without their actual evidence.
+- **On resume:** re-read this file and `docs/ROADMAP.md`, check `git status` and
+  `gh pr checks`, then continue from PR #32's outcome.
