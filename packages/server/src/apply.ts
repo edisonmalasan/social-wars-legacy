@@ -2019,8 +2019,10 @@ function dailyBonusCommand(
   }
 
   // The bonus index is the server's: the client's `args[1]` is ignored.
+  // A lapsed streak restarts the cycle, as the client's own rules say; without
+  // this the server would grant the old day's prize after any long absence.
   const bonusNextId = Number(privateState['bonusNextId'] ?? 0);
-  const nextId = bonusNextId >= 5 ? 1 : bonusNextId + 1;
+  const nextId = readiness.reset || bonusNextId >= 5 ? 1 : bonusNextId + 1;
   const reward = dailyBonusReward(deps.dailyBonus, nextId);
 
   privateState['timestampLastBonus'] = deps.now();

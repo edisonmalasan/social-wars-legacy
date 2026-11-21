@@ -17,6 +17,7 @@ import {
   CLOSED_DIALOG,
   activeQuestState,
   type ArmyUnitView,
+  bonusPanel,
   hudState,
   levelOf,
   questChoices,
@@ -77,6 +78,8 @@ export interface RootProps {
   selectedIso?: number | null;
   /** The client's unix second, used only for on-screen countdowns. */
   now?: number;
+  /** The player's time-zone offset in hours, for the local bonus day. */
+  tzOffsetHours?: number;
   /** The other players, for the neighbour strip. */
   neighbours?: readonly Neighbour[];
   /** The tutorial step to draw, or null when the tutorial is not running. */
@@ -143,6 +146,7 @@ export function Root({
   selected,
   selectedIso = null,
   now = Math.floor(Date.now() / 1000),
+  tzOffsetHours = 0,
   neighbours = [],
   tutorial = null,
   dialog = null,
@@ -170,6 +174,10 @@ export function Root({
   onActivate,
 }: RootProps): React.JSX.Element {
   const state = hudState(hudInput(bundle, world));
+  const bonus = useMemo(
+    () => bonusPanel(world, now, tzOffsetHours),
+    [world, now, tzOffsetHours],
+  );
   const items = useMemo(() => buildItems(bundle), [bundle]);
   const tabs = useMemo(() => categories(bundle), [bundle]);
   const placingName = useMemo(() => {
@@ -201,7 +209,7 @@ export function Root({
 
   return (
     <div className="swl-ui">
-      <Hud state={state} placing={placingName} onClaimBonus={onClaimBonus} />
+      <Hud state={state} placing={placingName} bonus={bonus} onClaimBonus={onClaimBonus} />
       <Goals goals={goals} onCommand={onCommand} />
       <Expansion view={expansion} onCommand={onCommand} />
       <Inventory

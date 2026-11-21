@@ -49,9 +49,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 90,
+      implemented: 94,
       dropped: 52,
-      planned: 118,
+      planned: 114,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -177,6 +177,22 @@ describe('the screen inventory', () => {
 });
 
 describe('the screens the clone has modelled', () => {
+  it('models the daily and Monday bonus screens from the server state', async () => {
+    const all = await screens();
+    const paths = [
+      'GUI/MondayBonusButton.as',
+      'popups/MondayBonusPopUp.as',
+      'PopupNewDailyMC.as',
+      'popups/PopupNewDaily.as',
+    ];
+    for (const path of paths) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not modelled`);
+      assert.match(screen!.decisionNote, /`packages\/client\/src\/bonus\.ts`/);
+    }
+  });
+
   it('really does model the build menu', async () => {
     // The inventory claims the build window is implemented, so the model
     // has to exist and work.

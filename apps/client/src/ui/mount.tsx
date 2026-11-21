@@ -53,6 +53,8 @@ export interface UiOverlayState {
   readonly selectedIso?: number | null;
   /** The client's unix second, for on-screen countdowns. */
   readonly now?: number;
+  /** The player's time-zone offset in hours; defaults to the browser's. */
+  readonly tzOffsetHours?: number;
   /** The player picked a stored item to place on the map. */
   readonly onPlaceStored?: (entry: StoredItemView) => void;
   /** The player asked for the daily bonus. */
@@ -112,6 +114,9 @@ export function mountUi(
           selected={selected}
           selectedIso={overlays.selectedIso}
           now={overlays.now}
+          tzOffsetHours={
+            overlays.tzOffsetHours ?? -new Date().getTimezoneOffset() / 60
+          }
           neighbours={neighbours}
           tutorial={tutorial}
           dialog={overlays.dialog}

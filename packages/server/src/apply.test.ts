@@ -901,6 +901,19 @@ describe('the daily bonus', () => {
     const outcome = applier(world, { name: 'win_daily_bonus', args: [] });
     assert.equal(outcome.world.save.privateState['bonusNextId'], 1);
   });
+
+  it('restarts the cycle at day 1 after the streak lapses', () => {
+    const applier = createApplier(deps());
+    const world = worldWithBuilding({});
+    // Three local days since the last claim: the rules say the streak reset.
+    world.save.privateState['timestampLastBonus'] = NOW - 3 * 86_400;
+    world.save.privateState['bonusNextId'] = 4;
+    const outcome = applier(world, { name: 'win_daily_bonus', args: [] });
+    assert.equal(outcome.applied, true);
+    // Without the reset the server would hand out the day-5 hero instead.
+    assert.equal(outcome.world.save.privateState['bonusNextId'], 1);
+    assert.equal(outcome.world.resources['g'], 100);
+  });
 });
 
 describe('the commands whose cost the server computes', () => {
