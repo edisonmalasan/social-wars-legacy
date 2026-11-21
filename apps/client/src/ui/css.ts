@@ -1905,5 +1905,163 @@ export function uiCss(): string {
 }
 
 .swl-roster-actions button:disabled { opacity: 0.5; cursor: default; }
+
+/* --- The reusable UI chrome ---------------------------------------------
+ * Tabs, pills, the popover and its cover, the zoom bound to the camera, the
+ * speaker box and the collect/hurry affordances. All drawn with text and CSS:
+ * none of the original's proprietary button or icon art is claimed.
+ * ---------------------------------------------------------------------- */
+
+.swl-chrome {
+  position: absolute;
+  right: 8px;
+  top: 344px;
+  width: 220px;
+  max-height: 156px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  padding: 6px 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: rgba(19, 26, 36, 0.94);
+  color: var(--swl-ink);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  pointer-events: auto;
+  z-index: 12;
+}
+
+.swl-chrome-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.swl-chrome-title {
+  color: var(--swl-accent);
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.swl-chrome button {
+  padding: 2px 6px;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  background: var(--swl-surface-raised);
+}
+
+.swl-chrome button:hover:not(:disabled) { border-color: var(--swl-accent); }
+.swl-chrome button:disabled { opacity: 0.5; cursor: default; }
+
+.swl-chrome-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  background: var(--swl-scrim);
+}
+
+.swl-chrome-popover {
+  position: absolute;
+  right: 12px;
+  top: 376px;
+  z-index: 26;
+  width: 232px;
+  box-sizing: border-box;
+  padding: var(--swl-gap) var(--swl-gap-lg);
+  border: 1px solid var(--swl-accent);
+  border-radius: 4px;
+  background: var(--swl-surface);
+  box-shadow: 0 6px 20px #000a;
+  pointer-events: auto;
+}
+
+.swl-chrome-popover-line { margin: 0 0 6px; line-height: 1.3; }
+.swl-chrome-popover-ok { border-color: var(--swl-accent) !important; }
+
+.swl-chrome-zoom {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.swl-chrome-zoom-step { min-width: 22px; }
+.swl-chrome-zoom-range { flex: 1; min-width: 0; accent-color: var(--swl-accent); }
+.swl-chrome-zoom-value { color: var(--swl-ink-muted); white-space: nowrap; }
+
+.swl-chrome-actions { display: flex; gap: 4px; }
+
+.swl-chrome-action {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  text-align: left;
+}
+
+.swl-chrome-action-collect { border-left: 3px solid var(--swl-success) !important; }
+.swl-chrome-action-hurry { border-left: 3px solid var(--swl-accent) !important; }
+.swl-chrome-action-mark { color: var(--swl-accent); font-size: 14px; }
+.swl-chrome-action-note { color: var(--swl-ink-muted); font-size: calc(10px * var(--swl-font-scale-body, 1)); }
+
+.swl-chrome-notice { display: flex; flex-direction: column; gap: 4px; }
+
+.swl-chrome-speaker {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 4px;
+  border-left: 3px solid var(--swl-danger);
+  background: var(--swl-surface-raised);
+}
+
+.swl-chrome-speaker-mark { color: var(--swl-danger); font-weight: 700; }
+.swl-chrome-speaker-text { flex: 1; white-space: pre-line; }
+
+.swl-chrome-tabs,
+.swl-chrome-pills { display: flex; flex-wrap: wrap; gap: 2px; }
+
+.swl-chrome-tab {
+  padding: 2px 5px !important;
+  border-radius: 3px !important;
+  color: var(--swl-ink-muted);
+}
+
+.swl-chrome-tab-hover { border-color: var(--swl-accent) !important; color: var(--swl-ink); }
+.swl-chrome-tab-selected { background: var(--swl-accent) !important; color: #10151d !important; font-weight: 700; }
+.swl-chrome-pills .swl-chrome-tab { border-radius: 10px !important; }
+
+.swl-chrome-catalogue {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 56px;
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+.swl-chrome-catalogue-item { width: 100%; text-align: left; }
+
+.swl-chrome-attachable {
+  position: absolute;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -100%);
+  color: var(--swl-accent);
+  text-shadow: 0 1px 3px #000;
+  pointer-events: none;
+}
+
+.swl-chrome-attach-arrow { font-size: 16px; line-height: 1; }
+.swl-chrome-attach-label { font-size: calc(10px * var(--swl-font-scale-body, 1)); white-space: nowrap; }
+
+.swl-chrome-popup-message { margin: 0 0 8px; white-space: pre-line; }
+.swl-chrome-popup-actions { display: flex; justify-content: flex-end; }
+.swl-chrome-popup-actions button { border-color: var(--swl-accent) !important; }
 `.trim();
 }

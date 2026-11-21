@@ -9,7 +9,14 @@
  * the client draws them. It never decides an outcome.
  */
 import { AtlasIndex, type FrameManifest, type WorldSnapshot } from '@swl/client';
-import { cameraCentredOn, MAP_HEIGHT, MAP_WIDTH, type CameraState } from '@swl/client';
+import {
+  cameraCentredOn,
+  MAP_HEIGHT,
+  MAP_WIDTH,
+  sliderZoomIn,
+  sliderZoomOut,
+  type CameraState,
+} from '@swl/client';
 import { Interaction, pixelToTile } from '@swl/client';
 import { fetchNeighbours, type Neighbour } from '@swl/client';
 import {
@@ -87,7 +94,10 @@ import {
   INTRO_TITLE,
   armyPanel,
   assaultDialog,
+  chromePopupDialog,
   confirmPanel,
+  dismissPopup,
+  EMPTY_POPUP_SLOT,
   missionInfoPanel,
   nextMissionPanel,
   onboardingDialog,
@@ -95,12 +105,18 @@ import {
   questMinLevels,
   questRanks,
   questViewOptions,
+  requestPopup,
   rosterDialog,
+  speakerNotice,
   tutorialHelpView,
+  zoomFromPercent,
   type AssaultPanelKind,
+  type ChromePopupRequest,
+  type ChromePopupSlot,
   type OnboardingPanelKind,
   type OnboardingPanelView,
 } from './ui/state.ts';
+import { setChromeHost } from './ui/chrome.tsx';
 import { setOnboardingHost } from './ui/onboarding.tsx';
 import { setRosterHost } from './ui/roster.tsx';
 import { PRODUCTION_DIALOG_ID } from './ui/info.tsx';
@@ -601,6 +617,73 @@ async function main(): Promise<void> {
   let chosenDifficulty: 1 | 2 | 3 = 1;
   /** One quest request at a time; a rapid double-click must not send two. */
   let questBusy = false;
+  /**
+   * The chrome's one-slot popup queue. `PopupObject`'s priority order lives
+   * in `state.ts`; the body still goes through the one shared dialog, so a
+   * second notice waits rather than opening a second modal stack.
+   */
+  let popupSlot: ChromePopupSlot = EMPTY_POPUP_SLOT;
+
+  /** Publish the camera and the chrome's UI-only gestures to the view. */
+  function publishChrome(): void {
+    setChromeHost({
+      camera: renderer.camera,
+      zoomIn: () => {
+        const result = sliderZoomIn(renderer.camera);
+        if (result.camera) renderer.setCamera(result.camera);
+        publishChrome();
+      },
+      zoomOut: () => {
+        const result = sliderZoomOut(renderer.camera);
+        if (result.camera) renderer.setCamera(result.camera);
+        publishChrome();
+      },
+      zoomTo: (percent) => {
+        renderer.setCamera(zoomFromPercent(renderer.camera, percent));
+        publishChrome();
+      },
+      openNotice: openChromeNotice,
+      dismissNotice: dismissChromeNotice,
+      popup: popupSlot.open,
+    });
+  }
+
+  /** Ask the server's latest notice into the one dialog, by priority. */
+  function openChromeNotice(): void {
+    const note = speakerNotice(feedback);
+    if (!note) {
+      gestureRefusal('the server has sent no notice yet');
+      return;
+    }
+    const request: ChromePopupRequest = {
+      id: 'chrome-notice',
+      title: 'Notice',
+      message: note.text,
+      priority: 10,
+    };
+    popupSlot = requestPopup(popupSlot, request);
+    if (!dialogState.dialog) {
+      const panel = chromePopupDialog(request);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    }
+    publishChrome();
+    drawInterface();
+  }
+
+  /** Dismiss the open chrome popup and promote the next waiter, if any. */
+  function dismissChromeNotice(): void {
+    popupSlot = dismissPopup(popupSlot);
+    if (dialogState.dialog?.id === 'chrome-notice') {
+      dialogState = closeDialog(dialogState);
+    }
+    publishChrome();
+    const next = popupSlot.open;
+    if (next && !dialogState.dialog) {
+      const panel = chromePopupDialog(next);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    }
+    drawInterface();
+  }
 
   /** Close a period dialog that is about to lose its selected building. */
   function closeProductionDialog(): void {
@@ -612,17 +695,28 @@ async function main(): Promise<void> {
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
     const now = Math.floor(Date.now() / 1000);
+    publishChrome();
     ui?.draw(world, placing, selected, neighbours, tutorialProps(), {
       dialog: dialogState,
       feedback,
       questPanel,
       questBusy,
       onDialogDismiss: () => {
+        // A chrome popup is dismissed through its own one-slot queue, so a
+        // later notice can still be promoted instead of being stranded.
+        if (dialogState.dialog?.id === 'chrome-notice') {
+          popupSlot = dismissPopup(popupSlot);
+        }
         dialogState = closeDialog(dialogState);
         questPanel = null;
         onboarding = null;
         confirmAction = null;
         publishOnboarding();
+        const next = popupSlot.open;
+        if (next) {
+          const panel = chromePopupDialog(next);
+          dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+        }
         drawInterface();
       },
       onPlaceStored,

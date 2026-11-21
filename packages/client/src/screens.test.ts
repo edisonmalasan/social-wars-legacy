@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 120,
+      implemented: 134,
       dropped: 52,
-      planned: 88,
+      planned: 74,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -533,6 +533,64 @@ describe('the roster, team-thumbnail and unit-XP screen family decisions', () =>
       assert.ok(screen, `${path} is not in the inventory`);
       assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
       assert.match(screen!.decisionNote, /licensed|portraits/i);
+    }
+  });
+});
+
+describe('the reusable UI-chrome screen family decisions', () => {
+  // These deferrals said there was no selection state, popover, slider,
+  // acknowledgement, request gesture, attachment lifecycle, cover or modal
+  // ordering. All are now modelled and drawn by apps/client/src/ui/chrome.tsx
+  // over the existing camera, dialog and request models — with the original
+  // art deliberately excluded from every claim.
+  const CHROME_SCREENS = [
+    'ButtonTabAsset.as',
+    'GUI/SubCategory.as',
+    'GUI/Tab.as',
+    'GUI/SpeakerBox.as',
+    'GUI/ZoomSlider.as',
+    'GUI/attachables/AttachableVisualElement.as',
+    'IconCollect.as',
+    'ButtonSpeedUpNoIconAsset.as',
+    'ButtonSpeedUpWideAsset.as',
+    'GuiCover.as',
+    'PopOverMC.as',
+    'TabMC.as',
+    'popups/PopOver.as',
+    'popups/PopupObject.as',
+  ];
+
+  it('records each modelled screen against the chrome panel', async () => {
+    const all = await screens();
+    for (const path of CHROME_SCREENS) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/chrome\.tsx`/);
+    }
+  });
+
+  it('leaves the ones that need capture state, exploration or a distinct popup planned', async () => {
+    // A cover primitive now exists, but there is still no exploration view to
+    // cover; a capture icon has no server capture outcome to model; and the
+    // info popup's timer/repositioning and multiline art are not the popover
+    // the chrome draws. Flipping these would grow the count without modelling
+    // anything new.
+    const LEFT_PLANNED = [
+      'IconoCapturadoMC.as',
+      'GuiCoverExplorationMC.as',
+      'GUI/InfoPopup.as',
+      'InfoPopupMC.as',
+      'InfoPopupManaMc.as',
+      'GUI/ResourcesTab.as',
+      'TooltipMultilineMC.as',
+    ];
+    const all = await screens();
+    for (const path of LEFT_PLANNED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
+      assert.match(screen!.decisionNote, /^Deferred: /);
     }
   });
 });

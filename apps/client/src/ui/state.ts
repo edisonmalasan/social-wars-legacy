@@ -20,7 +20,10 @@ import type {
   AssaultResultView,
   BuildingInfoView,
   BuildMenuItem,
+  BuildTab,
+  CameraState,
   DialogContent,
+  FeedbackMessage,
   HudInput,
   HudRules,
   ItemPopulation,
@@ -46,14 +49,19 @@ import {
   battleOptions,
   briefingView,
   buildingInfoView,
+  buildTabs,
   completeGoal,
   expand,
   lastAssaultResult,
   questResultActionChoice,
   specialAttackHud,
+  tileToPixel,
   tutorialLiteral,
+  viewportOf,
   itemType,
   levelOf,
+  MAX_ZOOM,
+  MIN_ZOOM,
   magicBook,
   magicInputFromWorld,
   magicLab,
@@ -1277,4 +1285,324 @@ export const ROSTER_DIALOG_ID = 'roster-army';
 /** The one dialog's descriptor for the roster panel. */
 export function rosterDialog(): DialogContent {
   return { id: ROSTER_DIALOG_ID, kind: 'alert', title: 'Your Army' };
+}
+
+/* ----------------------------------------------------------------------
+ * UI chrome
+ *
+ * The reusable pieces the original draws as tabs, pills, popovers, a zoom
+ * slider, a speaker box, collect/hurry buttons, world-space attachables and
+ * a cover. Every view here is a **reading** of the server's answer, the
+ * content or the camera: the tab and pill state is UI state, the zoom is the
+ * camera model, and the collect/hurry rows only describe requests the host
+ * sends. None of it owns a world, a resource or an outcome.
+ * -------------------------------------------------------------------- */
+
+/** One tab or sub-category pill, with its UI-only selection and hover state. */
+export interface ChromeTabView {
+  readonly id: string;
+  readonly label: string;
+  readonly selected: boolean;
+  readonly hovered: boolean;
+}
+
+/** The selection/hover state a tab strip or pill row owns. */
+export interface TabStripState {
+  readonly selectedId: string | null;
+  readonly hoveredId: string | null;
+}
+
+/** The empty strip: nothing selected, nothing hovered. */
+export const EMPTY_TAB_STRIP: TabStripState = Object.freeze({
+  selectedId: null,
+  hoveredId: null,
+});
+
+/** A gesture on a strip. Hovering null means the pointer left the row. */
+export type TabStripAction =
+  | { readonly type: 'select'; readonly id: string }
+  | { readonly type: 'hover'; readonly id: string | null };
+
+/**
+ * Select or hover one entry.
+ *
+ * The original's `highlightTab/fadeTab` and `seleccionar/deseleccionar` are
+ * one selection slot; `overPastilla/outPastilla` is one hover slot. Both are
+ * replaced, never accumulated, and neither touches game state.
+ */
+export function tabStrip(state: TabStripState, action: TabStripAction): TabStripState {
+  if (action.type === 'hover') {
+    if (state.hoveredId === action.id) return state;
+    return { ...state, hoveredId: action.id };
+  }
+  if (state.selectedId === action.id) return state;
+  return { ...state, selectedId: action.id };
+}
+
+/** Pair entries with a strip's state for drawing. */
+export function tabViews(
+  entries: readonly { readonly id: string; readonly label: string }[],
+  state: TabStripState,
+): readonly ChromeTabView[] {
+  return entries.map((entry) => ({
+    id: entry.id,
+    label: entry.label,
+    selected: entry.id === state.selectedId,
+    hovered: entry.id === state.hoveredId,
+  }));
+}
+
+/**
+ * The content's build categories as string ids, so a category and its
+ * sub-categories cannot collide in one strip's state.
+ */
+export function chromeBuildTabs(
+  categories: Categories,
+): { id: string; label: string; subs: { id: string; label: string }[] }[] {
+  return buildTabs(categories).map((tab: BuildTab) => ({
+    id: `cat:${tab.id}`,
+    label: tab.name,
+    subs: tab.subcategories.map((sub) => ({ id: `sub:${sub.id}`, label: sub.name })),
+  }));
+}
+
+/** The content entries a chosen category and sub-category pill show. */
+export function chromeCatalogue(
+  items: readonly BuildMenuItem[],
+  categoryId: string | null,
+  subcategoryId: string | null,
+): readonly BuildMenuItem[] {
+  if (categoryId === null) return [];
+  const category = Number(categoryId.slice('cat:'.length));
+  const sub = subcategoryId === null ? null : Number(subcategoryId.slice('sub:'.length));
+  return items.filter(
+    (entry) =>
+      entry.categoryId === category &&
+      (sub === null || entry.subcategoryId === sub),
+  );
+}
+
+/** The zoom slider's reading of the camera model. */
+export interface ZoomView {
+  readonly zoom: number;
+  /** The camera's zoom as an integer percent, for the range input. */
+  readonly percent: number;
+  readonly minPercent: number;
+  readonly maxPercent: number;
+  readonly canZoomIn: boolean;
+  readonly canZoomOut: boolean;
+  readonly label: string;
+}
+
+/** Read the camera's zoom without changing it. The bounds are `camera.ts`'s. */
+export function zoomView(camera: CameraState): ZoomView {
+  const zoom = Number.isFinite(camera.zoom)
+    ? Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, camera.zoom))
+    : 1;
+  return {
+    zoom,
+    percent: Math.round(zoom * 100),
+    minPercent: Math.round(MIN_ZOOM * 100),
+    maxPercent: Math.round(MAX_ZOOM * 100),
+    canZoomIn: zoom < MAX_ZOOM,
+    canZoomOut: zoom > MIN_ZOOM,
+    label: `Zoom ${Math.round(zoom * 100)}%`,
+  };
+}
+
+/** A range-input percent as a camera zoom, clamped to the camera's own range. */
+export function zoomFromPercent(camera: CameraState, percent: number): CameraState {
+  const value = Number.isFinite(percent) ? percent / 100 : 1;
+  return { ...camera, zoom: Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value)) };
+}
+
+/** The one speaker-box notice, read from the server's last answer. */
+export interface SpeakerNotice {
+  readonly id: string;
+  readonly text: string;
+  readonly tone: FeedbackMessage['tone'];
+}
+
+/** The newest feedback message as a notice, or null when the server said nothing. */
+export function speakerNotice(messages: readonly FeedbackMessage[]): SpeakerNotice | null {
+  const last = messages[messages.length - 1];
+  if (!last || last.text.length === 0) return null;
+  return { id: `${last.tone}:${last.text}`, text: last.text, tone: last.tone };
+}
+
+/** Which notices the player has acknowledged. UI state only. */
+export interface NoticeState {
+  readonly acknowledged: readonly string[];
+}
+
+/** Nobody has acknowledged a notice yet. */
+export const NO_NOTICES: NoticeState = Object.freeze({ acknowledged: [] });
+
+/** The OK of a speaker box records the notice's id; it does not alter a world. */
+export function acknowledgeNotice(state: NoticeState, id: string): NoticeState {
+  if (state.acknowledged.includes(id)) return state;
+  return { acknowledged: [...state.acknowledged, id] };
+}
+
+/** Whether a notice still needs acknowledging. */
+export function noticeVisible(
+  notice: SpeakerNotice | null,
+  state: NoticeState,
+): boolean {
+  return notice !== null && !state.acknowledged.includes(notice.id);
+}
+
+/** A collect or hurry-up affordance: a label and whether its request can be sent. */
+export interface ChromeActionView {
+  readonly kind: 'collect' | 'hurry';
+  readonly label: string;
+  readonly note: string;
+  readonly enabled: boolean;
+}
+
+/**
+ * The selected building's chrome actions.
+ *
+ * Collect is available only when the server's cycle is due; hurry only when
+ * the server and the content say a build is still in progress. They describe
+ * requests — the host sends `collect`/`finish_building` and the server still
+ * decides what, if anything, is paid or finished.
+ */
+export function chromeActions(
+  building: BuildingInfoView | null,
+  production: ProductionPanelView | null,
+): readonly ChromeActionView[] {
+  return [
+    {
+      kind: 'collect',
+      label: 'Collect',
+      note: production ? (production.due ? 'Ready' : 'Still accruing') : 'No production',
+      enabled: production?.due === true,
+    },
+    {
+      kind: 'hurry',
+      label: 'Hurry up',
+      note: building?.finish
+        ? `${building.finish.remainingSeconds}s · ${building.finish.clicksToBuild} clicks`
+        : 'Nothing building',
+      enabled: building?.finish !== null && building?.finish !== undefined,
+    },
+  ];
+}
+
+/** A world-space attachable, anchored to a tile the server actually owns. */
+export interface ChromeAttachment {
+  readonly isoId: number;
+  readonly itemId: number;
+  readonly name: string;
+  readonly tx: number;
+  readonly ty: number;
+}
+
+/** Read the selected map item's tile from the server's answer, if it is one. */
+export function chromeAttachment(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  isoId: number | null,
+): ChromeAttachment | null {
+  const tuple = selectedItem(world, isoId);
+  if (!tuple || isoId === null) return null;
+  const itemId = Number(tuple[0]);
+  const tx = Number(tuple[1]);
+  const ty = Number(tuple[2]);
+  if (![itemId, tx, ty].every((value) => Number.isFinite(value))) return null;
+  const name = bundle.items.find((entry) => entry.id === itemId)?.name ?? '';
+  return { isoId, itemId, name, tx, ty };
+}
+
+/** The attach/dettach lifecycle the original's attachables all share. */
+export interface AttachmentState {
+  readonly attached: ChromeAttachment | null;
+}
+
+/** Nothing is attached. */
+export const NO_ATTACHMENT: AttachmentState = Object.freeze({ attached: null });
+
+/** Attach to one world element, replacing any previous target. */
+export function attachTo(state: AttachmentState, target: ChromeAttachment): AttachmentState {
+  void state;
+  return { attached: target };
+}
+
+/** Dettach, leaving no world-space marker behind. */
+export function dettach(state: AttachmentState): AttachmentState {
+  void state;
+  return NO_ATTACHMENT;
+}
+
+/** Whether the marker is on this particular server element. */
+export function isAttachedTo(
+  state: AttachmentState,
+  target: ChromeAttachment | null,
+): boolean {
+  return (
+    state.attached !== null &&
+    target !== null &&
+    state.attached.isoId === target.isoId &&
+    state.attached.tx === target.tx &&
+    state.attached.ty === target.ty
+  );
+}
+
+/** Where an attachment sits on screen, through the client's own projection. */
+export function attachmentPixel(
+  target: ChromeAttachment,
+  camera: CameraState,
+): { x: number; y: number } {
+  return tileToPixel(target.tx, target.ty, viewportOf(camera));
+}
+
+/** One request for the chrome's single modal slot. */
+export interface ChromePopupRequest {
+  readonly id: string;
+  readonly title: string;
+  readonly message: string;
+  /** Higher priority opens first; ties keep request order. */
+  readonly priority: number;
+}
+
+/** The one open popup and the requests waiting behind it. */
+export interface ChromePopupSlot {
+  readonly open: ChromePopupRequest | null;
+  readonly pending: readonly ChromePopupRequest[];
+}
+
+/** An empty slot: no popup, no queue. */
+export const EMPTY_POPUP_SLOT: ChromePopupSlot = Object.freeze({
+  open: null,
+  pending: [],
+});
+
+/**
+ * Ask for a popup.
+ *
+ * This is `PopupObject`'s priority order in the clone's **one** dialog slot:
+ * a second popup never opens a second modal, it waits in `pending` until the
+ * first is dismissed. The body is still hosted by `dialog.tsx`; there is no
+ * second stack of DOM overlays.
+ */
+export function requestPopup(
+  slot: ChromePopupSlot,
+  request: ChromePopupRequest,
+): ChromePopupSlot {
+  if (!slot.open) return { open: request, pending: slot.pending };
+  const pending = [...slot.pending, request].sort((a, b) => b.priority - a.priority);
+  return { open: slot.open, pending };
+}
+
+/** Dismiss the open popup and promote the highest-priority waiter. */
+export function dismissPopup(slot: ChromePopupSlot): ChromePopupSlot {
+  if (!slot.open) return slot;
+  const [next, ...rest] = slot.pending;
+  return { open: next ?? null, pending: rest };
+}
+
+/** The one dialog's descriptor for a chrome popup. */
+export function chromePopupDialog(request: ChromePopupRequest): DialogContent {
+  return { id: request.id, kind: 'alert', title: request.title };
 }
