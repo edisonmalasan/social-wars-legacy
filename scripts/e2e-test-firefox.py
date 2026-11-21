@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
-"""Full end-to-end play session in Firefox (Gecko), against the real server.
+"""Full end-to-end play session in a Playwright engine, against the real server.
 
 The Chrome/Edge end-to-end harness (``scripts/e2e-test.mjs``) drives its
-browsers over the Chrome DevTools Protocol. Firefox does not speak CDP; it
-speaks Juggler/BiDi, which Playwright drives. This is the Gecko counterpart:
-the *same* built client, the *same* real authoritative server, and the *same*
-rendered controls, but driven with Python Playwright.
+browsers over the Chrome DevTools Protocol. Firefox and WebKit do not speak
+CDP; Playwright drives them through Juggler/BiDi and its WebKit protocol. This
+is that counterpart: the *same* built client, the *same* real authoritative
+server, and the *same* rendered controls, but driven with Python Playwright.
+
+The engine is selected by the entry point, and every line of output names the
+engine that actually ran:
+
+    python scripts/e2e-test-firefox.py    # Firefox / Gecko
+    python scripts/e2e-test-webkit.py     # WebKit (Playwright)
+
+WebKit here is Playwright's open-source WebKit engine, **not** branded Safari.
+Neither run claims a real device.
 
 What this proves, in one run
 ----------------------------
@@ -33,13 +42,16 @@ control; the client's own request builder and transport send it, and the
 server's own rules decide the result. ``window.__swl`` is *not* used to issue
 commands or grant anything.
 
-Gecko only. Safari/WebKit and real devices are NOT RUN. The G5 "run in Firefox
-and Safari" roadmap checkbox stays open because it also names Safari.
+Branded Safari and real devices are NOT RUN. The G5 "run in Firefox and
+Safari" roadmap checkbox stays open until branded Safari itself is played (or
+the roadmap owner rewords the requirement honestly).
 
 Usage (from the repository root)::
 
     python scripts/e2e-test-firefox.py
     python scripts/e2e-test-firefox.py --screenshot path/to/shot.png
+    python scripts/e2e-test-webkit.py
+    python scripts/e2e-test-webkit.py --screenshot path/to/shot.png
 """
 
 from __future__ import annotations
@@ -101,6 +113,45 @@ BUILD_OUTLINE_OFFSET_Y = 54
 WALLET_KEY = {
     "energy": "e", "xp": "x", "gold": "g", "wood": "w",
     "oil": "o", "steel": "s", "cash": "c", "mana": "m",
+}
+
+# One harness, two Playwright engines. The CSV of identity strings lives here
+# so an entry point cannot accidentally report a different browser than the one
+# it launched. Each engine owns its player id, temp-data prefix and screenshot
+# name, so concurrent runs cannot share a server, a database or a proof image.
+ENGINES = {
+    "firefox": {
+        "label": "firefox",
+        "player": "e2e-ui-firefox",
+        "data_prefix": "swl-ff-e2e-",
+        "screenshot": "swl-firefox-e2e.png",
+        "install": "python -m playwright install firefox",
+        "launch": lambda playwright: playwright.firefox.launch(headless=True),
+        "browsers_run": "  browsers run: firefox (Playwright, Gecko)",
+        "browsers_not_run": (
+            "  browsers not run: WebKit/Safari (Playwright WebKit is covered by "
+            "scripts/e2e-test-webkit.py; branded Safari not run), Chrome/Edge "
+            "(covered by scripts/e2e-test.mjs and scripts/smoke-test-client.mjs), real devices"
+        ),
+        "scope": "  scope: full Firefox gameplay session; branded Safari and devices NOT RUN",
+        "ok": "OK: a player registered, played and signed in again after a server restart in Firefox.",
+    },
+    "webkit": {
+        "label": "webkit",
+        "player": "e2e-ui-webkit",
+        "data_prefix": "swl-wk-e2e-",
+        "screenshot": "swl-webkit-e2e.png",
+        "install": "python -m playwright install webkit",
+        "launch": lambda playwright: playwright.webkit.launch(headless=True),
+        "browsers_run": "  browsers run: webkit (Playwright, WebKit)",
+        "browsers_not_run": (
+            "  browsers not run: branded Safari (NOT RUN - this run uses Playwright's "
+            "WebKit engine, not Safari), Firefox (covered by scripts/e2e-test-firefox.py), "
+            "Chrome/Edge (covered by scripts/e2e-test.mjs and scripts/smoke-test-client.mjs), real devices"
+        ),
+        "scope": "  scope: full WebKit (Playwright) gameplay session; branded Safari and devices NOT RUN",
+        "ok": "OK: a player registered, played and signed in again after a server restart in WebKit (Playwright).",
+    },
 }
 
 
@@ -229,8 +280,22 @@ def make_handler(api_port: int):
     return Handler
 
 
+class QuietHTTPServer(ThreadingHTTPServer):
+    """A static server that stays quiet about WebKit's teardown resets.
+
+    WebKit drops keep-alive connections abruptly when the page is torn down.
+    A reset while shutting down is not a session failure and must not bury the
+    result in a socketserver traceback. Every other error is still reported.
+    """
+
+    def handle_error(self, request, client_address):
+        if isinstance(sys.exc_info()[1], ConnectionResetError):
+            return
+        super().handle_error(request, client_address)
+
+
 def start_static_server(api_port: int):
-    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(api_port))
+    server = QuietHTTPServer(("127.0.0.1", 0), make_handler(api_port))
     threading.Thread(target=server.serve_forever, daemon=True).start()
     port = server.server_address[1]
     return server, port
@@ -801,11 +866,19 @@ def _weekly_play_index(world) -> int:
     return 0
 
 
-def run_browser(server_port: int, client_port: int, data_dir: Path, screenshot: Path):
-    """Run the full Firefox session. Returns (ran, failures, console_errors)."""
+def run_browser(
+    server_port: int,
+    client_port: int,
+    data_dir: Path,
+    screenshot: Path,
+    engine: str = "firefox",
+):
+    """Run the full session in ``engine``. Returns (ran, failures, console_errors)."""
     from playwright.sync_api import sync_playwright
 
-    player_id = "e2e-ui-firefox"
+    config = ENGINES[engine]
+    label = config["label"]
+    player_id = config["player"]
     password = "correct horse"
     failures: list[str] = []
     console_errors: list[str] = []
@@ -814,14 +887,17 @@ def run_browser(server_port: int, client_port: int, data_dir: Path, screenshot: 
     restart_child = None
 
     with sync_playwright() as playwright:
-        browser = playwright.firefox.launch(headless=True)
+        browser = config["launch"](playwright)
         try:
             context = browser.new_context(viewport={"width": 1280, "height": 900})
             page = context.new_page()
 
             def on_console(message):
                 if message.type == "error":
-                    console_errors.append(f"console.error: {message.text}")
+                    where = (message.location or {}).get("url", "")
+                    console_errors.append(
+                        f"console.error: {message.text}" + (f" ({where})" if where else "")
+                    )
 
             def on_page_error(error):
                 console_errors.append(f"pageerror: {error}")
@@ -829,7 +905,7 @@ def run_browser(server_port: int, client_port: int, data_dir: Path, screenshot: 
             page.on("console", on_console)
             page.on("pageerror", on_page_error)
 
-            print("  firefox: ", end="", flush=True)
+            print(f"  {label}: ", end="", flush=True)
             server, _ = start_server(data_dir, server_port)
             try:
                 url = f"http://127.0.0.1:{client_port}/"
@@ -884,7 +960,7 @@ def run_browser(server_port: int, client_port: int, data_dir: Path, screenshot: 
                     flush=True,
                 )
             except Exception as error:
-                failures.append(f"firefox: {error}")
+                failures.append(f"{label}: {error}")
                 print(f"FAILED ({error})", flush=True)
             finally:
                 stop_server(server)
@@ -894,7 +970,7 @@ def run_browser(server_port: int, client_port: int, data_dir: Path, screenshot: 
             browser.close()
 
     if console_errors:
-        failures.extend(f"firefox: {error}" for error in console_errors)
+        failures.extend(f"{label}: {error}" for error in console_errors)
         print(f"  console/page errors: {len(console_errors)}", flush=True)
     else:
         print("  console/page errors: none", flush=True)
@@ -902,12 +978,14 @@ def run_browser(server_port: int, client_port: int, data_dir: Path, screenshot: 
     return ran, failures, console_errors
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+def main(engine: str = "firefox", description: str | None = None) -> int:
+    config = ENGINES[engine]
+    label = config["label"]
+    parser = argparse.ArgumentParser(description=description or __doc__)
     parser.add_argument(
         "--screenshot",
         type=Path,
-        default=Path(tempfile.gettempdir()) / "swl-firefox-e2e.png",
+        default=Path(tempfile.gettempdir()) / config["screenshot"],
         help="where to write the proof-of-session screenshot",
     )
     args = parser.parse_args()
@@ -917,7 +995,7 @@ def main() -> int:
     except ImportError:
         print(
             "Playwright for Python is not installed. Provision it with:\n"
-            "  python -m playwright install firefox",
+            f"  {config['install']}",
             file=sys.stderr,
         )
         return 2
@@ -933,35 +1011,34 @@ def main() -> int:
         print("the content bundle has not been built. Run: pnpm build:content", file=sys.stderr)
         return 2
 
-    data_dir = Path(tempfile.mkdtemp(prefix="swl-ff-e2e-"))
+    data_dir = Path(tempfile.mkdtemp(prefix=config["data_prefix"]))
     server_port = free_port()
     static, client_port = start_static_server(server_port)
     try:
-        ran, failures, _ = run_browser(server_port, client_port, data_dir, args.screenshot)
+        ran, failures, _ = run_browser(
+            server_port, client_port, data_dir, args.screenshot, engine
+        )
     finally:
         static.shutdown()
         static.server_close()
         shutil.rmtree(data_dir, ignore_errors=True)
 
     print("")
-    print("  browsers run: firefox (Playwright, Gecko)")
-    print(
-        "  browsers not run: WebKit/Safari (not provisioned), Chrome/Edge "
-        "(covered by scripts/e2e-test.mjs and scripts/smoke-test-client.mjs), real devices"
-    )
-    print("  scope: full Firefox gameplay session; Safari/WebKit and devices NOT RUN")
+    print(config["browsers_run"])
+    print(config["browsers_not_run"])
+    print(config["scope"])
 
     if failures:
         print("", file=sys.stderr)
-        print("the Firefox end-to-end session failed:", file=sys.stderr)
+        print(f"the {label} end-to-end session failed:", file=sys.stderr)
         for failure in failures:
             print(f"  {failure}", file=sys.stderr)
         return 1
     if not ran:
-        print("no Firefox browser was available to play in.", file=sys.stderr)
+        print(f"no {label} browser was available to play in.", file=sys.stderr)
         return 2
 
-    print("OK: a player registered, played and signed in again after a server restart in Firefox.")
+    print(config["ok"])
     return 0
 
 
