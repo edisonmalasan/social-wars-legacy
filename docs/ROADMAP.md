@@ -2727,7 +2727,7 @@ be mistaken for unfinished work.*
 | G | Playable at the original resolutions and phone scales | The stage model exists; real-device verification does not | Test on the target devices |
 | G | Played on an actual phone with touch controls | No device here | A phone and touch-control implementation |
 | H | A player with no server cannot play | **Non-goal** — the product is pure online (ADR 19) | A reversal of ADR 19 |
-| H | Installers for Windows, macOS and Linux | An **unsigned Windows NSIS** installer was built on this host (`Social Wars Legacy_0.1.0_x64-setup.exe`, 33.27 MiB) with the npm Tauri CLI 2.12.3; NSIS 3.13 is cached, WebView2 is present and WiX is auto-downloadable. MSI was not attempted, and macOS/Linux have no build hosts here | Signed artefacts plus macOS and Linux CI runners; this row stays open until all three platforms are produced |
+| H | Installers for Windows, macOS and Linux | **Unsigned Windows NSIS** (`Social Wars Legacy_0.1.0_x64-setup.exe`, 33.27 MiB) and **unsigned Windows MSI** (`Social Wars Legacy_0.1.0_x64_en-US.msi`, 49.88 MiB) were both built on this host with the npm Tauri CLI 2.12.3. The first MSI attempt failed on a config gap (`bundle.icon` listed only the PNG; the existing `icons/icon.ico` was not referenced); adding the `.ico` and retrying produced the MSI. NSIS 3.13 is cached, WiX 3.14.1 auto-downloads and hash-verifies, and WebView2 is present. macOS/Linux have no build hosts here | Signed artefacts plus macOS and Linux CI runners; this row stays open until all three platforms are produced |
 | H | Code-signed binaries, notarised macOS build | No code-signing certificate or Apple developer account exists; the one built installer is unsigned | Obtain the credentials |
 | H | Auto-update with clean rollback | The pure decision/rollback logic exists and is mock-tested, but there is no signed release stream, HTTPS endpoint, installer hook or rollback executor | A signed release stream, endpoint and a real install/rollback layer |
 | I | A corrections request actually received and honoured | No rights holder has made a request; the policy and log exist | A real request through `docs/CORRECTIONS.md` |
@@ -2998,6 +2998,25 @@ reviewed without reconstructing the conversation that led to it.*
   filenames), `e2e-test.mjs` (Chrome + Edge), `cargo test --locked` (39 Rust
   tests), `cargo fmt --check` and `check-desktop-dist.mjs`, plus the bounded
    `tauri build --bundles nsis` (exit 0) and the sidecar health probe above.
+- **2026-11-21 — unsigned Windows MSI produced; installer item stays open (Group H).**
+  A first bounded `tauri build --bundles msi` (npm Tauri CLI 2.12.3) compiled
+  and patched the release binary and auto-downloaded + hash-verified WiX 3.14.1
+  (the anticipated VBSCRIPT/download blocker did **not** occur), then failed at
+  bundling with `Couldn't find a .ico icon`: `bundle.icon` listed only
+  `icons/icon.png` while `icons/icon.ico` existed on disk unreferenced. Adding
+  the `.ico` to `bundle.icon` and retrying produced a real unsigned MSI:
+  `Social Wars Legacy_0.1.0_x64_en-US.msi` (**49.88 MiB**, exit 0). Together
+  with the 33.27 MiB NSIS `.exe` from PR #26, both Windows installer formats are
+  now attested. *Rationale:* a one-line config fix was a safely achievable
+  portion of the task, so the blocker record was corrected rather than left
+  stale. The "Installers for Windows, macOS and Linux" box stays **unticked**:
+  macOS and Linux have no build hosts here, and neither artefact is signed.
+  *Still blocked:* macOS/Linux builds (build hosts), code signing and
+  notarisation, a live signed update stream with a real rollback executor, and
+  publication. *Evidence:* `tauri build --bundles msi` exit 0 with the .ico
+  configured; full gate green — `pnpm test` 1742 pass / 0 fail, `pnpm typecheck`,
+  `pnpm lint`, `cargo test --locked`, `cargo fmt --check` and `check-roadmap.mjs`
+  (401 items) all exit 0.
 
 ---
 
