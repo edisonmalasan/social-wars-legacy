@@ -215,9 +215,9 @@ first means guessing at the rules being cloned.
       (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
       attack interval, the velocity, the life and the population
 - [ ] The panels and the popups are **rendered**, and the popups that are not
-      implemented are recorded as dropped. The screen inventory now reads **108
-      implemented / 52 dropped / 100 planned**; the counts are checked by
-      `packages/client/src/screens.test.ts`, and this item stays open while **100
+      implemented are recorded as dropped. The screen inventory now reads **141
+      implemented / 52 dropped / 67 planned**; the counts are checked by
+      `packages/client/src/screens.test.ts`, and this item stays open while **67
       screens are planned** - a `Deferred: ` reason records honest scope, not a
       rendered screen or a drop
 - [x] The authoritative **item id → delegate** map is extracted from
@@ -1198,21 +1198,21 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **108 implemented** - the clone models the screen's behaviour, and the decision
+      - **141 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **52 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **100 planned** - in scope, the client's behaviour is real, and not modelled
+      - **67 planned** - in scope, the client's behaviour is real, and not modelled
         yet; each now carries a `Deferred: ` reason saying what is missing or how it
         unblocks
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
       exists, every dropped one must say why, and every planned one must start with
       `Deferred: ` and say what is missing or how it unblocks. The counts above are
-      checked by the same test. **This item stays open while 100 screens are planned**:
+      checked by the same test. **This item stays open while 67 screens are planned**:
       a deferral reason is neither an implementation nor a drop, and the earlier
       106/23/131 breakdown was a factual error, not a hidden batch of finished work
 - [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
@@ -1731,9 +1731,13 @@ non-goal work are kept distinct; an unfinished screen is not counted as complete
 - **Screen inventory.** Four entries in `re/data/ui-screens.json` now name a
   real model path — the army unit cell, the inventory items tab, the reward
   screen and the team-selection window — so the 260 screens read **89
-  implemented, 52 dropped, 119 planned** (G5.1: 85/52/123). The four team
-  quests, the collections-content tab and the next-mission confirmation remain
-  planned where the clone has only an inline action.
+  implemented, 52 dropped, 119 planned** (G5.1: 85/52/123). That was the G5.2
+  position, not the current one: the four team quests still need a legitimately
+  high-level save for a browser happy path, but the team roster, the
+  collections-content tab and the next-mission confirmation have since been
+  implemented in the one dialog from server/content state (see *Final
+  screen-family refresh* below). The original's proprietary artwork stays
+  planned.
 
 **Partial, not complete:**
 
@@ -1763,11 +1767,12 @@ production release. Firefox and a real phone remain external platform blockers.
 
 **Remaining gaps:** the mobile shell (Group G5) is still not implemented; the
 two licensing/no-Flash checks must still be run before the client build or on a
-cleaned tree, as in CI; the four level-40 team quests need a legitimately
-high-level save for a browser happy-path run; and the insert-unit expansion UI
-and full collections-content tabs remain deferred. No change here weakens the
-server's authority: combat, resources, progression and rewards remain
-server-side.
+cleaned tree, as in CI; and the four level-40 team quests need a legitimately
+high-level save for a browser happy-path run. The insert-unit expansion prompts
+and the collections-content tab are no longer deferred — they are drawn from
+server/content state in the screen-family refresh below; the original's
+separate art remains excluded. No change here weakens the server's authority:
+combat, resources, progression and rewards remain server-side.
 
 ---
 
@@ -1836,22 +1841,26 @@ work are kept distinct, and no unfinished screen is counted as complete.*
   G5.1 and G5.2.
 - **Screen inventory.** One entry, `GUI/ExpandTabNew2.as`, now records the
   implemented purchase control with real model paths, so the 260 screens read
-  **90 implemented, 52 dropped, 118 planned** (G5.2: 89/52/119). The original's
-  per-slot expansion buttons and post-purchase celebration popup remain planned
-  where the clone has only the inline control.
+  **90 implemented, 52 dropped, 118 planned** (G5.2: 89/52/119). That was the
+  position at this milestone: the per-slot buy-for prompts and the post-purchase
+  celebration are now drawn inline by the same control (see *Final
+  screen-family refresh* below); the original's Share! popup and artwork stay
+  excluded.
 
 **Deferred, not claimed:**
 
 - The original expansion price table also carries `neighbors` and `inventory_qte`
-  columns. Those gates are **deferred**: their inputs are not server-owned in
-  this workflow, so the server charges only the coins and cash columns and the
-  client claims neither. They are not described as implemented.
+  columns. Their literals are now drawn as **display-only prompts** from the
+  server's wallet and neighbour count, not as enforced gates: the client sends
+  the same `expand(tileId)`, and the server alone decides acceptance and price.
+  No client-side gate is claimed.
 - **No original grid-placement rule is restored.** The UI suggests a
   deterministic, not-yet-owned tile **identifier**; the server validates it and
   decides whether a purchase is accepted. A tile id is an identifier, never an
   outcome or a claim about the original grid.
-- The post-purchase `PopupExpand` celebration/share popup and the
-  `ItemButtonLargeExpand2` per-slot buttons are not modelled, and no extra
+- The `PopupExpand` celebration and the `ItemButtonLargeExpand2` per-slot
+  buy-for prompts are now modelled inline in the one panel; the original's
+  Share! social popup and proprietary art remain excluded, and no second
   modal, dependency or proprietary art was added.
 
 **Remaining gaps:** the mobile shell (Group G5) is still not implemented; the
@@ -1860,6 +1869,68 @@ cleaned tree, as in CI; and the four level-40 team quests need a legitimately
 high-level save for a browser happy-path run. No change here weakens the
 server's authority: combat, resources, progression, rewards and expansion
 pricing remain server-side.
+
+---
+
+## Final screen-family refresh — verified inventory at 4551edd
+
+*Status: **verified**. This section records the five screen-family increments
+that followed the G5.2 and Expansion milestones, and supersedes their "remain
+planned" notes. It sits **outside** the `## Group X` sections, so
+`node scripts/check-roadmap.mjs` still counts the same **401** items (22 open:
+B 4, E 1, G 8, H 4, I 5). The inventory in `re/data/ui-screens.json` now reads
+**141 implemented / 52 dropped / 67 planned** out of 260; the `movieclip`
+count of 108 is a by-kind count, not a decision count. Nothing here turns a
+`Deferred: ` reason into a completed screen.*
+
+- **PR #51 (`37d2ff3`) — onboarding and confirmation (6 screens).** The one
+  accessible dialog hosts the intro/help tutorial steps from
+  `packages/client/src/tutorial.ts`, the authoritative mission-info briefing
+  from `packages/client/src/questview.ts`, a yes/no confirmation body and a
+  next-mission offer; the client's own texts come from
+  `apps/client/src/ui/state.ts`, and the choice only sends the host's
+  pre-chosen, server-owned request (`apps/client/src/ui/onboarding.tsx`).
+  Still planned: the cosmetic loading animation and the parent popups that
+  need the original artwork.
+- **PR #52 (`314b227`) — roster, team thumbnails and unit XP (6 screens).** The
+  full army roster, the generic unit selector and the selected/unselected team
+  thumbnails are drawn from server state through `packages/client/src/army.ts`
+  and `apps/client/src/ui/roster.tsx`; the unit-XP display uses
+  `packages/rules/src/xp.ts` with the client's own LEVEL UP literals. Still
+  planned: the proprietary unit portraits. The four level-40 team quests stay
+  externally blocked for a browser happy path, and no positional combat
+  simulator was added.
+- **PR #53 (`204cfa0`) — reusable UI chrome (14 screens).** Tabs, sub-category
+  pills, the build tab buttons, the zoom slider, the speaker box, the collect
+  affordance, the hurry-up buttons, the world-space attachable marker, the
+  cover, the pop-over and the shared popup body are drawn in
+  `apps/client/src/ui/chrome.tsx` from server state and the client's own
+  literals. There is still **one** dialog, not a second modal. Still planned:
+  artwork-gated icons and portraits.
+- **PR #54 (`ac0cc7e`) — expansion growth, buy-for prompts and the collections
+  tab (4 screens).** `apps/client/src/ui/expansion.tsx` draws the growth result
+  from the server's before/after expansion lists and the buy-for/requirement
+  prompts from the content's price row; `apps/client/src/ui/collections.tsx`
+  draws the ten collections rows from content and the server's stored items in
+  a tab of the storage panel. `neighbors` and `inventory_qte` are display-only
+  prompts, not gates: the client sends the same `expand(tileId)` and the server
+  decides. Excluded: the original's art and the Share! social popup.
+- **PR #55 (`4551edd`) — hospital recovery and attack-symbol legend (3
+  screens).** `apps/client/src/ui/charactersetup.tsx` draws the hospital from
+  the server's `deadHeroes`, stored syringes and the content's names/costs, and
+  sends the catalogue's `resurrect_hero` request; the attack-symbol legend
+  presents the client's own literals and the rules' ten damage classes. No
+  revival is decided locally and no proprietary art is claimed. Still planned:
+  the gender/character-setup choice — the save has no character-setup field
+  and no command exists, so there is nothing authoritative to render.
+
+**Verified gates for this refresh:** `node scripts/check-roadmap.mjs` reports
+401 items, 22 open (B 42/4, E 37/1, G 78/8, H 14/4, I 99/5, with A, C, D and F
+complete); `node scripts/check-report-sync.mjs` agrees with the implementation
+(4 claims) after `pnpm build:content`; and this documentation-only diff touches
+only `docs/ROADMAP.md` and `docs/GOAL.md`. The B6 and G3 checkbox items stay
+open while 67 screens are planned: a deferral is honest scope, not a finished
+screen or a drop.
 
 ---
 
@@ -2980,7 +3051,7 @@ be mistaken for unfinished work.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 100 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 100; the art gate applies to the drawn ones |
+| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 67 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 67; the art gate applies to the drawn ones |
 | B | PvP `end_attack` payload captured live | Needs a live second player and the original Flash client driven over CDP | A Flash test rig with two live accounts |
 | B | `attack_player` / `spy_player` payloads captured live | Same as above | The same Flash test rig |
 | B | Premium purchase flow captured live | Needs a real-money account, which the preservation project must not use | A funded test account and explicit approval |
@@ -2992,7 +3063,7 @@ be mistaken for unfinished work.*
 |---|---|---|---|
 | G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout, or a licensing decision |
 | G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented | Licence or re-create the art (I6) |
-| G | Every B6 screen implemented or explicitly dropped | 100 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 100 |
+| G | Every B6 screen implemented or explicitly dropped | 67 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 67 |
 | G | Client runs in Firefox and Safari | **Firefox and WebKit (Playwright) are verified**: full rendered gameplay sessions ran under Gecko via `scripts/e2e-test-firefox.py` and under WebKit via `scripts/e2e-test-webkit.py` (both Playwright engines, driven over Juggler/BiDi). Branded Safari and real devices have not been run — Playwright's WebKit is an engine test, not Safari | Play the same session in branded Safari and on real devices; this box closes once Safari passes |
 | G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux bundling is now in CI, unsigned** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` with `libwebkit2gtk-4.1-dev`, and its informational, non-required `linux-bundle` job produces unsigned `.deb`/`.AppImage` artefacts; macOS genuinely needs a host | Add a macOS runner and signed artefacts (Linux bundling is already in CI); this box closes once all three platforms are produced |
 | G | Mobile build runs on Android and iOS | No Capacitor, Android SDK or Xcode on this machine | Install the Capacitor toolchain and SDKs |
