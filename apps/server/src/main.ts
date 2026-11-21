@@ -244,6 +244,8 @@ async function main(): Promise<void> {
     // Deterministic strike damage, from the server's own seed.
     serverSeed: process.env['SWL_SERVER_SEED'] ?? 'swl-server-v1',
     offerPacks: content.offerPacks,
+    // Expansion prices are indexed by the server's owned-tile count.
+    expansionPrices: bundle.expansionPrices,
     populationRules: populationRules(globals),
     // The darts schedule and the market prices are the content's own.
     dartsItems: bundle.dartsItems,

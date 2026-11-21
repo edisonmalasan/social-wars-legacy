@@ -341,15 +341,14 @@ export function computeCommandCost(
     }
 
     case 'expand': {
-      // args: tile id, price, type. The price is computed from the
-      // expansion table, never taken from the argument.
-      const owned = Number(args[0]);
-      const price = content.expansionPrices[owned];
-      if (!price) return null;
-      const cost: Resources = {};
-      if (price.coins) cost['g'] = price.coins;
-      if (price.cash) cost['c'] = price.cash;
-      return { cost, gain: {} };
+      // args: tile id (the legacy client also sent a price and a type). The
+      // first argument is a TILE ID, not the number of owned tiles, so its
+      // value cannot index the price table here. Only the applier knows the
+      // server's owned count; it charges the content price from that count
+      // and ignores the client's declared price and type. Charging here
+      // would also put an affordability gate in front of a purchase the
+      // applier may refuse for an already-owned or out-of-range tile.
+      return NO_COST;
     }
 
     case 'trade_resource': {

@@ -446,6 +446,51 @@ export function uiCss(): string {
   font-weight: 700;
 }
 
+/* --- The expansion control --------------------------------------------- */
+
+.swl-expansion {
+  position: absolute;
+  left: 8px;
+  top: 168px;
+  width: 300px;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: #131a24;
+  pointer-events: auto;
+}
+
+.swl-expansion-head {
+  margin-bottom: 4px;
+  color: #8d97a8;
+  font-size: calc(10px * var(--swl-font-scale-display, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.swl-ui button.swl-expansion-buy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  background: #1b2432;
+  color: #f5c542;
+  font-size: calc(12px * var(--swl-font-scale-display, 1));
+}
+
+.swl-ui button.swl-expansion-buy:hover:not(:disabled) { background: #27324a; }
+
+.swl-expansion-price { display: flex; gap: 8px; }
+
+.swl-expansion-gold { color: #f2d67a; }
+
+.swl-expansion-cash { color: #9fd3a0; }
+
 /* --- The info panel ---------------------------------------------------- */
 
 .swl-info {

@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 89,
+   "implemented": 90,
    "dropped": 52,
-   "planned": 119
+   "planned": 118
   }
  },
  "screens": [
@@ -454,8 +454,8 @@
    ],
    "overrides": [],
    "bytes": 6386,
-   "decision": "planned",
-   "decisionNote": "Deferred (P1): base expansion is a later progression step; the G5.1 loop uses the starting map."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the purchase gesture is modelled by `apps/client/src/ui/state.ts`, which prices the next tile from the content row at the server-owned ordinal, and `apps/client/src/ui/expansion.tsx`, which sends `expand(tileId)` through the one command transport and draws the server's answer in the shared Feedback region. The original's separate gold/cash buttons, slot picker, neighbour (`neighbors`) and inventory (`inventory_qte`) gates, and the post-purchase popup are not modelled; the tile id is an identifier the server validates, not a grid-placement rule."
   },
   {
    "class": "ExtendedPortraitPopupButton",
@@ -4318,7 +4318,7 @@
    "overrides": [],
    "bytes": 4890,
    "decision": "planned",
-   "decisionNote": "Deferred (P1): expansion choices and their cash/gold pricing are outside the P0 vertical slice."
+   "decisionNote": "Deferred (P1): the post-purchase 'Your empire has GROWN!' celebration and share popup is not modelled. The purchase and its content-derived pricing are implemented separately; only the celebration remains deferred."
   },
   {
    "class": "PopupGenericUnitSelector",

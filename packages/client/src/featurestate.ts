@@ -433,3 +433,21 @@ export function productionState(
       attrs && typeof attrs['collectType'] === 'string' ? attrs['collectType'] : null,
   };
 }
+
+/* -------------------------------------------------------------------------
+ * Expansion
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The tile ids of the expansions the server's save owns.
+ *
+ * The list is the **server's**: the world endpoint sends the map verbatim and
+ * the applier appends to it when a purchase is accepted. This selector only
+ * copies the finite numbers out of it. A save with no `expansions` field — or
+ * an older world with no map at all — owns nothing, so the safe default is an
+ * empty list rather than an invented set of tiles.
+ */
+export function ownedExpansions(world: WorldSnapshot): number[] {
+  const map = record(world.maps[0]);
+  return map ? numberList(map['expansions']) : [];
+}

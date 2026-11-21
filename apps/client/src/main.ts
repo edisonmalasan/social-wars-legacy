@@ -39,6 +39,7 @@ import {
   buy,
   claimDailyBonus,
   completeTutorial,
+  expand,
   finishBuilding,
   finishView,
   storedPlacement,
@@ -286,6 +287,11 @@ export interface ClientHandle {
    * population and the limits, and places it if the rules allow it.
    */
   buy: typeof buy;
+  /**
+   * Buy the next expansion, naming only a tile id. The server prices it from
+   * its own owned-tile count and decides whether the tile is available.
+   */
+  expand: typeof expand;
   /** The frames per second the render loop is running at. */
   framesPerSecond: () => number;
   /**
@@ -1142,6 +1148,7 @@ async function main(): Promise<void> {
     },
     claimDailyBonus,
     buy,
+    expand,
     framesPerSecond: () => framesPerSecond,
     selectedItem: () => selected,
     tutorialStep: () => (tutorialRunning ? tutorial.current?.step ?? null : null),

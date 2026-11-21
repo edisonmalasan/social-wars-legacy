@@ -58,6 +58,15 @@ export const MAX_FREE_ENERGY = 30;
 export const STARTING_XP = 4;
 
 /**
+ * The tiles a new town already owns.
+ *
+ * The original's `initial.json` seeds `expansions: [35, 36, 45, 46]` — the
+ * four free rows of the content's expansion price table. A first purchase
+ * therefore starts at ordinal 4 (2500 gold + 5 cash), priced from the content.
+ */
+export const STARTING_EXPANSIONS: number[] = [35, 36, 45, 46];
+
+/**
  * Where the Command Center stands.
  *
  * The middle of the map, so that the town has room around it in every
@@ -125,6 +134,9 @@ export function initialWorld(playerId: string): ShimWorld {
           // the map and the server's own rules read it from there too.
           level: 1,
           xp: STARTING_XP,
+          // Server-owned: the four tiles the original's initial save grants.
+          // A fresh copy per world so one town's purchases cannot leak.
+          expansions: [...STARTING_EXPANSIONS],
         },
       ],
       privateState: { mana: 0, magics: {} },

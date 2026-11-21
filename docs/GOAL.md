@@ -1,379 +1,361 @@
-# GOAL: Social Wars Legacy — G5.2 Gameplay Systems Completion & UI/UX Refinement
+# GOAL: Social Wars Legacy — Autonomous Roadmap Execution Until Completion or Genuine Blockage
 
 ## Mission
 
-Continue development of Social Wars Legacy from the successfully completed G5.1 milestone.
+You are the autonomous engineering orchestrator responsible for continuing the development of **Social Wars Legacy** toward its documented production-ready state.
 
 **Repository:** https://github.com/edisonmalasan/social-wars-legacy
 
-**Baseline:** `main` at `7a584b8` — PR #21 merged.
+**Current verified baseline:** `main` at `60b12e6` — G5.2, PR #22 merged.
 
-**New milestone:** G5.2 — Gameplay Systems Completion & UI/UX Refinement.
+**Primary source of truth:** `docs/ROADMAP.md`
 
-Your responsibility is to complete the remaining high-priority P1 gameplay systems, improve the existing interface, and deliver a more complete playable alpha without breaking the functionality verified in G5.1.
+**Operating instructions:** `AGENTS.md`, especially **Autonomous Orchestration Mode**.
 
-This is an **implementation goal**, not a request for another analysis-only report.
+### Explicit Authorization
 
-Use the installed Superpowers workflow for repository exploration, specification, planning, implementation, testing, debugging, code review, and verification.
+**ACTIVATE AUTONOMOUS ORCHESTRATION MODE.**
 
-Work autonomously within the approved scope. Make justified implementation decisions using repository evidence, existing ADRs, and test results.
+This instruction explicitly authorizes continuous, multi-task roadmap execution within the repository's existing engineering, security, Git, CI, and approval policies.
 
-Do not stop after writing a plan. Continue through implementation and verification.
+You are no longer operating under a single-milestone goal such as G5.1 or G5.2.
 
----
+Your assignment is to continuously advance the entire approved roadmap.
 
-## 1. Establish the Current Baseline
+**Do not stop merely because one milestone is finished, a PR is merged, or CI is green.**
 
-Before changing code:
-
-1. Read `docs/CONTEXT.md`, `docs/GOAL.md`, `docs/ROADMAP.md`, and `docs/DEVELOPING.md`.
-2. Examine PR #21 and its resulting implementation.
-3. Review `re/docs/14-ui-screen-inventory.md` and `re/data/ui-screens.json`.
-4. Inspect the current React components, PixiJS renderer, pure view models, and native server endpoints.
-5. Review relevant quest, production, economy, and army rules.
-6. Inspect existing e2e tests and the CI configuration.
-7. Verify the current branch, working-tree state, and latest commit.
-
-Treat G5.1 as completed work.
-
-Do not recreate components already implemented or replace working systems unnecessarily.
-
-Identify the exact remaining gaps, their dependencies, and the smallest safe changes needed to close them.
-
-Record a concise technical plan using the repository's existing Superpowers/SDD conventions.
+A completed milestone is a checkpoint, not the end of the mission.
 
 ---
 
-## 2. Primary Objective
+## 1. Mandatory Initialization
 
-Complete the missing user-facing gameplay workflows:
+Begin by inspecting:
 
-**Base → Production → Collection Period → Recruitment → Army Management → Quest Team Selection → Combat → Victory/Defeat → Reward Details → Next Mission**
+- `AGENTS.md`
+- `docs/CONTEXT.md`
+- `docs/ROADMAP.md`
+- `docs/GOAL.md`
+- `docs/DEVELOPING.md`
+- `docs/RELEASE.md`
+- `docs/LICENSING.md`
+- Relevant architectural decision records
+- The latest commits, pull requests, and repository test results
 
-The player must be able to complete these interactions through the actual rendered interface.
+Verify the current branch, commit, working-tree status, and roadmap counts.
 
-Every gameplay operation must remain server-authoritative.
+Do not blindly trust historical progress reports. Inspect code and evidence when necessary.
 
-Success is not measured by how many new components exist. It is measured by whether real players can complete the workflows reliably without debug tools, manual requests, or fabricated game state.
+The earlier G5.1 and G5.2 milestones are completed. Preserve their historical documentation.
 
----
+Treat `docs/ROADMAP.md` as the canonical source for requirements, priorities, exit criteria, verified outcomes, and outstanding dependencies.
 
-## 3. P0 — Authoritative Reward Payloads and Result Screens
+If `docs/GOAL.md` still contains the finished G5.2 task, update it to reflect this persistent roadmap-execution objective while preserving useful historical records.
 
-### Problem
-
-G5.1 successfully pays quest rewards, but the actual native command outcome returns `kind: "none"`.
-
-The existing `QuestResultView` already supports reward rows, but those rows are empty because the response does not contain the authoritative reward information.
-
-### Required implementation
-
-Trace the complete quest-reward flow:
-
-- `packages/server/src/apply.ts`
-- `apps/server/src/app.ts`
-- `packages/protocol/src/commands.ts`
-- `packages/client/src/questview.ts`
-- `apps/client/src/main.ts`
-- `apps/client/src/ui/quests.tsx`
-
-Implement an authoritative, typed reward result from the successful server transaction.
-
-The result should provide the actual awarded resource types and amounts.
-
-Reuse the existing `CommandResult` rewards variant wherever appropriate.
-
-### Requirements
-
-1. The server computes and grants rewards.
-2. The response reflects exactly what the server granted.
-3. The client only formats and displays those results.
-4. Failed quests never display granted rewards.
-5. Duplicate completion attempts never issue additional rewards.
-6. Retried requests remain idempotent.
-7. Result information remains consistent with persisted player state.
-8. Legacy protocol compatibility is preserved.
-
-Do not calculate reward rows from client-side formulas, hardcoded reward tables, or guessed wallet differences.
-
-Avoid introducing a second reward authority or a second reward-granting operation.
-
-If displaying a reward after reconnecting requires retaining an authoritative receipt, design the smallest safe persisted representation rather than replaying a reward transaction.
-
-### Result screen improvements
-
-Implement dedicated presentations for:
-
-- Quest victory.
-- Quest defeat.
-- Reward details.
-- Mission completion confirmation.
-- Next mission availability.
-- Retry or return to base.
-
-Use the existing shared accessible Dialog architecture.
-
-Do not introduce another unrelated modal system.
-
-The next-mission action must respect actual server-side quest progression and unlock restrictions.
-
-**Acceptance criteria:** A player completes a quest and sees exactly the rewards granted by the server. Replay, failure, and restart cases cannot produce incorrect reward displays or duplicate payments.
+Do not rewrite the roadmap to manufacture completion.
 
 ---
 
-## 4. P0 — Resource Collection Period Selection
+## 2. Continuous Execution Loop
 
-### Problem
+Follow this cycle:
 
-G5.1 supports building production and resource collection, but it does not provide the original collection-period chooser.
+**AUDIT → PRIORITIZE → PLAN → IMPLEMENT → TEST → REVIEW → PR → CI → MERGE → REASSESS → CONTINUE**
 
-The existing protocol already defines the `activate` command. Verify whether its server-side application is complete before implementing the UI.
+### Step A — Audit
 
-### Required implementation
+Read the current roadmap and identify unfinished work.
 
-Implement an interactive production-period selector using the documented collection periods:
+Classify tasks into:
 
-- 5 minutes
-- 60 minutes
-- 240 minutes
-- 480 minutes
+1. Actionable now.
+2. Partially actionable.
+3. Blocked by an external dependency.
+4. Deferred by an approved decision.
+5. Explicit non-goals.
+6. Completed but requiring correction because evidence has become invalid.
 
-The existing rules describe corresponding production multipliers of 0.25×, 1×, 2×, and 3×. Verify all indices, eligible buildings, costs, and constraints against the actual rules before using them.
+Review related code, tests, contracts, and documentation before deciding.
 
-### Required behavior
+### Step B — Prioritize
 
-1. Select a supported resource-producing building.
-2. Open its production settings.
-3. Display available collection periods.
-4. Show the server/content-derived production details.
-5. Select and activate a period.
-6. Display the active production cycle and countdown.
-7. Collect resources after the server confirms readiness.
-8. Update the interface from the returned world state.
+Select the highest-value eligible task using:
 
-Validate eligibility, period indices, resource capacity, timestamps, and duplicate requests server-side.
+- Existing roadmap priorities and exit criteria.
+- Dependencies and the critical path.
+- Player-facing impact.
+- Engineering risk.
+- Security and correctness implications.
+- Production-readiness impact.
+- Availability of development resources.
 
-Do not allow users to bypass timers by modifying the client clock.
+Prefer tasks that unblock multiple downstream requirements.
 
-Do not permit arbitrary production multipliers.
+Do not automatically choose the next unchecked checkbox without evaluating dependencies.
 
-Use the current shared dialog and feedback components.
+### Step C — Plan
 
-**Acceptance criteria:** A player selects a production period, waits for the authoritative completion condition, collects the correct resources, and sees the next production state.
+For substantial work, use the installed Superpowers specification and planning workflows.
 
----
+Define:
 
-## 5. P0 — Army Management and Team Selection
+- The expected observable outcome.
+- Existing implementation to reuse.
+- Required changes.
+- Security and compatibility risks.
+- Test cases.
+- Definition of Done.
 
-### Problem
+Keep each implementation increment focused enough to review and verify.
 
-G5.1 implements recruitment and training queues, but full army roster management and team selection remain deferred.
+### Step D — Implement
 
-### Required implementation
+Use the appropriate Superpowers implementation workflow and subagents when supported.
 
-Create a functional army-management interface that supports:
+Write tests for behavioral changes.
 
-- Viewing owned units.
-- Unit names and appropriate statistics.
-- Available unit quantities.
-- Units currently training.
-- Unit selection and deselection.
-- Selected army composition.
-- Relevant population or capacity restrictions.
-- Quest-specific eligibility rules.
-- Clear validation and error feedback.
+Implement actual functionality, not placeholders that merely satisfy documentation.
 
-Use existing content and server-owned player inventory.
+Reuse the established architecture.
 
-Do not manufacture unit ownership or availability.
+### Step E — Verify
 
-### Team selection
+Run focused tests first, followed by the applicable repository verification gates.
 
-Implement team selection for quest workflows where the original game requires it.
+Fix real regressions before proceeding.
 
-Review `re/docs/12-quest-system.md` and the original `QUESTS_WITH_TEAMS` behavior. The documented team-selection quests include the four higher-level quests.
+Perform code review and address actionable findings.
 
-Do not incorrectly force every quest to use the same selection workflow.
+### Step F — Integrate
 
-For supported quests:
+Follow the Git workflow in `AGENTS.md`.
 
-1. Display the player's available army.
-2. Allow selection of eligible units.
-3. Validate availability and restrictions.
-4. Submit the selected composition to the authoritative server.
-5. Persist or bind the accepted composition to the correct active quest.
-6. Reject forged, unavailable, excessive, or disallowed selections.
+Create a feature branch, commit, push, open a PR, and confirm all required checks pass.
 
-First determine whether the current quest-start endpoint accepts team composition.
+Merge only when branch protection, review requirements, and CI policies permit.
 
-If additional native endpoint fields are necessary, make the smallest backward-compatible change with server validation and tests. Do not change the 94-command catalogue simply to add a selection interface.
+After merging:
 
-The selected team must matter to the authoritative gameplay state. A cosmetic team selector that is ignored by the server is not complete.
+1. Synchronize local `main`.
+2. Verify the merged state.
+3. Update the roadmap with verified evidence.
+4. Record architectural decisions and remaining limitations.
+5. Select the next eligible task.
 
-If full team-to-combat integration exposes a larger missing simulator dependency, implement the safely supported portion, document the precise limitation, and do not claim full team-selection fidelity.
+**Immediately repeat the execution loop.**
 
-**Acceptance criteria:** Players can manage owned units and, for applicable quests, select a team whose composition the server validates and actually uses.
+Do not treat a successful merge as permission to terminate the mission.
 
 ---
 
-## 6. P1 — Remaining Gameplay Interface Improvements
+## 3. Current Roadmap Priorities
 
-After the three P0 goals are complete, continue with the remaining achievable P1 work.
+The existing roadmap covers Groups A through I. The approved roadmap is the primary work queue.
 
-### Building and inventory improvements
+At the current baseline, pay particular attention to these areas.
 
-- Improve building information and production feedback.
-- Implement item-category tabs using existing inventory data.
-- Improve building upgrade and collection confirmations.
-- Implement expansion UI if the existing authoritative server operation supports it.
-- Show requirements, costs, and refusal reasons clearly.
+### A. Remaining Gameplay and Client Functionality
 
-### Quest navigation improvements
+Investigate and complete eligible functionality including:
 
-- Add a coherent next-mission flow.
-- Improve mission progression indicators.
-- Improve difficulty and team-selection presentation.
-- Preserve progress correctly when a dialog closes or the client reloads.
+- Server-authoritative positional combat fidelity.
+- Remaining quest-specific behavioral discrepancies.
+- Q11 timer and army-wipe enforcement.
+- Q08's documented unwinnable state.
+- Expansion functionality and its missing server applier.
+- Incomplete inventory, army, or gameplay interfaces.
+- Remaining eligible B6 UI screens.
+- Accurate end-to-end tests for higher-level gameplay.
 
-### General interaction improvements
+Do not fabricate a winning quest outcome merely to make a test pass.
 
-- Prevent duplicate submissions.
-- Provide consistent loading and disabled states.
-- Restore focus when dialogs close.
-- Improve handling of long content and small viewports.
-- Ensure server refusals are displayed meaningfully.
-- Keep the interface navigable without a mouse where practical.
+### B. Stronger End-to-End Coverage
 
-Avoid adding decorative components that do not improve the player's ability to understand or operate the game.
+Improve tests that currently cover only part of the behavior.
 
----
+In particular:
 
-## 7. UI/UX Standards
+- Non-zero production and collection rewards.
+- High-level quests with team selection.
+- Actual team validation and its impact on gameplay.
+- Persistence across restart.
+- Real browser interactions.
+- Server-authoritative results.
+- Failure and replay scenarios.
 
-The existing G5.1 UI is the foundation.
+For difficult test prerequisites, investigate deterministic fixtures and supported test environments.
 
-Refine it rather than rebuilding it.
+Do not bypass actual gameplay constraints in production code.
 
-Maintain:
+### C. Group G5 — Platform Clients
 
-- PixiJS v8 for the game world.
-- React for interface panels.
-- The existing shared Dialog.
-- The existing Feedback system.
-- The established typography and styling conventions.
-- Server-driven state models.
-- Reusable UI elements and consistent spacing.
+The roadmap still requires broader platform support.
 
-Improve the interface so that it feels like an integrated strategy game rather than a collection of development tools.
+Investigate what can be implemented without unavailable hardware.
 
-Prioritize usability, readable resource information, understandable unit statistics, and clear gameplay feedback.
+Potential actionable tasks include:
 
-Use purposeful animation where it helps convey changes.
+- Capacitor mobile shell implementation.
+- Android and iOS project configuration.
+- Mobile-safe UI layout.
+- Touch and gesture input.
+- Automated responsive-layout tests.
+- Firefox and WebKit browser automation.
+- Development builds and CI configuration.
 
-Do not invent unrelated features, promotional sections, filler text, or unnecessary UI elements.
+If a platform SDK is missing, determine whether it can safely be installed or provisioned through existing tooling.
 
-### Asset restrictions
+Do not classify something as externally blocked merely because a tool is not preinstalled.
 
-Do not introduce proprietary Zynga artwork, audio, or fonts into distributable outputs.
+However, never claim real-device verification based only on emulation.
 
-Use existing CSS/SVG primitives and appropriately licensed assets.
+### D. Group H — Desktop Distribution
 
-Do not let unavailable original art stop implementation of functional UI elements.
+Continue eligible desktop release engineering:
 
----
+- Unsigned development installers.
+- Windows packaging.
+- macOS build configuration.
+- Linux packaging.
+- Cross-platform CI where supported.
+- Auto-update infrastructure and rollback tests.
+- Reproducible build verification.
 
-## 8. Non-Negotiable Architecture
+Code signing, notarization credentials, and production publication remain gated on their actual requirements.
 
-Preserve these decisions:
+### E. Group I — Production Readiness
 
-1. Server-authoritative gameplay, economy, and rewards.
-2. Shared TypeScript rules and protocol types.
-3. PixiJS world renderer and React DOM interface.
-4. Existing 94-command catalogue and legacy compatibility.
-5. Two-argument `set_quest_var`.
-6. Explicit quest-start semantics.
-7. `end_quest` as completion, never implicit initialization.
-8. Transactional and idempotent reward processing.
-9. No runtime dependency on `upstream/`.
-10. No modification of vendored source files.
-11. No Flash dependency in shipped applications.
-12. No unauthorized proprietary assets in release builds.
+Continue tasks involving:
 
-Where a native API enhancement is genuinely needed, document and test it instead of silently changing the wire contract.
+- Reliability and security.
+- Performance profiling.
+- GPU-compatible benchmark fixtures.
+- Monitoring and diagnostics.
+- Deployment and rollback rehearsal.
+- Documentation and release validation.
+- Licensing and provenance safeguards.
 
----
-
-## 9. Testing Strategy
-
-Follow test-driven development where practical.
-
-Add unit tests, integration tests, and actual browser e2e coverage for the new features.
-
-### Reward tests
-
-Verify:
-
-- Successful quest returns exact awarded reward rows.
-- Client displays authoritative amounts.
-- Failure grants and displays nothing.
-- Duplicate completion cannot pay twice.
-- Request retries produce consistent results.
-- Server restart preserves rewards and relevant receipts.
-
-### Collection-period tests
-
-Verify:
-
-- Every supported period.
-- Correct period validation.
-- Production not ready.
-- Production ready.
-- Duplicate collection.
-- Insufficient capacity.
-- Invalid building and invalid period.
-- Persistence across reload/restart.
-
-### Army tests
-
-Verify:
-
-- Correct owned-unit counts.
-- Selection and deselection.
-- Unavailable units.
-- Exceeded quantities.
-- Quest restrictions.
-- Server-side acceptance or refusal.
-- Correct binding to the active quest.
-- No client-forged unit availability.
-
-### UI tests
-
-Verify:
-
-- Opening and closing dialogs.
-- Keyboard and focus behavior.
-- Responsive layouts.
-- Accurate loading and refusal states.
-- No duplicate actions.
-- Correct result and reward presentation.
-
-### End-to-end requirements
-
-Extend the actual G5.1 Chrome and Edge e2e tests.
-
-The browser must interact with rendered controls, not merely call internal request builders.
-
-Test the complete enhanced gameplay loop, including production-period selection, army selection where supported, quest completion, reward presentation, reload, and server restart.
-
-Use deterministic clocks and fixtures where required. Do not introduce arbitrary sleeps or weaken assertions to make tests pass.
-
-Fix failing tests at their cause, not by skipping them.
+Do not publish publicly while unresolved legal or licensing requirements remain.
 
 ---
 
-## 10. Verification Gates
+## 4. Do Not Invent Milestones to Justify Stopping
 
-Run all applicable existing project gates, including:
+G5.1 and G5.2 were useful development increments.
+
+However, the execution model must no longer be:
+
+"Complete G5.3 → Stop → Wait for next goal."
+
+Instead:
+
+"Complete the highest-priority eligible work → Verify → Merge → Continue to the next eligible work."
+
+You may create internal implementation increments such as G5.3 if they help organize development.
+
+But those labels are not execution boundaries.
+
+Use the existing Groups A–I and the roadmap's actual unmet outcomes as the source of truth.
+
+Do not expand the roadmap with artificial milestones merely to generate more work.
+
+---
+
+## 5. Blocker Resolution Protocol
+
+An apparent blocker is not automatically a reason to stop.
+
+When you encounter one:
+
+**First:** Identify the exact missing dependency.
+
+**Second:** Determine whether it can be resolved safely using available repository tools, test fixtures, standard SDKs, CI runners, or compatible alternatives.
+
+**Third:** Implement any independently verifiable portion.
+
+**Fourth:** Record the remaining blocked work with:
+
+- The affected roadmap requirement.
+- The precise blocker.
+- What was attempted.
+- What evidence was collected.
+- What resource or decision would unblock it.
+
+**Fifth:** Continue with another independent eligible task.
+
+Do not repeatedly ask for resources that are unnecessary for the next independent task.
+
+Do not claim all outstanding work is externally blocked without inspecting each requirement.
+
+### Genuine Blockers
+
+Examples include:
+
+- Unavailable rights-holder permissions.
+- Required code-signing credentials.
+- Physical device testing that cannot be replicated.
+- External Flash captures requiring unavailable accounts.
+- Production publishing authorization.
+- External infrastructure requiring paid access.
+
+Never invent evidence to bypass these requirements.
+
+---
+
+## 6. Architecture and Security Boundaries
+
+Preserve the repository's approved decisions:
+
+1. TypeScript monorepo.
+2. Deterministic rules engine.
+3. Server-authoritative gameplay.
+4. PixiJS world and React UI.
+5. Existing protocol compatibility.
+6. The 94-command catalogue unless explicitly authorized otherwise.
+7. Strict two-argument `set_quest_var`.
+8. Correct `end_quest` completion semantics.
+9. Authenticated, transactional persistence.
+10. Idempotent reward processing.
+11. Read-only vendored upstream.
+12. No Flash runtime dependency.
+13. No unauthorized proprietary assets in distributable builds.
+14. Pure-online architecture unless an approved ADR changes it.
+
+Never weaken security, correctness, or compatibility simply to close roadmap items.
+
+Document proposed architectural changes through the established ADR process.
+
+Obtain explicit approval for irreversible, financially consequential, legally sensitive, or otherwise unauthorized external actions.
+
+---
+
+## 7. Autonomous Git and CI Workflow
+
+Use the existing Git workflow in `AGENTS.md`.
+
+For every independently reviewable increment:
+
+1. Synchronize with the current `main`.
+2. Create a task-specific branch.
+3. Implement with tests.
+4. Run appropriate local verification.
+5. Commit and push.
+6. Create a pull request.
+7. Inspect CI results.
+8. Fix failed checks.
+9. Complete review requirements.
+10. Merge when permitted.
+11. Synchronize and continue.
+
+Do not bypass branch protection or required reviews.
+
+Never force-push or discard unrelated local changes without authorization.
+
+Do not leave partially integrated work represented as completed.
+
+### Required Verification
+
+Use the appropriate existing scripts, including:
 
 ```bash
 pnpm test
@@ -381,6 +363,7 @@ pnpm test:integration
 pnpm typecheck
 pnpm lint
 pnpm build:content
+pnpm check:content
 
 node scripts/verify-command-catalogue.mjs
 node scripts/check-roadmap.mjs
@@ -388,141 +371,127 @@ node scripts/check-report-sync.mjs
 node scripts/run-cheat-battery.mjs
 node scripts/golden-master.mjs
 node scripts/check-coverage.mjs
+node scripts/verify-upstream.mjs
+node scripts/check-licensing.mjs
+node scripts/check-no-flash.mjs
 node scripts/e2e-test.mjs
 ```
 
-Also run the client build, relevant security checks, licensing checks, and CI-defined validation steps.
+Also execute applicable client, Tauri, performance, security, licensing, and platform-specific checks.
 
-G5.1 recorded false positives when running certain licensing/no-Flash checks after generating `dist` artefacts. Investigate those precisely, distinguish legitimate assets from harmless identifiers, and make any checker correction narrowly scoped and tested.
+Use commands that actually exist in the repository.
 
-Never disable a security or licensing check just to get a green result.
+A green local test suite does not replace required CI checks.
 
-Do not claim that a platform or test passed unless it actually ran.
-
----
-
-## 11. Documentation and Milestone Tracking
-
-Update the appropriate documentation:
-
-- `docs/ROADMAP.md`
-- `docs/GOAL.md` or the repository's established milestone history
-- Relevant developer documentation
-- `re/data/ui-screens.json`
-- Architectural decisions, where applicable
-
-Preserve G5.1's historical completion record.
-
-Record G5.2 separately without corrupting the established 401-item roadmap accounting.
-
-Use evidence-based screen classifications.
-
-Do not label a partially implemented feature complete.
-
-Maintain the distinction between:
-
-- Implemented and verified.
-- Partially implemented.
-- Deferred.
-- Externally blocked.
-- Explicit non-goals.
-
-Do not claim that the full positional combat simulator, original artwork, mobile builds, or production release have been completed as part of G5.2.
+Maintain accurate distinctions between passed, failed, skipped, and unavailable tests.
 
 ---
 
-## 12. Development Workflow
+## 8. Continuous Progress and State Preservation
 
-Use the installed Superpowers skills and established repository practices.
+After each completed task, update the relevant documentation.
 
-Suggested workflow:
+Keep a concise execution record containing:
 
-1. Inspect the current implementation.
-2. Produce a scoped implementation plan.
-3. Write failing tests.
-4. Implement authoritative reward responses.
-5. Implement resource-period selection.
-6. Implement army management and team selection.
-7. Complete achievable P1 improvements.
-8. Run focused tests after each increment.
-9. Run the full verification gate.
-10. Perform code review and fix actual findings.
-11. Update documentation and the milestone ledger.
-12. Prepare the completed pull request.
+- Latest merged commit.
+- Completed roadmap requirement.
+- Verification evidence.
+- Remaining applicable tasks.
+- External dependencies.
+- Next selected task.
+- Active PR or branch, if any.
 
-Suggested branch:
+Use existing documentation conventions rather than creating unnecessary duplicate tracking systems.
 
-`feat/g5-2-gameplay-systems`
+The record must make it possible to resume after an interrupted session without restarting the investigation or losing decisions.
 
-Suggested PR title:
+Do not claim work is continuing in the background if execution has actually stopped.
 
-`feat(g5.2): complete gameplay systems and reward UI`
+If the execution environment terminates, leave a precise checkpoint and continuation instructions.
 
-Keep commits logically organized.
-
-Do not include unrelated refactoring.
-
-Follow repository branch protection and review requirements. Do not bypass required checks.
+When resumed under this same goal, continue from the last verified state.
 
 ---
 
-## 13. Definition of Done
+## 9. Reporting Rules
 
-G5.2 is complete when:
+Provide concise progress reports at meaningful checkpoints.
 
-- [ ] The native quest response returns authoritative reward details.
-- [ ] Dedicated result/reward dialogs show the correct outcomes.
-- [ ] Failed and replayed quests cannot generate duplicate rewards.
-- [ ] Players can select valid production periods through the UI.
-- [ ] Collection timers, requirements, and rewards remain server-authoritative.
-- [ ] Army management displays real player-owned units.
-- [ ] Team selection is implemented and server-enforced for supported quests.
-- [ ] Quest navigation and next-mission interactions work correctly.
-- [ ] The existing G5.1 gameplay loop remains functional.
-- [ ] The shared dialog and feedback architecture is preserved.
-- [ ] Chrome and Edge e2e tests verify the enhanced gameplay loop.
-- [ ] All applicable CI, security, protocol, and licensing checks pass.
-- [ ] Documentation accurately records completed and unfinished work.
+After each successful merge, report:
 
-A visually polished interface with disconnected actions does not satisfy this definition.
+- What was completed.
+- What tests passed.
+- Which roadmap requirement changed.
+- Which PR was merged.
+- What task you selected next.
 
-An API that works but cannot be used through the actual game interface also does not satisfy it.
+**A progress report is not a stopping condition.**
+
+Avoid asking whether you should proceed after routine successful milestones.
+
+Do not request a new user-authored goal for each G5.x increment.
+
+If one task is blocked, explain the limitation and continue with another eligible task.
 
 ---
 
-## 14. Final Report
+## 10. Actual Stopping Conditions
 
-When implementation and verification are complete, provide:
+You may end autonomous roadmap execution only when one of these conditions applies:
 
-1. Implemented features and their player-facing behavior.
-2. Files and modules changed.
-3. New or modified server/API contracts.
-4. Exact automated test results.
-5. Chrome/Edge e2e verification evidence.
-6. Compatibility and security verification.
-7. Architectural decisions and trade-offs.
-8. Remaining blockers and fidelity gaps.
-9. Pull request and merge status.
-10. Recommended next milestone, G5.3.
+1. Every authorized and actionable roadmap requirement has been completed and verified.
+2. All remaining work is genuinely blocked, deferred, or explicitly excluded, and no useful independent implementation can proceed.
+3. Required authorization or a material architectural decision prevents further safe progress, with no independent work available.
+4. The environment cannot continue execution because of an unrecoverable technical limit.
+5. The user explicitly instructs you to stop.
 
-Do not represent unmerged work as merged or partially tested features as verified.
+A green CI pipeline, a merged PR, or a completed G5.x milestone is **not** a valid stopping condition by itself.
+
+Do not claim roadmap completion merely because every easily accessible checkbox has been addressed.
 
 ---
 
-## Final Execution Directive
+## 11. Final Project Objective
 
-**Continue Social Wars Legacy from G5.1 to G5.2.**
+The long-term objective remains the outcome specified by `docs/ROADMAP.md`:
 
-Do not restart the project, replace the established architecture, or spend the milestone rebuilding features already completed.
+A playable, tested, maintainable Social Wars Legacy implementation with:
 
-Focus on closing the actual gameplay gaps identified in G5.1:
+- An authoritative server.
+- Faithful and deterministic gameplay.
+- A functional modern interface.
+- Supported web, desktop, and mobile clients.
+- Appropriate testing and security.
+- Reproducible distribution artefacts.
+- Proper licensing and attribution.
+- A release process that can be safely exercised.
 
-**Reward payloads → Collection-period chooser → Army management/team selection → Result and mission navigation → Integrated gameplay verification.**
+Public distribution must remain gated by licensing and other release requirements.
 
-Execute the work, verify it, resolve regressions, and deliver a reviewable implementation.
+Prioritize actual software quality and verified player-facing functionality over artificially completing checklist items.
 
-Make routine technical decisions autonomously using repository evidence.
+---
 
-Escalate only decisions that would alter approved architecture, introduce licensing risks, weaken security, or materially expand scope.
+# EXECUTION DIRECTIVE
 
-**Success criterion: G5.2 delivers a complete, coherent, and server-authoritative gameplay experience that meaningfully extends G5.1 rather than simply adding more screens.**
+**Activate Autonomous Orchestration Mode now.**
+
+Start from the latest `main`, inspect the roadmap, and choose the highest-priority eligible task.
+
+Create the first implementation plan and execute it.
+
+After successful verification and merge, **automatically select and execute the next eligible roadmap task**.
+
+Repeat that cycle within the available execution session.
+
+Do not stop after G5.3, G5.4, or any other individual milestone.
+
+Do not stop solely to present a completion summary.
+
+Do not ask for routine continuation permission.
+
+If a task is blocked, continue independent work.
+
+Preserve a verifiable checkpoint if execution must be interrupted.
+
+**Your assignment is continuous, evidence-driven advancement of Social Wars Legacy's approved roadmap—not completion of one isolated milestone.**

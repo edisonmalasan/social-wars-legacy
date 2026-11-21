@@ -39,7 +39,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 
 import { brokenBudgets } from '../packages/server/src/budgets.ts';
-import { COMMAND_CENTER_TILE } from '../packages/server/src/starttown.ts';
+import { COMMAND_CENTER_TILE, STARTING_EXPANSIONS } from '../packages/server/src/starttown.ts';
 import { QUESTS } from '../packages/rules/src/quest.ts';
 import { tileToPixel } from '../packages/client/src/iso.ts';
 import { BUILD_OUTLINE_OFFSET_Y, cameraCentredOn } from '../packages/client/src/camera.ts';
@@ -99,6 +99,27 @@ function collectRules() {
   return { minutes: minutes.slice(0, 4), multipliers: multipliers.slice(0, 4) };
 }
 const COLLECT = collectRules();
+
+/**
+ * The price the server will charge for a fresh save's first expansion, from
+ * the same content bundle the server reads. A new town owns the seeded
+ * STARTING_EXPANSIONS tiles, so the purchase is priced at that ordinal. The
+ * test compares the rendered panel with these numbers instead of hard-coding
+ * the game's configuration.
+ */
+function expansionRules() {
+  const bundlePath = path.join(ROOT, 'packages/content/dist/content-bundle.json');
+  if (!existsSync(bundlePath)) {
+    throw new Error('the content bundle has not been built. Run: pnpm build:content');
+  }
+  const prices = JSON.parse(readFileSync(bundlePath, 'utf8')).expansionPrices ?? [];
+  const row = prices[STARTING_EXPANSIONS.length];
+  if (!row || !Number.isFinite(row.coins) || !Number.isFinite(row.cash)) {
+    throw new Error('the content bundle has no usable expansion price for a fresh save');
+  }
+  return { coins: row.coins, cash: row.cash };
+}
+const EXPANSION = expansionRules();
 
 /**
  * The wallet keys behind the protocol's resource names, from the server's
@@ -1029,6 +1050,127 @@ async function playThroughDom(page, serverPort, browserName) {
     throw new Error(`the army panel did not show the owned unit: ${JSON.stringify(armyRows)}`);
   }
   console.log(`  UI: the army panel shows the placed Worker I (${workerRow.qty}) from the server's map`);
+
+  // --- The expansion control: content price, native path, server's answer -
+  // The panel must show the content's price at the ordinal the SERVER owns,
+  // send expand(tileId) through the client's one command transport when its
+  // button is clicked, and draw the server's answer in the shared feedback
+  // region. A fresh save cannot afford the first tile, so the click is first
+  // refused (no free tile, unchanged wallet); after legitimately earning gold
+  // through the game's own daily bonus the same rendered button buys the tile
+  // and pays exactly the content price. Nothing here fabricates an owned tile
+  // or a price.
+  const expansionView = await domValue(
+    page,
+    `(() => {
+       const e = document.querySelector('#ui .swl-expansion');
+       if (!e) return null;
+       return {
+         gold: e.querySelector('.swl-expansion-gold')?.textContent ?? '',
+         cash: e.querySelector('.swl-expansion-cash')?.textContent ?? '',
+       };
+     })()`,
+  );
+  if (!expansionView) throw new Error('the expansion control is not rendered');
+  if (expansionView.gold !== `${EXPANSION.coins} gold` ||
+      expansionView.cash !== `${EXPANSION.cash} cash`) {
+    throw new Error(
+      `the expansion panel shows ${JSON.stringify(expansionView)}, ` +
+        `not the content price (${EXPANSION.coins} gold / ${EXPANSION.cash} cash)`,
+    );
+  }
+  const beforeExpansion = await worldOf(serverPort, session.token);
+  const ownedBefore = beforeExpansion?.maps?.[0]?.expansions ?? [];
+  if (ownedBefore.length !== STARTING_EXPANSIONS.length) {
+    throw new Error(`a fresh save owns ${ownedBefore.length} tiles, not ${STARTING_EXPANSIONS.length}`);
+  }
+  const goldBeforeExpansion = Number(beforeExpansion?.resources?.g ?? 0);
+  const cashBeforeExpansion = Number(beforeExpansion?.resources?.c ?? 0);
+  if (goldBeforeExpansion >= EXPANSION.coins) {
+    throw new Error('the e2e fixture unexpectedly starts with enough gold to afford an expansion');
+  }
+  // Snapshot the channel before the click: a generic "refused" left over from
+  // an earlier step must not be mistaken for this click's answer.
+  const feedbackBeforeExpand = await domValue(
+    page,
+    "document.querySelector('#ui .swl-feedback')?.textContent ?? ''",
+  );
+  await domClickPlain(page, '#ui .swl-expansion button.swl-expansion-buy', 'Expand button');
+  const expansionRefusal = await domWait(
+    page,
+    "document.querySelector('#ui .swl-feedback')?.textContent ?? ''",
+    (value) =>
+      typeof value === 'string' && value !== feedbackBeforeExpand && /refused/i.test(value),
+    'a fresh server refusal from this expansion click',
+  );
+  if (!/refused/i.test(String(expansionRefusal))) {
+    throw new Error(`the unaffordable expansion drew no refusal: ${expansionRefusal}`);
+  }
+  const afterRefusal = await worldOf(serverPort, session.token);
+  if ((afterRefusal?.maps?.[0]?.expansions ?? []).length !== ownedBefore.length) {
+    throw new Error('the server granted a tile for an unaffordable expansion');
+  }
+  if (Number(afterRefusal?.resources?.g ?? -1) !== goldBeforeExpansion ||
+      Number(afterRefusal?.resources?.c ?? -1) !== cashBeforeExpansion) {
+    throw new Error('a refused expansion changed the wallet');
+  }
+  console.log(
+    `  UI: the expansion panel showed ${EXPANSION.coins} gold / ${EXPANSION.cash} cash from ` +
+      `the content; the click was refused ("${String(expansionRefusal).trim()}") with no tile or charge`,
+  );
+
+  // Fund the purchase the way the game itself does: the daily bonus is a real
+  // command, the server picks the day from its own clock (advanced by the
+  // deterministic fixture) and grants its own gold. No cheat command and no
+  // minted wallet — the same authority as every other claim.
+  let enriched = afterRefusal;
+  for (let day = 0; day < 5 && Number(enriched?.resources?.g ?? 0) < EXPANSION.coins + 1; day++) {
+    const previousGold = Number(enriched?.resources?.g ?? 0);
+    advanceClock(86_400);
+    await page.evaluate(`(async () => {
+       const handle = window.__swl;
+       if (handle) await handle.run([handle.claimDailyBonus()]);
+     })()`);
+    enriched = await worldWait(
+      serverPort,
+      session.token,
+      (world) => Number(world?.resources?.g ?? 0) > previousGold,
+      'the server to grant the next daily bonus',
+    );
+  }
+  if (Number(enriched?.resources?.g ?? 0) < EXPANSION.coins + 1) {
+    throw new Error('the daily bonus could not fund the expansion within five days');
+  }
+  console.log(
+    `  UI: the server granted daily-bonus gold up to ${Number(enriched.resources.g)} ` +
+      `so the rendered purchase could be afforded`,
+  );
+  const goldWithFunds = Number(enriched.resources.g);
+  const cashWithFunds = Number(enriched.resources.c);
+  await domClickPlain(page, '#ui .swl-expansion button.swl-expansion-buy', 'Expand button with funds');
+  const paidExpansion = await worldWait(
+    serverPort,
+    session.token,
+    (world) => (world?.maps?.[0]?.expansions ?? []).length === ownedBefore.length + 1,
+    'the server to add the bought expansion tile',
+  );
+  const ownedAfter = paidExpansion?.maps?.[0]?.expansions ?? [];
+  const newTile = ownedAfter.find((tile) => !ownedBefore.includes(tile));
+  if (!Number.isInteger(newTile) || newTile <= 0) {
+    throw new Error(`the server added no valid tile id: ${JSON.stringify(ownedAfter)}`);
+  }
+  const goldDelta = goldWithFunds - Number(paidExpansion.resources.g);
+  const cashDelta = cashWithFunds - Number(paidExpansion.resources.c);
+  if (goldDelta !== EXPANSION.coins || cashDelta !== EXPANSION.cash) {
+    throw new Error(
+      `the expansion charged ${goldDelta} gold / ${cashDelta} cash, ` +
+        `not the content price (${EXPANSION.coins} / ${EXPANSION.cash})`,
+    );
+  }
+  console.log(
+    `  UI: the rendered Expand button bought tile ${newTile}; the server charged ` +
+      `exactly ${goldDelta} gold / ${cashDelta} cash and added it to its own save`,
+  );
 
   // A team is only accepted on the four level-40 quests. a fresh e2e player
   // cannot reach them legitimately, so the rendered briefing is checked to

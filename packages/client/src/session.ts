@@ -219,6 +219,12 @@ export interface WorldSnapshot {
     level?: number;
     /** The XP the player has. */
     xp?: number;
+    /**
+     * The tile ids the player has bought, as the server's save keeps them.
+     * The world endpoint sends the map verbatim; older saves have no field.
+     * The server owns the list — the client reads it, never writes it.
+     */
+    expansions?: number[];
     /** The extra population the map's expansions grant. */
     increasedPopulation?: number;
     /** The rank each quest was reached at, by the quest's index. */

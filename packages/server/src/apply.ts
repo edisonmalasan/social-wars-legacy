@@ -616,6 +616,13 @@ export interface ApplierDeps {
   serverSeed?: string;
   /** The offer packs, by id, for `buy_offer_pack`. */
   offerPacks?: Map<number, CostOfferPack>;
+  /**
+   * The content's expansion prices, indexed by the number of owned tiles.
+   *
+   * The server derives that count from its own save; the client's tile id is
+   * never used as an index into this table.
+   */
+  expansionPrices?: readonly { coins: number; cash: number }[];
   /** The darts schedule, for the board's prize items and the extra prize. */
   dartsItems?: readonly DartsGame[];
   /** The market rules, for `trade_resource`. */
@@ -740,6 +747,8 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return upgradeCommand(world, command.args, deps);
       case 'buy':
         return buyCommand(world, command.args, deps);
+      case 'expand':
+        return expandCommand(world, command.args, deps);
       case 'buy_offer_pack':
         return buyOfferPackCommand(world, command.args, deps);
       case 'collect':
@@ -1312,6 +1321,63 @@ function buyCommand(
   const orientation = Number(args[5] ?? 0);
   const placed = placeBuilding(world, item, tx, ty, orientation, deps);
   if (!placed.ok) return { applied: false, refused: placed.reason, world };
+  return { applied: true, world };
+}
+
+/**
+ * `expand` - buy the next tile of the town.
+ *
+ * The client sends a tile id (the legacy form also carried a price and a type,
+ * both of which are claims and are ignored). The price is the content row at
+ * the number of tiles the SERVER's save owns — never the client's number and
+ * never the tile id. Every check runs before the wallet or the save is
+ * touched, so a refused purchase leaves both exactly as they arrived in the
+ * native and the legacy path.
+ */
+function expandCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const prices = deps.expansionPrices;
+  if (!prices || prices.length === 0) {
+    return { applied: false, refused: 'not-implemented', world };
+  }
+
+  const tileId = Number(args[0]);
+  if (!Number.isInteger(tileId) || tileId <= 0) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+
+  const map = ownMap(world);
+  if (!map) return { applied: false, refused: 'no-map', world };
+
+  // An older save has no `expansions` field: it owns no tiles yet.
+  const stored = map['expansions'];
+  const expansions: number[] = Array.isArray(stored) ? stored.map(Number) : [];
+  if (expansions.some((owned) => owned === tileId)) {
+    return { applied: false, refused: 'already-owned', world };
+  }
+
+  const price = prices[expansions.length];
+  if (!price) return { applied: false, refused: 'expansion-limit', world };
+
+  // Only the coins and cash columns are charged. The content also carries
+  // `neighbors` and `inventory_qte`, but their inputs are not server-owned
+  // here, so enforcing them is deferred rather than guessed at.
+  const cost: Record<string, number> = {};
+  if (price.coins) cost['g'] = price.coins;
+  if (price.cash) cost['c'] = price.cash;
+  const settled = applyCommandCost(world.resources, { cost, gain: {} });
+  if (!settled.ok) {
+    return { applied: false, refused: settled.reason ?? 'insufficient-resources', world };
+  }
+
+  // All checks are done. The wallet and the owned-tile list move together, so
+  // a replay of the same tile is caught by the membership check above and can
+  // neither charge twice nor append the tile twice.
+  world.resources = settled.resources;
+  map['expansions'] = [...expansions, tileId];
   return { applied: true, world };
 }
 

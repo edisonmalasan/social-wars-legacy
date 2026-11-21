@@ -1696,6 +1696,98 @@ server-side.
 
 ---
 
+## Expansion — authoritative town expansion (verified)
+
+*Outcome: buying a tile is priced and applied by the server, exposed through the
+real interface and proven in Chrome and Edge. This milestone is recorded here,
+**outside** the `## Group X` sections above, so `node scripts/check-roadmap.mjs`
+still counts the same **401** items. The G5.1 and G5.2 records above are preserved
+unchanged; this section records the later work that supersedes G5.2's note that
+the insert-unit expansion UI was deferred. Implemented, deferred and non-goal
+work are kept distinct, and no unfinished screen is counted as complete.*
+
+**Implemented and verified (every gate was run; all passed):**
+
+- **Authoritative pricing and application.** `expand` charges the content's
+  expansion-price row at the number of tiles **the server's save owns**, not at
+  a client-declared ordinal or price; the client sends only a tile id. The
+  applier refuses a non-positive or already-owned tile, an ordinal past the
+  content table, an unaffordable wallet and a replay, and leaves the wallet and
+  the save untouched on every refusal. A fresh save seeds the four free tiles;
+  an older save with no `expansions` field defaults safely to none. The
+  94-command catalogue is unchanged.
+- **Player-facing control.** The interface shows the price from the content at
+  the server-owned ordinal and sends `expand(tileId)` through the one `onCommand`
+  transport; the server's answer is drawn in the existing Feedback region. The
+  owned-tile selector and the price view are pure readings
+  (`packages/client/src/featurestate.ts`, `apps/client/src/ui/state.ts`,
+  `apps/client/src/ui/expansion.tsx`). A content row with a non-finite price is
+  hidden rather than drawn as a fabricated 0/0.
+- **Chrome and Edge e2e.** `node scripts/e2e-test.mjs` ended with
+  `the browsers that ran: chrome, edge` and
+  `OK: a player registers, signs in, plays, and signs in again after a restart.`
+  On top of every earlier assertion it reported, in **both** browsers:
+  `UI: the expansion panel showed 2500 gold / 5 cash from the content; the click was refused ("!Command 0 was refused (command-failed): insufficient-resources") with no tile or charge`;
+  `UI: the server granted daily-bonus gold up to 2830 so the rendered purchase could be afforded`;
+  `UI: the rendered Expand button bought tile 47; the server charged exactly 2500 gold / 5 cash and added it to its own save`.
+  The gold was earned through the game's own daily bonus across the
+  deterministic clock fixture: no debug grant and no minted wallet. The refusal
+  assertion snapshots the feedback channel before the click, so a stale
+  "refused" from an earlier step cannot stand in for this click's answer.
+- **Gates:** `pnpm test` (**1714 pass, 0 fail**), `pnpm test:integration`
+  (**64 pass**), `pnpm typecheck`, `pnpm lint` (139 browser modules, none needs
+  node), `pnpm build:content` (build id `63e067bd…`), `pnpm check:content`,
+  `node scripts/verify-command-catalogue.mjs` (94 commands),
+  `node scripts/check-roadmap.mjs` (**401 items**),
+  `node scripts/check-report-sync.mjs` (4 claims),
+  `node scripts/run-cheat-battery.mjs` (**11 attacks had no effect**),
+  `node scripts/golden-master.mjs` (50 scenarios, 0 differences),
+  `node scripts/check-coverage.mjs` (97.61 % lines / 85.53 % functions /
+  95.54 % branches, above every floor), `node scripts/verify-upstream.mjs`
+  (3292 files, 0 mismatched), `node scripts/check-licensing.mjs`,
+  `node scripts/check-no-flash.mjs`, the client build and
+  `node scripts/e2e-test.mjs` — all passed.
+- **The licensing / no-Flash ordering quirk was respected, not disabled.** Both
+  checks were run **before** the client was rebuilt, with `apps/client/dist`
+  absent — the same ordering as CI's `verify` job. `check-licensing.mjs`
+  reported `the shipped trees carry no Zynga media (3 trees)` and
+  `OK: the licensing position holds`; `check-no-flash.mjs` reported
+  `the shipped trees: 3 (1 absent)`, `the files scanned: 2` and
+  `OK: nothing that ships needs Flash`. Run after a local client build they
+  report false positives in generated artefacts only: upstream asset
+  *identifiers* ending in `.swf` in the copied content/manifest JSON, and
+  OFL-licensed substitute font filenames named after the faces they replace.
+  No checker was changed or weakened; the limitation is recorded here as in
+  G5.1 and G5.2.
+- **Screen inventory.** One entry, `GUI/ExpandTabNew2.as`, now records the
+  implemented purchase control with real model paths, so the 260 screens read
+  **90 implemented, 52 dropped, 118 planned** (G5.2: 89/52/119). The original's
+  per-slot expansion buttons and post-purchase celebration popup remain planned
+  where the clone has only the inline control.
+
+**Deferred, not claimed:**
+
+- The original expansion price table also carries `neighbors` and `inventory_qte`
+  columns. Those gates are **deferred**: their inputs are not server-owned in
+  this workflow, so the server charges only the coins and cash columns and the
+  client claims neither. They are not described as implemented.
+- **No original grid-placement rule is restored.** The UI suggests a
+  deterministic, not-yet-owned tile **identifier**; the server validates it and
+  decides whether a purchase is accepted. A tile id is an identifier, never an
+  outcome or a claim about the original grid.
+- The post-purchase `PopupExpand` celebration/share popup and the
+  `ItemButtonLargeExpand2` per-slot buttons are not modelled, and no extra
+  modal, dependency or proprietary art was added.
+
+**Remaining gaps:** the mobile shell (Group G5) is still not implemented; the
+two licensing/no-Flash checks must still be run before the client build or on a
+cleaned tree, as in CI; and the four level-40 team quests need a legitimately
+high-level save for a browser happy-path run. No change here weakens the
+server's authority: combat, resources, progression, rewards and expansion
+pricing remain server-side.
+
+---
+
 ## Group H — Desktop Shell & Release
 
 *Outcome: a standalone, signed, updatable desktop executable.*

@@ -6,6 +6,7 @@ import {
   bonusState,
   dartsState,
   marketState,
+  ownedExpansions,
   premiumState,
   productionState,
   questState,
@@ -367,5 +368,38 @@ describe('productionState', () => {
   it('is null when there is no selection or no such map item', () => {
     assert.equal(productionState(world(), 7), null);
     assert.equal(productionState(world(), null), null);
+  });
+});
+
+describe('ownedExpansions', () => {
+  it('reads the tile ids the server owns from its own map', () => {
+    assert.deepEqual(
+      ownedExpansions(world({}, { expansions: [35, 36, 45, 46] })),
+      [35, 36, 45, 46],
+    );
+  });
+
+  it('defaults to no owned tiles when the save has no expansions field', () => {
+    assert.deepEqual(ownedExpansions(world()), []);
+  });
+
+  it('reads no map as owning nothing', () => {
+    assert.deepEqual(
+      ownedExpansions({
+        maps: [],
+        privateState: {},
+        resources: { g: 0, w: 0, o: 0, s: 0, c: 0, e: 0, x: 0, m: 0 },
+      }),
+      [],
+    );
+  });
+
+  it('ignores malformed values rather than inventing an owned tile', () => {
+    assert.deepEqual(
+      ownedExpansions(
+        world({}, { expansions: [35, '36', Number.NaN, 46, null, Number.POSITIVE_INFINITY] }),
+      ),
+      [35, 46],
+    );
   });
 });
