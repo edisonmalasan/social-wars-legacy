@@ -36,6 +36,7 @@ import {
 import type { Army } from '@swl/rules';
 import type { ContentBundle } from '@swl/content';
 
+import { AssaultPanel, type AssaultPanelView } from './assault.tsx';
 import { BuildMenu } from './buildmenu.tsx';
 import { Chapters } from './chapters.tsx';
 import { Dialog } from './dialog.tsx';
@@ -53,6 +54,10 @@ import { SpellBook } from './spellbook.tsx';
 import { Store } from './store.tsx';
 import { TutorialOverlay, type TutorialOverlayProps } from './tutorial.tsx';
 import {
+  assaultHistoryPanel,
+  assaultHudPanel,
+  assaultResultPanel,
+  battleOptionsPanel,
   buildingInfo,
   buildItems,
   categories,
@@ -215,6 +220,28 @@ export function Root({
     [bundle, world, selectedIso, now],
   );
 
+  // The dialog's id selects which of the four assault-family screens to host.
+  // Each view is a fresh reading of the server's answer: the interface keeps
+  // no outcome, history row, strategy choice or charge of its own.
+  const dialogId = dialog?.dialog?.id ?? null;
+  const assaultPanel = useMemo<AssaultPanelView | null>(() => {
+    if (dialogId === 'assault-result') {
+      const view = assaultResultPanel(bundle, world, now);
+      return view ? { kind: 'result', view } : null;
+    }
+    if (dialogId === 'assault-history') {
+      const view = assaultHistoryPanel(world, now);
+      return view ? { kind: 'history', view: view.history, countdown: view.countdown } : null;
+    }
+    if (dialogId === 'assault-options') {
+      return { kind: 'options', view: battleOptionsPanel(world) };
+    }
+    if (dialogId === 'assault-hud') {
+      return { kind: 'hud', ...assaultHudPanel(world, now) };
+    }
+    return null;
+  }, [dialogId, bundle, world, now]);
+
   return (
     <div className="swl-ui">
       <Hud state={state} placing={placingName} bonus={bonus} onClaimBonus={onClaimBonus} />
@@ -253,7 +280,7 @@ export function Root({
         state={dialog ?? CLOSED_DIALOG}
         onDismiss={onDialogDismiss ?? (() => {})}
       >
-        {questPanel && onQuestStart && onQuestAction ? (
+        {!dialogId?.startsWith('assault-') && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
             key={
               questPanel.kind === 'briefing'
@@ -273,6 +300,18 @@ export function Root({
         ) : null}
         {dialog?.dialog?.id === PRODUCTION_DIALOG_ID && production && onActivate ? (
           <ProductionSelector view={production} onActivate={onActivate} />
+        ) : null}
+        {assaultPanel ? (
+          <AssaultPanel
+            key={dialogId ?? undefined}
+            panel={assaultPanel}
+            // The one transport is a request, not a local decision: the host
+            // redraws from the server's answer, so no pending assault state is
+            // held here to disable the buttons.
+            busy={false}
+            onCommand={onCommand}
+            onCancel={onDialogDismiss ?? (() => {})}
+          />
         ) : null}
       </Dialog>
       <BuildMenu

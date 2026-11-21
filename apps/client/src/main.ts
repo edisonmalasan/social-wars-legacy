@@ -82,10 +82,12 @@ import type { TutorialOverlayProps } from './ui/tutorial.tsx';
 import type { QuestPanelView } from './ui/quests.tsx';
 import {
   armyPanel,
+  assaultDialog,
   productionPanel,
   questMinLevels,
   questRanks,
   questViewOptions,
+  type AssaultPanelKind,
 } from './ui/state.ts';
 import { PRODUCTION_DIALOG_ID } from './ui/info.tsx';
 import {
@@ -273,6 +275,14 @@ export interface ClientHandle {
   lastReward?: () => QuestResultView | null;
   /** Open that persisted reward in the one shared dialog. */
   showLastReward?: () => boolean;
+  /**
+   * Open one of the four assault panels in the one shared dialog.
+   *
+   * Only the dialog's id, kind and title come from here (`assaultDialog`);
+   * the body is derived by the interface from the server's current answer.
+   * The panel's gestures use the client's one command transport.
+   */
+  showAssaultPanel?: (kind: AssaultPanelKind) => void;
   /**
    * The client's own request builders.
    *
@@ -1146,6 +1156,11 @@ async function main(): Promise<void> {
       dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
       drawInterface();
       return true;
+    },
+    showAssaultPanel: (kind) => {
+      const panel = assaultDialog(kind);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+      drawInterface();
     },
     claimDailyBonus,
     buy,
