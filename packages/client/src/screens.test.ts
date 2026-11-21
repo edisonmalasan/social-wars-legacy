@@ -49,9 +49,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 94,
+      implemented: 98,
       dropped: 52,
-      planned: 114,
+      planned: 110,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -190,6 +190,22 @@ describe('the screens the clone has modelled', () => {
       assert.ok(screen, `${path} is not in the inventory`);
       assert.equal(screen!.decision, 'implemented', `${path} is not modelled`);
       assert.match(screen!.decisionNote, /`packages\/client\/src\/bonus\.ts`/);
+    }
+  });
+
+  it('models the offer-pack store screens from the content and wallet', async () => {
+    const all = await screens();
+    const paths = [
+      'PopupGetPackMC.as',
+      'PopupGotPackMC.as',
+      'popups/PopupGetPack.as',
+      'popups/PopupGotPack.as',
+    ];
+    for (const path of paths) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not modelled`);
+      assert.match(screen!.decisionNote, /`packages\/client\/src\/store\.ts`/);
     }
   });
 

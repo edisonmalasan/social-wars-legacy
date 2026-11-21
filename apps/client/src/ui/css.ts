@@ -754,6 +754,46 @@ export function uiCss(): string {
   cursor: not-allowed;
 }
 
+/* --- The store ---------------------------------------------------------- */
+
+.swl-store {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  max-width: 320px;
+  max-height: 45vh;
+  overflow: auto;
+  padding: 6px 8px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: rgba(16, 21, 29, 0.92);
+  color: #f2e6c8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  pointer-events: auto;
+}
+
+.swl-store-summary { cursor: pointer; color: #f5c542; font-weight: 700; }
+.swl-store-packs { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.swl-store-pack { border-top: 1px solid #38445a; padding-top: 4px; }
+.swl-store-pack-name { margin-bottom: 3px; }
+.swl-store-tiers { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.swl-ui button.swl-store-buy {
+  padding: 3px 6px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: #f2e6c8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+.swl-ui button.swl-store-buy:disabled {
+  border-color: #38445a;
+  background: #1d2430;
+  color: #5c6678;
+  cursor: not-allowed;
+}
+
 /* --- The neighbour strip ----------------------------------------------- */
 
 .swl-neighbours {
