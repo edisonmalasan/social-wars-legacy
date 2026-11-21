@@ -330,12 +330,17 @@ export function uiCss(): string {
 
 /* --- The inventory panel ---------------------------------------------- */
 
+/* The chapter strip above ends at about y=144, so the inventory starts
+   below it. The maximum height is reduced by the same amount: the panel
+   keeps its old bottom edge and scrolls its contents rather than covering
+   the chapter buttons. This holds at every viewport because the whole stage
+   is scaled uniformly, never reflowed. */
 .swl-inventory {
   position: absolute;
   right: 8px;
-  top: 104px;
+  top: 152px;
   width: 220px;
-  max-height: 240px;
+  max-height: 192px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

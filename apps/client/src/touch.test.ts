@@ -81,4 +81,18 @@ describe('touch-safe styles in the one shared client', () => {
     assert.match(css, /--swl-font-scale-body/);
     assert.match(css, /--swl-font-scale-display/);
   });
+
+  it('starts the inventory below the chapter strip and inside the stage', () => {
+    const css = uiCss();
+    const inventory = css.match(/\.swl-inventory\s*\{([^}]*)\}/)?.[1] ?? '';
+    const top = Number(/top:\s*(\d+)px/.exec(inventory)?.[1]);
+    const maxHeight = Number(/max-height:\s*(\d+)px/.exec(inventory)?.[1]);
+    // The chapter strip is at top 58 and is 86px tall with the content's
+    // quest slots, so it ends at 144; the inventory must start below it.
+    assert.ok(top >= 152, `the inventory starts at ${top}px, over the chapters`);
+    assert.ok(
+      top + maxHeight <= 600,
+      `the inventory can reach ${top + maxHeight}px, past the 600px stage`,
+    );
+  });
 });

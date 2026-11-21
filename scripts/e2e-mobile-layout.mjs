@@ -1,0 +1,679 @@
+#!/usr/bin/env node
+/**
+ * Emulated-phone layout verification.
+ *
+ * **This is EMULATION, not device verification.** A real Chromium browser is
+ * driven over the DevTools protocol with `Emulation.setDeviceMetricsOverride`
+ * (390x844 CSS pixels @dpr 2) and `Emulation.setTouchEmulationEnabled`. No
+ * Android/iOS build, emulator, real phone, Firefox or Safari is involved, and
+ * nothing here claims any of them ran.
+ *
+ * The assertions are deliberately the phone ones that cannot be made at the
+ * desktop viewport:
+ *
+ * 1. the client's own status is `started`;
+ * 2. the `#stage` transform scale equals `stageScale({390,844})` from the
+ *    shared model, read from the running page;
+ * 3. the HUD, goals, inventory and chapter panels are inside the stage and do
+ *    not overlap one another;
+ * 4. `window.__swl.visibleSprites()` is positive;
+ * 5. a touch tap (pointerdown then pointerup) on the canvas selects a building.
+ *
+ * A browser that is not installed is reported as **NOT RUN**, not as a
+ * failure. The script fails only when a drivable browser fails an assertion,
+ * or when no browser ran at all — the same rule as the existing harnesses.
+ *
+ * Usage:
+ *   node scripts/e2e-mobile-layout.mjs
+ *   node scripts/e2e-mobile-layout.mjs --browser chrome
+ */
+import { spawn } from 'node:child_process';
+import {
+  createReadStream,
+  existsSync,
+  mkdtempSync,
+  statSync,
+} from 'node:fs';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { createServer } from 'node:http';
+import os from 'node:os';
+import path from 'node:path';
+import process from 'node:process';
+
+import { stageScale } from '../packages/client/src/stage.ts';
+
+const ROOT = process.cwd();
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** Chrome keeps profile files briefly after exit; retry the temp cleanup. */
+async function removeTemp(directory) {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    try {
+      await rm(directory, { recursive: true, force: true });
+      return;
+    } catch {
+      await sleep(250);
+    }
+  }
+}
+
+/** The emulated phone: CSS pixels, at a phone's device pixel ratio. */
+const PHONE = { width: 390, height: 844, deviceScaleFactor: 2 };
+const EXPECTED_SCALE = stageScale({ width: PHONE.width, height: PHONE.height });
+
+/** The panels whose layout is checked inside the stage. */
+const PANELS = [
+  ['hud', '#ui .swl-hud'],
+  ['goals', '#ui .swl-goals'],
+  ['inventory', '#ui .swl-inventory'],
+  ['chapters', '#ui .swl-chapters'],
+];
+
+/** Where the browsers are looked for (the same table as e2e-test.mjs). */
+const BROWSERS = [
+  {
+    name: 'chrome',
+    paths: [
+      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+      '/usr/bin/google-chrome',
+      '/usr/bin/chromium',
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    ],
+  },
+  {
+    name: 'edge',
+    paths: [
+      'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+      'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+      '/usr/bin/microsoft-edge',
+      '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+    ],
+  },
+];
+
+const TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.woff2': 'font/woff2',
+  '.wasm': 'application/wasm',
+};
+
+const ROOTS = [
+  path.join(ROOT, 'apps/client/dist'),
+  path.join(ROOT, 'apps/client/public'),
+  path.join(ROOT, '.work/frames'),
+];
+
+function findBrowser(name) {
+  const entry = BROWSERS.find((browser) => browser.name === name);
+  if (!entry) return null;
+  for (const candidate of entry.paths) {
+    if (existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+/** Static files for the client, with the API proxied to the real server. */
+async function serve(port, apiPort) {
+  const server = createServer((request, response) => {
+    const url = (request.url ?? '/').split('?')[0];
+    if (url.startsWith('/api/') || url === '/health') {
+      const chunks = [];
+      request.on('data', (chunk) => chunks.push(chunk));
+      request.on('end', async () => {
+        try {
+          const headers = {
+            'content-type': request.headers['content-type'] ?? 'application/json',
+          };
+          if (request.headers['authorization']) {
+            headers.authorization = request.headers['authorization'];
+          }
+          const upstream = await fetch(`http://127.0.0.1:${apiPort}${url}`, {
+            method: request.method,
+            headers,
+            body: chunks.length ? Buffer.concat(chunks) : undefined,
+          });
+          response.writeHead(upstream.status, {
+            'content-type': upstream.headers.get('content-type') ?? 'application/json',
+          });
+          response.end(Buffer.from(await upstream.arrayBuffer()));
+        } catch {
+          response.writeHead(502, { 'content-type': 'application/json' });
+          response.end(JSON.stringify({ error: 'the server is not reachable' }));
+        }
+      });
+      return;
+    }
+    const relative = url.replace(/^\/+/, '') || 'index.html';
+    for (const root of ROOTS) {
+      const file = path.resolve(root, relative);
+      if (!file.startsWith(path.resolve(root))) continue;
+      if (!existsSync(file) || !statSync(file).isFile()) continue;
+      response.writeHead(200, {
+        'content-type': TYPES[path.extname(file)] ?? 'application/octet-stream',
+      });
+      createReadStream(file).pipe(response);
+      return;
+    }
+    response.writeHead(404, { 'content-type': 'text/plain' });
+    response.end('not found');
+  });
+  await new Promise((resolve) => server.listen(port, '127.0.0.1', resolve));
+  return server;
+}
+
+async function waitForDevTools(port, timeoutMs = 30_000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(`http://127.0.0.1:${port}/json/version`);
+      if (response.ok) return;
+    } catch {
+      // Not up yet.
+    }
+    await sleep(150);
+  }
+  throw new Error('the browser did not open its debugging port');
+}
+
+/** A page, driven over the DevTools protocol (the e2e-test.mjs pattern). */
+class Page {
+  constructor(socket) {
+    this.socket = socket;
+    this.nextId = 1;
+    this.pending = new Map();
+    socket.addEventListener('message', (event) => {
+      const message = JSON.parse(String(event.data));
+      const resolver = this.pending.get(message.id);
+      if (resolver) {
+        this.pending.delete(message.id);
+        resolver(message);
+      }
+    });
+  }
+
+  static async openBlank(devToolsPort) {
+    const target = await (
+      await fetch(`http://127.0.0.1:${devToolsPort}/json/new?about:blank`, {
+        method: 'PUT',
+      })
+    ).json();
+    const socket = new WebSocket(target.webSocketDebuggerUrl);
+    await new Promise((resolve, reject) => {
+      socket.addEventListener('open', resolve, { once: true });
+      socket.addEventListener('error', reject, { once: true });
+    });
+    const page = new Page(socket);
+    page.targetId = target.id;
+    await page.send('Runtime.enable', {});
+    await page.send('Page.enable', {});
+    return page;
+  }
+
+  send(method, params) {
+    return new Promise((resolve) => {
+      const id = this.nextId++;
+      this.pending.set(id, resolve);
+      this.socket.send(JSON.stringify({ id, method, params }));
+    });
+  }
+
+  async evaluate(expression) {
+    const answer = await this.send('Runtime.evaluate', {
+      expression,
+      returnByValue: true,
+      awaitPromise: true,
+    });
+    if (answer.result?.exceptionDetails) {
+      throw new Error(
+        answer.result.exceptionDetails.exception?.description ??
+          answer.result.exceptionDetails.text,
+      );
+    }
+    return answer.result?.result?.value;
+  }
+
+  /** Poll the address/document, as the existing harness does. */
+  async waitForLoad(timeoutMs = 30_000) {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+      try {
+        const where = await this.evaluate('location.href');
+        if (typeof where === 'string' && where.startsWith('http://127.0.0.1:')) {
+          const state = await this.evaluate('document.readyState');
+          if (state === 'complete' || state === 'interactive') return;
+        }
+      } catch {
+        // The document is not there yet.
+      }
+      await sleep(100);
+    }
+    throw new Error('the page did not load');
+  }
+
+  /** Reload and wait for the new document. */
+  async reload() {
+    await this.send('Page.reload', {});
+    await this.waitForLoad();
+  }
+
+  async waitForStatus(states, timeoutMs = 60_000) {
+    const deadline = Date.now() + timeoutMs;
+    let last = '';
+    while (Date.now() < deadline) {
+      last = await this.evaluate(
+        "(() => { const e = document.getElementById('status');" +
+          " return e ? e.getAttribute('data-state') + '|' + e.textContent : 'missing'; })()",
+      );
+      const state = String(last).split('|')[0];
+      if (states.includes(state)) return String(last);
+      await sleep(200);
+    }
+    return String(last);
+  }
+
+  async close(devToolsPort) {
+    try {
+      this.socket.close();
+    } catch {
+      // Already closed.
+    }
+    await fetch(`http://127.0.0.1:${devToolsPort}/json/close/${this.targetId}`).catch(
+      () => {},
+    );
+  }
+}
+
+/** Start the real server the emulated client talks to. */
+async function startServer(dataDir, port) {
+  const env = { ...process.env, SWL_DATA_DIR: dataDir, PORT: String(port) };
+  const child = spawn(process.execPath, ['apps/server/src/main.ts'], {
+    cwd: ROOT,
+    env,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  let output = '';
+  child.stdout.on('data', (chunk) => { output += String(chunk); });
+  child.stderr.on('data', (chunk) => { output += String(chunk); });
+  const deadline = Date.now() + 60_000;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(`http://127.0.0.1:${port}/health`);
+      if (response.ok) return child;
+    } catch {
+      // Not up yet.
+    }
+    await sleep(200);
+  }
+  child.kill();
+  throw new Error(`the server did not start:\n${output}`);
+}
+
+async function register(port, playerId) {
+  const response = await fetch(`http://127.0.0.1:${port}/api/account`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ playerId, password: 'correct horse' }),
+  });
+  if (response.status !== 201) {
+    throw new Error(`the account was not created: ${response.status} ${await response.text()}`);
+  }
+  return response.json();
+}
+
+/** Two rectangles overlap when neither is entirely to one side of the other. */
+function overlaps(a, b) {
+  return !(
+    a.right <= b.left + 0.5 ||
+    b.right <= a.left + 0.5 ||
+    a.bottom <= b.top + 0.5 ||
+    b.bottom <= a.top + 0.5
+  );
+}
+
+/** Read the emulated page's geometry, in CSS pixels after the stage transform. */
+async function readGeometry(page) {
+  return page.evaluate(
+    `(() => {
+       const rect = (selector) => {
+         const e = document.querySelector(selector);
+         if (!e) return null;
+         const r = e.getBoundingClientRect();
+         return {left: r.left, top: r.top, right: r.right, bottom: r.bottom};
+       };
+       const stage = document.querySelector('#stage');
+       return {
+         innerWidth: window.innerWidth,
+         innerHeight: window.innerHeight,
+         dpr: window.devicePixelRatio,
+         transform: stage ? getComputedStyle(stage).transform : null,
+         stage: rect('#stage'),
+         panels: {
+           hud: rect('#ui .swl-hud'),
+           goals: rect('#ui .swl-goals'),
+           inventory: rect('#ui .swl-inventory'),
+           chapters: rect('#ui .swl-chapters'),
+         },
+       };
+     })()`,
+  );
+}
+
+/** All the phone assertions for one drivable browser. */
+async function verifyEmulatedPhone(page, name, serverPort, session, failures) {
+  const fail = (message) => {
+    failures.push(`${name}: ${message}`);
+    console.log(`  FAILED (${message})`);
+  };
+
+  // The client signs in with the session the real server issued.
+  await page.evaluate(
+    `window.localStorage.setItem('swl.session', ${JSON.stringify(
+      JSON.stringify({
+        token: session.token,
+        playerId: session.playerId,
+        expiresAt: session.expiresAt,
+      }),
+    )})`,
+  );
+  await page.reload();
+
+  // 1. The client's own status.
+  const status = await page.waitForStatus(['started', 'failed']);
+  const [state, detail = ''] = String(status).split('|');
+  if (state !== 'started') {
+    fail(`the client said "${state}" (${detail})`);
+    return;
+  }
+  console.log(`  EMULATION ${name}: client status started (${detail})`);
+
+  // The fresh player's tutorial is closed through its rendered button, so
+  // the layout measured below is the ordinary play layout, not the overlay.
+  const skipped = await page.evaluate(
+    `(() => {
+       const button = document.querySelector('#ui .swl-tutorial-skip');
+       if (!button) return true;
+       button.click();
+       return true;
+     })()`,
+  );
+  if (!skipped) {
+    fail('the rendered tutorial Skip button could not be clicked');
+    return;
+  }
+  const deadline = Date.now() + 10_000;
+  while (Date.now() < deadline && await page.evaluate("!!document.querySelector('#ui .swl-tutorial')")) {
+    await sleep(100);
+  }
+  if (await page.evaluate("!!document.querySelector('#ui .swl-tutorial')")) {
+    fail('the tutorial overlay did not close');
+    return;
+  }
+
+  // 2. The emulated viewport is really in force, and the stage scale is the
+  //    shared model's answer for it. The scale is the `a` term of the CSS
+  //    matrix the renderer wrote; the model is imported from stage.ts.
+  const geometry = await readGeometry(page);
+  if (geometry?.innerWidth !== PHONE.width || geometry?.innerHeight !== PHONE.height) {
+    fail(
+      `the browser reported ${geometry?.innerWidth}x${geometry?.innerHeight}, ` +
+        `not ${PHONE.width}x${PHONE.height}`,
+    );
+    return;
+  }
+  if (Number(geometry.dpr) !== PHONE.deviceScaleFactor) {
+    fail(`the browser reported dpr ${geometry.dpr}, not ${PHONE.deviceScaleFactor}`);
+    return;
+  }
+  const match = /matrix\(\s*([-\d.]+)/.exec(String(geometry.transform ?? ''));
+  const applied = match ? Number(match[1]) : NaN;
+  if (!Number.isFinite(applied) || Math.abs(applied - EXPECTED_SCALE) > 0.001) {
+    fail(
+      `the #stage transform scale is ${String(geometry.transform)}, ` +
+        `but stageScale({${PHONE.width},${PHONE.height}}) is ${EXPECTED_SCALE}`,
+    );
+    return;
+  }
+  console.log(
+    `  EMULATION ${name}: ${geometry.innerWidth}x${geometry.innerHeight} @dpr ${geometry.dpr}; ` +
+      `#stage scale ${applied} = stageScale({${PHONE.width},${PHONE.height}}) ${EXPECTED_SCALE}`,
+  );
+
+  // 3. Every named panel is inside the transformed stage and the four do not
+  //    overlap one another. Rectangles are read from the live page, so this is
+  //    the emulated layout and not an assumption from the CSS.
+  if (!geometry.stage) {
+    fail('the #stage element is missing');
+    return;
+  }
+  const rects = [];
+  for (const [label, selector] of PANELS) {
+    const rect = geometry.panels?.[label];
+    if (!rect) {
+      fail(`the ${label} panel is missing`);
+      return;
+    }
+    if (
+      rect.left < geometry.stage.left - 0.5 ||
+      rect.top < geometry.stage.top - 0.5 ||
+      rect.right > geometry.stage.right + 0.5 ||
+      rect.bottom > geometry.stage.bottom + 0.5
+    ) {
+      fail(`the ${label} panel falls outside the stage: ${JSON.stringify(rect)}`);
+      return;
+    }
+    rects.push([label, rect]);
+  }
+  for (let i = 0; i < rects.length; i++) {
+    for (let j = i + 1; j < rects.length; j++) {
+      if (overlaps(rects[i][1], rects[j][1])) {
+        fail(
+          `the ${rects[i][0]} panel overlaps the ${rects[j][0]} panel: ` +
+            `${JSON.stringify(rects[i][1])} / ${JSON.stringify(rects[j][1])}`,
+        );
+        return;
+      }
+    }
+  }
+  console.log(
+    `  EMULATION ${name}: hud/goals/inventory/chapters are inside the stage ` +
+      `(${geometry.stage.left.toFixed(1)},${geometry.stage.top.toFixed(1)} to ` +
+      `${geometry.stage.right.toFixed(1)},${geometry.stage.bottom.toFixed(1)}) and do not overlap`,
+  );
+
+  // 4. The town is drawn on the screen at the phone viewport.
+  const visible = await page.evaluate(
+    '(() => { const h = window.__swl; return h ? h.visibleSprites() : 0; })()',
+  );
+  if (!Number.isFinite(Number(visible)) || Number(visible) < 1) {
+    fail(`the town is not on the screen (${visible} visible sprite(s))`);
+    return;
+  }
+  console.log(`  EMULATION ${name}: ${visible} sprite(s) visible on the emulated screen`);
+
+  // 5. A touch tap on the canvas selects a building. Touch input is deferred
+  //    to release by the shared client's gesture guard, so a real tap is a
+  //    pointerdown **and** a pointerup with pointerType 'touch'. The bare
+  //    pointerdown must not select on its own: that is the duplicate-command
+  //    guard, not a missing assertion.
+  const picked = await page.evaluate(
+    `(() => {
+       const canvas = document.querySelector('#game canvas');
+       if (!canvas) return {error: 'the client has no canvas'};
+       const rect = canvas.getBoundingClientRect();
+       const x = rect.left + rect.width / 2;
+       const y = rect.top + rect.height / 2;
+       const base = {
+         clientX: x, clientY: y, bubbles: true, cancelable: true,
+         pointerId: 7, isPrimary: true, pointerType: 'touch',
+       };
+       const handle = window.__swl;
+       const before = handle ? handle.selectedItem() : null;
+       canvas.dispatchEvent(new PointerEvent('pointerdown', base));
+       const afterDown = handle ? handle.selectedItem() : null;
+       canvas.dispatchEvent(new PointerEvent('pointerup', base));
+       const afterUp = handle ? handle.selectedItem() : null;
+       return {before, afterDown, afterUp};
+     })()`,
+  );
+  if (!picked || picked.error) {
+    fail(picked?.error ?? 'the touch gesture did not answer');
+    return;
+  }
+  if (!Number.isInteger(picked.afterUp)) {
+    fail(`the touch tap selected no building: ${JSON.stringify(picked)}`);
+    return;
+  }
+  if (picked.before === null && picked.afterDown !== null) {
+    fail(`the touch pointerdown selected before release: ${JSON.stringify(picked)}`);
+    return;
+  }
+  console.log(
+    `  EMULATION ${name}: a touch pointerdown+pointerup selected building item ` +
+      `${picked.afterUp} (the pointerdown alone selected ${JSON.stringify(picked.afterDown)})`,
+  );
+
+  // The server is still the authority: selection was a read of the client's
+  // own world, which was fetched from this server with the issued token.
+  const world = await fetch(`http://127.0.0.1:${serverPort}/api/world`, {
+    headers: { authorization: `Bearer ${session.token}` },
+  }).then((response) => response.json());
+  if (!world?.maps?.[0]?.items || Object.keys(world.maps[0].items).length === 0) {
+    fail('the server did not own the town the emulated client rendered');
+    return;
+  }
+  console.log(`  EMULATION ${name}: the selected town came from the real server's save`);
+}
+
+async function main() {
+  const only = process.argv.includes('--browser')
+    ? process.argv[process.argv.indexOf('--browser') + 1]
+    : null;
+
+  if (!existsSync(path.join(ROOT, 'apps/client/dist/index.html'))) {
+    console.error('the client has not been built. Run:');
+    console.error('  pnpm --filter @swl/app-client build');
+    process.exit(2);
+  }
+
+  const dataDir = await mkdtemp(path.join(os.tmpdir(), 'swl-mobile-'));
+  const base = 8300 + Math.floor(Math.random() * 200);
+  const serverPort = base;
+  const clientPort = base + 200;
+  const devToolsPort = 9544;
+  const server = await startServer(dataDir, serverPort);
+  const client = await serve(clientPort, serverPort);
+
+  const failures = [];
+  const ran = [];
+  const notRun = [];
+  const profiles = [];
+  const browsers = [];
+
+  console.log(
+    `  EMULATION: ${PHONE.width}x${PHONE.height} CSS pixels @dpr ${PHONE.deviceScaleFactor}; ` +
+      `expected #stage scale ${EXPECTED_SCALE} from packages/client/src/stage.ts`,
+  );
+
+  try {
+    for (const entry of BROWSERS) {
+      if (only && entry.name !== only) continue;
+      const browser = findBrowser(entry.name);
+      if (!browser) {
+        notRun.push(entry.name);
+        continue;
+      }
+      console.log(`  EMULATION ${entry.name}:`);
+      ran.push(entry.name);
+      const session = await register(serverPort, `mobile-${entry.name.toLowerCase()}`);
+      const profile = mkdtempSync(path.join(os.tmpdir(), 'swl-mobile-profile-'));
+      profiles.push(profile);
+      const child = spawn(
+        browser,
+        [
+          '--headless=new',
+          '--disable-gpu',
+          '--no-sandbox',
+          '--disable-dev-shm-usage',
+          '--no-first-run',
+          '--no-default-browser-check',
+          `--user-data-dir=${profile}`,
+          `--remote-debugging-port=${devToolsPort}`,
+          'about:blank',
+        ],
+        { stdio: 'ignore' },
+      );
+      browsers.push(child);
+      let page = null;
+      try {
+        await waitForDevTools(devToolsPort);
+        page = await Page.openBlank(devToolsPort);
+        // The CDP emulation. These two calls are the whole device story:
+        // everything below ran in a real browser at a phone viewport. Apply
+        // them before navigation, so the client's viewport meta tag is
+        // parsed against the emulated phone from the first layout.
+        // `mobile: false` is deliberate. In headless Chromium, `mobile: true`
+        // makes `window.innerWidth` disagree with the layout viewport (it
+        // reported 575/690 instead of 390), which would drive the client's
+        // fit to the wrong size and make the assertion meaningless. Without
+        // mobile mode the CSS viewport is exactly 390x844 @dpr 2; touch is
+        // still enabled by the next call, so the gestures are real touch.
+        await page.send('Emulation.setDeviceMetricsOverride', {
+          width: PHONE.width,
+          height: PHONE.height,
+          deviceScaleFactor: PHONE.deviceScaleFactor,
+          mobile: false,
+        });
+        await page.send('Emulation.setTouchEmulationEnabled', {
+          enabled: true,
+          maxTouchPoints: 1,
+        });
+        await page.send('Page.navigate', { url: `http://127.0.0.1:${clientPort}/` });
+        await page.waitForLoad();
+        await verifyEmulatedPhone(page, entry.name, serverPort, session, failures);
+      } catch (error) {
+        failures.push(`${entry.name}: ${error?.message ?? String(error)}`);
+        console.log(`  FAILED (${error?.message ?? String(error)})`);
+      } finally {
+        if (page) await page.close(devToolsPort);
+      }
+    }
+  } finally {
+    for (const child of browsers) child.kill();
+    client.close();
+    server.kill();
+    await removeTemp(dataDir);
+    for (const profile of profiles) await removeTemp(profile);
+  }
+
+  console.log('');
+  console.log(`  the browsers that ran: ${ran.length ? ran.join(', ') : 'none'}`);
+  if (notRun.length) {
+    console.log(`  the browsers NOT RUN: ${notRun.join(', ')}`);
+  }
+  if (failures.length) {
+    console.error('');
+    console.error('the emulated-phone verification failed:');
+    for (const failure of failures) console.error(`  ${failure}`);
+    process.exit(1);
+  }
+  if (ran.length === 0) {
+    console.error('');
+    console.error('no browser was available for emulation.');
+    process.exit(2);
+  }
+  console.log(
+    'OK: the phone layout was verified by EMULATION in a real browser at 390x844 @dpr 2. ' +
+      'No device, Android/iOS build, emulator, Firefox or Safari was used or claimed.',
+  );
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
