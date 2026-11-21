@@ -504,13 +504,17 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main`:** `013d57c` — PR #44 (`feat/mount-assault-panels`)
-  merged with all four CI checks green. The merge chain since the prior
-  checkpoint (`9026017`) is PR #40 (`0053306`, unsigned Linux CI bundles),
-  PR #41 (`fa92150`, WebKit evidence + checkpoint), PR #42 (`cf9941d`,
-  multi-resolution phone matrix), PR #43 (`8de433a`, assault result/history/HUD
-  selectors and panels) and PR #44 (`013d57c`, mounting those panels in the one
-  shared dialog). The earlier chain that ended at `9026017` was PR #32
+- **Last verified `main`:** `6954a19` — PR #46 (`test/updater-rollback-seam`,
+  a test-only rollback-executor seam in the updater) merged with all four CI
+  checks green. The merge chain since the prior checkpoint (`9026017`) is
+  PR #40 (`0053306`, unsigned Linux CI bundles), PR #41 (`fa92150`, WebKit
+  evidence + checkpoint), PR #42 (`cf9941d`, multi-resolution phone matrix),
+  PR #43 (`8de433a`, assault result/history/HUD selectors and panels),
+  PR #44 (`013d57c`, mounting those panels in the one shared dialog), PR #45
+  (`bbb7ff9`, docs: record the #40–#44 batch and refresh the checkpoint) and
+  PR #46 (`6954a19`, test: pin the rollback decision path with a test-side
+  executor seam — test coverage only, no real executor or installer hook).
+  The earlier chain that ended at `9026017` was PR #32
   (`d303cba`), PR #33 (`2d273be`), PR #34 (`3228d0e`), PR #35 (`b4aea12`),
   PR #36 (`1689882`), PR #10 (`a0befef`), PR #37 (`6e084e7`), PR #38 (`31b6834`)
   and PR #39 (`9026017`). The prior `social-wars-legacy-main` session ended at
@@ -601,4 +605,4 @@ verified checkpoint, not at every tool call.
   build-artefact condition, not a source change. CI's Scan check passed.
 - **On resume:** re-read this file and `docs/ROADMAP.md`, check `git status`,
   `git stash list`, `git worktree list` and `gh pr checks`, then continue from the
-  verified `013d57c` state and the worker results above.
+  verified `6954a19` state and the worker results above.
