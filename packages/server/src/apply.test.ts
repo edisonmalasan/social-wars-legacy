@@ -1043,6 +1043,7 @@ describe('expanding the town', () => {
         args: [bad],
       });
       assert.equal(outcome.applied, false, `tile ${String(bad)}`);
+      assert.equal(outcome.refused, 'bad-argument', `tile ${String(bad)}`);
       assert.equal(outcome.world.resources['g'], 100_000);
       assert.deepEqual(owned(outcome.world), [35, 36, 45, 46]);
     }
