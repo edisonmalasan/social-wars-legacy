@@ -1974,6 +1974,89 @@ two-argument `set_quest_var`, the server's authority, or the 401-item accounting
 
 ---
 
+## Firefox smoke — the built client boots and renders under Gecko (smoke verified)
+
+*Status: **smoke verified**. This outcome is recorded here, **outside** the
+`## Group X` sections above, so `node scripts/check-roadmap.mjs` still counts
+the same **401** items (Group G: 81 items, 73 done / 8 open) and the G5
+"client is run in **Firefox and Safari**" checkbox above **stays open**. The
+G5.1, G5.2, expansion, phone-ready and Q11 records are preserved unchanged.
+This is a **boot/render smoke**, not a Firefox play session and not a Safari
+run.*
+
+**What was provisioned and verified:**
+
+- **The matching Firefox build was provisioned as a test tool, not added to the
+  shipped client.** `python -m playwright install firefox` downloaded
+  `Firefox 150.0.2 (playwright firefox v1522)` (116.2 MiB) into
+  `C:\Users\Edison\AppData\Local\ms-playwright\firefox-1522`; a launch probe
+  (`p.firefox.launch(headless=True)`) loaded a page successfully. Python
+  Playwright 1.60.0 was already installed. No runtime dependency was added to
+  the client and no existing CDP harness was modified.
+- **A thin, separate Playwright smoke script** (`scripts/smoke-test-client-firefox.py`)
+  serves the built client plus the same stub world/session as the Node smoke
+  harness, seeds `localStorage['swl.session']` with `page.evaluate`, reloads,
+  and waits for `#status[data-state=started]`. It drives Gecko through
+  Playwright because Firefox speaks Juggler/BiDi, **not** the Chrome DevTools
+  Protocol. Its four assertions are real: a `#game canvas` with a **WebGL2
+  context** and non-zero size, the client's own
+  `window.__swl.visibleSprites() >= 1`, a numeric gold readout in
+  `#ui .swl-hud .swl-resource-gold .swl-readout-value`, and the goals panel with
+  three `#ui .swl-goals .swl-goal-slot` slots. Console errors and uncaught page
+  errors are collected and fail the run.
+- **Exact smoke output (final run, exit 0):**
+  `firefox: started (started: 3 sprites)`;
+  `WebGL2 canvas 760x600, 3 visible sprite(s) drawn`;
+  `the top bar shows 2,000 gold`;
+  `the goals panel shows 3 goal(s)`;
+  `console/page errors: none`;
+  `browsers run: firefox (Playwright, Gecko)`;
+  `scope: smoke only - full Firefox e2e and Safari remain NOT RUN`;
+  `OK: the client boots, renders and lays out its DOM in Firefox (smoke).`
+  A 1280 × 900 screenshot was written to
+  `C:\Users\Edison\AppData\Local\Temp\opencode\sdd-firefox\firefox-smoke.png`
+  and shows the rendered HUD, goals, build menu, missions and tutorial overlay.
+- **Browsers run versus not run.** Ran: **firefox** (Gecko, headless). Not run:
+  **WebKit/Safari** (not provisioned), Chrome/Edge in this script (they are
+  covered by `scripts/smoke-test-client.mjs`, which still reports both started),
+  and real devices. The script prints these distinctions explicitly.
+
+**Gates (all run on the final tree; none weakened or disabled):**
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Unit tests | `pnpm test` | **PASS** — 1740 tests, 1740 pass, 0 fail |
+| Integration tests | `pnpm test:integration` | **PASS** — 64 pass, 0 fail |
+| Typecheck / Lint | `pnpm typecheck`, `pnpm lint` | **PASS** |
+| Content build / check | `pnpm build:content`, `pnpm check:content` | **PASS** |
+| Command catalogue | `node scripts/verify-command-catalogue.mjs` | **PASS** — 94 commands |
+| Roadmap counts | `node scripts/check-roadmap.mjs` | **PASS** — 401 items |
+| Report sync | `node scripts/check-report-sync.mjs` | **PASS** — 4 claims |
+| Cheat battery | `node scripts/run-cheat-battery.mjs` | **PASS** — all 11 attacks had no effect |
+| Golden master | `node scripts/golden-master.mjs` | **PASS** — 50 scenarios, 0 differences |
+| Coverage | `node scripts/check-coverage.mjs` | **PASS** — 97.62 % lines / 85.71 % functions / 95.55 % branches |
+| Upstream | `node scripts/verify-upstream.mjs` | **PASS** — 3292 files, 0 mismatched |
+| Licensing / no-Flash | `node scripts/check-licensing.mjs`, `node scripts/check-no-flash.mjs` | **PASS** in the CI-equivalent clean ordering (built `dist` artifacts moved aside and restored): `OK: the licensing position holds` and `OK: nothing that ships needs Flash`. With a built tree present they flag only the documented false positives — `.swf`-named asset identifiers in the generated JSON and the OFL substitute-font filenames — as in G5.2. No checker changed. |
+| Existing smoke | `node scripts/smoke-test-client.mjs` | **PASS** — chrome and edge started |
+| Chrome/Edge e2e | `node scripts/e2e-test.mjs` | **PASS** — full session and restart in chrome and edge |
+| Firefox smoke | `python scripts/smoke-test-client-firefox.py` | **PASS** — Firefox boots, WebGL2 render and DOM layout verified |
+| Supplementary doc checks | `build-licence-report.mjs --check`, `check-adrs.mjs`, `check-security-review.mjs`, `check-corrections.mjs`, `check-release.mjs` | **PASS** |
+
+**Explicit non-claims:** no full Firefox end-to-end session (no build placement,
+quest, battle or restart under Gecko), no Safari/WebKit run, no device or
+emulator run, no signed build or release, no proprietary asset, no revert of
+the CDP harnesses and no new client runtime dependency. The Firefox/Safari G5
+box stays open. Nothing here weakens server authority, the 94-command
+catalogue, the strict two-argument `set_quest_var`, the licensing/no-Flash
+checks or the 401-item accounting.
+
+**Remaining gaps:** the G5 Firefox/Safari box above remains open until a full
+session is played in both browsers; Safari/WebKit was not provisioned or run;
+and the two licensing/no-Flash checks must still be run before the client build
+or on a cleaned tree, as in CI.
+
+---
+
 ## Group H — Desktop Shell & Release
 
 *Outcome: a standalone, signed, updatable desktop executable.*
