@@ -19,6 +19,7 @@ import {
   populationPopover,
   resourcePopover,
   xpProgress,
+  type BonusPanelView,
   type HudResource,
   type HudState,
   type Popover,
@@ -32,6 +33,13 @@ const RESOURCES: readonly { key: HudResource; label: string }[] = [
   { key: 'steel', label: 'Steel' },
   { key: 'cash', label: 'Cash' },
 ];
+
+/** A server-timestamp wait, in words. Presentation only. */
+function wait(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return minutes > 0 ? `${minutes}m ${rest}s` : `${rest}s`;
+}
 
 /** A popover, in the markup. */
 function PopoverBox({ popover }: { popover: Popover }): React.JSX.Element {
@@ -80,6 +88,8 @@ export interface HudProps {
   state: HudState;
   /** The item the player is about to place, or null. */
   placing?: string | null;
+  /** The server-owned bonus cycles, read for display only. */
+  bonus?: BonusPanelView | null;
   /**
    * The player asked for the daily bonus. The server decides the reward;
    * the promise, when there is one, tells the button when to unlock again.
@@ -93,7 +103,7 @@ export interface HudProps {
  * The numbers are the model's, and the popovers are the model's too: the
  * texts are the client's, and they are tested where they live.
  */
-export function Hud({ state, placing, onClaimBonus }: HudProps): React.JSX.Element {
+export function Hud({ state, placing, bonus = null, onClaimBonus }: HudProps): React.JSX.Element {
   const energy = energyDisplay(state);
   const xp = xpProgress(state);
   const [bonusBusy, setBonusBusy] = useState(false);
@@ -171,6 +181,27 @@ export function Hud({ state, placing, onClaimBonus }: HudProps): React.JSX.Eleme
             {formatNumber(xp.current)}/{formatNumber(xp.needed)}
           </span>
         </div>
+        {bonus ? (
+          <div className="swl-bonus-status" role="status">
+            <span className="swl-bonus-day">Daily · day {bonus.day}</span>
+            <span className="swl-bonus-when">
+              {bonus.ready
+                ? bonus.reset
+                  ? 'Ready · new cycle'
+                  : 'Ready to claim'
+                : `Next in ${wait(bonus.secondsToNextDay)}`}
+            </span>
+            {bonus.weekly !== 'hidden' ? (
+              <span className="swl-bonus-weekly">
+                {bonus.weekly === 'ready'
+                  ? 'Monday bonus · ready'
+                  : bonus.weekly === 'collected'
+                    ? 'Monday bonus · claimed'
+                    : 'Monday bonus · Sunday, not ready'}
+              </span>
+            ) : null}
+          </div>
+        ) : null}
         {onClaimBonus ? (
           <button
             type="button"

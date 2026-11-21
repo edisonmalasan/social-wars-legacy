@@ -215,9 +215,9 @@ first means guessing at the rules being cloned.
       (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
       attack interval, the velocity, the life and the population
 - [ ] The panels and the popups are **rendered**, and the popups that are not
-      implemented are recorded as dropped. The screen inventory now reads **90
-      implemented / 52 dropped / 118 planned**; the counts are checked by
-      `packages/client/src/screens.test.ts`, and this item stays open while **118
+      implemented are recorded as dropped. The screen inventory now reads **94
+      implemented / 52 dropped / 114 planned**; the counts are checked by
+      `packages/client/src/screens.test.ts`, and this item stays open while **114
       screens are planned** - a `Deferred: ` reason records honest scope, not a
       rendered screen or a drop
 - [x] The authoritative **item id → delegate** map is extracted from
@@ -800,7 +800,9 @@ protocol and the original dialect.*
       tier the member count qualifies for, and only once a day. The weekly bonus uses
       the player's **local** week day (`Utils.getWeekDayFromTimeStamp` reads
       `Date.getDay()`), not UTC's, or the bonus moves by a day for everybody east or
-      west of Greenwich
+      west of Greenwich. A **lapsed streak** restarts the daily cycle at day 1 on the
+      server, as the client's rules require — the readiness flag was computed but
+      ignored before, so a long-absent player was handed the old day's prize
 - [x] **Premium expiry** is evaluated server-side: the premium is a **timestamp** in
       the private state, not a flag, and the server owns it
       (`packages/rules/src/premium.ts`). Buying while it is still running **extends**
@@ -1186,21 +1188,21 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **90 implemented** - the clone models the screen's behaviour, and the decision
+      - **94 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **52 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **118 planned** - in scope, the client's behaviour is real, and not modelled
+      - **114 planned** - in scope, the client's behaviour is real, and not modelled
         yet; each now carries a `Deferred: ` reason saying what is missing or how it
         unblocks
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
       exists, every dropped one must say why, and every planned one must start with
       `Deferred: ` and say what is missing or how it unblocks. The counts above are
-      checked by the same test. **This item stays open while 118 screens are planned**:
+      checked by the same test. **This item stays open while 114 screens are planned**:
       a deferral reason is neither an implementation nor a drop, and the earlier
       106/23/131 breakdown was a factual error, not a hidden batch of finished work
 - [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
@@ -1224,6 +1226,13 @@ assault against the new server, and the cheat battery is fully rejected.
       does not**; the **battle spell book** lists the learned spells, three to a page,
       with the quest's veto and the mana check separate. The buy, mana and cast
       actions are requests (`buy_magic`, `buy_mana_new`, `use_magic`)
+- [x] The **daily and Monday bonus screens** are modelled
+      (`packages/client/src/bonus.ts`): the cycle day, the readiness, the lapsed-streak
+      flag, the wait to the next local day and the weekly bonus's state are all read
+      from the server's save and the client's rules — the model never grants a prize.
+      The HUD draws the read-out (`apps/client/src/ui/hud.tsx`); the claim stays a
+      request the server answers. This closes the four screens whose deferral said
+      only that no client surface rendered them
 - [x] The **HUD is drawn** (`apps/client/src/ui/hud.tsx`): the top bar is the model's
       HUD — the resources, the population, the level and the energy — and every number
       opens the popover the model writes. The interface is **React DOM**, the renderer

@@ -197,6 +197,21 @@ export function uiCss(): string {
   font-variant-numeric: tabular-nums;
 }
 
+/* The bonus read-out: a reading of the server's own cycles, never a claim. */
+.swl-bonus-status {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px 6px;
+  border-left: 1px solid #38445a;
+  color: #f2e6c8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  font-variant-numeric: tabular-nums;
+}
+
+.swl-bonus-day { color: #f5c542; font-weight: 700; }
+.swl-bonus-weekly { color: #9fb3d1; }
+
 /* The bonus is a gesture: the client asks, and the server names the reward. */
 /* The button qualifier beats the generic .swl-ui button reset above. */
 .swl-ui button.swl-bonus {

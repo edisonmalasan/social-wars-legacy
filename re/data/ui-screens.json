@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 90,
+   "planned": 114,
    "dropped": 52,
-   "planned": 118
+   "implemented": 94
   }
  },
  "screens": [
@@ -845,8 +845,8 @@
    ],
    "overrides": [],
    "bytes": 607,
-   "decision": "planned",
-   "decisionNote": "Deferred: the Monday bonus cycle is implemented server-side already, but no client popup renders it."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/bonus.ts` — the server-owned daily cycle and Monday bonus state, drawn as the HUD bonus read-out."
   },
   {
    "class": "Portrait",
@@ -3158,8 +3158,8 @@
    ],
    "overrides": [],
    "bytes": 1582,
-   "decision": "planned",
-   "decisionNote": "Deferred: the daily bonus is awarded server-side already, but no client popup renders it."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/bonus.ts` — the server-owned daily cycle and Monday bonus state, drawn as the HUD bonus read-out."
   },
   {
    "class": null,
@@ -3778,8 +3778,8 @@
    ],
    "overrides": [],
    "bytes": 6149,
-   "decision": "planned",
-   "decisionNote": "Deferred: the Monday bonus cycle is implemented server-side already, but no client popup renders it."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/bonus.ts` — the server-owned daily cycle and Monday bonus state, drawn as the HUD bonus read-out."
   },
   {
    "class": "PopOver",
@@ -4885,8 +4885,8 @@
    ],
    "overrides": [],
    "bytes": 10873,
-   "decision": "planned",
-   "decisionNote": "Deferred: the daily bonus is awarded server-side already, but no client popup renders it."
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/bonus.ts` — the server-owned daily cycle and Monday bonus state, drawn as the HUD bonus read-out."
   },
   {
    "class": "PopupNews",
