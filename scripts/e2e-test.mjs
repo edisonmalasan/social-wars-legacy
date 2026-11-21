@@ -1089,12 +1089,19 @@ async function playThroughDom(page, serverPort, browserName) {
   if (goldBeforeExpansion >= EXPANSION.coins) {
     throw new Error('the e2e fixture unexpectedly starts with enough gold to afford an expansion');
   }
+  // Snapshot the channel before the click: a generic "refused" left over from
+  // an earlier step must not be mistaken for this click's answer.
+  const feedbackBeforeExpand = await domValue(
+    page,
+    "document.querySelector('#ui .swl-feedback')?.textContent ?? ''",
+  );
   await domClickPlain(page, '#ui .swl-expansion button.swl-expansion-buy', 'Expand button');
   const expansionRefusal = await domWait(
     page,
     "document.querySelector('#ui .swl-feedback')?.textContent ?? ''",
-    (value) => typeof value === 'string' && /refused/i.test(value),
-    'the server refusal of an unaffordable expansion',
+    (value) =>
+      typeof value === 'string' && value !== feedbackBeforeExpand && /refused/i.test(value),
+    'a fresh server refusal from this expansion click',
   );
   if (!/refused/i.test(String(expansionRefusal))) {
     throw new Error(`the unaffordable expansion drew no refusal: ${expansionRefusal}`);

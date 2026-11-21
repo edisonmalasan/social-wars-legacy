@@ -662,4 +662,20 @@ describe('the expansion panel', () => {
   it('is null when the content has no row at the owned ordinal', () => {
     assert.equal(expansionPanel(prices([{ coins: 0, cash: 0 }]), fourOwned), null);
   });
+
+  it('is null for a present row with a non-finite price, not a fake 0/0', () => {
+    const noneOwned = {
+      maps: [{ id: 0, items: {}, expansions: [] }],
+      resources: {},
+      privateState: {},
+    } as WorldSnapshot;
+    for (const row of [
+      { coins: Number.NaN, cash: 5 },
+      { coins: 2500, cash: Number.POSITIVE_INFINITY },
+      { coins: '2500', cash: 5 },
+      { cash: 5 },
+    ]) {
+      assert.equal(expansionPanel(prices([row]), noneOwned), null, JSON.stringify(row));
+    }
+  });
 });

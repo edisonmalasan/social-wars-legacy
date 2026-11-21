@@ -663,7 +663,9 @@ export function recruitView(
  * price is the **content's** row at that ordinal. This bridge only reads them.
  * The tile id is a deterministic identifier that is not already owned; the
  * server decides whether that tile may actually be bought, so a refusal is
- * shown through the feedback channel rather than hidden here.
+ * shown through the feedback channel rather than hidden here. A row whose
+ * prices are not finite is not a price at all, so the control is hidden rather
+ * than drawing a fabricated 0/0.
  */
 export interface ExpansionPanelView {
   /** How many tiles the server says the town owns. */
@@ -686,11 +688,14 @@ export function expansionPanel(
   const owned = ownedExpansions(world);
   const row = recordOrNull((bundle.expansionPrices ?? [])[owned.length]);
   if (!row) return null;
+  const coins = finite(row['coins']);
+  const cash = finite(row['cash']);
+  if (coins === null || cash === null) return null;
   const tileId = Math.floor(Math.max(0, ...owned)) + 1;
   return {
     owned: owned.length,
-    coins: finite(row['coins']) ?? 0,
-    cash: finite(row['cash']) ?? 0,
+    coins,
+    cash,
     tileId,
     command: expand(tileId),
   };
