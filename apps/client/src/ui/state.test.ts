@@ -16,6 +16,7 @@ import {
   hudRules,
   infoPanel,
   inventoryItems,
+  magicBookPanel,
   magicLabPanel,
   populationItems,
   productionPanel,
@@ -724,5 +725,44 @@ describe('the Research LAB panel', () => {
     assert.deepEqual(view.canBuyMana, { c: true, g: true });
     const poor = magicLabPanel(withSpells, { ...world7, resources: { ...world7.resources, c: 0, g: 0 } }, 0);
     assert.deepEqual(poor.canBuyMana, { c: false, g: false });
+  });
+});
+
+describe('the spell book panel', () => {
+  const learned = Array.from({ length: 4 }, (_, i) => ({
+    id: i + 1,
+    name: `Spell ${i + 1}`,
+    description: 'does a thing',
+    mana: 10,
+    level: 1,
+    gold: 100,
+    cash: 5,
+    area: [1, 2, 3],
+    target: 2,
+    imgName: `spell${i + 1}`,
+  }));
+  const withLearned = bundle({ magics: learned, globals: {} });
+  const world = {
+    maps: [{ id: 0, items: {}, level: 7 }],
+    resources: { g: 0, c: 0, w: 0, o: 0, s: 0, e: 30, x: 0, m: 0 },
+    privateState: { mana: 12, magics: { 1: 5, 2: 25, 3: 60, 4: 0 } },
+  } as unknown as WorldSnapshot;
+
+  it('lists only learned spells, three to a page, with the server\'s mana', () => {
+    const first = magicBookPanel(withLearned, world, 0);
+    assert.equal(first.pageCount, 2);
+    assert.deepEqual(first.items.map((spell) => spell.id), [1, 2, 3]);
+    assert.deepEqual(first.items.map((spell) => spell.level), [1, 2, 3]);
+    assert.equal(first.mana, 12);
+    assert.ok(first.items.every((spell) => spell.castable && spell.enabled));
+    const second = magicBookPanel(withLearned, world, 1);
+    assert.deepEqual(second.items.map((spell) => spell.id), [4]);
+  });
+
+  it('disables a spell the active quest vetoes and marks low mana', () => {
+    const view = magicBookPanel(withLearned, world, 0, [2]);
+    assert.equal(view.items.find((spell) => spell.id === 2)!.enabled, false);
+    const short = magicBookPanel(withLearned, { ...world, privateState: { ...world.privateState, mana: 5 } }, 0);
+    assert.ok(short.items.every((spell) => !spell.castable));
   });
 });

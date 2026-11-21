@@ -843,6 +843,51 @@ export function uiCss(): string {
 .swl-magic-packs { display: flex; gap: 4px; margin-top: 8px; }
 .swl-magic-pages { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
 
+/* --- The spell book ----------------------------------------------------- */
+
+.swl-spellbook {
+  position: absolute;
+  right: 700px;
+  bottom: 8px;
+  max-width: 340px;
+  max-height: 60vh;
+  overflow: auto;
+  padding: 6px 8px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: rgba(16, 21, 29, 0.92);
+  color: #f2e6c8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  pointer-events: auto;
+}
+
+.swl-spellbook-summary { cursor: pointer; color: #c9a9ff; font-weight: 700; }
+.swl-spellbook-body { margin-top: 6px; }
+.swl-spellbook-empty { color: #9fb3d1; }
+.swl-spellbook-spells { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.swl-spellbook-spell { display: flex; gap: 6px; align-items: center; border-top: 1px solid #38445a; padding-top: 4px; }
+.swl-spellbook-name { font-weight: 700; }
+.swl-spellbook-level, .swl-spellbook-area { color: #9fb3d1; }
+
+.swl-ui button.swl-spellbook-cast {
+  margin-left: auto;
+  padding: 3px 6px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: #f2e6c8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+.swl-ui button.swl-spellbook-cast:disabled {
+  border-color: #38445a;
+  background: #1d2430;
+  color: #5c6678;
+  cursor: not-allowed;
+}
+
+.swl-spellbook-pages { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+
 /* --- The neighbour strip ----------------------------------------------- */
 
 .swl-neighbours {

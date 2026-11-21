@@ -504,10 +504,11 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main:** `2d273be` — PR #33 (`feat: model the offer-pack store
-  screens`) merged with all four CI checks green, after PR #32 (`d303cba`). The
-  prior `social-wars-legacy-main` session ended at `1a6a89e` (PR #31) when its
-  context filled during compaction, not because the roadmap was finished.
+- **Last verified `main:** `3228d0e` — PR #34 (`feat: draw the Research LAB from
+  the existing spell model`) merged with all four CI checks green, after PR #33
+  (`2d273be`) and PR #32 (`d303cba`). The prior `social-wars-legacy-main`
+  session ended at `1a6a89e` (PR #31) when its context filled during compaction,
+  not because the roadmap was finished.
 - **Where that session stopped:** it had merged nine increments (#23–#31) and
   classified the remaining open items. Most are genuine blockers (Flash live
   captures, licence-gated art, missing platform hosts/devices, rights-holder
@@ -515,21 +516,25 @@ verified checkpoint, not at every tool call.
   it identified is Group B3/G3's screen backlog, which it left at 90 implemented
   / 52 dropped / 118 planned.
 - **Completed this session:** the daily/Monday bonus screens (PR #32), the
-  offer-pack store screens (PR #33) — both merged with green CI.
-- **Next task selected:** drawing the Research LAB. Its 10 spells, paging,
-  learned/blocked states and cash-unlock quirk were fully modelled in
-  `magic.ts` but no interface drew them, so this is player-facing functionality
-  rather than a checklist reclassification.
-- **Active branch / PR:** `feat/magic-lab-ui` adds `apps/client/src/ui/magiclab.tsx`
-  and a tested bridge in `state.ts`. It does **not** change the screen counts:
-  the LAB screens were already `implemented` as models and the research-centre
-  pair is a different, late-era robot feature whose deferral stays honest.
-  Locally verified: `pnpm test` 1764/1764, `pnpm typecheck` clean, and the
-  real-browser e2e in Chrome and Edge — all passed.
+  offer-pack store screens (PR #33), and the Research LAB interface (PR #34) —
+  all merged with green CI.
+- **Next task selected:** drawing the battle spell book. Its learned-only list,
+  three-to-a-page paging, spell levels and mana state were modelled in `magic.ts`
+  but no interface drew them, and casting had no button anywhere in the client.
+- **Active branch / PR:** the spell-book increment adds
+  `apps/client/src/ui/spellbook.tsx` and a tested `magicBookPanel` bridge. It
+  does **not** change the screen counts: the spell-book screens were already
+  `implemented` as models. Locally verified: `pnpm test` 1766/1766,
+  `pnpm typecheck` clean, coverage/command-catalogue/report-sync gates passed,
+  and the real-browser e2e in Chrome and Edge — all passed.
+- **Environment note:** `node scripts/check-no-flash.mjs` fails locally on stale
+  built `dist/content-bundle.json` and `dist/frame-manifest.json` files (SWF
+  string references); this is a local build-artefact condition, not a source
+  change from this session. CI's Scan check passes.
 - **Verification run for PR #32:** 1754/1754 tests, clean typecheck, golden master
   50/50 with 0 differences, cheat battery 11/11, report sync, roadmap check, and
   the real-browser e2e in Chrome and Edge — all passed; CI's four checks passed.
-- **Remaining applicable tasks:** continue reducing the 114 planned screens in
+- **Remaining applicable tasks:** continue reducing the 110 planned screens in
   coherent, player-facing families; re-audit the blockers in section 5 before
   treating any as final; do not claim the frame-rate, platform or release items
   without their actual evidence.
