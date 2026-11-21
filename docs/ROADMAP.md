@@ -2635,9 +2635,9 @@ be mistaken for unfinished work.*
 | G | Playable at the original resolutions and phone scales | The stage model exists; real-device verification does not | Test on the target devices |
 | G | Played on an actual phone with touch controls | No device here | A phone and touch-control implementation |
 | H | A player with no server cannot play | **Non-goal** — the product is pure online (ADR 19) | A reversal of ADR 19 |
-| H | Installers for Windows, macOS and Linux | The Tauri CLI is not installed; WiX and the other platforms' packagers are absent | Install the Tauri CLI and each platform's packager |
-| H | Code-signed binaries, notarised macOS build | No code-signing certificate or Apple developer account exists | Obtain the credentials |
-| H | Auto-update with clean rollback | Needs a release endpoint and a signed release stream | Release infrastructure |
+| H | Installers for Windows, macOS and Linux | An **unsigned Windows NSIS** installer was built on this host (`Social Wars Legacy_0.1.0_x64-setup.exe`, 33.27 MiB) with the npm Tauri CLI 2.12.3; NSIS 3.13 is cached, WebView2 is present and WiX is auto-downloadable. MSI was not attempted, and macOS/Linux have no build hosts here | Signed artefacts plus macOS and Linux CI runners; this row stays open until all three platforms are produced |
+| H | Code-signed binaries, notarised macOS build | No code-signing certificate or Apple developer account exists; the one built installer is unsigned | Obtain the credentials |
+| H | Auto-update with clean rollback | The pure decision/rollback logic exists and is mock-tested, but there is no signed release stream, HTTPS endpoint, installer hook or rollback executor | A signed release stream, endpoint and a real install/rollback layer |
 | I | A corrections request actually received and honoured | No rights holder has made a request; the policy and log exist | A real request through `docs/CORRECTIONS.md` |
 | I | Stable frame rate on the largest documented battle | Needs a real GPU and a large-battle fixture; a headless browser's frames are throttled | A GPU test host and the fixture |
 | I | Frame rate measured on a real GPU | Same as above | The same GPU test host |
@@ -2870,6 +2870,42 @@ reviewed without reconstructing the conversation that led to it.*
   `verify-upstream.mjs`, `check-no-flash.mjs` and `check-licensing.mjs` (with
   `apps/client/dist` absent, as in CI), the client build and `e2e-test.mjs`
   (Chrome + Edge).
+- **2026-11-21 — desktop distribution progress (Group H).** Recorded outside the
+  Group headers, with the 401-item accounting and every prior milestone record
+  left intact. Three outcomes are verified. The packaged shell ships the **real
+  web client**: `prepare-desktop.mjs` replaces the placeholder with the built
+  `apps/client/dist`, `check-desktop-dist.mjs` fails on a placeholder, and CI
+  builds the server sidecar before `cargo check`/`test`. The server ships as a
+  **self-contained sidecar**: `scripts/build-desktop-server.mjs` copies the build
+  Node runtime and a stripped, dependency-complete server tree; Tauri's
+  `bundle.externalBin` places it beside the executable, and the packaged command
+  path selects it through `!tauri::is_dev()` while development keeps
+  `node apps/server/src/main.ts`. The generated sidecar answered a real `/health`
+  request with HTTP 200. Updater and rollback **decisions** are pure and
+  mock-tested in `apps/desktop/src-tauri/src/updater.rs` (15 tests, with an
+  injectable `ReleaseVerifier` fake); there is no key, endpoint, install or
+  rollback executor. A **bounded, single unsigned Windows NSIS build** was also
+  attempted from `apps/desktop/src-tauri` with `tauri build --bundles nsis`:
+  exit 0, producing
+  `target/release/bundle/nsis/Social Wars Legacy_0.1.0_x64-setup.exe`
+  (34,889,727 bytes, 33.27 MiB). *Rationale:* that installer is real but
+  **unsigned and Windows-only**, so the "Installers produced for Windows, macOS
+  and Linux" box is deliberately **not** ticked; no signing, publication or
+  auto-update claim is made. *Still blocked:* signed and notarised binaries,
+  MSI and macOS/Linux builds (no build hosts or credentials), a live signed
+  update stream and rollback executor, and publication. *Evidence:* all GOAL §7
+  gates exit 0 — `pnpm test` 1740 pass / 0 fail, `pnpm test:integration` 64 pass,
+  `pnpm typecheck`, `pnpm lint`, `pnpm build:content` + `pnpm check:content`
+  (build id `63e067bd…`), `pnpm --filter @swl/app-client build`,
+  `verify-command-catalogue.mjs` (94/94/94), `check-roadmap.mjs` (401 items),
+  `check-report-sync.mjs` (4 claims), `run-cheat-battery.mjs` (11/11),
+  `golden-master.mjs` (0 differences), `check-coverage.mjs` (above the floors),
+  `verify-upstream.mjs`, `check-no-flash.mjs` and `check-licensing.mjs` (run on a
+  clean tree, as CI's Scan job does — generated client/sidecar artefacts make
+  them flag `.swf` data strings in the content bundle and substitute-font
+  filenames), `e2e-test.mjs` (Chrome + Edge), `cargo test --locked` (39 Rust
+  tests), `cargo fmt --check` and `check-desktop-dist.mjs`, plus the bounded
+   `tauri build --bundles nsis` (exit 0) and the sidecar health probe above.
 
 ---
 
