@@ -500,6 +500,146 @@ describe('Q11 civilian evacuations', () => {
   });
 });
 
+describe('Q11 server-clock timer', () => {
+  it('stamps the server clock at start and refuses an action once 240s have passed', () => {
+    const clock = { value: 1000 };
+    const helpers = createQuestHelpers(qdeps({ now: () => clock.value }));
+    const started = helpers.beginQuest(freshWorld(), Q11);
+    assert.equal(started.ok, true, started.ok ? '' : started.reason);
+    if (!started.ok) return;
+    const stamped = active(started.world);
+    assert.equal(stamped.startedAt, 1000);
+    assert.equal(stamped.lastTickAt, 1000);
+    assert.equal(stamped.timeRemaining, 240);
+
+    // Inside the window an action is accepted and the clock checkpoint moves.
+    clock.value = 1000 + 239;
+    const within = helpers.applyQuestAction(started.world, Q11, {
+      type: 'civilian-evacuation',
+      ref: 'item:20',
+    });
+    assert.equal(within.ok, true, within.ok ? '' : within.reason);
+    if (!within.ok) return;
+    assert.equal(active(within.world).lastTickAt, 1239);
+    assert.equal(active(within.world).timeRemaining, 1);
+
+    // One more second exhausts the timer: the quest is a loss and every later
+    // action is refused with an unchanged save.
+    clock.value = 1000 + 240;
+    const before = structuredClone(within.world);
+    const late = helpers.applyQuestAction(within.world, Q11, {
+      type: 'civilian-evacuation',
+      ref: 'item:21',
+    });
+    assert.equal(late.ok, false);
+    if (late.ok) return;
+    assert.equal(late.reason, 'quest-lost');
+    assert.deepEqual(late.world, before);
+
+    // The loss is not persisted on refusal; the next call re-derives it from
+    // the same server timestamp, so end_quest is refused too and pays nothing.
+    const end = createApplier(qdeps({ now: () => clock.value }))(before, {
+      name: 'end_quest',
+      args: [Q11, 1],
+    });
+    assert.equal(end.applied, false);
+    assert.equal(end.refused, 'quest-lost');
+    assert.deepEqual(end.world, before);
+  });
+
+  it('refuses end_quest after expiry and pays nothing', () => {
+    const clock = { value: 1000 };
+    const clockDeps = qdeps({ now: () => clock.value });
+    const helpers = createQuestHelpers(clockDeps);
+    const started = helpers.beginQuest(freshWorld(), Q11);
+    assert.equal(started.ok, true, started.ok ? '' : started.reason);
+    if (!started.ok) return;
+
+    let world = started.world;
+    for (const ref of ['item:20', 'item:21', 'item:22']) {
+      const next = helpers.applyQuestAction(world, Q11, {
+        type: 'civilian-evacuation',
+        ref,
+      });
+      assert.equal(next.ok, true, `${ref}: ${next.ok ? '' : next.reason}`);
+      if (!next.ok) return;
+      world = next.world;
+    }
+    // A genuine win by the server's own counters, still inside the window.
+    assert.equal(active(world).script.counters['workersInVillages'], 0);
+
+    clock.value = 1000 + 241;
+    const before = structuredClone(world);
+    const outcome = createApplier(clockDeps)(world, { name: 'end_quest', args: [Q11, 1] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'quest-lost');
+    assert.deepEqual(outcome.world, before);
+    assert.deepEqual(outcome.world.resources, before.resources);
+    assert.equal(ACTIVE_QUEST_KEY in outcome.world.save.privateState, true);
+  });
+
+  it('advances time monotonically and never double-counts a replayed tick', () => {
+    const clock = { value: 1000 };
+    const helpers = createQuestHelpers(qdeps({ now: () => clock.value }));
+    const started = helpers.beginQuest(freshWorld(), Q11);
+    assert.equal(started.ok, true, started.ok ? '' : started.reason);
+    if (!started.ok) return;
+
+    clock.value = 1100;
+    const first = helpers.applyQuestAction(started.world, Q11, {
+      type: 'civilian-evacuation',
+      ref: 'item:20',
+    });
+    assert.equal(first.ok, true, first.ok ? '' : first.reason);
+    if (!first.ok) return;
+    assert.equal(active(first.world).timeRemaining, 140);
+    assert.equal(active(first.world).lastTickAt, 1100);
+
+    // A second call at the same server time must not tick the same 100s again.
+    const replay = helpers.applyQuestAction(first.world, Q11, {
+      type: 'civilian-evacuation',
+      ref: 'item:21',
+    });
+    assert.equal(replay.ok, true, replay.ok ? '' : replay.reason);
+    if (!replay.ok) return;
+    assert.equal(active(replay.world).timeRemaining, 140);
+    assert.equal(active(replay.world).lastTickAt, 1100);
+
+    // An out-of-order (earlier) clock must not refund the elapsed 100s.
+    clock.value = 1050;
+    const earlier = helpers.applyQuestAction(replay.world, Q11, {
+      type: 'civilian-evacuation',
+      ref: 'item:22',
+    });
+    assert.equal(earlier.ok, true, earlier.ok ? '' : earlier.reason);
+    if (!earlier.ok) return;
+    assert.equal(active(earlier.world).timeRemaining, 140);
+    assert.equal(active(earlier.world).lastTickAt, 1100);
+  });
+
+  it('leaves an untimed quest unaffected by a large clock jump', () => {
+    const clock = { value: 1000 };
+    const clockDeps = qdeps({ now: () => clock.value });
+    const helpers = createQuestHelpers(clockDeps);
+    const started = helpers.beginQuest(freshWorld(), Q02);
+    assert.equal(started.ok, true, started.ok ? '' : started.reason);
+    if (!started.ok) return;
+
+    clock.value = 1000 + 10_000;
+    const struck = helpers.applyQuestAction(started.world, Q02, {
+      type: 'strike',
+      ref: 'commandCenter',
+    });
+    assert.equal(struck.ok, true, struck.ok ? '' : struck.reason);
+    if (!struck.ok) return;
+    assert.equal(active(struck.world).timeRemaining, null);
+    assert.equal(active(struck.world).ledger.elements['commandCenter']!.alive, false);
+    const outcome = createApplier(clockDeps)(struck.world, { name: 'end_quest', args: [Q02, 1] });
+    assert.equal(outcome.applied, true, outcome.refused ?? '');
+    assert.equal(outcome.world.resources['g'], 4000);
+  });
+});
+
 describe('end_quest after an explicit start', () => {
   const applier = () => createApplier(qdeps());
 

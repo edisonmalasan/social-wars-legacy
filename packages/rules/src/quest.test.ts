@@ -15,6 +15,7 @@ import {
   QUEST_ID_08_ROCKET,
   QUEST_ID_09_LABORATORIES,
   QUEST_ID_10_SPECIAL_OPS,
+  QUEST_ID_11_SAVE_VILLAGES,
   QUEST_ID_13_TYRANNOSAURUS,
   QUEST_ID_15_HARDCORE1,
   QUEST_ID_19_HARDCORE5,
@@ -433,6 +434,33 @@ describe('a story quest', () => {
     assert.equal(state.lossArmedAt, 3);
     const expired = tickQuest(state, 3);
     assert.equal(expired.result, 'loss');
+  });
+
+  it('Q11: an immediate army-wipe win is not also a recorded defeat', () => {
+    // Quest11SaveVillages overrides `prepareQuestEnd` so the airstrike resolves
+    // the instant the army is wiped: it wins when every civilian is already
+    // out of the villages (quest/Quest11SaveVillages.as:388-391). Such a state
+    // must not simultaneously report `result = 'win'` and a defeat, merely
+    // because `armyWipedOut` is set.
+    let state = prepareQuest(QUEST_ID_11_SAVE_VILLAGES, {
+      army: [{ unitId: 1008, count: 1 }],
+    });
+    state = setQuestCounter(state, 'workersInVillages', 0);
+    const killed = killQuestElement(state, friendlyUnit('item:1008'));
+    assert.equal(killed.state.result, 'win');
+    assert.equal(killed.state.armyWipedOut, true);
+    assert.equal(isQuestDefeat(killed.state), false);
+  });
+
+  it('Q11: an immediate army wipe with civilians still present is a loss', () => {
+    // The other half of the same override: civilians left behind lose.
+    let state = prepareQuest(QUEST_ID_11_SAVE_VILLAGES, {
+      army: [{ unitId: 1008, count: 1 }],
+    });
+    state = setQuestCounter(state, 'workersInVillages', 2);
+    const killed = killQuestElement(state, friendlyUnit('item:1008'));
+    assert.equal(killed.state.result, 'loss');
+    assert.equal(isQuestDefeat(killed.state), true);
   });
 
   it('wins the nuclear quest by destroying the command centre alone', () => {

@@ -1884,6 +1884,96 @@ legitimately high-level save for a browser happy-path run.
 
 ---
 
+## Authoritative quest timing — verified (Q11 240-second timer)
+
+*Status: **the mission timer is implemented and verified**; army-wipe defeat
+remains a simulator-dependent fidelity boundary. This outcome is recorded
+here, **outside** the `## Group X` sections above, so
+`node scripts/check-roadmap.mjs` still counts the same **401** items. The
+G5.1, G5.2, expansion, phone-ready and amendment-log records are preserved
+unchanged. No checkbox was ticked, no blocker was relabelled, and no existing
+assertion was weakened.*
+
+**Implemented and verified:**
+
+- **Q11's 240-second timer runs from the server clock.**
+  `beginQuest` stamps `startedAt`/`lastTickAt` from `deps.now()` (the server's
+  `Date.now()`, floored to seconds) and never from a client value; quest
+  actions and `end_quest` advance the clock with the pure `tickQuest` before
+  trusting any request. The delta is clamped at zero, so a backward or replayed
+  clock cannot rewind a countdown or double-count a tick. An expired or
+  otherwise lost quest is refused with a typed `quest-lost` (HTTP 409) and its
+  ticked state is deliberately not persisted: the next call re-derives the
+  same loss. A quest already recorded as a win is no longer also reported as a
+  defeat, which reconciles Q11's immediate airstrike resolution without
+  changing any other quest's win/fail behaviour
+  (`packages/server/src/apply.ts`, `packages/rules/src/quest.ts`,
+  `apps/server/src/app.ts`).
+- **Expired quests pay nothing, once.** The refusal happens before any wallet,
+  award, rank or receipt write, so an expired mission grants no resources and
+  cannot be retried into a second payout. This extends the once-only guard
+  already proved for wins and replays to a timer loss.
+- **Browser proof in Chrome and Edge.** With the deterministic clock fixture
+  (a test-only preload injected into the server child, never the shipped
+  server), the real client started Q11 (`100000011`) with the server's own save
+  showing `timeRemaining: 240`; after the harness advanced the **server**
+  clock by 241 s, a reload restored the combat dialog from that saved quest,
+  the client's action was refused with `quest-lost`, and the rendered **Finish**
+  gesture showed `command-failed: quest-lost` in the result dialog with **no
+  reward row**; neither cash nor oil changed. The browser's clock and every
+  gameplay rule were untouched; no client clock was trusted and no win or loss
+  was fabricated. Every earlier e2e assertion was kept intact. Q11 was left
+  active on that throwaway player; the DOM loop registers its own fresh
+  player, so its weekly quest was unaffected. The run ended with
+  `the browsers that ran: chrome, edge` and
+  `OK: a player registers, signs in, plays, and signs in again after a restart.`
+- **HTTP/unit evidence.** The typed refusal, unchanged wallet, once-only
+  behaviour, non-expired-quest isolation and Q11 win/defeat agreement are
+  covered by `packages/server/src/quest-authority.test.ts`,
+  `apps/server/src/quest-endpoints.test.ts`,
+  `packages/server/src/apply.test.ts` and `packages/rules/src/quest.test.ts`.
+
+**Remaining fidelity boundary (deliberately not enforced):**
+
+- **Army-wipe defeat still needs a positional simulator and authoritative
+  friendly-unit death events.** The server has no unit positions or death
+  events against which to verify a wipe; a client-reported wipe would be a
+  forged outcome and is deliberately not accepted. This boundary stays in
+  *Unimplemented layers* beside the no-simulator and Q08 rows, and is distinct
+  from the device, original-art, live-capture and release blockers in
+  *Externally Blocked Items*. No box is ticked for it.
+
+**Gates (all run on the final tree; none skipped):**
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Unit tests | `pnpm test` | **PASS** — 1740 tests, 1740 pass, 0 fail |
+| Integration tests | `pnpm test:integration` | **PASS** — 64 pass, 0 fail |
+| Typecheck / lint | `pnpm typecheck`, `pnpm lint` | **PASS** — 141 browser modules, none needs node |
+| Content build / check | `pnpm build:content`, `pnpm check:content` | **PASS** — build id `63e067bd…` |
+| Command catalogue | `node scripts/verify-command-catalogue.mjs` | **PASS** — 94 commands |
+| Roadmap counts | `node scripts/check-roadmap.mjs` | **PASS** — 401 items |
+| Report sync | `node scripts/check-report-sync.mjs` | **PASS** — 4 claims |
+| Cheat battery | `node scripts/run-cheat-battery.mjs` | **PASS** — 11 attacks had no effect |
+| Golden master | `node scripts/golden-master.mjs` | **PASS** — 50 scenarios, 0 differences |
+| Coverage | `node scripts/check-coverage.mjs` | **PASS** — 97.62 % lines / 85.71 % functions / 95.55 % branches |
+| Upstream | `node scripts/verify-upstream.mjs` | **PASS** — vendored releases match their manifest |
+| Licensing / no-Flash | `node scripts/check-no-flash.mjs`, `node scripts/check-licensing.mjs` | **PASS** — run with `apps/client/dist` absent, as in CI |
+| Client build | `pnpm --filter @swl/app-client build` | **PASS** — only the pre-existing chunk-size warning |
+| Desktop e2e | `node scripts/e2e-test.mjs` | **PASS** — `browsers that ran: chrome, edge`; includes the Q11 expiry assertion |
+| Supplementary CI checks | `build-licence-report.mjs --check`, `check-adrs.mjs`, `check-security-review.mjs`, `check-corrections.mjs`, `check-release.mjs` | **PASS** |
+
+**Non-claims and blockers:** no positional combat simulator, no army-wipe
+defeat enforcement, no Q08 fix, no device or Firefox/Safari run, no original
+art, no mobile or signed release, and no client-reported outcome is accepted.
+The licensing/no-Flash checks must still be run before the client build or on
+a cleaned tree, as in CI; with a built client they flag only the copied
+`.swf`-named asset identifiers and the OFL substitute-font filenames already
+documented in G5.2. Nothing here changes the 94-command catalogue, the strict
+two-argument `set_quest_var`, the server's authority, or the 401-item accounting.
+
+---
+
 ## Group H — Desktop Shell & Release
 
 *Outcome: a standalone, signed, updatable desktop executable.*
@@ -2562,7 +2652,7 @@ owner and a precise condition for closing it.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| G | Full authoritative positional combat and remaining quest fidelity gaps | The server-authoritative workflow is in place and verified: `beginQuest` seeds a server-owned ledger and counters from content, strikes damage from the server seed with encounter HP bounded to at most four strikes, the two-argument `set_quest_var` kill report is accepted only once the ledger marks the element dead, and Q03 truck arrivals plus Q10/Q11/Q14 event counters advance from server-validated events. Rewards are paid once and survive a real server restart. What remains is not a missing event source but deliberate fidelity boundaries: (1) there is **no positional combat simulator** — the server validates player events against a server-owned ledger rather than replaying a battle from unit positions, so a "validated" event is one that matches the ledger, not one a simulated fight produced; (2) **Q11's 240-second timer and army-wipe defeat are not enforced** by this workflow — a known fidelity gap, the client still reports the outcome and the server neither times the mission nor checks an army wipe; (3) **Q08 Rocket remains client-unwinnable** (`canDie: false`) and stays flagged; (4) **chapters remain client-reported state predicates** — the client writes `spawned`/`ended`, while the server owns the reward, the once-only guard and the chapter state keys; (5) the **legacy Flash client cannot emit the new native start/strike operations** — those are web-client-only (`POST /api/quest/start` and the native action endpoint), so an unmodified original client cannot drive this workflow. These are in-repo fidelity boundaries, kept distinct from the external dependencies in *Externally Blocked Items* above, not relabelled as blockers | Close this row only when a real positional combat simulator replaces ledger validation, Q11's timer and army-wipe defeat are enforced server-side, Q08 becomes winnable, chapters stop relying on client-reported `spawned`/`ended`, and the legacy client can emit the start/strike operations. None of those is required for the G4 "Quests, goals, … functional" item, which is now closed on the verified three-layer workflow. *RE documentation note:* `re/data/quests.json:30,36` records the five bots as item id 1063 while `re/data/asset-manifest.json` and the vendored `100000049.json` snapshot call the GunBot 1061; resolving that disagreement is a separate documentation task, not a correctness issue — the server takes the roster item id from its own spec and the client sends positional refs only. Regenerating the tracked `apps/client/public/content-bundle.json` with `node scripts/build-client-manifest.mjs` remains a separate integration step and does not affect server-side roster resolution |
+| G | Full authoritative positional combat and remaining quest fidelity gaps | The server-authoritative workflow is in place and verified: `beginQuest` seeds a server-owned ledger and counters from content, strikes damage from the server seed with encounter HP bounded to at most four strikes, the two-argument `set_quest_var` kill report is accepted only once the ledger marks the element dead, and Q03 truck arrivals plus Q10/Q11/Q14 event counters advance from server-validated events. Rewards are paid once and survive a real server restart. What remains is not a missing event source but deliberate fidelity boundaries: (1) there is **no positional combat simulator** — the server validates player events against a server-owned ledger rather than replaying a battle from unit positions, so a "validated" event is one that matches the ledger, not one a simulated fight produced; (2) **Q11's 240-second timer is enforced from the server clock** - `beginQuest` stamps a server-owned `startedAt`/`lastTickAt`, quest actions and `end_quest` advance the pure `tickQuest`, and an expired mission is refused with a typed `quest-lost` that pays nothing (proved in Chrome and Edge and by the HTTP/unit suite); **army-wipe defeat is still not enforced** - there is no positional simulator or authoritative friendly-unit death event, so a client-reported wipe would be a forged outcome and is deliberately not accepted; (3) **Q08 Rocket remains client-unwinnable** (`canDie: false`) and stays flagged; (4) **chapters remain client-reported state predicates** — the client writes `spawned`/`ended`, while the server owns the reward, the once-only guard and the chapter state keys; (5) the **legacy Flash client cannot emit the new native start/strike operations** — those are web-client-only (`POST /api/quest/start` and the native action endpoint), so an unmodified original client cannot drive this workflow. These are in-repo fidelity boundaries, kept distinct from the external dependencies in *Externally Blocked Items* above, not relabelled as blockers | Close this row only when a real positional combat simulator replaces ledger validation, army-wipe defeat is enforced server-side from authoritative friendly-unit death events (Q11's timer is already enforced), Q08 becomes winnable, chapters stop relying on client-reported `spawned`/`ended`, and the legacy client can emit the start/strike operations. None of those is required for the G4 "Quests, goals, … functional" item, which is now closed on the verified three-layer workflow. *RE documentation note:* `re/data/quests.json:30,36` records the five bots as item id 1063 while `re/data/asset-manifest.json` and the vendored `100000049.json` snapshot call the GunBot 1061; resolving that disagreement is a separate documentation task, not a correctness issue — the server takes the roster item id from its own spec and the client sends positional refs only. Regenerating the tracked `apps/client/public/content-bundle.json` with `node scripts/build-client-manifest.mjs` remains a separate integration step and does not affect server-side roster resolution |
 
 ---
 
@@ -2750,6 +2840,36 @@ reviewed without reconstructing the conversation that led to it.*
   (Chrome + Edge + restart). `verify-upstream.mjs` also passed. The dangling
   `verify:provenance` npm script was removed afterwards: `verify:upstream` is the single
   provenance check, and nothing referenced the alias
+- **2026-11-21 — Q11's 240-second timer is enforced from the server clock.**
+  Task 2 recorded the verified outcome from branch `feat/q11-timer-enforcement`
+  outside the Group headers. `beginQuest` stamps `startedAt`/`lastTickAt` from
+  `deps.now()`; quest actions and `end_quest` advance the pure `tickQuest` and
+  refuse an expired mission with a typed `quest-lost` (HTTP 409) before any
+  wallet or award write, without persisting the ticked state. The narrow Q11
+  win/defeat contradiction in `isQuestDefeat` was reconciled without changing
+  other quests. The deterministic clock fixture drove a real client in Chrome
+  and Edge: Q11 started with `timeRemaining: 240`, a 241 s **server-clock**
+  advance produced a typed `quest-lost` refusal on the action and a rendered
+  `command-failed: quest-lost` result dialog with no reward row on the real
+  Finish gesture, and neither cash nor oil changed; every earlier e2e
+  assertion stayed intact.
+  *Rationale:* the server is authoritative (ADR 0003) and the rules are pure
+  (ADR 0014), so time comes from the server clock and no client-reported loss
+  is accepted. *Remaining boundary:* army-wipe defeat still needs a positional
+  simulator and authoritative friendly-unit death events; it is deliberately
+  not enforced, and no box was ticked for it. *Evidence:*
+  `packages/server/src/quest-authority.test.ts`,
+  `apps/server/src/quest-endpoints.test.ts`,
+  `packages/server/src/apply.test.ts`, `packages/rules/src/quest.test.ts` and
+  the Q11 expiry assertion in `scripts/e2e-test.mjs`. Gates, all exit 0:
+  `pnpm test` 1740 pass / 0 fail, `pnpm test:integration` 64 pass,
+  `pnpm typecheck`, `pnpm lint`, content build/check (`63e067bd…`),
+  `verify-command-catalogue.mjs`, `check-roadmap.mjs` (401 items),
+  `check-report-sync.mjs` (4 claims), `run-cheat-battery.mjs` (11/11),
+  `golden-master.mjs` (50 scenarios, 0 differences), `check-coverage.mjs`,
+  `verify-upstream.mjs`, `check-no-flash.mjs` and `check-licensing.mjs` (with
+  `apps/client/dist` absent, as in CI), the client build and `e2e-test.mjs`
+  (Chrome + Edge).
 
 ---
 

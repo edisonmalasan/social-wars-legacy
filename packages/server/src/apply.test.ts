@@ -3223,3 +3223,72 @@ describe('the weekly quest', () => {
     assert.equal(outcome.refused, 'no-victory');
   });
 });
+
+describe('quest timing from the injected server clock', () => {
+  /** A bare world, started through the authoritative helper. */
+  function timedWorld(clockDeps: ApplierDeps): { ok: true; world: ShimWorld } | { ok: false } {
+    const world: ShimWorld = {
+      save: {
+        playerInfo: {},
+        maps: [{ id: 0, idCurrentMission: 1, currentQuestVars: {} }],
+        privateState: {},
+      },
+      resources: { g: 0, w: 0, o: 0, s: 0, c: 0, e: 0, x: 0, m: 0 },
+      nextCommandNumber: 1,
+    };
+    const started = createQuestHelpers(clockDeps).beginQuest(world, QUEST_ID_WEEKLY_01);
+    return started.ok ? { ok: true, world: started.world } : { ok: false };
+  }
+
+  it('stamps the start and refuses end_quest once the clock passes the mission timer', () => {
+    const clock = { value: NOW };
+    const clockDeps = questDeps({ now: () => clock.value });
+    const started = timedWorld(clockDeps);
+    assert.equal(started.ok, true);
+    if (!started.ok) return;
+    const state = activeState(started.world);
+    assert.equal(state.startedAt, NOW);
+    assert.equal(state.lastTickAt, NOW);
+    assert.equal(state.timeRemaining, 90);
+
+    clock.value = NOW + 91;
+    const before = structuredClone(started.world);
+    const outcome = createApplier(clockDeps)(started.world, {
+      name: 'end_quest',
+      args: [QUEST_ID_WEEKLY_01, 1],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'quest-lost');
+    assert.deepEqual(outcome.world, before);
+    assert.deepEqual(outcome.world.resources, before.resources);
+  });
+
+  it('ticks timeRemaining by exactly the injected clock delta, once per action', () => {
+    const clock = { value: NOW };
+    const clockDeps = questDeps({ now: () => clock.value });
+    const helpers = createQuestHelpers(clockDeps);
+    const started = timedWorld(clockDeps);
+    assert.equal(started.ok, true);
+    if (!started.ok) return;
+
+    clock.value = NOW + 30;
+    const first = helpers.applyQuestAction(started.world, QUEST_ID_WEEKLY_01, {
+      type: 'strike',
+      ref: WEEKLY_BOT_REFS[0]!,
+    });
+    assert.equal(first.ok, true, first.ok ? '' : first.reason);
+    if (!first.ok) return;
+    assert.equal(activeState(first.world).timeRemaining, 60);
+    assert.equal(activeState(first.world).lastTickAt, NOW + 30);
+
+    clock.value = NOW + 50;
+    const second = helpers.applyQuestAction(first.world, QUEST_ID_WEEKLY_01, {
+      type: 'strike',
+      ref: WEEKLY_BOT_REFS[1]!,
+    });
+    assert.equal(second.ok, true, second.ok ? '' : second.reason);
+    if (!second.ok) return;
+    assert.equal(activeState(second.world).timeRemaining, 40);
+    assert.equal(activeState(second.world).lastTickAt, NOW + 50);
+  });
+});

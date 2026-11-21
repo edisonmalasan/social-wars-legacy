@@ -75,6 +75,18 @@ const WEEKLY = QUESTS.find((quest) => quest.constantName === 'QUEST_WEEKLY_01');
 if (!WEEKLY) throw new Error('the rules have no weekly quest');
 
 /**
+ * Q11, whose 240-second mission timer is enforced by the server clock.
+ *
+ * It is a level-0 quest, so a fresh e2e player may start it. The spec (not a
+ * hard-coded id) supplies the limit the harness advances past, keeping the
+ * expiry assertion honest if the content changes.
+ */
+const TIMED = QUESTS.find((quest) => quest.constantName === 'QUEST_11_SAVE_VILLAGES');
+if (!TIMED || TIMED.timeLimitSeconds !== 240) {
+  throw new Error('the rules have no Q11 with a 240-second timer');
+}
+
+/**
  * The four collection periods and their multipliers, from the same content
  * bundle the server reads. The DOM assertions compare the selector's buttons
  * with these numbers instead of hard-coding the game's own configuration.
@@ -2207,6 +2219,153 @@ async function main() {
           continue;
         }
         console.log(`  the server awarded ${KILL.questId} from the accepted kill`);
+
+        // --- 3d. Q11's 240s timer is enforced from the server clock ----------
+        // The deterministic clock fixture changes only the SERVER's
+        // `Date.now()`; the browser's own clock, the game's rules and every
+        // existing assertion are untouched. The real client starts Q11 (a
+        // level-0 quest, so a fresh player may), the harness advances the
+        // server clock past the spec's 240s limit, and the SAME client asks
+        // for an action and for end_quest. The server must answer with its
+        // typed quest-lost refusal and grant nothing. No client clock is
+        // trusted and no win or loss is fabricated. Leaving Q11 active is
+        // safe: playThroughDom below registers its own fresh player, so its
+        // weekly-quest start is unaffected.
+        const timedBefore = await fetch(`http://127.0.0.1:${serverPort}/api/world`, {
+          headers: { authorization: `Bearer ${browserSession.token}` },
+        }).then((response) => response.json());
+        const cashBeforeTimeout = cashOf(timedBefore);
+        const oilBeforeTimeout = Number(timedBefore?.resources?.o ?? 0);
+        if ((timedBefore?.privateState?.questProgress?.awarded ?? []).includes(TIMED.id)) {
+          failures.push(`${entry.name}: the e2e player already holds the Q11 award`);
+          console.log('FAILED (Q11 was already awarded)');
+          continue;
+        }
+        const timedStart = await page.evaluate(`(async () => {
+           const handle = window.__swl;
+           if (!handle) return { error: 'the client has no handle' };
+           const started = await handle.startQuest(${JSON.stringify(TIMED.id)}, 1);
+           if (!started.ok) {
+             return { error: 'the server refused the timed quest start', status: started.status };
+           }
+           const active = handle.activeQuest();
+           if (!active || active.questId !== ${JSON.stringify(TIMED.id)}) {
+             return { error: 'the client saw no active timed quest' };
+           }
+           return { questId: active.questId };
+         })()`);
+        if (!timedStart || timedStart.error) {
+          const detail = timedStart?.error ?? 'the timed quest did not start';
+          failures.push(`${entry.name}: ${detail} ${JSON.stringify(timedStart)}`);
+          console.log(`FAILED (${detail} ${JSON.stringify(timedStart)})`);
+          continue;
+        }
+        // The server's own save, not the browser's presentation, must hold
+        // the full 240 seconds at the moment the real client started it.
+        const timedStartWorld = await fetch(`http://127.0.0.1:${serverPort}/api/world`, {
+          headers: { authorization: `Bearer ${browserSession.token}` },
+        }).then((response) => response.json());
+        if (Number(timedStartWorld?.privateState?.activeQuest?.timeRemaining) !== TIMED.timeLimitSeconds) {
+          failures.push(`${entry.name}: the server did not stamp Q11's ${TIMED.timeLimitSeconds}s timer`);
+          console.log(`FAILED (the server did not stamp Q11's timer)`);
+          continue;
+        }
+        console.log(
+          `  the client started ${TIMED.id} with ${TIMED.timeLimitSeconds}s on the server's clock`,
+        );
+
+        // Advance the SERVER clock past the 240-second limit. This is the
+        // same fixture the collection and daily-bonus steps already use: no
+        // real time is slept and no production code gets a time override.
+        advanceClock(TIMED.timeLimitSeconds + 1);
+
+        // Reload recovery restores the combat dialog from the SERVER's saved
+        // active quest, never from browser memory. The player then makes the
+        // real Finish gesture and sees the typed refusal in the same result
+        // dialog every other quest outcome uses. The browser's own clock is
+        // deliberately left alone: a stale countdown is presentation only.
+        page.loaded = false;
+        await page.send('Page.reload', {});
+        await page.waitForLoad();
+        const timedStatus = await page.waitForStatus(['started', 'failed']);
+        if (!String(timedStatus).startsWith('started')) {
+          failures.push(`${entry.name}: the reloaded client said "${timedStatus}"`);
+          console.log(`FAILED (the reloaded client said "${timedStatus}")`);
+          continue;
+        }
+        await domWait(
+          page,
+          "!!document.querySelector('#ui .swl-dialog button[data-swl-action=\"end\"]')",
+          (v) => v === true,
+          'the restored Q11 combat dialog',
+        );
+
+        // An action on an expired mission is refused with the typed code,
+        // through the client's own quest-action request builder and transport.
+        const timedAction = await page.evaluate(`(async () => {
+           const handle = window.__swl;
+           if (!handle) return { error: 'the client has no handle' };
+           const ref = Object.keys(handle.activeQuest()?.elements || {})[0];
+           const acted = ref
+             ? await handle.questAction(${JSON.stringify(TIMED.id)}, { type: 'strike', ref })
+             : null;
+           return { ok: acted ? acted.ok : null, code: acted ? (acted.serverError ?? null) : null };
+         })()`);
+        if (!timedAction || timedAction.error || timedAction.ok !== false ||
+            timedAction.code !== 'quest-lost') {
+          const detail = `the expired quest action drew ${JSON.stringify(timedAction)}`;
+          failures.push(`${entry.name}: ${detail}`);
+          console.log(`FAILED (${detail})`);
+          continue;
+        }
+
+        // The rendered Finish gesture is the one a player makes. The result
+        // dialog must show the server's typed refusal and draw no reward row.
+        await domClick(
+          page,
+          '#ui .swl-dialog button[data-swl-action="end"]',
+          "document.querySelector('#ui .swl-dialog .swl-quest-lost')?.textContent ?? ''",
+          'Finish quest button on the expired Q11',
+        );
+        const refusalText = await domValue(
+          page,
+          "document.querySelector('#ui .swl-dialog .swl-quest-lost')?.textContent ?? ''",
+        );
+        if (!/quest-lost/i.test(String(refusalText))) {
+          failures.push(
+            `${entry.name}: the expired result dialog showed no quest-lost refusal (${refusalText})`,
+          );
+          console.log(`FAILED (the expired result dialog showed "${refusalText}")`);
+          continue;
+        }
+        const rewardCount = await domValue(
+          page,
+          "document.querySelectorAll('#ui .swl-dialog [data-swl-rewards] [data-swl-reward]').length",
+        );
+        if (rewardCount !== 0) {
+          failures.push(`${entry.name}: the expired result dialog drew ${rewardCount} reward row(s)`);
+          console.log(`FAILED (the expired result dialog drew ${rewardCount} reward rows)`);
+          continue;
+        }
+        const timedAfter = await fetch(`http://127.0.0.1:${serverPort}/api/world`, {
+          headers: { authorization: `Bearer ${browserSession.token}` },
+        }).then((response) => response.json());
+        if (cashOf(timedAfter) !== cashBeforeTimeout ||
+            Number(timedAfter?.resources?.o ?? 0) !== oilBeforeTimeout) {
+          failures.push(`${entry.name}: an expired quest changed the wallet`);
+          console.log('FAILED (an expired quest changed the wallet)');
+          continue;
+        }
+        if ((timedAfter?.privateState?.questProgress?.awarded ?? []).includes(TIMED.id)) {
+          failures.push(`${entry.name}: an expired quest was awarded`);
+          console.log('FAILED (an expired quest was awarded)');
+          continue;
+        }
+        console.log(
+          `  UI: after advancing the server clock ${TIMED.timeLimitSeconds + 1}s, ` +
+            `${TIMED.id} showed "${String(refusalText).trim()}" and refused the strike; ` +
+            `no reward row, no oil or cash`,
+        );
 
         questPlayer = { playerId: browserSession.playerId, password: 'correct horse' };
 
