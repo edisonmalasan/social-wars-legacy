@@ -33,8 +33,10 @@ import {
   armyView,
   buildingInfoView,
   completeGoal,
+  expand,
   itemType,
   levelOf,
+  ownedExpansions,
   productionState,
   resourcePanel,
   storedItems,
@@ -49,6 +51,11 @@ export type Categories = Record<
   string,
   { id: number; name: string; sub?: { id: number; name: string }[] }
 >;
+
+/** A finite number from the content's untyped rows, or null. */
+function finite(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
 
 /** A number in the content's globals, or the fallback. */
 function numberAt(globals: Record<string, unknown>, key: string, fallback: number): number {
@@ -643,4 +650,48 @@ export function recruitView(
     if (unit) units.push({ itemId: id, name: unit.name });
   }
   return { buildingName: item.name, units, queue };
+}
+
+/* -------------------------------------------------------------------------
+ * Expansion
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The expansion purchase the interface offers.
+ *
+ * The owned count is the **server's** (its save's expansion list) and the
+ * price is the **content's** row at that ordinal. This bridge only reads them.
+ * The tile id is a deterministic identifier that is not already owned; the
+ * server decides whether that tile may actually be bought, so a refusal is
+ * shown through the feedback channel rather than hidden here.
+ */
+export interface ExpansionPanelView {
+  /** How many tiles the server says the town owns. */
+  readonly owned: number;
+  /** The gold price, from the content row at the owned ordinal. */
+  readonly coins: number;
+  /** The cash price, from that same row. */
+  readonly cash: number;
+  /** A deterministic tile identifier that is not in the server's owned list. */
+  readonly tileId: number;
+  /** The native command a click sends; the server decides acceptance. */
+  readonly command: NativeCommand;
+}
+
+/** The expansion view, from the server's owned count and the content's prices. */
+export function expansionPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+): ExpansionPanelView | null {
+  const owned = ownedExpansions(world);
+  const row = recordOrNull((bundle.expansionPrices ?? [])[owned.length]);
+  if (!row) return null;
+  const tileId = Math.floor(Math.max(0, ...owned)) + 1;
+  return {
+    owned: owned.length,
+    coins: finite(row['coins']) ?? 0,
+    cash: finite(row['cash']) ?? 0,
+    tileId,
+    command: expand(tileId),
+  };
 }

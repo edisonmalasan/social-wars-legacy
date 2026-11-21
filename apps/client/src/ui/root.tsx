@@ -37,6 +37,7 @@ import type { ContentBundle } from '@swl/content';
 import { BuildMenu } from './buildmenu.tsx';
 import { Chapters } from './chapters.tsx';
 import { Dialog } from './dialog.tsx';
+import { Expansion } from './expansion.tsx';
 import { Feedback } from './feedback.tsx';
 import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
@@ -50,6 +51,7 @@ import {
   buildingInfo,
   buildItems,
   categories,
+  expansionPanel,
   goalList,
   hudInput,
   infoPanel,
@@ -175,6 +177,7 @@ export function Root({
     return items.find((item) => item.id === placing)?.name ?? null;
   }, [items, placing]);
   const goals = useMemo(() => goalList(bundle, world), [bundle, world]);
+  const expansion = useMemo(() => expansionPanel(bundle, world), [bundle, world]);
   const stored = useMemo(() => inventoryItems(bundle, world), [bundle, world]);
   const ranks = useMemo(() => questRanks(world), [world]);
   const minLevels = useMemo(() => questMinLevels(bundle), [bundle]);
@@ -200,6 +203,7 @@ export function Root({
     <div className="swl-ui">
       <Hud state={state} placing={placingName} onClaimBonus={onClaimBonus} />
       <Goals goals={goals} onCommand={onCommand} />
+      <Expansion view={expansion} onCommand={onCommand} />
       <Inventory
         items={stored}
         categories={tabs}

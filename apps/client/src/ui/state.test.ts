@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { completeGoal, type WorldSnapshot } from '@swl/client';
+import { completeGoal, expand, type WorldSnapshot } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 
 import {
@@ -10,6 +10,7 @@ import {
   buildItems,
   categories,
   expRequiredByLevel,
+  expansionPanel,
   goalList,
   hudInput,
   hudRules,
@@ -605,5 +606,60 @@ describe('the army panel', () => {
     assert.deepEqual(armyPanel(content, w, 0), [
       { itemId: 1001, name: 'Soldier', groupType: 'INFANTRY', available: 2, allowed: true },
     ]);
+  });
+});
+
+describe('the expansion panel', () => {
+  // The four tiles a fresh save owns, as the server sends them.
+  const fourOwned = {
+    maps: [{ id: 0, items: {}, expansions: [35, 36, 45, 46] }],
+    resources: {},
+    privateState: {},
+  } as WorldSnapshot;
+  const prices = (rows: unknown[]): ContentBundle => bundle({ expansionPrices: rows });
+
+  it('prices from the content row at the server-owned ordinal', () => {
+    const view = expansionPanel(
+      prices([
+        { coins: 0, cash: 0 },
+        { coins: 0, cash: 0 },
+        { coins: 0, cash: 0 },
+        { coins: 0, cash: 0 },
+        { coins: 2500, cash: 5 },
+      ]),
+      fourOwned,
+    )!;
+    assert.equal(view.owned, 4);
+    assert.equal(view.coins, 2500);
+    assert.equal(view.cash, 5);
+  });
+
+  it('uses the first content row when the server owns no tiles yet', () => {
+    const view = expansionPanel(
+      prices([{ coins: 0, cash: 0 }, { coins: 2500, cash: 5 }]),
+      { maps: [{ id: 0, items: {}, expansions: [] }], resources: {}, privateState: {} } as WorldSnapshot,
+    )!;
+    assert.equal(view.owned, 0);
+    assert.equal(view.coins, 0);
+    assert.equal(view.cash, 0);
+  });
+
+  it('carries an expand command for a deterministic, unowned tile id', () => {
+    const view = expansionPanel(
+      prices([
+        { coins: 0, cash: 0 },
+        { coins: 0, cash: 0 },
+        { coins: 0, cash: 0 },
+        { coins: 0, cash: 0 },
+        { coins: 2500, cash: 5 },
+      ]),
+      fourOwned,
+    )!;
+    assert.equal(view.tileId, 47);
+    assert.deepEqual(view.command, expand(47));
+  });
+
+  it('is null when the content has no row at the owned ordinal', () => {
+    assert.equal(expansionPanel(prices([{ coins: 0, cash: 0 }]), fourOwned), null);
   });
 });
