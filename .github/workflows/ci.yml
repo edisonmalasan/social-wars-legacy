@@ -178,15 +178,23 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # Tauri's build needs a `frontendDist` to exist before it will
-      # compile, and a Windows build needs an `.ico`. The script writes
-      # both, and the icon is drawn rather than shipped as a binary.
-      - name: The desktop shell's build inputs
-        run: node scripts/prepare-desktop.mjs
+      # compile, and a Windows build needs an `.ico`. This early pass
+      # writes only the icons; the real client is copied once it is built.
+      - name: The desktop shell's icons
+        run: node scripts/prepare-desktop.mjs --icons-only
 
       # The content bundle the manifest is cut from, and the server's
       # own configuration.
       - name: Build the content bundle
         run: pnpm build:content
+
+      # `tauri_build::build()` copies external binaries and resources at
+      # COMPILE time, with no development guard. `cargo check/test` below
+      # cannot compile on a fresh checkout unless the sidecar and its
+      # runtime tree exist. The build needs the content bundle above and
+      # the installed pnpm workspace (for PGlite).
+      - name: Build the desktop server sidecar
+        run: node scripts/build-desktop-server.mjs
 
       # The client's manifest is **measured and minimised**: the asset
       # pipeline's is 118 MB, and the browser cannot be sent that.
@@ -198,6 +206,13 @@ jobs:
       # it in a WebView. So it has to build.
       - name: The web client builds
         run: pnpm --filter @swl/app-client build
+
+      # The shell must ship the real client, not the placeholder. The
+      # check fails if the copied page has no hashed module script.
+      - name: The desktop shell's frontend
+        run: |
+          node scripts/prepare-desktop.mjs
+          node scripts/check-desktop-dist.mjs
 
       # A build that produces different bytes each time cannot be
       # trusted: a release cannot be rebuilt and a change cannot be

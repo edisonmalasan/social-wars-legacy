@@ -29,14 +29,24 @@
 //! it will not go below it.
 
 pub mod certificate;
+pub mod updater;
 
 use std::io::{Read, Write};
 use std::net::TcpStream;
+use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::time::{Duration, Instant};
 
 /// The default port the local server listens on.
 pub const DEFAULT_LOCAL_PORT: u16 = 8080;
+
+/// The file-name prefix of the packaged server's sidecar. Tauri adds the
+/// target triple and, on Windows, `.exe` to `bundle.externalBin`.
+pub const SIDECAR_PREFIX: &str = "swl-server";
+/// The server's entry point in development, run from the repository.
+pub const DEV_SERVER_SCRIPT: &str = "apps/server/src/main.ts";
+/// The bundled server's entry, relative to the app's resource directory.
+pub const SIDECAR_ENTRY: &str = "server/runtime/start.mjs";
 
 /// The port the client was built for, in the client's own terms.
 pub const STAGE_WIDTH: u32 = 760;
@@ -137,6 +147,50 @@ impl ServerCommand {
     }
 }
 
+/// Choose how the local server starts.
+///
+/// `packaged` is `!tauri::is_dev()`. A packaged build has no repository and
+/// cannot assume `node` is on the player's PATH, so it runs the sidecar
+/// Tauri placed beside the executable. Development keeps the repository's
+/// own Node server, which is the path the tests and CI exercise.
+pub fn server_command(packaged: bool, exe_dir: &Path, resource_dir: &Path) -> ServerCommand {
+    if !packaged {
+        return development_command();
+    }
+
+    // `externalBin` puts the binary beside the executable, named with the
+    // target triple. Find it rather than hard-coding a triple the build
+    // machine may not match.
+    let program = find_sidecar(exe_dir).unwrap_or_else(|| {
+        exe_dir.join(format!("{SIDECAR_PREFIX}{}", std::env::consts::EXE_SUFFIX))
+    });
+    ServerCommand::Sidecar {
+        program: program.to_string_lossy().into_owned(),
+        args: vec![resource_dir
+            .join(SIDECAR_ENTRY)
+            .to_string_lossy()
+            .into_owned()],
+    }
+}
+
+/// The sidecar beside an executable, if there is one.
+fn find_sidecar(exe_dir: &Path) -> Option<PathBuf> {
+    let mut found: Vec<PathBuf> = std::fs::read_dir(exe_dir)
+        .ok()?
+        .filter_map(Result::ok)
+        .map(|entry| entry.path())
+        .filter(|path| {
+            path.is_file()
+                && path
+                    .file_name()
+                    .and_then(|name| name.to_str())
+                    .is_some_and(|name| name.starts_with(SIDECAR_PREFIX))
+        })
+        .collect();
+    found.sort();
+    found.into_iter().next()
+}
+
 /// The local server, as a child process.
 pub struct LocalServer {
     child: Child,
@@ -235,6 +289,9 @@ pub struct ShellState {
 pub fn run() {
     let args: Vec<String> = std::env::args().collect();
     let target = resolve_server_target(&args);
+    // Tauri sets `custom-protocol` for a packaged build. That, rather than
+    // the optimisation level, is what decides where the server lives.
+    let packaged = !tauri::is_dev();
 
     // The remote server's **certificate** is checked before the web
     // view is pointed at it, and the address is shown to the player.
@@ -275,7 +332,12 @@ pub fn run() {
         // so the first request the client makes does not fail.
         if local {
             if let ServerTarget::Local { port } = target {
-                let command = development_command();
+                let exe_dir = std::env::current_exe()
+                    .ok()
+                    .and_then(|path| path.parent().map(Path::to_path_buf))
+                    .unwrap_or_default();
+                let resource_dir = app.path().resource_dir().unwrap_or_default();
+                let command = server_command(packaged, &exe_dir, &resource_dir);
                 let server = LocalServer::start(command, port, Duration::from_secs(30))
                     .map_err(std::io::Error::other)?;
                 app.manage(server);
@@ -316,7 +378,7 @@ pub fn run() {
 fn development_command() -> ServerCommand {
     ServerCommand::Development {
         program: "node".to_string(),
-        script: "apps/server/src/main.ts".to_string(),
+        script: DEV_SERVER_SCRIPT.to_string(),
     }
 }
 
@@ -405,5 +467,71 @@ mod tests {
         };
         let result = LocalServer::start(command, 1, Duration::from_millis(200));
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn a_packaged_local_server_uses_the_sidecar() {
+        let bin = tempfile::tempdir().unwrap();
+        let resources = tempfile::tempdir().unwrap();
+        let sidecar = bin.path().join("swl-server-x86_64-pc-windows-msvc");
+        std::fs::write(&sidecar, b"a stand-in for the bundled runtime").unwrap();
+
+        let command = server_command(true, bin.path(), resources.path());
+        let ServerCommand::Sidecar { program, args } = command else {
+            panic!("a packaged shell must use the sidecar, not node and the source tree");
+        };
+        assert_eq!(program.as_str(), sidecar.to_string_lossy().as_ref());
+        assert_eq!(
+            args,
+            vec![resources
+                .path()
+                .join(SIDECAR_ENTRY)
+                .to_string_lossy()
+                .into_owned()]
+        );
+    }
+
+    #[test]
+    fn a_development_local_server_uses_the_repository_script() {
+        let bin = tempfile::tempdir().unwrap();
+        let resources = tempfile::tempdir().unwrap();
+        let command = server_command(false, bin.path(), resources.path());
+        assert_eq!(
+            command,
+            ServerCommand::Development {
+                program: "node".to_string(),
+                script: DEV_SERVER_SCRIPT.to_string(),
+            }
+        );
+    }
+
+    #[test]
+    fn a_missing_sidecar_still_selects_a_sidecar_path() {
+        let bin = tempfile::tempdir().unwrap();
+        let resources = tempfile::tempdir().unwrap();
+        let command = server_command(true, bin.path(), resources.path());
+        let ServerCommand::Sidecar { program, .. } = command else {
+            panic!("a packaged shell must not fall back to the development command");
+        };
+        assert!(program.contains(SIDECAR_PREFIX), "program was {program}");
+    }
+
+    #[test]
+    fn a_sidecar_command_runs_the_configured_binary() {
+        let dir = tempfile::tempdir().unwrap();
+        let program = dir.path().join("swl-server-x86_64-pc-windows-msvc");
+        let entry = dir.path().join("start.mjs");
+        let program = program.to_string_lossy().into_owned();
+        let entry = entry.to_string_lossy().into_owned();
+        let command = ServerCommand::Sidecar {
+            program: program.clone(),
+            args: vec![entry.clone()],
+        }
+        .to_command();
+        // `Command`'s Debug prints the program and its arguments, with
+        // the same escaping as a string literal.
+        let rendered = format!("{command:?}");
+        assert!(rendered.contains(&format!("{program:?}")));
+        assert!(rendered.contains(&format!("{entry:?}")));
     }
 }
