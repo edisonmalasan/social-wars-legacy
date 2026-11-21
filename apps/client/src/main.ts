@@ -95,6 +95,7 @@ import {
   INTRO_TITLE,
   armyPanel,
   assaultDialog,
+  characterSetupDialog,
   chromePopupDialog,
   confirmPanel,
   dismissPopup,
@@ -113,6 +114,7 @@ import {
   tutorialHelpView,
   zoomFromPercent,
   type AssaultPanelKind,
+  type CharacterSetupPanelKind,
   type ChromePopupRequest,
   type ChromePopupSlot,
   type OnboardingPanelKind,
@@ -316,6 +318,15 @@ export interface ClientHandle {
    * The panel's gestures use the client's one command transport.
    */
   showAssaultPanel?: (kind: AssaultPanelKind) => void;
+  /**
+   * Open the hospital or the attack-symbol legend in the one shared dialog.
+   *
+   * The dialog's id, kind and title come from here; the body is derived by
+   * the interface from the server's save and the content. The hospital's one
+   * gesture uses the client's command transport, so the server still owns
+   * every outcome.
+   */
+  showCharacterSetup?: (kind: CharacterSetupPanelKind) => void;
   /**
    * Open one of the onboarding family's panels through the one dialog.
    *
@@ -1479,6 +1490,11 @@ async function main(): Promise<void> {
     },
     showAssaultPanel: (kind) => {
       const panel = assaultDialog(kind);
+      dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+      drawInterface();
+    },
+    showCharacterSetup: (kind) => {
+      const panel = characterSetupDialog(kind);
       dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
       drawInterface();
     },

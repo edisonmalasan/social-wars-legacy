@@ -38,6 +38,10 @@ import type { ContentBundle } from '@swl/content';
 
 import { AssaultPanel, type AssaultPanelView } from './assault.tsx';
 import { BuildMenu } from './buildmenu.tsx';
+import {
+  CharacterSetupPanel,
+  type CharacterSetupPanelView,
+} from './charactersetup.tsx';
 import { Chapters } from './chapters.tsx';
 import { ChromeDock, ChromePopupBody, useChrome } from './chrome.tsx';
 import { Dialog } from './dialog.tsx';
@@ -60,12 +64,14 @@ import {
   assaultHistoryPanel,
   assaultHudPanel,
   assaultResultPanel,
+  attackSymbolsPanel,
   battleOptionsPanel,
   buildingInfo,
   buildItems,
   categories,
   collectionsPanel,
   expansionPanel,
+  hospitalPanel,
   goalList,
   hudInput,
   infoPanel,
@@ -267,6 +273,20 @@ export function Root({
     return null;
   }, [dialogId, bundle, world, now]);
 
+  // The last two modelled screen families are derived the same way: a fresh
+  // reading of the server's save and the content for the hospital, and the
+  // client's own literals plus the rules' damage classes for the symbol legend.
+  // Neither keeps an outcome; each has only the one shared dialog's slot.
+  const characterSetupPanel = useMemo<CharacterSetupPanelView | null>(() => {
+    if (dialogId === 'charactersetup-hospital') {
+      return { kind: 'hospital', view: hospitalPanel(bundle, world) };
+    }
+    if (dialogId === 'charactersetup-attack-symbols') {
+      return { kind: 'attack-symbols', view: attackSymbolsPanel() };
+    }
+    return null;
+  }, [dialogId, bundle, world]);
+
   return (
     <div className="swl-ui">
       <Hud state={state} placing={placingName} bonus={bonus} onClaimBonus={onClaimBonus} />
@@ -307,7 +327,7 @@ export function Root({
         state={dialog ?? CLOSED_DIALOG}
         onDismiss={onDialogDismiss ?? (() => {})}
       >
-        {!onboarding.view && !dialogId?.startsWith('assault-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
+        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
             key={
               questPanel.kind === 'briefing'
@@ -344,6 +364,14 @@ export function Root({
             // redraws from the server's answer, so no pending assault state is
             // held here to disable the buttons.
             busy={false}
+            onCommand={onCommand}
+            onCancel={onDialogDismiss ?? (() => {})}
+          />
+        ) : null}
+        {!onboarding.view && characterSetupPanel ? (
+          <CharacterSetupPanel
+            key={`charactersetup:${characterSetupPanel.kind}`}
+            panel={characterSetupPanel}
             onCommand={onCommand}
             onCancel={onDialogDismiss ?? (() => {})}
           />

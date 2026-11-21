@@ -2149,5 +2149,39 @@ export function uiCss(): string {
 .swl-chrome-popup-message { margin: 0 0 8px; white-space: pre-line; }
 .swl-chrome-popup-actions { display: flex; justify-content: flex-end; }
 .swl-chrome-popup-actions button { border-color: var(--swl-accent) !important; }
+
+/* The hospital and attack-symbol panels, hosted by the one shared dialog. */
+.swl-character-setup { display: flex; flex-direction: column; gap: 8px; }
+.swl-hospital-description,
+.swl-hospital-store,
+.swl-hospital-empty,
+.swl-attack-symbols-heading,
+.swl-attack-symbols-subhead { margin: 0; }
+
+.swl-hospital-store { color: var(--swl-ink-muted); }
+.swl-hospital-units,
+.swl-attack-symbols-stats,
+.swl-attack-symbols-classes { margin: 0; padding: 0; list-style: none; }
+
+.swl-hospital-units { display: flex; flex-direction: column; gap: 4px; max-height: 160px; overflow-y: auto; }
+.swl-hospital-unit {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px;
+  background: var(--swl-surface-raised);
+}
+.swl-hospital-unit-name { font-weight: 700; }
+.swl-hospital-unit-cost { color: var(--swl-ink-muted); font-size: calc(10px * var(--swl-font-scale-body, 1)); }
+.swl-hospital-help { margin: 0; white-space: pre-line; color: var(--swl-ink-muted); font-size: calc(10px * var(--swl-font-scale-body, 1)); }
+.swl-hospital-resurrect-syringe { border-color: var(--swl-accent) !important; }
+
+.swl-attack-symbols-stats { display: flex; flex-direction: column; gap: 3px; }
+.swl-attack-symbols-stat { display: grid; grid-template-columns: 100px 1fr; gap: 6px; }
+.swl-attack-symbols-stat dt { color: var(--swl-accent); }
+.swl-attack-symbols-stat dd { margin: 0; }
+.swl-attack-symbols-classes { columns: 2; font-size: calc(10px * var(--swl-font-scale-body, 1)); }
+.swl-character-setup-actions { display: flex; justify-content: flex-end; }
 `.trim();
 }
