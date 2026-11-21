@@ -22,17 +22,42 @@ interface Screen {
   decisionNote: string;
 }
 
-async function screens(): Promise<Screen[]> {
-  const manifest = JSON.parse(
+interface ScreenInventory {
+  counts: { total: number; byDecision: Record<string, number> };
+  screens: Screen[];
+}
+
+async function inventory(): Promise<ScreenInventory> {
+  return JSON.parse(
     await readFile(path.join(repoRoot(), 're/data/ui-screens.json'), 'utf8'),
-  ) as { screens: Screen[] };
-  return manifest.screens;
+  ) as ScreenInventory;
+}
+
+async function screens(): Promise<Screen[]> {
+  return (await inventory()).screens;
 }
 
 describe('the screen inventory', () => {
   it('lists the client 260 screens', async () => {
     const all = await screens();
     assert.equal(all.length, 260);
+  });
+
+  it('checks the recorded decision counts against the screens', async () => {
+    // The roadmap quotes these counts, so the header and the records must
+    // agree and a hand-edit of either one must fail a test.
+    const { counts, screens: all } = await inventory();
+    assert.equal(counts.total, 260);
+    assert.deepEqual(counts.byDecision, {
+      implemented: 90,
+      dropped: 52,
+      planned: 118,
+    });
+    const recomputed: Record<string, number> = {};
+    for (const screen of all) {
+      recomputed[screen.decision] = (recomputed[screen.decision] ?? 0) + 1;
+    }
+    assert.deepEqual(recomputed, counts.byDecision);
   });
 
   it('gives every screen a decision', async () => {
@@ -72,6 +97,25 @@ describe('the screen inventory', () => {
       assert.ok(
         screen.decisionNote.length > 40,
         `${screen.path} is dropped without saying why`,
+      );
+    }
+  });
+
+  it('gives every planned screen a checked deferral reason', async () => {
+    // A planned screen is in-scope work, not a finished one. Its note must
+    // say what is missing or what unblocks it, so deferrals stay testable
+    // rather than being a synonym for "we never got round to it".
+    const all = await screens();
+    const planned = all.filter((screen) => screen.decision === 'planned');
+    assert.ok(planned.length > 0, 'nothing is planned');
+    for (const screen of planned) {
+      assert.ok(
+        screen.decisionNote.startsWith('Deferred: '),
+        `${screen.path} is planned without a "Deferred: " reason`,
+      );
+      assert.ok(
+        screen.decisionNote.length > 40,
+        `${screen.path} is planned without saying what is missing or how it unblocks`,
       );
     }
   });

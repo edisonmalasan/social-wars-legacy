@@ -1,5 +1,5 @@
 {
- "note": "The client's 260 screens, with a decision for each one: `implemented` (the clone models the screen's behaviour, and the note says where), `dropped` (with the reason), or `planned` (in scope and not modelled yet). The decision is recorded here so that the roadmap's \"every screen is implemented, or explicitly dropped\" can be checked rather than believed.",
+ "note": "The client's 260 screens, with a decision for each one: `implemented` (the clone models the screen's behaviour, and the note says where), `dropped` (with the reason), or `planned` (in scope and not modelled yet). Every planned note starts `Deferred: ` and says what is missing and/or the unblock condition; `packages/client/src/screens.test.ts` checks the format and the counts. The decision is recorded here so that the roadmap's \"every screen is implemented, or explicitly dropped\" can be checked rather than believed.",
  "counts": {
   "total": 260,
   "byKind": {
@@ -33,7 +33,7 @@
    "overrides": [],
    "bytes": 546,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the market entry button is a Flash movieclip; the clone has no click or hover gesture wired to a market panel, and the button art is still under the Zynga licence gate."
   },
   {
    "class": null,
@@ -54,7 +54,7 @@
    "overrides": [],
    "bytes": 459,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the resource-shortcut button has no gesture or tooltip wiring in the clone; unblock when the resource panel it should open is modelled and the button art is licensed."
   },
   {
    "class": null,
@@ -75,7 +75,7 @@
    "overrides": [],
    "bytes": 616,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the small labelled resource button has no rendered equivalent or click wiring; unblock when the icon/text art is available and a resource action is modelled."
   },
   {
    "class": null,
@@ -96,7 +96,7 @@
    "overrides": [],
    "bytes": 528,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the text-only small button has no gesture or style model in the clone; unblock when the button art and the action it triggers are available."
   },
   {
    "class": null,
@@ -117,7 +117,7 @@
    "overrides": [],
    "bytes": 597,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the small icon-plus-resource button has no click wiring or tooltip; unblock when the resource action it triggers is modelled and its art is licensed."
   },
   {
    "class": null,
@@ -138,7 +138,7 @@
    "overrides": [],
    "bytes": 538,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the iconless speed-up button is not wired to any hurry-up action in the clone; unblock when the hurry-up command is surfaced in the UI and the art is available."
   },
   {
    "class": null,
@@ -159,7 +159,7 @@
    "overrides": [],
    "bytes": 631,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the wide speed-up button has no click handler in the clone; unblock when the hurry-up flow is rendered and the drawn button is licensed."
   },
   {
    "class": null,
@@ -180,7 +180,7 @@
    "overrides": [],
    "bytes": 594,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the tab button has no selection state or click wiring in the clone; unblock when a tabbed panel that uses it is modelled and the art is available."
   },
   {
    "class": "AdminButton",
@@ -257,7 +257,7 @@
    "overrides": [],
    "bytes": 6833,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the animated-unit panel has no rendered unit sprite or remove lifecycle; the frame-selection model exists, but no GUI panel draws its states and the frames await the art licence."
   },
   {
    "class": "AnimatedUnitCentered",
@@ -277,7 +277,7 @@
    "overrides": [],
    "bytes": 6359,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the centred animated-unit panel has no rendered animation state; unblock when the unit art is licensed and a modelled screen needs a centred presentation."
   },
   {
    "class": "ArmyUnitCell",
@@ -318,7 +318,7 @@
    "overrides": [],
    "bytes": 2675,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the assault countdown's init/finish/stopCountdown lifecycle has no client counterpart; unblock when an assault screen renders a server-owned timer."
   },
   {
    "class": "BuildingWindow",
@@ -378,7 +378,7 @@
    "overrides": [],
    "bytes": 15504,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the countdown timer's setTimerOgres/onCompleteOgres/setTextAssault variants and its '1 Enemy alive' text are not rendered; unblock when a combat screen needs a server-owned countdown."
   },
   {
    "class": "CrossDCiViralIcon",
@@ -475,7 +475,7 @@
    "overrides": [],
    "bytes": 1070,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the extended portrait button has no loadImage or click wiring in the clone; unblock when a portrait-backed popup is modelled and the artwork is available."
   },
   {
    "class": "ExtendedPortraitPopupButtonEmbeded",
@@ -495,7 +495,7 @@
    "overrides": [],
    "bytes": 960,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the embedded portrait button's loadInstance path has no counterpart in the clone; unblock when the parent popup is rendered and its art is licensed."
   },
   {
    "class": "FriendButton",
@@ -525,7 +525,7 @@
    "overrides": [],
    "bytes": 10936,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the friend button's ASSIST!/WORLD! actions and points label have no client model; the social layer is server-side only, so unblock needs an explicit client scope decision (ADR 20)."
   },
   {
    "class": "FriendsWindow",
@@ -551,7 +551,7 @@
    "overrides": [],
    "bytes": 8665,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the friends window has no rendered friend list or \"Are you sure?\" confirmation; social screens are out of scope for the client (ADR 20), so unblock needs a scope reversal."
   },
   {
    "class": "GiftButtonLarge",
@@ -579,7 +579,7 @@
    "overrides": [],
    "bytes": 6295,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the large gift button's USE/SELL gestures and its 'Tower limit reached!'/'Wall limit reached!' warnings have no model; unblock when gifting is surfaced in the client and its art is licensed."
   },
   {
    "class": "GiftWindow",
@@ -607,7 +607,7 @@
    "overrides": [],
    "bytes": 9942,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the gift window's selectGift/createButtons and confirmation flow are not modelled; unblock when the gifting service is surfaced in the client and its artwork is available."
   },
   {
    "class": "GuiManager",
@@ -681,7 +681,7 @@
    "overrides": [],
    "bytes": 6501,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the icon panel has no addIcon/removeIcon layout or tooltip-offset model in the client; unblock when a panel uses it and the icons are licensed."
   },
   {
    "class": "InfoPopup",
@@ -704,7 +704,7 @@
    "overrides": [],
    "bytes": 2671,
    "decision": "planned",
-   "decisionNote": "Deferred (P2): the HUD's popovers explain the readouts from the client's own model; the original info popup's timer and repositioning behaviour is not modelled."
+   "decisionNote": "Deferred: (P2) the HUD's popovers explain the readouts from the client's own model; the original info popup's timer and repositioning behaviour is not modelled."
   },
   {
    "class": "InventoryItem",
@@ -724,7 +724,7 @@
    "overrides": [],
    "bytes": 1616,
    "decision": "planned",
-   "decisionNote": "Deferred (P1): the storage panel draws each server-owned item as a row with a Place gesture; the original cell's drag positioning and grid layout are not modelled."
+   "decisionNote": "Deferred: (P1) the storage panel draws each server-owned item as a row with a Place gesture; the original cell's drag positioning and grid layout are not modelled."
   },
   {
    "class": "ItemButtonLarge",
@@ -758,7 +758,7 @@
    "overrides": [],
    "bytes": 18467,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the large item button's Limited Offer / EARNINGS / BUY FOR text and overUnlock/outUnlock hover states are not rendered; unblock when a store panel is modelled and the art is licensed."
   },
   {
    "class": "ItemButtonLargeExpand2",
@@ -782,7 +782,7 @@
    "overrides": [],
    "bytes": 4901,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the expansion item button's buy-for prompt and cash/gold/neighbour expansion messages are not modelled; unblock when base expansion is rendered in the client and the art is available."
   },
   {
    "class": "ItemButtonLargeResources",
@@ -801,7 +801,7 @@
    "overrides": [],
    "bytes": 5529,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the resource variant of the large item button has no rendered model; unblock when a resource purchase panel is modelled and the button art is licensed."
   },
   {
    "class": "MagicEntry",
@@ -846,7 +846,7 @@
    "overrides": [],
    "bytes": 607,
    "decision": "planned",
-   "decisionNote": "The Monday bonus. The cycle is implemented server-side already."
+   "decisionNote": "Deferred: the Monday bonus cycle is implemented server-side already, but no client popup renders it."
   },
   {
    "class": "Portrait",
@@ -875,7 +875,7 @@
    "overrides": [],
    "bytes": 4976,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the portrait's setElement, clickItem/overItem and UpdateImage states have no client model; unblock when a portrait-backed screen is rendered and the images are available."
   },
   {
    "class": "PortraitAssault",
@@ -896,7 +896,7 @@
    "overrides": [],
    "bytes": 1337,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the assault portrait has no rendered UpdateImage/loadImage counterpart; unblock when an assault roster is drawn and the portraits are licensed."
   },
   {
    "class": "PortraitSpecialAttack",
@@ -927,7 +927,7 @@
    ],
    "bytes": 9580,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the special-attack portrait's startCastingMask and 'Not ready yet!' state are not modelled; unblock when a combat HUD renders special attacks."
   },
   {
    "class": "PortraitSpecialAttackLimit",
@@ -956,7 +956,7 @@
    ],
    "bytes": 4328,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the charge-limit portrait's 'not charged yet' state has no client model; unblock when special-attack charging is rendered in the combat HUD."
   },
   {
    "class": "PortraitTrainQueue",
@@ -982,7 +982,7 @@
    "overrides": [],
    "bytes": 4170,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the training-queue portrait has no startRefreshing/clickItem/setVisible model; unblock when a training panel is rendered and the portraits are licensed."
   },
   {
    "class": "PremiumCollectPanel",
@@ -1078,7 +1078,7 @@
    "overrides": [],
    "bytes": 4434,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the resource tab has no createButtons/resetWindow layout model; unblock when a window with resource tabs is rendered and the tab art is licensed."
   },
   {
    "class": "SelectedMagic",
@@ -1127,7 +1127,7 @@
    "overrides": [],
    "bytes": 3487,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the speaker box has no client model for its OK acknowledgement; unblock when a notice is surfaced in the UI and the box art is available."
   },
   {
    "class": "SpellButton",
@@ -1175,7 +1175,7 @@
    "overrides": [],
    "bytes": 4442,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the sub-category pill's seleccionar/deseleccionar and overPastilla/outPastilla hover colours are not modelled; unblock when a category-filtered list is rendered."
   },
   {
    "class": "Tab",
@@ -1198,7 +1198,7 @@
    "overrides": [],
    "bytes": 2783,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the tab has no highlightTab/fadeTab selection-state model in the client; unblock when a tabbed window is rendered and the tab art is licensed."
   },
   {
    "class": "UnitTooltip",
@@ -1243,7 +1243,7 @@
    "overrides": [],
    "bytes": 7436,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the unit-XP display's LEVEL UP / Unit Level / 'Defeat enemies to level up your unit!!' literals have no rendered model; unblock when unit progression is surfaced in the client."
   },
   {
    "class": "ZoomSlider",
@@ -1267,7 +1267,7 @@
    "overrides": [],
    "bytes": 4378,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the zoom slider has no setValue/setItem model in the client; unblock when the isometric view exposes a zoom control and the slider art is available."
   },
   {
    "class": "AttachableArrow",
@@ -1313,7 +1313,7 @@
    "overrides": [],
    "bytes": 1857,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the attachable visual element has no attachTo/dettach/isAttached lifecycle in the client; unblock when a screen needs world-space UI attached to a unit."
   },
   {
    "class": "InfoButtonBarrack",
@@ -1605,7 +1605,7 @@
    "overrides": [],
    "bytes": 264,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the GUI cover movieclip has no rendered dimming layer; unblock when a modal popup is drawn and the cover art is licensed."
   },
   {
    "class": null,
@@ -1626,7 +1626,7 @@
    "overrides": [],
    "bytes": 290,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the exploration GUI cover has no dimming or click-to-dismiss model; unblock when the exploration view is rendered in the client."
   },
   {
    "class": null,
@@ -1647,7 +1647,7 @@
    "overrides": [],
    "bytes": 461,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the GUI container movieclip has no rendered counterpart; unblock when the client draws the chrome it hosts and the art is licensed."
   },
   {
    "class": null,
@@ -1668,7 +1668,7 @@
    "overrides": [],
    "bytes": 290,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the assault-objective icon has no rendered model; unblock when an assault objective list is drawn and the icon art is licensed."
   },
   {
    "class": null,
@@ -1689,7 +1689,7 @@
    "overrides": [],
    "bytes": 409,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the collect icon has no click or hover wiring; unblock when a collectable is rendered in the client and the icon art is available."
   },
   {
    "class": null,
@@ -1710,7 +1710,7 @@
    "overrides": [],
    "bytes": 271,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the player icon has no rendered counterpart; unblock when a player marker is drawn on the world map and the icon art is licensed."
   },
   {
    "class": null,
@@ -1731,7 +1731,7 @@
    "overrides": [],
    "bytes": 276,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the resources icon has no rendered counterpart; unblock when a resource readout is drawn and the icon art is licensed."
   },
   {
    "class": null,
@@ -1794,7 +1794,7 @@
    "overrides": [],
    "bytes": 280,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the captured icon has no state model in the clone; unblock when capture outcomes are surfaced in the UI and the icon art is available."
   },
   {
    "class": null,
@@ -2214,7 +2214,7 @@
    "overrides": [],
    "bytes": 542,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the info popup movieclip has no rendered model; the HUD popovers cover the readouts, so unblock needs a distinct popup and licensed art."
   },
   {
    "class": null,
@@ -2235,7 +2235,7 @@
    "overrides": [],
    "bytes": 358,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the mana info popup has no rendered model; unblock when mana readouts are surfaced beyond the HUD popovers and the art is licensed."
   },
   {
    "class": null,
@@ -2256,7 +2256,7 @@
    "overrides": [],
    "bytes": 371,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the friends menu tab has no selection model; social screens are out of scope for the client (ADR 20), so unblock needs a scope reversal."
   },
   {
    "class": null,
@@ -2277,7 +2277,7 @@
    "overrides": [],
    "bytes": 631,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the pop-over movieclip has no rendered model; unblock when a pop-over is drawn and its art is licensed."
   },
   {
    "class": null,
@@ -2319,7 +2319,7 @@
    "overrides": [],
    "bytes": 688,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the all-units popup has no roster model in the client; unit state is server-owned, so unblock when a roster is rendered and the art is available."
   },
   {
    "class": null,
@@ -2382,7 +2382,7 @@
    "overrides": [],
    "bytes": 1244,
    "decision": "planned",
-   "decisionNote": "The assault history. The battle simulation is already modelled."
+   "decisionNote": "Deferred: the battle simulation is already modelled, but the assault-history popup has no client screen."
   },
   {
    "class": null,
@@ -2403,7 +2403,7 @@
    "overrides": [],
    "bytes": 1649,
    "decision": "planned",
-   "decisionNote": "The attack's result. The assault loot is already modelled."
+   "decisionNote": "Deferred: the assault loot is already modelled, but the attack-result popup has no client screen."
   },
   {
    "class": null,
@@ -2424,7 +2424,7 @@
    "overrides": [],
    "bytes": 1425,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the breeding popup has no breeding-rule model in the client; unblock when the breeding flow is implemented and its art is licensed."
   },
   {
    "class": null,
@@ -2550,7 +2550,7 @@
    "overrides": [],
    "bytes": 450,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the gender-choice popup has no client model; unblock when character setup is rendered and the artwork is available."
   },
   {
    "class": null,
@@ -2592,7 +2592,7 @@
    "overrides": [],
    "bytes": 478,
    "decision": "planned",
-   "decisionNote": "Deferred (P1): the shared dialog covers briefing, combat and result; a separate confirmation asset is not part of the playable alpha."
+   "decisionNote": "Deferred: (P1) the shared dialog covers briefing, combat and result; a separate confirmation asset is not part of the playable alpha."
   },
   {
    "class": null,
@@ -2634,7 +2634,7 @@
    "overrides": [],
    "bytes": 576,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the expansion popup has no client-side expansion model; unblock when base expansion is rendered and the popup art is licensed."
   },
   {
    "class": null,
@@ -2655,7 +2655,7 @@
    "overrides": [],
    "bytes": 529,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the generic unit selector has no roster-backed model; unblock when a unit list is rendered and the selector art is available."
   },
   {
    "class": null,
@@ -2676,7 +2676,7 @@
    "overrides": [],
    "bytes": 626,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the get-energy popup has no client model; monetisation screens are out of scope for a Flash-free preservation client, so unblock needs an explicit scope change."
   },
   {
    "class": null,
@@ -2697,7 +2697,7 @@
    "overrides": [],
    "bytes": 647,
    "decision": "planned",
-   "decisionNote": "The offer packs. The packs are priced by the cost table already."
+   "decisionNote": "Deferred: the offer packs are priced by the cost table already, but the pack-picker popup has no client model."
   },
   {
    "class": null,
@@ -2760,7 +2760,7 @@
    "overrides": [],
    "bytes": 594,
    "decision": "planned",
-   "decisionNote": "The offer packs. The packs are priced by the cost table already."
+   "decisionNote": "Deferred: the offer packs are priced by the cost table already, but the pack-picker popup has no client model."
   },
   {
    "class": null,
@@ -2781,7 +2781,7 @@
    "overrides": [],
    "bytes": 506,
    "decision": "planned",
-   "decisionNote": "The help island. The tutorial's steps are already extracted and modelled."
+   "decisionNote": "Deferred: the tutorial's steps are already extracted and modelled, but the help-island screen is not rendered."
   },
   {
    "class": null,
@@ -2823,7 +2823,7 @@
    "overrides": [],
    "bytes": 1226,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the hospital popup has no client-side healing model; unblock when unit recovery is rendered and the artwork is available."
   },
   {
    "class": null,
@@ -2865,7 +2865,7 @@
    "overrides": [],
    "bytes": 572,
    "decision": "planned",
-   "decisionNote": "The introduction. The tutorial's steps are already extracted and modelled."
+   "decisionNote": "Deferred: the tutorial's steps are already extracted and modelled, but the introduction screen is not rendered."
   },
   {
    "class": null,
@@ -2928,7 +2928,7 @@
    "overrides": [],
    "bytes": 836,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the assault-loading movieclip has no rendered progress model; unblock when an assault transition is drawn and the art is licensed."
   },
   {
    "class": null,
@@ -2949,7 +2949,7 @@
    "overrides": [],
    "bytes": 849,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the quest-loading movieclip has no rendered progress model; unblock when a quest transition is drawn and the art is licensed."
   },
   {
    "class": null,
@@ -3012,7 +3012,7 @@
    "overrides": [],
    "bytes": 981,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the marketplace popup has no client model; the auction service is server-side only (ADR 20), so unblock needs an explicit client scope decision."
   },
   {
    "class": null,
@@ -3033,7 +3033,7 @@
    "overrides": [],
    "bytes": 1888,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the marketplace unit popup has no client model; unblock when the auction service is surfaced in the client and the art is available."
   },
   {
    "class": null,
@@ -3054,7 +3054,7 @@
    "overrides": [],
    "bytes": 511,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the marketplace bidder has no client model; unblock when bidding is surfaced in the client and the art is licensed."
   },
   {
    "class": null,
@@ -3075,7 +3075,7 @@
    "overrides": [],
    "bytes": 757,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the mission-info popup has no client model; unblock when a mission briefing is rendered from server content and the art is available."
   },
   {
    "class": null,
@@ -3096,7 +3096,7 @@
    "overrides": [],
    "bytes": 1109,
    "decision": "planned",
-   "decisionNote": "The mystery box. Its rules are not modelled yet."
+   "decisionNote": "Deferred: the mystery box is in scope; its rules are not modelled yet, so its popup cannot be drawn."
   },
   {
    "class": null,
@@ -3159,7 +3159,7 @@
    "overrides": [],
    "bytes": 1582,
    "decision": "planned",
-   "decisionNote": "The daily bonus. The bonus is awarded server-side already."
+   "decisionNote": "Deferred: the daily bonus is awarded server-side already, but no client popup renders it."
   },
   {
    "class": null,
@@ -3180,7 +3180,7 @@
    "overrides": [],
    "bytes": 1409,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the news popup needs Zynga's live media and services; unblock by substituting local content or by licensing the feed."
   },
   {
    "class": null,
@@ -3201,7 +3201,7 @@
    "overrides": [],
    "bytes": 756,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the next-island victory popup has no rendered model; unblock when island progression is surfaced in the client and the reward art is licensed."
   },
   {
    "class": null,
@@ -3327,7 +3327,7 @@
    "overrides": [],
    "bytes": 1425,
    "decision": "planned",
-   "decisionNote": "The research centre. The tech tree is already modelled."
+   "decisionNote": "Deferred: the tech tree is already modelled, but the research-centre screen is not rendered."
   },
   {
    "class": null,
@@ -3348,7 +3348,7 @@
    "overrides": [],
    "bytes": 678,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the allied-market resource selector has no client model; the market service is server-side only, so unblock needs a client scope decision and licensed art."
   },
   {
    "class": null,
@@ -3411,7 +3411,7 @@
    "overrides": [],
    "bytes": 611,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the send-message popup has no client model; social messaging is out of scope (ADR 20), so unblock needs a scope reversal."
   },
   {
    "class": null,
@@ -3453,7 +3453,7 @@
    "overrides": [],
    "bytes": 450,
    "decision": "planned",
-   "decisionNote": "The soul mixer's help. Its rules are not modelled yet."
+   "decisionNote": "Deferred: the soul mixer's help is in scope; its rules are not modelled yet, so no help panel can be drawn."
   },
   {
    "class": null,
@@ -3474,7 +3474,7 @@
    "overrides": [],
    "bytes": 1451,
    "decision": "planned",
-   "decisionNote": "The super mystery box. Its rules are not modelled yet."
+   "decisionNote": "Deferred: the super mystery box is in scope; its rules are not modelled yet, so its popup cannot be drawn."
   },
   {
    "class": null,
@@ -3621,7 +3621,7 @@
    "overrides": [],
    "bytes": 892,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the store movieclip has no rendered model; unblock when a store front is drawn from content and the button art is licensed."
   },
   {
    "class": null,
@@ -3642,7 +3642,7 @@
    "overrides": [],
    "bytes": 300,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the tab movieclip has no selection-state model; unblock when a tabbed window is rendered and the art is available."
   },
   {
    "class": null,
@@ -3663,7 +3663,7 @@
    "overrides": [],
    "bytes": 399,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the multiline tooltip has no rendered model; unblock when a multi-line help string is surfaced and the tooltip art is licensed."
   },
   {
    "class": null,
@@ -3684,7 +3684,7 @@
    "overrides": [],
    "bytes": 367,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the attack-symbol tooltip has no rendered model; unblock when attack stats are explained in the UI and the art is available."
   },
   {
    "class": "ButtonMarket",
@@ -3713,7 +3713,7 @@
    "overrides": [],
    "bytes": 5793,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the market button's buy/sell refresh and 24-hour exhaustion text have no client model; unblock when the market flow is rendered and the art is licensed."
   },
   {
    "class": "InventoryTabCollections",
@@ -3733,7 +3733,7 @@
    "overrides": [],
    "bytes": 3353,
    "decision": "planned",
-   "decisionNote": "Deferred (P2): collections are a later catalogue feature, not needed to place or collect stored items."
+   "decisionNote": "Deferred: (P2) collections are a later catalogue feature, not needed to place or collect stored items."
   },
   {
    "class": "InventoryTabItems",
@@ -3779,7 +3779,7 @@
    "overrides": [],
    "bytes": 6149,
    "decision": "planned",
-   "decisionNote": "The Monday bonus. The cycle is implemented server-side already."
+   "decisionNote": "Deferred: the Monday bonus cycle is implemented server-side already, but no client popup renders it."
   },
   {
    "class": "PopOver",
@@ -3799,7 +3799,7 @@
    "overrides": [],
    "bytes": 5658,
    "decision": "planned",
-   "decisionNote": "Deferred (P2): hover explanations are covered by the HUD popovers; a separate popover system is not needed for the alpha."
+   "decisionNote": "Deferred: (P2) hover explanations are covered by the HUD popovers; a separate popover system is not needed for the alpha."
   },
   {
    "class": "PopUpBattleOptions",
@@ -3839,7 +3839,7 @@
    "overrides": [],
    "bytes": 7956,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the battle-options popup's four defensive strategies and their descriptions have no client model; unblock when defensive selection is rendered from server state."
   },
   {
    "class": "PopUpLost",
@@ -3875,7 +3875,7 @@
    "overrides": [],
    "bytes": 7489,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the lost-item popup's discovery and share flow has no client model; unblock when found items are surfaced and the art is licensed."
   },
   {
    "class": "PopupAlert",
@@ -3931,7 +3931,7 @@
    "overrides": [],
    "bytes": 18894,
    "decision": "planned",
-   "decisionNote": "Deferred (P1): a full unit roster is not required to train units or play the weekly quest from the chapter map."
+   "decisionNote": "Deferred: (P1) a full unit roster is not required to train units or play the weekly quest from the chapter map."
   },
   {
    "class": "PopupAssaultHistory",
@@ -3973,7 +3973,7 @@
    "overrides": [],
    "bytes": 7082,
    "decision": "planned",
-   "decisionNote": "The assault history. The battle simulation is already modelled."
+   "decisionNote": "Deferred: the battle simulation is already modelled, but the assault-history popup has no client screen."
   },
   {
    "class": "PopupAttackFinished",
@@ -4028,7 +4028,7 @@
    "overrides": [],
    "bytes": 23865,
    "decision": "planned",
-   "decisionNote": "The attack's result. The assault loot is already modelled."
+   "decisionNote": "Deferred: the assault loot is already modelled, but the attack-result popup has no client screen."
   },
   {
    "class": "PopupBuilding",
@@ -4178,7 +4178,7 @@
    "overrides": [],
    "bytes": 1717,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the gender-choice popup has the literal \"Are you man or woman?\" but no rendered model; unblock when character setup is implemented and the art is available."
   },
   {
    "class": "PopupCollect",
@@ -4230,7 +4230,7 @@
    "overrides": [],
    "bytes": 2062,
    "decision": "planned",
-   "decisionNote": "Deferred (P1): the one accessible dialog hosts the game's panels, but a dedicated yes/no confirmation popup with the client's own button texts is not needed for the G5.1 loop."
+   "decisionNote": "Deferred: (P1) the one accessible dialog hosts the game's panels, but a dedicated yes/no confirmation popup with the client's own button texts is not needed for the G5.1 loop."
   },
   {
    "class": "PopupCrossDCi",
@@ -4318,7 +4318,7 @@
    "overrides": [],
    "bytes": 4890,
    "decision": "planned",
-   "decisionNote": "Deferred (P1): the post-purchase 'Your empire has GROWN!' celebration and share popup is not modelled. The purchase and its content-derived pricing are implemented separately; only the celebration remains deferred."
+   "decisionNote": "Deferred: (P1) the post-purchase 'Your empire has GROWN!' celebration and share popup is not modelled. The purchase and its content-derived pricing are implemented separately; only the celebration remains deferred."
   },
   {
    "class": "PopupGenericUnitSelector",
@@ -4338,7 +4338,7 @@
    "overrides": [],
    "bytes": 4201,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the generic unit selector's init path has no roster-backed model; unblock when a unit list is rendered in the client."
   },
   {
    "class": "PopupGetEnergy",
@@ -4362,7 +4362,7 @@
    "overrides": [],
    "bytes": 2053,
    "decision": "planned",
-   "decisionNote": "Deferred (P2, excluded from G5.1): the original offers energy for real money; monetisation screens are out of scope for a Flash-free preservation client."
+   "decisionNote": "Deferred: (P2, excluded from G5.1) the original offers energy for real money; monetisation screens are out of scope for a Flash-free preservation client."
   },
   {
    "class": "PopupGetPack",
@@ -4387,7 +4387,7 @@
    "overrides": [],
    "bytes": 2216,
    "decision": "planned",
-   "decisionNote": "The offer packs. The packs are priced by the cost table already."
+   "decisionNote": "Deferred: the offer packs are priced by the cost table already, but the pack-picker popup has no client model."
   },
   {
    "class": "PopupGoalComplete",
@@ -4484,7 +4484,7 @@
    "overrides": [],
    "bytes": 1576,
    "decision": "planned",
-   "decisionNote": "The offer packs. The packs are priced by the cost table already."
+   "decisionNote": "Deferred: the offer packs are priced by the cost table already, but the pack-picker popup has no client model."
   },
   {
    "class": "PopupHelpIsland",
@@ -4510,7 +4510,7 @@
    "overrides": [],
    "bytes": 3214,
    "decision": "planned",
-   "decisionNote": "Deferred (P2): an onboarding island that needs proprietary art and is outside the P0 loop."
+   "decisionNote": "Deferred: (P2) an onboarding island that needs proprietary art and is outside the P0 loop."
   },
   {
    "class": "PopupHireFriendsGeneric",
@@ -4568,7 +4568,7 @@
    "overrides": [],
    "bytes": 17590,
    "decision": "planned",
-   "decisionNote": "Deferred (P2): a late-era army-recovery screen outside the G5.1 playable slice."
+   "decisionNote": "Deferred: (P2) a late-era army-recovery screen outside the G5.1 playable slice."
   },
   {
    "class": "PopupHurryup",
@@ -4629,7 +4629,7 @@
    "overrides": [],
    "bytes": 4225,
    "decision": "planned",
-   "decisionNote": "Deferred (P2, excluded from G5.1): the original intro depends on proprietary artwork; the client's own tutorial overlay replaces it."
+   "decisionNote": "Deferred: (P2, excluded from G5.1) the original intro depends on proprietary artwork; the client's own tutorial overlay replaces it."
   },
   {
    "class": "PopupInventory",
@@ -4712,7 +4712,7 @@
    "overrides": [],
    "bytes": 7434,
    "decision": "planned",
-   "decisionNote": "Deferred (P1): the briefing hands over to the live combat panel drawn from the server's ledger; a separate full-screen map-loading animation is cosmetic."
+   "decisionNote": "Deferred: (P1) the briefing hands over to the live combat panel drawn from the server's ledger; a separate full-screen map-loading animation is cosmetic."
   },
   {
    "class": "PopupMagic",
@@ -4831,7 +4831,7 @@
    "overrides": [],
    "bytes": 3944,
    "decision": "planned",
-   "decisionNote": "The mystery box. Its rules are not modelled yet."
+   "decisionNote": "Deferred: the mystery box is in scope; its rules are not modelled yet, so its popup cannot be drawn."
   },
   {
    "class": "PopupNeighbors",
@@ -4886,7 +4886,7 @@
    "overrides": [],
    "bytes": 10873,
    "decision": "planned",
-   "decisionNote": "The daily bonus. The bonus is awarded server-side already."
+   "decisionNote": "Deferred: the daily bonus is awarded server-side already, but no client popup renders it."
   },
   {
    "class": "PopupNews",
@@ -4917,7 +4917,7 @@
    "overrides": [],
    "bytes": 13436,
    "decision": "planned",
-   "decisionNote": "Deferred (P2, excluded from G5.1): the news screen needs Zynga's live media and services, which the clone does not ship."
+   "decisionNote": "Deferred: (P2, excluded from G5.1) the news screen needs Zynga's live media and services, which the clone does not ship."
   },
   {
    "class": "PopupNextIslandAttack",
@@ -4945,7 +4945,7 @@
    "overrides": [],
    "bytes": 5118,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the island-victory popup's KING OF THE WORLD/ISLAND reward text and soldado_regalos.png image are not rendered; unblock when island progression is surfaced and the art is licensed."
   },
   {
    "class": "PopupNextMission",
@@ -4968,7 +4968,7 @@
    "overrides": [],
    "bytes": 1532,
    "decision": "planned",
-   "decisionNote": "Deferred (P1): the shared result dialog shows the server's end_quest outcome; a bespoke next-mission offer is not modelled."
+   "decisionNote": "Deferred: (P1) the shared result dialog shows the server's end_quest outcome; a bespoke next-mission offer is not modelled."
   },
   {
    "class": "PopupObject",
@@ -4987,7 +4987,7 @@
    "overrides": [],
    "bytes": 2224,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the shared PopupObject modal-stack base has no client implementation; unblock when the priority-ordered stack is ported and the first popup is drawn."
   },
   {
    "class": "PopupPlayerProfile",
@@ -5228,7 +5228,7 @@
    "overrides": [],
    "bytes": 23945,
    "decision": "planned",
-   "decisionNote": "Deferred (P2): a late-era progression screen outside the G5.1 playable slice."
+   "decisionNote": "Deferred: (P2) a late-era progression screen outside the G5.1 playable slice."
   },
   {
    "class": "PopupRewards",
@@ -5277,7 +5277,7 @@
    "overrides": [],
    "bytes": 3221,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the allied-market resource selector's 'Allies Market' prompt has no client model; the market service is server-side only, so unblock needs a client scope decision."
   },
   {
    "class": "PopupSelectRobot",
@@ -5422,7 +5422,7 @@
    "overrides": [],
    "bytes": 41931,
    "decision": "planned",
-   "decisionNote": "Deferred (P2): a late-era feature screen outside the G5.1 playable slice."
+   "decisionNote": "Deferred: (P2) a late-era feature screen outside the G5.1 playable slice."
   },
   {
    "class": "PopupSoulMixerHelp",
@@ -5445,7 +5445,7 @@
    "overrides": [],
    "bytes": 1303,
    "decision": "planned",
-   "decisionNote": "The soul mixer's help. Its rules are not modelled yet."
+   "decisionNote": "Deferred: the soul mixer's help is in scope; its rules are not modelled yet, so no help panel can be drawn."
   },
   {
    "class": "PopupSuperMistery",
@@ -5479,7 +5479,7 @@
    "overrides": [],
    "bytes": 15384,
    "decision": "planned",
-   "decisionNote": "The super mystery box. Its rules are not modelled yet."
+   "decisionNote": "Deferred: the super mystery box is in scope; its rules are not modelled yet, so its popup cannot be drawn."
   },
   {
    "class": "PopupTutorial",
@@ -5649,7 +5649,7 @@
    "overrides": [],
    "bytes": 4025,
    "decision": "planned",
-   "decisionNote": "The soul mixer's turbine. Its rules are not modelled yet."
+   "decisionNote": "Deferred: the soul mixer's turbine is in scope; its rules are not modelled yet, so the panel cannot be drawn."
   },
   {
    "class": "AllianceInfoRendererItem",
@@ -6059,7 +6059,7 @@
    "overrides": [],
    "bytes": 3468,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the friend-assist popup has no client model for its Wants to help you!/Accept gesture; social assistance is out of scope (ADR 20), so unblock needs a scope reversal."
   },
   {
    "class": "BidderRenderer",
@@ -6249,7 +6249,7 @@
    "overrides": [],
    "bytes": 9245,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the assault-loading popup's 'Preparing To SPY' / 'GOING TO BATTLE' transitions and Battle Help overlay have no client model; unblock when an assault flow is rendered and the art is licensed."
   },
   {
    "class": "ThumbSelectedUnit",
@@ -6270,7 +6270,7 @@
    "overrides": [],
    "bytes": 1988,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the selected-team thumbnail has no activate/deactivate state model; unblock when a team-selection screen is rendered and the art is available."
   },
   {
    "class": "ThumbUnit",
@@ -6291,7 +6291,7 @@
    "overrides": [],
    "bytes": 3570,
    "decision": "planned",
-   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
+   "decisionNote": "Deferred: the team thumbnail has no activate/deactivate state model in the client; unblock when team selection is drawn and the art is licensed."
   }
  ]
 }
