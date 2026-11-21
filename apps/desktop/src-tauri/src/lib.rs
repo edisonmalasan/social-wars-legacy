@@ -29,6 +29,7 @@
 //! it will not go below it.
 
 pub mod certificate;
+pub mod updater;
 
 use std::io::{Read, Write};
 use std::net::TcpStream;
