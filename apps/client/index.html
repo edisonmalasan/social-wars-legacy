@@ -31,8 +31,17 @@
         transform: translate(-50%, -50%) scale(1);
       }
 
+      /*
+       * The map canvas owns its touch gestures: the browser must not pan,
+       * pinch-zoom or double-tap-zoom the page out from under the game.
+       * The gesture guard turns one tap into one command (see touch.ts).
+       * Panels are a sibling layer, so they keep their own touch scrolling.
+       */
       #game canvas {
         display: block;
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
       }
 
       /*

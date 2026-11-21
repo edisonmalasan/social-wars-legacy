@@ -49,6 +49,20 @@ export function uiCss(): string {
   pointer-events: auto;
 }
 
+/*
+ * Panels that can be long scroll **inside** the 760x600 stage instead of
+ * clipping or pushing their tabs out of it. touch-action: pan-y tells a
+ * touch browser the panel owns vertical panning (the canvas has
+ * touch-action: none), so a finger scrolls the list rather than the page.
+ * The font-scale variables below are deliberately untouched.
+ */
+.swl-inventory-scroll,
+.swl-build-list,
+.swl-dialog-body {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* --- The account form -------------------------------------------------- */
 
 .swl-auth-modes {
