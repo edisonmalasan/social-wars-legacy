@@ -49,6 +49,7 @@ import {
   expand,
   finishBuilding,
   finishView,
+  ownedExpansions,
   storedPlacement,
   takeTrainedUnit,
   type ItemType,
@@ -98,6 +99,7 @@ import {
   confirmPanel,
   dismissPopup,
   EMPTY_POPUP_SLOT,
+  expansionResultPanel,
   missionInfoPanel,
   nextMissionPanel,
   onboardingDialog,
@@ -117,6 +119,7 @@ import {
   type OnboardingPanelView,
 } from './ui/state.ts';
 import { setChromeHost } from './ui/chrome.tsx';
+import { setExpansionHost } from './ui/expansion.tsx';
 import { setOnboardingHost } from './ui/onboarding.tsx';
 import { setRosterHost } from './ui/roster.tsx';
 import { PRODUCTION_DIALOG_ID } from './ui/info.tsx';
@@ -1279,6 +1282,10 @@ async function main(): Promise<void> {
    */
   async function run(commands: readonly NativeCommand[]) {
     const started = performance.now();
+    // The owned list before the request is the server's, and so is the one in
+    // the answer below. Comparing them is how the client knows an expansion
+    // was accepted; it never declares a purchase or a tile of its own.
+    const ownedBefore = ownedExpansions(world);
     const result = await sendCommands(signedIn.token, commands);
     // The answer's outcomes used to be discarded, so a refusal was silent.
     // Read them into the feedback channel before the redraw below; the
@@ -1287,6 +1294,9 @@ async function main(): Promise<void> {
       ? feedbackFrom(result.response.outcomes, result.response.ok)
       : [{ tone: 'error', text: `The request failed (${result.reason}).` }];
     world = await fetchWorld();
+    // The growth result is drawn only when the server's list really grew. A
+    // refusal or a replay leaves it null, and the next command clears it.
+    setExpansionHost({ result: expansionResultPanel(content, world, ownedBefore.length) });
     scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
     renderer.draw(scene);
     // The world the interface draws is the same one the quest panel reads.

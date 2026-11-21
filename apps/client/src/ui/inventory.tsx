@@ -21,7 +21,12 @@ import {
   type ArmyUnitView,
 } from '@swl/client';
 
+import { Collections } from './collections.tsx';
 import { useRoster } from './roster.tsx';
+import type { CollectionsPanelView } from './state.ts';
+
+/** The inventory panel's tabs: All, a content category, or the collections tab. */
+type InventoryTab = number | 'collections' | null;
 
 /** The inventory panel's props. */
 export interface InventoryProps {
@@ -29,6 +34,8 @@ export interface InventoryProps {
   items: readonly StoredItemView[];
   /** The content's categories, which name the tabs. */
   categories: Readonly<Record<string, InventoryCategoryDefinition>>;
+  /** The content's collections with the server's progress. */
+  collections: CollectionsPanelView;
   /** The army the server's save accounts for, from the same reading. */
   army?: readonly ArmyUnitView[];
   /** The player picked an item to place. */
@@ -39,17 +46,23 @@ export interface InventoryProps {
 export function Inventory({
   items,
   categories,
+  collections,
   army = [],
   onPlace,
 }: InventoryProps): React.JSX.Element {
   // The content's categories that actually hold a stored item, in id order.
   // With fewer than two there is nothing to choose between, so no tabs show.
   const groups = inventoryCategories(items, categories);
-  const [tab, setTab] = useState<number | null>(null);
+  const [tab, setTab] = useState<InventoryTab>(null);
   // A later server answer can empty the selected category, removing its tab.
   // Fall back to All so an invisible filter never hides the remaining items.
-  const active = tab !== null && groups.some((group) => group.id === tab) ? tab : null;
-  const visible = itemsForCategory(items, active);
+  const active: InventoryTab =
+    tab === 'collections'
+      ? 'collections'
+      : typeof tab === 'number' && groups.some((group) => group.id === tab)
+        ? tab
+        : null;
+  const visible = itemsForCategory(items, typeof active === 'number' ? active : null);
   // The roster is a gesture that opens the one shared dialog from this head;
   // opening a panel never changes the world.
   const roster = useRoster();
@@ -68,7 +81,7 @@ export function Inventory({
             Roster
           </button>
         ) : null}
-        {groups.length > 1 ? (
+        {groups.length > 1 || collections.entries.length > 0 ? (
           <nav className="swl-inventory-tabs" aria-label="Storage categories">
             <button
               type="button"
@@ -89,11 +102,23 @@ export function Inventory({
                 {group.name}
               </button>
             ))}
+            {collections.entries.length > 0 ? (
+              <button
+                type="button"
+                className={active === 'collections' ? 'swl-tab swl-tab-active' : 'swl-tab'}
+                aria-pressed={active === 'collections'}
+                onClick={() => setTab('collections')}
+              >
+                Collections
+              </button>
+            ) : null}
           </nav>
         ) : null}
       </div>
       <div className="swl-inventory-scroll">
-        {visible.length === 0 ? (
+        {active === 'collections' ? (
+          <Collections view={collections} />
+        ) : visible.length === 0 ? (
           <p className="swl-inventory-empty">Nothing in storage.</p>
         ) : (
           <ul className="swl-inventory-list">

@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 134,
+      implemented: 138,
       dropped: 52,
-      planned: 74,
+      planned: 70,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -585,6 +585,66 @@ describe('the reusable UI-chrome screen family decisions', () => {
       'GUI/ResourcesTab.as',
       'TooltipMultilineMC.as',
     ];
+    const all = await screens();
+    for (const path of LEFT_PLANNED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
+      assert.match(screen!.decisionNote, /^Deferred: /);
+    }
+  });
+});
+
+describe('the expansion and collections screen family decisions', () => {
+  // These four deferrals said there was no rendered expansion result, no
+  // buy-for prompt/messages, no client expansion model behind the popup, and
+  // no collections catalogue. Each is reclassified only because a real panel
+  // now draws that behaviour from the content and the server's own answers.
+  const RECLASSIFIED: readonly { path: string; model: RegExp }[] = [
+    {
+      path: 'GUI/ItemButtonLargeExpand2.as',
+      model: /`apps\/client\/src\/ui\/state\.ts`/,
+    },
+    {
+      path: 'PopupExpandMC.as',
+      model: /`apps\/client\/src\/ui\/expansion\.tsx`/,
+    },
+    {
+      path: 'popups/PopupExpand.as',
+      model: /`apps\/client\/src\/ui\/expansion\.tsx`/,
+    },
+    {
+      path: 'popups/InventoryTabCollections.as',
+      model: /`apps\/client\/src\/ui\/collections\.tsx`/,
+    },
+  ];
+
+  it('records each rendered screen as implemented against its model', async () => {
+    const all = await screens();
+    for (const { path, model } of RECLASSIFIED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, model);
+    }
+  });
+
+  it('says the celebrated art and the share popup stay excluded', async () => {
+    const all = await screens();
+    const popup = all.find((entry) => entry.path === 'popups/PopupExpand.as');
+    assert.ok(popup);
+    assert.match(popup!.decisionNote, /art|Share!/i);
+    const catalogue = all.find((entry) => entry.path === 'popups/InventoryTabCollections.as');
+    assert.ok(catalogue);
+    assert.match(catalogue!.decisionNote, /read-only|never claimed/i);
+  });
+
+  it('leaves the screens with no modelled behaviour planned', async () => {
+    // The drag-to-position cell and the lost-item discovery share flow have
+    // no server outcome to read and no behaviour the new panels draw. Flipping
+    // either would grow the count while claiming art and gestures we do not
+    // render.
+    const LEFT_PLANNED = ['GUI/InventoryItem.as', 'popups/PopUpLost.as'];
     const all = await screens();
     for (const path of LEFT_PLANNED) {
       const screen = all.find((entry) => entry.path === path);
