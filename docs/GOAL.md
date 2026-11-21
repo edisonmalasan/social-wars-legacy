@@ -504,7 +504,32 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main`:** `e11cbca` — PR #49
+- **Last verified `main`:** `4551edd` — PR #55
+  (hospital recovery and attack-symbol legend, the fifth of the screen-family
+  PRs) merged. The chain from the prior verified checkpoint (`e11cbca`) is PR
+  #50 (`14f6b20`, docs: refresh the E4/mobile checkpoint), PR #51 (`37d2ff3`,
+  onboarding/confirmation, 6 screens), PR #52 (`314b227`, roster/team/unit XP,
+  6), PR #53 (`204cfa0`, reusable UI chrome, 14), PR #54 (`ac0cc7e`,
+  expansion/collections, 4) and PR #55 (`4551edd`, hospital/attack-symbol
+  legend, 3). The verified screen inventory is **141 implemented / 52 dropped /
+  67 planned**; `node scripts/check-roadmap.mjs` reports 401 items and 22
+  open, and `node scripts/check-report-sync.mjs` agrees with the implementation
+  (4 claims). The honest scope of each family, including what stays planned
+  behind the art gate, is recorded in *Final screen-family refresh* in
+  `docs/ROADMAP.md`. This checkpoint is a documentation-only increment; only
+  the orchestrator merges branches.
+- **The five delivered families (checked, honest scope):** onboarding and
+  confirmation panels live in the one shared dialog (the cosmetic loading
+  animation and the art-gated parent popups stay planned); roster, team
+  thumbnails and unit XP come from server state (portrait art stays planned);
+  the reusable chrome primitives add no second modal (artwork-gated icons and
+  portraits stay planned); expansion growth, buy-for prompts and the collections
+  tab are drawn from server/content state, with `neighbors`/`inventory_qte`
+  display-only prompts and the Share! popup and art excluded; and hospital
+  recovery and the attack-symbol legend use server data and the rules'
+  vocabulary, with the gender choice planned because the save has no
+  character-setup field and no command exists.
+- **Previously verified `main`:** `e11cbca` — PR #49
   (`feat/check-mobile-capacitor-config`, the read-only mobile-config check)
   merged. The merge chain since the prior checkpoint (`6954a19`) is PR #47
   (`f4b4e69`, docs: update the verified state), PR #48 (`608d940`, read-only
@@ -558,9 +583,10 @@ verified checkpoint, not at every tool call.
   `apps/client/src/ui/assault.tsx`; and PR #44's mounting of those panels in the
   one shared `Dialog` via `showAssaultPanel(kind)` (31/31 focused tests,
   1786/1786 serial full suite, typecheck, e2e in Chrome and Edge). Nine screens
-  were honestly reclassified as implemented: the inventory now reads **108
-  implemented / 52 dropped / 100 planned**, with art-licence-blocked assault
-  screens still planned. Three further increments are on `main`: PR #47
+  were honestly reclassified as implemented in that batch; after PRs #51–#55
+  the inventory now reads **141 implemented / 52 dropped / 67 planned**, with
+  art-licence-blocked screens still planned. Three further increments are on
+  `main`: PR #47
   (`f4b4e69`) refreshed the verified-state documentation for the `6954a19`
   checkpoint; PR #48 (`608d940`) added `scripts/flash-differential.mjs`, a
   read-only evidence audit of the sole captured `end_quest` payload — it exits
@@ -574,8 +600,8 @@ verified checkpoint, not at every tool call.
   JDK/Android SDK/Xcode` — the config is coherent, but no native build or device
   run was performed. Neither script changes the item accounting.
 - **Verified roadmap state:** `node scripts/check-roadmap.mjs` reports 401 items,
-  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **108 implemented /
-  52 dropped / 100 planned**. The Status Summary still reads G 78/8. The G5
+  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **141 implemented /
+  52 dropped / 67 planned**. The Status Summary still reads G 78/8. The G5
   blocker row records Firefox and WebKit as verified, with branded Safari and
   real devices the only unrun browsers; the desktop and installer rows now
   record **Linux bundling in CI, unsigned** while staying open for macOS and
@@ -604,9 +630,11 @@ verified checkpoint, not at every tool call.
   is a documentation-only increment prepared on its own task branch for review,
   not a merge.
 - **Next, from the audit ranking:** re-audit the section 5 blockers before
-  treating any as final, and keep reducing the 100 planned B6 screens in
-  coherent, player-facing families — the assault family is the latest, and the
-  screens that need Zynga's art stay planned behind the licence gate. The
+  treating any as final, and keep reducing the 67 planned B6 screens in
+  coherent, player-facing families — the five families in PRs #51–#55 are the
+  latest, and the screens that need Zynga's art stay planned behind the licence
+  gate. The gender/character-setup choice also stays planned: the save has no
+  character-setup field and no command exists. The
   remaining platform and release items should be advanced only with evidence:
   branded Safari and real devices, signed installers and a macOS runner (Linux
   bundling is now in CI but unsigned and informational), the Flash live captures
