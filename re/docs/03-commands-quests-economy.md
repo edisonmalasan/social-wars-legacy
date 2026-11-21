@@ -515,13 +515,16 @@ pack's price is the tier price, which the client has already copied into
 
 **Trust boundary.** The Python upstream parses the client's `item_list` and
 adds every id to `map["store"]` (`upstream/socialwarriors/command.py:710-718`).
-That grants any item in any quantity for free. The clone must ignore the item
-list as a *source of truth*: price the pack from content, roll the random or
-super selection server-side, and add only the resulting ids to the store. The
+That grants any item in any quantity for free. The clone ignores the item
+list as a *source of truth*: it prices the pack from content, rolls the random
+or super selection server-side, and adds only the resulting ids to the store
+(`packages/rules/src/offerpacks.ts` decides the shape, tier, price and roll;
+`packages/server/src/apply.ts`, `buyOfferPackCommand`, grants them). The
 super tier is identifiable from the selected-item count — 1, 2 or 4 — because
 the three tiers grant exactly those counts. A count other than 1, 2 or 4 is
-invalid. The `place_stored_item` side must then **decrement** the store entry
-when the item is placed; otherwise a pack item can be placed repeatedly.
+invalid and is refused. The `place_stored_item` path **decrements** the store
+entry when the item is placed, so a pack item cannot be placed repeatedly
+(`packages/server/src/apply.ts`, `placeCommand`).
 
 The premium entry is pack **18**: `type` is `"premium_account"`, `items` is
 `null`, and `cost_cash` is 0. It never sends `buy_offer_pack`; the store opens
@@ -535,11 +538,14 @@ Known data defects to handle explicitly:
 * Pack 18 is the premium entry and must not be sold as a normal pack.
 * Pack 35 and packs 37-43 contain the malformed id `1072.1224` in the super
   rows. The upstream turns that into the store key `"1072.1224"`. The clone
-  should reject the malformed entry (or normalise it deliberately) rather than
-  creating an unplaceable store item.
+  rejects the malformed entry rather than creating an unplaceable store item:
+  `packages/rules/src/offerpacks.ts` refuses a non-integer candidate and
+  `packages/server/src/apply.ts` (`buyOfferPackCommand`) rejects the pack
+  before anything is written.
 * `enabled` and `position` decide whether a pack is shown; `position = 0` is
-  hidden. The server should refuse a disabled or hidden pack even if the client
-  sends its id.
+  hidden. The server refuses a disabled or hidden pack even if the client
+  sends its id (`isOfferPackAvailable` in `packages/rules/src/offerpacks.ts`,
+  enforced by `buyOfferPackCommand` in `packages/server/src/apply.ts`).
 
 ---
 
