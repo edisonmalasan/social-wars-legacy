@@ -3275,7 +3275,7 @@ owner and a precise condition for closing it.*
 **Inventory discrepancy — found in PR #79, fixed by PR #80.** PR #79 recorded these three portrait screens as implemented from PR #75 while the checked inventory still read **159 / 52 / 49** and carried `GUI/Portrait.as`, `GUI/PortraitTrainQueue.as` and `GUI/AnimatedUnit.as` as `planned` with `Deferred: ` notes. PR #80 corrected the data: those three entries are now `implemented` against `apps/client/src/ui/unitportraits.tsx`, with notes that only server-owned unit id, count and ready state from `TrainingView` and the original inline-SVG art are drawn, while Zynga's proprietary unit art and animation frames stay excluded. The count on merged `main` at that merge was **162 / 52 / 46**, asserted by `packages/client/src/screens.test.ts`. This alignment owns only `docs/ROADMAP.md` and `docs/GOAL.md`; no parity claim follows from any of the eight entries.
 
 **Clean-room art foundation (PR #76, ADR 0021).** The clean-room route is approved in
-[ADR 0021](./adr/0021-clean-room-assets.md): the dependency-free generator in `packages/art/` deterministically emits **25 CC0-1.0 original assets** into `assets/original/` (icons, a sprite sheet and six synthesised effects) with a per-file provenance manifest and its own tests. This is a **foundation, not a cleared gate**: Zynga's proprietary config remains a separate data problem, the release-licence gate (I6) stays open, no rights-holder request has been received, and no publication is authorised. No screen is claimed implemented by the existence of this package.
+[ADR 0021](./adr/0021-clean-room-assets.md): the dependency-free generator in `packages/art/` deterministically emits a regenerated set of **37 CC0-1.0 files** into `assets/original/` — 29 SVG (16 Foundry icons, one sprite sheet and the 12 frames of two six-frame original FX sequences, `shield-pulse` and `spark-trail`), six WAV effects, `LICENSE` and `manifest.json` (the manifest enumerates the other 36) — with a per-file provenance manifest and its own tests. PR #86 wired the FX frames into an "Original FX" client panel that cycles one frame at a time under a `prefers-reduced-motion` still-frame fallback, shown under the generator's CC0 provenance. This is a **foundation, not a cleared gate**: Zynga's proprietary config remains a separate data problem, the release-licence gate (I6) stays open, no rights-holder request has been received, and no publication is authorised. No screen is claimed implemented by the existence of this package.
 
 **Apple-platform CI results (PR #73).** Informational, non-required macOS, WebKit and iOS jobs were added to CI. The unsigned **macOS `.app`/`.dmg`** build and the unsigned **iOS simulator** build succeeded on macOS runners. A **WebKit CI attempt failed honestly** on HTTP 404s for excluded proprietary atlas assets; it did not affect the four protected checks and does not replace the earlier verified Playwright WebKit session. **Branded Safari remains unrun**, as do real devices; no result here is a platform-verification or release verdict.
 
@@ -3388,9 +3388,15 @@ reviewed without reconstructing the conversation that led to it.*
   `node scripts/check-adrs.mjs` → 21 ADRs, all well formed; `git diff --check` → clean
   (exit 0).
 - **2026-11-23 — clean-room art foundation recorded; the art gate stays open
-  (Groups G and I, ADR 0021; PR #76).** The approved clean-room route now has a working
-  generator (`packages/art/`) and **25 CC0-1.0 original assets** in `assets/original/`
-  with a per-file provenance manifest. *Rationale:* the foundation is real, verified
+  (Groups G and I, ADR 0021; PR #76, inventory refreshed after PR #86).** The approved
+  clean-room route has a working generator (`packages/art/`) and a regenerated
+  **37-file CC0-1.0 inventory** in `assets/original/`: 29 SVG (16 Foundry icons, one
+  sprite sheet and the `shield-pulse` and `spark-trail` six-frame original FX
+  sequences), six WAV effects, `LICENSE` and `manifest.json` (the manifest enumerates
+  the other 36), with a per-file provenance manifest. PR #86 wired the FX frames into
+  an "Original FX" client panel that cycles one frame at a time under a
+  `prefers-reduced-motion` still-frame fallback, shown under CC0 provenance.
+  *Rationale:* the foundation is real, verified
   progress and should be visible in the roadmap's account of the art blocker.
   *Evidence:* ADR 0021, the generated manifest and the generator's own tests and
   `--check` mode. *What did not change:* proprietary config remains a separate
