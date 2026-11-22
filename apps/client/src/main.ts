@@ -114,6 +114,7 @@ import {
   questViewOptions,
   requestPopup,
   rosterDialog,
+  soulMixerDialog,
   speakerNotice,
   storeQuantities,
   tutorialHelpView,
@@ -129,6 +130,7 @@ import {
   type OnboardingPanelView,
 } from './ui/state.ts';
 import { setMysteryHost } from './ui/mystery.tsx';
+import { setSoulMixerHost } from './ui/soulmixerhelp.tsx';
 import { setChromeHost } from './ui/chrome.tsx';
 import { setExpansionHost } from './ui/expansion.tsx';
 import { setOnboardingHost } from './ui/onboarding.tsx';
@@ -347,6 +349,8 @@ export interface ClientHandle {
   showRoster?: () => void;
   /** Open a mystery-box popup in the one shared dialog. */
   showMystery?: (kind: MysteryKind) => void;
+  /** Open the soul-mixer help and turbine in the one shared dialog. */
+  showSoulMixer?: () => void;
   /** Shorthands for the five gestures above, for driving the client. */
   showIntro?: () => void;
   showHelp?: () => void;
@@ -1170,6 +1174,24 @@ async function main(): Promise<void> {
     void run([purchase.command]);
   }
 
+  /* ---------------------------------------------------------------------
+   * The soul-mixer help and turbine (presentation only)
+   *
+   * The panel draws the recovered help copy and a reading of the server's
+   * turbine state. It sends no command: buy_powerups, soulmixer_speedup and
+   * the fusion itself have no authoritative answer, so no Powerup, Speedup
+   * or Fusion gesture is offered. The dialog slot is the only one we own.
+   * ------------------------------------------------------------------- */
+
+  /** Open the help copy and turbine state in the one shared dialog. */
+  function openSoulMixer(): void {
+    clearOnboarding();
+    questPanel = null;
+    const panel = soulMixerDialog();
+    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    drawInterface();
+  }
+
   /** Send the composed team with the next mission the server has opened. */
   function submitRosterTeam(team: Army): void {
     if (questBusy) return;
@@ -1284,6 +1306,8 @@ async function main(): Promise<void> {
   // The box popups' two gestures use the same one dialog and transport; the
   // host keeps only which box is open and which answer it is showing.
   setMysteryHost({ open: openMystery, buy: buyMystery });
+  // The help panel owns no game state; the host only supplies the gesture.
+  setSoulMixerHost({ open: openSoulMixer });
 
   const ui = UI ? mountUi(UI, content, onPick, onCollect, onCommand) : null;
   drawInterface();
@@ -1582,6 +1606,7 @@ async function main(): Promise<void> {
       if (box) openMystery(box);
       else gestureRefusal('the server has no such mystery box');
     },
+    showSoulMixer: () => openSoulMixer(),
     showIntro: () => openOnboarding('intro'),
     showHelp: () => openOnboarding('help'),
     showMissionInfo: () => openOnboarding('mission'),

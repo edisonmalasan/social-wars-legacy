@@ -2702,3 +2702,96 @@ export function mysteryResultPanel(
     items,
   };
 }
+
+/* -------------------------------------------------------------------------
+ * The soul-mixer help and turbine (presentation only)
+ *
+ * `popups/PopupSoulMixerHelp.as` exists to write one literal into a textfield:
+ * the four numbered steps below are the decompiled copy, kept verbatim (down
+ * to the stray newline before the final full stop). They are help text only —
+ * the POWERUP and SPEEDUP they mention are *not* offered as working gestures:
+ * buy_powerups and soulmixer_speedup have no applier case in the server, the
+ * output-item derivation rule was never recovered, and soulmixer_speedup is
+ * unpriced. Drawing the copy does not claim to draw the fusion.
+ *
+ * `popups/SoulMixer/SoulMixerTurbina.as` only has a `setState` method: its
+ * timer is the server's. The bridge below reads a server-owned state if one is
+ * present and otherwise reports its absence. It never computes a countdown
+ * from a timestamp or a guessed training time, so the panel can never show a
+ * number the server did not publish.
+ * ---------------------------------------------------------------------- */
+
+/** The four help steps, verbatim from `popups/PopupSoulMixerHelp.as`. */
+export const SOUL_MIXER_HELP =
+  '1. Fuse two soldiers and create a new powerful unit.\n' +
+  '2. Give a BOOST to the new unit with the POWERUP button.\n' +
+  '3. Start the FUSION and press the SPEEDUP button to get your unit immediately.\n' +
+  '4. Take out your three soldiers and continue exploring the unique combinations\n' +
+  '.';
+
+/** The turbine's own label on the fusion screen, used as the timer heading. */
+export const SOUL_MIXER_TURBINA_LABEL = 'Remaining time:';
+
+/** Shown when the server has published no turbine state. Never a countdown. */
+export const SOUL_MIXER_TURBINA_PLACEHOLDER =
+  'No active fusion timer is reported by the server.';
+
+/**
+ * The server key a turbine state would be read from.
+ *
+ * No current server writes this key — there is no applier case for the
+ * soul-mixer commands — so a fresh, unmodified world always reads as absent.
+ * The selector is deliberately narrow: it consumes only values the server
+ * wrote, and treats a missing or malformed record as absent.
+ */
+const SOUL_MIXER_STATE_KEY = 'soulMixer';
+
+/** What the turbine can honestly say about the server's state. */
+export interface SoulMixerTurbinaView {
+  /** True only when the server actually published a well-formed record. */
+  readonly available: boolean;
+  /** The server's own state label, or null when it did not publish one. */
+  readonly state: string | null;
+  /** The server's own remaining seconds, verbatim; never computed here. */
+  readonly remainingSeconds: number | null;
+}
+
+/**
+ * Read the turbine's state from the server's world, or report its absence.
+ *
+ * This is a selector, not a rule: it copies two fields the server may have
+ * written and invents neither a state nor a number. In particular it never
+ * turns a start timestamp plus a training time into a remaining time — that
+ * would need the fusion's output rule, which was never recovered.
+ */
+export function soulMixerTurbina(world: WorldSnapshot): SoulMixerTurbinaView {
+  const raw = world.privateState[SOUL_MIXER_STATE_KEY];
+  if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
+    return { available: false, state: null, remainingSeconds: null };
+  }
+  const record = raw as Record<string, unknown>;
+  const state = typeof record['state'] === 'string' && record['state'] !== ''
+    ? record['state']
+    : null;
+  const remaining = finite(record['remainingSeconds']);
+  if (state === null && remaining === null) {
+    return { available: false, state: null, remainingSeconds: null };
+  }
+  return {
+    available: true,
+    state,
+    remainingSeconds: remaining === null ? null : Math.max(0, remaining),
+  };
+}
+
+/** Format a server-published remaining time as mm:ss for display only. */
+export function formatTurbinaRemaining(seconds: number): string {
+  const whole = Math.max(0, Math.floor(seconds));
+  const minutes = Math.floor(whole / 60);
+  return `${String(minutes).padStart(2, '0')}:${String(whole % 60).padStart(2, '0')}`;
+}
+
+/** The one dialog descriptor for the help/turbine panel. */
+export function soulMixerDialog(): DialogContent {
+  return { id: 'soulmixer-help', kind: 'alert', title: 'Soul Mixer Help' };
+}

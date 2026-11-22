@@ -58,6 +58,7 @@ import { OnboardingLauncher, OnboardingPanel, useOnboarding } from './onboarding
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
 import { RecruitPanel } from './recruit.tsx';
 import { RosterPanel, useRoster } from './roster.tsx';
+import { SoulMixerLauncher, SoulMixerPanel } from './soulmixerhelp.tsx';
 import { SpellBook } from './spellbook.tsx';
 import { Store } from './store.tsx';
 import { TutorialOverlay, type TutorialOverlayProps } from './tutorial.tsx';
@@ -320,6 +321,7 @@ export function Root({
       <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
       <Store packs={store} onCommand={onCommand} />
       <MysteryLauncher bundle={bundle} />
+      <SoulMixerLauncher />
       <MagicLab bundle={bundle} world={world} onCommand={onCommand} />
       <SpellBook bundle={bundle} world={world} onCommand={onCommand} />
       <Neighbours neighbours={neighbours} />
@@ -330,7 +332,7 @@ export function Root({
         state={dialog ?? CLOSED_DIALOG}
         onDismiss={onDialogDismiss ?? (() => {})}
       >
-        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
+        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && !dialogId?.startsWith('soulmixer-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
             key={
               questPanel.kind === 'briefing'
@@ -384,6 +386,13 @@ export function Root({
             key={`mystery:${dialogId}`}
             view={mystery.view}
             result={mystery.result}
+            onClose={onDialogDismiss ?? (() => {})}
+          />
+        ) : null}
+        {!onboarding.view && dialogId?.startsWith('soulmixer-') ? (
+          <SoulMixerPanel
+            key={`soulmixer:${dialogId}`}
+            world={world}
             onClose={onDialogDismiss ?? (() => {})}
           />
         ) : null}

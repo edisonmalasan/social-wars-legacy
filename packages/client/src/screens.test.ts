@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 147,
+      implemented: 150,
       dropped: 52,
-      planned: 61,
+      planned: 58,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -764,6 +764,49 @@ describe('the mystery-box screen family decisions', () => {
     // Flipping a deferral must not become a general amnesty: these remain
     // planned because no authoritative answer or modelled gesture exists.
     const LEFT_PLANNED = ['popups/PopUpLost.as', 'PopupResearchCenterMC.as'];
+    const all = await screens();
+    for (const path of LEFT_PLANNED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
+      assert.match(screen!.decisionNote, /^Deferred: /);
+    }
+  });
+});
+
+describe('the soul-mixer help and turbine screen decisions', () => {
+  // Only the presentation is drawn: the four help steps are the recovered
+  // literal, and the turbine reads server-owned state when present (otherwise
+  // a labelled placeholder). No Powerup/Speedup/Fusion gesture is offered and
+  // no output item is guessed. The fusion and breeding screens stay planned.
+  const RECLASSIFIED = [
+    'PopupSoulMixerHelpMC.as',
+    'popups/PopupSoulMixerHelp.as',
+    'popups/SoulMixer/SoulMixerTurbina.as',
+  ];
+
+  it('records the rendered help and turbine screens as implemented', async () => {
+    const all = await screens();
+    for (const path of RECLASSIFIED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/soulmixerhelp\.tsx`/);
+    }
+    const help = all.find((entry) => entry.path === 'popups/PopupSoulMixerHelp.as');
+    assert.match(help!.decisionNote, /verbatim/);
+    assert.match(help!.decisionNote, /fusion rule/);
+    const turbine = all.find(
+      (entry) => entry.path === 'popups/SoulMixer/SoulMixerTurbina.as',
+    );
+    assert.match(turbine!.decisionNote, /placeholder|countdown/i);
+    assert.match(turbine!.decisionNote, /server/);
+  });
+
+  it('leaves the broader fusion and breeding screens planned', async () => {
+    // Reclassifying the presentation must not imply the fusion itself works:
+    // there is no applier case, no recovered output rule and no speedup price.
+    const LEFT_PLANNED = ['popups/PopupSoulMixer.as', 'PopupBreedingMC.as'];
     const all = await screens();
     for (const path of LEFT_PLANNED) {
       const screen = all.find((entry) => entry.path === path);
