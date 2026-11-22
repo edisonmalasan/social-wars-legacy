@@ -504,20 +504,29 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main`:** `27f1dab` — PR #57
-  (`feat/add-remaining-screens`, the sixth screen-family increment: inventory
-  cells and the HUD info popup, 2 screens) merged. The chain from the prior
-  verified checkpoint (`4551edd`) is PR #56 (`47f0d48`, docs: refresh the
-  verified screen-family state after PRs #51–#55) and PR #57 (`27f1dab`,
-  inventory cells and the timed info popup). The verified screen inventory is
-  **143 implemented / 52 dropped / 65 planned**; `node scripts/check-roadmap.mjs`
-  reports 401 items and 22 open (B 4, E 1, G 8, H 4, I 5), and
+- **Last verified `main`:** `911057e` — PR #60
+  (`feat/soulmixer-help-turbina`, the soul-mixer help and turbine drawn from
+  recovered state, 3 screens) merged. The chain from the prior verified
+  checkpoint (`27f1dab`, PR #57 — inventory cells and the HUD info popup,
+  2 screens) is PR #58 (`7cda30e`, docs: correct the verified screen counts),
+  PR #59 (`96a2ca8`, mystery-box screens, 4 screens) and PR #60 (`f0658fb`,
+  soul-mixer help and turbine, 3 screens). The verified screen inventory is
+  **150 implemented / 52 dropped / 58 planned**; `node scripts/check-roadmap.mjs`
+  reports 401 items and 22 open (A 9/0, B 42/4, C 14/0, D 32/0, E 37/1,
+  F 54/0, G 78/8, H 14/4, I 99/5), and
   `node scripts/check-report-sync.mjs` agrees with the implementation (4 claims)
   after `pnpm build:content`. The honest scope of each family, including what
-  stays planned behind the art gate and the corrected robot-research gate, is
-  recorded in *Final screen-family refresh* in `docs/ROADMAP.md`. This
-  checkpoint is a documentation-only increment; only the orchestrator merges
-  branches.
+  stays planned behind the art gate, the corrected robot-research gate and the
+  confirmed fusion blocker, is recorded in *Final screen-family refresh* in
+  `docs/ROADMAP.md`. This checkpoint is a documentation-only increment; only
+  the orchestrator merges branches.
+- **Previously verified `main`:** `27f1dab` — PR #57
+  (`feat/add-remaining-screens`, the sixth screen-family increment: inventory
+  cells and the HUD info popup, 2 screens) merged. The chain from the earlier
+  checkpoint (`4551edd`) was PR #56 (`47f0d48`, docs: refresh the verified
+  screen-family state after PRs #51–#55) and PR #57 (`27f1dab`, inventory cells
+  and the timed info popup). The inventory at that checkpoint is preserved in
+  *Final screen-family refresh* in `docs/ROADMAP.md`; PRs #58–#60 superseded it.
 - **The six delivered families (checked, honest scope):** onboarding and
   confirmation panels live in the one shared dialog (the cosmetic loading
   animation and the art-gated parent popups stay planned); roster, team
@@ -534,6 +543,21 @@ verified checkpoint, not at every tool call.
   and still sends `place_stored_item`), and a HUD popover with a display timer
   and anchor-relative `reposition`, with each readout's lines coming from
   `packages/client/src/hud.ts` and the original art excluded.
+- **The two latest families (checked, honest scope):** the mystery-box screens
+  draw pack 4's four candidates and a super pack's priced rarity rows from
+  content and the popups' own literals; Buy only sends a request and the panel
+  renders what the server actually granted into its store, never a local roll.
+  Pack 4 is disabled in the shipped content, so its preview is drawn but Buy is
+  withheld, and the original box art stays excluded. The soul-mixer help and
+  turbine render the recovered four-step copy verbatim and read turbine state
+  from the server-owned save only when it is well-formed, otherwise a labelled
+  placeholder with no fabricated countdown; they offer no Powerup, Speedup or
+  Fusion gesture — those words are help text, not working controls. The
+  read-only audit's **confirmed fusion blocker** — no applier cases for
+  `buy_powerups` / `soulmixer_speedup` / research commands, no recovered
+  `(inputA, inputB, powerupLevel) -> output` rule (raw AS3 absent), unpriced
+  `soulmixer_speedup`, and breeding only as `PopupSoulMixer`'s art shell —
+  keeps the fusion and breeding screens planned.
 - **Corrected research-centre gate:** the old note on `PopupResearchCenterMC.as`
   falsely called it the magic tech tree. It is really the late-era AREA 51 /
   ROBOTIC CENTER robot-research screen (Zynga build-process art, a 6-hour cycle,
@@ -597,10 +621,10 @@ verified checkpoint, not at every tool call.
   `apps/client/src/ui/assault.tsx`; and PR #44's mounting of those panels in the
   one shared `Dialog` via `showAssaultPanel(kind)` (31/31 focused tests,
   1786/1786 serial full suite, typecheck, e2e in Chrome and Edge). Nine screens
-  were honestly reclassified as implemented in that batch; after PRs #51–#55
-  and #57 the inventory now reads **143 implemented / 52 dropped / 65 planned**, with
-  art-licence-blocked screens still planned. Three further increments are on
-  `main`: PR #47
+  were honestly reclassified as implemented in that batch; after PRs #51–#55,
+  #57, #59 and #60 the inventory now reads **150 implemented / 52 dropped /
+  58 planned**, with art-licence-blocked screens still planned. Three further
+  increments are on `main`: PR #47
   (`f4b4e69`) refreshed the verified-state documentation for the `6954a19`
   checkpoint; PR #48 (`608d940`) added `scripts/flash-differential.mjs`, a
   read-only evidence audit of the sole captured `end_quest` payload — it exits
@@ -614,8 +638,8 @@ verified checkpoint, not at every tool call.
   JDK/Android SDK/Xcode` — the config is coherent, but no native build or device
   run was performed. Neither script changes the item accounting.
 - **Verified roadmap state:** `node scripts/check-roadmap.mjs` reports 401 items,
-  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **143 implemented /
-  52 dropped / 65 planned**. The Status Summary still reads G 78/8. The G5
+  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **150 implemented /
+  52 dropped / 58 planned**. The Status Summary still reads G 78/8. The G5
   blocker row records Firefox and WebKit as verified, with branded Safari and
   real devices the only unrun browsers; the desktop and installer rows now
   record **Linux bundling in CI, unsigned** while staying open for macOS and
@@ -644,7 +668,7 @@ verified checkpoint, not at every tool call.
   is a documentation-only increment prepared on its own task branch for review,
   not a merge.
 - **Next, from the audit ranking:** re-audit the section 5 blockers before
-  treating any as final, and keep reducing the 65 planned B6 screens in
+  treating any as final, and keep reducing the 58 planned B6 screens in
   coherent, player-facing families — the six families in PRs #51–#55 and #57 are
   the latest, and the screens that need Zynga's art stay planned behind the licence
   gate. The gender/character-setup choice also stays planned: the save has no
@@ -661,4 +685,4 @@ verified checkpoint, not at every tool call.
   build-artefact condition, not a source change. CI's Scan check passed.
 - **On resume:** re-read this file and `docs/ROADMAP.md`, check `git status`,
   `git stash list`, `git worktree list` and `gh pr checks`, then continue from the
-  verified `27f1dab` state and the worker results above.
+  verified `911057e` state and the worker results above.
