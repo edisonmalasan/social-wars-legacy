@@ -74,3 +74,14 @@ and that the family has to be extended before it covers the game. The
 licensing gate stays **open** until the whole shipped set is original and
 integrated, and no release artefact may be published on the strength of this
 decision alone.
+
+## Status note (later work)
+
+This record remains as accepted; the text above is the decision as it was
+made. Later work (PRs #85 and #86) connected the browser-safe entry,
+`@swl/art/browser`, to two client UI galleries: "Original art" shows the
+generated Foundry motifs and "Original FX" shows the generated frames, with
+a single still frame under `prefers-reduced-motion: reduce`. Both render
+generated data inline and own no game state. Integration into the gameplay
+renderer is in flight. The licensing gate remains open: this note neither
+closes it nor authorises a release.
