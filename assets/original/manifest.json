@@ -268,6 +268,159 @@
       "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
     },
     {
+      "path": "gameplay/terrain/grass.svg",
+      "bytes": 15618,
+      "sha256": "2284547324ae945759afbe4d11993cf461dab35d9f8e7927597e70e6558365d6",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/terrain/water.svg",
+      "bytes": 7220,
+      "sha256": "d4248355dc30ca7c18f5cd950bd49276de30384b6745449a4a3f3e5894132750",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/terrain/path.svg",
+      "bytes": 4890,
+      "sha256": "3a8d4b189b528ceed0aa393ebf2646634d57bd8a8025588f0db1f2ffcfe05bbb",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/terrain/stone.svg",
+      "bytes": 6141,
+      "sha256": "e7b8778c4fc51ab98f9578944153fd291ed30fe44c80cd039590582fcf9f1f5f",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/building/housing.svg",
+      "bytes": 704,
+      "sha256": "a7c202b7a7672f9ceb128823ea13828744ce5a864567cb25a923b67e85e1a9b4",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/building/workshop.svg",
+      "bytes": 870,
+      "sha256": "cf35a19ffd3f468389307355744fee5ae856a794cd1c74bf933432ebe77b66d3",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/building/farm.svg",
+      "bytes": 1051,
+      "sha256": "86d94f64a6053be1fc73702de463dc79d62b947e4c3f5cff5a11593667e37787",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/building/storage.svg",
+      "bytes": 724,
+      "sha256": "0a9f1667b97c204cf747cac23b5c6c249cf06621f1969f7fa189f0c64c95eefe",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/building/tower.svg",
+      "bytes": 847,
+      "sha256": "68989578c6c823b0ba53f99bfb96ba186092e2a54b46bdb0b6fdf4e522a6ff67",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/unit/infantry.svg",
+      "bytes": 954,
+      "sha256": "c39970e303668d4ccdf2467ceaaed3b23581189715056048a7f6715948bba8df",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/unit/ranged.svg",
+      "bytes": 1429,
+      "sha256": "e7bff7622b88633b93285ea58354e64dfa6ba83b9165e7fef7e47f2323032339",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/unit/mounted.svg",
+      "bytes": 1174,
+      "sha256": "c93d695f890c7df27ded33000f1a90f5ba2468b62ec2d3dbbcad6139cf3c5df3",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/unit/worker.svg",
+      "bytes": 1022,
+      "sha256": "d4eedef2cb6be1951f09bca68fc04586229074510965823ef5f8911ee03372df",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/marker/selection.svg",
+      "bytes": 668,
+      "sha256": "66bcd8a40cf47d494b7c8499e117536d2669e2499be0c6d874b8fd7af9f49a05",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/marker/highlight.svg",
+      "bytes": 747,
+      "sha256": "f4ec007f5464f8d2007ec7a5fafbcd0ad16271cc2a64cc54d412152f8f0dcf3f",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/fx/impact.svg",
+      "bytes": 1238,
+      "sha256": "1aab7da47851a45a3dbc7392af0e3c1910c96f6193dd4ad66307b12f8a697023",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "gameplay/fallback.svg",
+      "bytes": 725,
+      "sha256": "bc28e29b47f699a09f7ba24fe7bae9b0b84fdfb97a99091e15dda410f8af6df3",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
       "path": "sounds/click.wav",
       "bytes": 3130,
       "sha256": "ffeaa80809c87c9380b9730c651c2de92f9d8331dc18756ac95f257cfbae305b",

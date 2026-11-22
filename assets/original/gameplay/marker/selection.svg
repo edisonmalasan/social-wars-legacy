@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Selection marker</title>
+  <desc id="swl-desc">A dashed diamond with seeded dash length and four corner pips.</desc>
+    <polygon points="32,6 58,32 32,58 6,32" fill="none" stroke="#e9a63f" stroke-width="3" stroke-linejoin="round" stroke-dasharray="6 4"/>
+    <circle cx="32" cy="4" r="2.5" fill="#f7ecd7"/>
+    <circle cx="60" cy="32" r="2.5" fill="#f7ecd7"/>
+    <circle cx="32" cy="60" r="2.5" fill="#f7ecd7"/>
+    <circle cx="4" cy="32" r="2.5" fill="#f7ecd7"/>
+</svg>

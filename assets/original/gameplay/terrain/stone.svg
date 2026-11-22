@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Town stone</title>
+  <desc id="swl-desc">A repeating rocky tile with seeded chips on an opaque ground.</desc>
+    <rect x="0" y="0" width="64" height="64" rx="0" fill="#4e555e"/>
+    <g transform="translate(-64 -64)">
+    <polygon points="0,0 26,0 18,16 0,22" fill="#707781"/>
+    <polygon points="64,8 64,38 45,30 40,14" fill="#666d77"/>
+    <polygon points="0,48 22,40 38,64 0,64" fill="#7c838c"/>
+    <line x1="28" y1="22" x2="33" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="32" x2="43" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="48" y1="22" x2="53" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="58" y1="32" x2="63" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(0 -64)">
+    <polygon points="0,0 26,0 18,16 0,22" fill="#707781"/>
+    <polygon points="64,8 64,38 45,30 40,14" fill="#666d77"/>
+    <polygon points="0,48 22,40 38,64 0,64" fill="#7c838c"/>
+    <line x1="28" y1="22" x2="33" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="32" x2="43" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="48" y1="22" x2="53" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="58" y1="32" x2="63" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(64 -64)">
+    <polygon points="0,0 26,0 18,16 0,22" fill="#707781"/>
+    <polygon points="64,8 64,38 45,30 40,14" fill="#666d77"/>
+    <polygon points="0,48 22,40 38,64 0,64" fill="#7c838c"/>
+    <line x1="28" y1="22" x2="33" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="32" x2="43" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="48" y1="22" x2="53" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="58" y1="32" x2="63" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(-64 0)">
+    <polygon points="0,0 26,0 18,16 0,22" fill="#707781"/>
+    <polygon points="64,8 64,38 45,30 40,14" fill="#666d77"/>
+    <polygon points="0,48 22,40 38,64 0,64" fill="#7c838c"/>
+    <line x1="28" y1="22" x2="33" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="32" x2="43" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="48" y1="22" x2="53" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="58" y1="32" x2="63" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(0 0)">
+    <polygon points="0,0 26,0 18,16 0,22" fill="#707781"/>
+    <polygon points="64,8 64,38 45,30 40,14" fill="#666d77"/>
+    <polygon points="0,48 22,40 38,64 0,64" fill="#7c838c"/>
+    <line x1="28" y1="22" x2="33" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="32" x2="43" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="48" y1="22" x2="53" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="58" y1="32" x2="63" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(64 0)">
+    <polygon points="0,0 26,0 18,16 0,22" fill="#707781"/>
+    <polygon points="64,8 64,38 45,30 40,14" fill="#666d77"/>
+    <polygon points="0,48 22,40 38,64 0,64" fill="#7c838c"/>
+    <line x1="28" y1="22" x2="33" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="32" x2="43" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="48" y1="22" x2="53" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="58" y1="32" x2="63" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(-64 64)">
+    <polygon points="0,0 26,0 18,16 0,22" fill="#707781"/>
+    <polygon points="64,8 64,38 45,30 40,14" fill="#666d77"/>
+    <polygon points="0,48 22,40 38,64 0,64" fill="#7c838c"/>
+    <line x1="28" y1="22" x2="33" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="32" x2="43" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="48" y1="22" x2="53" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="58" y1="32" x2="63" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(0 64)">
+    <polygon points="0,0 26,0 18,16 0,22" fill="#707781"/>
+    <polygon points="64,8 64,38 45,30 40,14" fill="#666d77"/>
+    <polygon points="0,48 22,40 38,64 0,64" fill="#7c838c"/>
+    <line x1="28" y1="22" x2="33" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="32" x2="43" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="48" y1="22" x2="53" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="58" y1="32" x2="63" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(64 64)">
+    <polygon points="0,0 26,0 18,16 0,22" fill="#707781"/>
+    <polygon points="64,8 64,38 45,30 40,14" fill="#666d77"/>
+    <polygon points="0,48 22,40 38,64 0,64" fill="#7c838c"/>
+    <line x1="28" y1="22" x2="33" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="32" x2="43" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="48" y1="22" x2="53" y2="26" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="58" y1="32" x2="63" y2="36" stroke="#9aa1a9" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+</svg>

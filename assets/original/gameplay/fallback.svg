@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Generic item</title>
+  <desc id="swl-desc">A neutral badge used when a content item supplies no recognised key.</desc>
+    <polygon points="32,10 54,32 32,54 10,32" fill="none" stroke="#2c4654" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="32" cy="32" r="9" fill="none" stroke="#2f7d78" stroke-width="2"/>
+    <circle cx="26" cy="32" r="2" fill="#86cdbd"/>
+    <circle cx="32" cy="32" r="2" fill="#86cdbd"/>
+    <circle cx="38" cy="32" r="2" fill="#86cdbd"/>
+    <circle cx="44" cy="32" r="2" fill="#86cdbd"/>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Workshop</title>
+  <desc id="swl-desc">A shed with a sawn timber stack and a wheel, for lumber production.</desc>
+    <polygon points="7,30 32,14 57,30" fill="#2c4654"/>
+    <rect x="11" y="30" width="42" height="24" rx="0" fill="#e9a63f"/>
+    <rect x="6" y="48" width="16" height="5" rx="2" fill="#b65340"/>
+    <rect x="13" y="44" width="16" height="5" rx="2" fill="#b65340"/>
+    <circle cx="47" cy="20" r="6" fill="none" stroke="#16242d" stroke-width="2"/>
+    <line x1="47" y1="11" x2="47" y2="29" stroke="#f7ecd7" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="56" y2="20" stroke="#f7ecd7" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

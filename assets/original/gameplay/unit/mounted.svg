@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Mounted unit</title>
+  <desc id="swl-desc">A simplified rider on a mount with a seeded mane.</desc>
+    <polygon points="10,40 24,28 46,28 56,38 50,48 18,48" fill="#2c4654"/>
+    <polygon points="46,28 58,18 60,28 52,34" fill="#2c4654"/>
+    <line x1="16" y1="48" x2="14" y2="58" stroke="#16242d" stroke-width="3" stroke-linecap="round"/>
+    <line x1="46" y1="48" x2="48" y2="58" stroke="#16242d" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="34" cy="18" r="6" fill="#f7ecd7"/>
+    <rect x="29" y="24" width="10" height="14" rx="2" fill="#b65340"/>
+    <line x1="40" y1="26" x2="50" y2="20" stroke="#16242d" stroke-width="2" stroke-linecap="round"/>
+    <line x1="48" y1="20" x2="54" y2="16" stroke="#e9a63f" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="50" y1="20" x2="56" y2="16" stroke="#e9a63f" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="52" y1="20" x2="58" y2="16" stroke="#e9a63f" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

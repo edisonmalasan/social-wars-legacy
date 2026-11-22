@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Town grass</title>
+  <desc id="swl-desc">A repeating grass tile with seeded tufts on an opaque ground.</desc>
+    <rect x="0" y="0" width="64" height="64" rx="0" fill="#3f6b48"/>
+    <g transform="translate(-64 -64)">
+    <line x1="5" y1="20" x2="4" y2="13" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="20" x2="8" y2="10" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="20" x2="12" y2="14" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="35" x2="15" y2="28" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="19" y1="35" x2="19" y2="25" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="35" x2="23" y2="29" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="50" x2="26" y2="43" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="50" x2="30" y2="40" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="50" x2="34" y2="44" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="37" y2="13" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="41" y1="20" x2="41" y2="10" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="44" y1="20" x2="45" y2="14" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="49" y1="35" x2="48" y2="28" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="52" y1="35" x2="52" y2="25" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="55" y1="35" x2="56" y2="29" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="30" cy="44" r="1.5" fill="#a9c98a"/>
+    <circle cx="52" cy="12" r="1.5" fill="#a9c98a"/>
+    </g>
+    <g transform="translate(0 -64)">
+    <line x1="5" y1="20" x2="4" y2="13" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="20" x2="8" y2="10" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="20" x2="12" y2="14" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="35" x2="15" y2="28" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="19" y1="35" x2="19" y2="25" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="35" x2="23" y2="29" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="50" x2="26" y2="43" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="50" x2="30" y2="40" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="50" x2="34" y2="44" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="37" y2="13" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="41" y1="20" x2="41" y2="10" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="44" y1="20" x2="45" y2="14" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="49" y1="35" x2="48" y2="28" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="52" y1="35" x2="52" y2="25" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="55" y1="35" x2="56" y2="29" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="30" cy="44" r="1.5" fill="#a9c98a"/>
+    <circle cx="52" cy="12" r="1.5" fill="#a9c98a"/>
+    </g>
+    <g transform="translate(64 -64)">
+    <line x1="5" y1="20" x2="4" y2="13" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="20" x2="8" y2="10" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="20" x2="12" y2="14" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="35" x2="15" y2="28" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="19" y1="35" x2="19" y2="25" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="35" x2="23" y2="29" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="50" x2="26" y2="43" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="50" x2="30" y2="40" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="50" x2="34" y2="44" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="37" y2="13" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="41" y1="20" x2="41" y2="10" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="44" y1="20" x2="45" y2="14" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="49" y1="35" x2="48" y2="28" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="52" y1="35" x2="52" y2="25" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="55" y1="35" x2="56" y2="29" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="30" cy="44" r="1.5" fill="#a9c98a"/>
+    <circle cx="52" cy="12" r="1.5" fill="#a9c98a"/>
+    </g>
+    <g transform="translate(-64 0)">
+    <line x1="5" y1="20" x2="4" y2="13" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="20" x2="8" y2="10" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="20" x2="12" y2="14" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="35" x2="15" y2="28" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="19" y1="35" x2="19" y2="25" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="35" x2="23" y2="29" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="50" x2="26" y2="43" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="50" x2="30" y2="40" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="50" x2="34" y2="44" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="37" y2="13" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="41" y1="20" x2="41" y2="10" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="44" y1="20" x2="45" y2="14" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="49" y1="35" x2="48" y2="28" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="52" y1="35" x2="52" y2="25" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="55" y1="35" x2="56" y2="29" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="30" cy="44" r="1.5" fill="#a9c98a"/>
+    <circle cx="52" cy="12" r="1.5" fill="#a9c98a"/>
+    </g>
+    <g transform="translate(0 0)">
+    <line x1="5" y1="20" x2="4" y2="13" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="20" x2="8" y2="10" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="20" x2="12" y2="14" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="35" x2="15" y2="28" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="19" y1="35" x2="19" y2="25" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="35" x2="23" y2="29" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="50" x2="26" y2="43" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="50" x2="30" y2="40" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="50" x2="34" y2="44" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="37" y2="13" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="41" y1="20" x2="41" y2="10" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="44" y1="20" x2="45" y2="14" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="49" y1="35" x2="48" y2="28" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="52" y1="35" x2="52" y2="25" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="55" y1="35" x2="56" y2="29" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="30" cy="44" r="1.5" fill="#a9c98a"/>
+    <circle cx="52" cy="12" r="1.5" fill="#a9c98a"/>
+    </g>
+    <g transform="translate(64 0)">
+    <line x1="5" y1="20" x2="4" y2="13" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="20" x2="8" y2="10" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="20" x2="12" y2="14" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="35" x2="15" y2="28" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="19" y1="35" x2="19" y2="25" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="35" x2="23" y2="29" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="50" x2="26" y2="43" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="50" x2="30" y2="40" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="50" x2="34" y2="44" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="37" y2="13" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="41" y1="20" x2="41" y2="10" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="44" y1="20" x2="45" y2="14" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="49" y1="35" x2="48" y2="28" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="52" y1="35" x2="52" y2="25" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="55" y1="35" x2="56" y2="29" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="30" cy="44" r="1.5" fill="#a9c98a"/>
+    <circle cx="52" cy="12" r="1.5" fill="#a9c98a"/>
+    </g>
+    <g transform="translate(-64 64)">
+    <line x1="5" y1="20" x2="4" y2="13" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="20" x2="8" y2="10" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="20" x2="12" y2="14" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="35" x2="15" y2="28" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="19" y1="35" x2="19" y2="25" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="35" x2="23" y2="29" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="50" x2="26" y2="43" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="50" x2="30" y2="40" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="50" x2="34" y2="44" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="37" y2="13" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="41" y1="20" x2="41" y2="10" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="44" y1="20" x2="45" y2="14" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="49" y1="35" x2="48" y2="28" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="52" y1="35" x2="52" y2="25" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="55" y1="35" x2="56" y2="29" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="30" cy="44" r="1.5" fill="#a9c98a"/>
+    <circle cx="52" cy="12" r="1.5" fill="#a9c98a"/>
+    </g>
+    <g transform="translate(0 64)">
+    <line x1="5" y1="20" x2="4" y2="13" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="20" x2="8" y2="10" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="20" x2="12" y2="14" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="35" x2="15" y2="28" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="19" y1="35" x2="19" y2="25" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="35" x2="23" y2="29" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="50" x2="26" y2="43" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="50" x2="30" y2="40" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="50" x2="34" y2="44" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="37" y2="13" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="41" y1="20" x2="41" y2="10" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="44" y1="20" x2="45" y2="14" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="49" y1="35" x2="48" y2="28" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="52" y1="35" x2="52" y2="25" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="55" y1="35" x2="56" y2="29" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="30" cy="44" r="1.5" fill="#a9c98a"/>
+    <circle cx="52" cy="12" r="1.5" fill="#a9c98a"/>
+    </g>
+    <g transform="translate(64 64)">
+    <line x1="5" y1="20" x2="4" y2="13" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="20" x2="8" y2="10" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="20" x2="12" y2="14" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="35" x2="15" y2="28" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="19" y1="35" x2="19" y2="25" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="35" x2="23" y2="29" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="50" x2="26" y2="43" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="50" x2="30" y2="40" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="50" x2="34" y2="44" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="37" y2="13" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="41" y1="20" x2="41" y2="10" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="44" y1="20" x2="45" y2="14" stroke="#6da05c" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="49" y1="35" x2="48" y2="28" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="52" y1="35" x2="52" y2="25" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="55" y1="35" x2="56" y2="29" stroke="#568952" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="30" cy="44" r="1.5" fill="#a9c98a"/>
+    <circle cx="52" cy="12" r="1.5" fill="#a9c98a"/>
+    </g>
+</svg>

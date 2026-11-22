@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Farm</title>
+  <desc id="swl-desc">A barn behind seeded furrows.</desc>
+    <rect x="6" y="40" width="52" height="16" rx="0" fill="#765f3f"/>
+    <line x1="9" y1="43" x2="55" y2="43" stroke="#a58855" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="9" y1="46" x2="55" y2="46" stroke="#a58855" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="9" y1="49" x2="55" y2="49" stroke="#a58855" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="9" y1="52" x2="55" y2="52" stroke="#a58855" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="9" y1="55" x2="55" y2="55" stroke="#a58855" stroke-width="1.5" stroke-linecap="round"/>
+    <polygon points="12,38 32,20 52,38" fill="#b65340"/>
+    <rect x="16" y="38" width="32" height="12" rx="0" fill="#f7ecd7"/>
+    <rect x="28" y="42" width="8" height="8" rx="1" fill="#2c4654"/>
+</svg>

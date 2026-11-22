@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Town water</title>
+  <desc id="swl-desc">A repeating water tile with fixed ripples and seeded glints.</desc>
+    <rect x="0" y="0" width="64" height="64" rx="0" fill="#2c5d72"/>
+    <g transform="translate(-64 -64)">
+    <path d="M4 18 Q16 12 28 18 T52 18" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 40 Q24 34 36 40 T60 40" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M-8 57 Q4 51 16 57 T40 57" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="27" x2="16" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="39" x2="30" y2="39" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="36" y1="27" x2="44" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(0 -64)">
+    <path d="M4 18 Q16 12 28 18 T52 18" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 40 Q24 34 36 40 T60 40" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M-8 57 Q4 51 16 57 T40 57" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="27" x2="16" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="39" x2="30" y2="39" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="36" y1="27" x2="44" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(64 -64)">
+    <path d="M4 18 Q16 12 28 18 T52 18" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 40 Q24 34 36 40 T60 40" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M-8 57 Q4 51 16 57 T40 57" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="27" x2="16" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="39" x2="30" y2="39" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="36" y1="27" x2="44" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(-64 0)">
+    <path d="M4 18 Q16 12 28 18 T52 18" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 40 Q24 34 36 40 T60 40" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M-8 57 Q4 51 16 57 T40 57" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="27" x2="16" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="39" x2="30" y2="39" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="36" y1="27" x2="44" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(0 0)">
+    <path d="M4 18 Q16 12 28 18 T52 18" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 40 Q24 34 36 40 T60 40" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M-8 57 Q4 51 16 57 T40 57" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="27" x2="16" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="39" x2="30" y2="39" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="36" y1="27" x2="44" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(64 0)">
+    <path d="M4 18 Q16 12 28 18 T52 18" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 40 Q24 34 36 40 T60 40" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M-8 57 Q4 51 16 57 T40 57" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="27" x2="16" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="39" x2="30" y2="39" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="36" y1="27" x2="44" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(-64 64)">
+    <path d="M4 18 Q16 12 28 18 T52 18" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 40 Q24 34 36 40 T60 40" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M-8 57 Q4 51 16 57 T40 57" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="27" x2="16" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="39" x2="30" y2="39" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="36" y1="27" x2="44" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(0 64)">
+    <path d="M4 18 Q16 12 28 18 T52 18" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 40 Q24 34 36 40 T60 40" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M-8 57 Q4 51 16 57 T40 57" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="27" x2="16" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="39" x2="30" y2="39" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="36" y1="27" x2="44" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(64 64)">
+    <path d="M4 18 Q16 12 28 18 T52 18" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 40 Q24 34 36 40 T60 40" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M-8 57 Q4 51 16 57 T40 57" fill="none" stroke="#5d9bb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="27" x2="16" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="39" x2="30" y2="39" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="36" y1="27" x2="44" y2="27" stroke="#b7dde3" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+</svg>
