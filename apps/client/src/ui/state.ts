@@ -3644,3 +3644,147 @@ export function resourceButtonsPanel(
 export function resourceButtonsDialog(): DialogContent {
   return { id: 'resourcebuttons-panel', kind: 'alert', title: RESOURCE_BUTTONS_TITLE };
 }
+
+/* -------------------------------------------------------------------------
+ * Extended portrait popup, icon panel and assault portraits
+ *
+ * These three readings feed the original inline-SVG shells in
+ * `portraitshells.tsx`. Every value below is the server's (army, wallet or
+ * assault receipt) or the content's (a unit's name); the layout columns are
+ * the client's own. Nothing here invents a portrait, an icon, an amount, a
+ * win/loss state or a command. Absent or malformed values fail closed.
+ * ---------------------------------------------------------------------- */
+
+/** The portrait-backed popup's subject: one unit the server accounts for. */
+export interface ExtendedPortraitPopupView {
+  /** The content id the server's save holds. */
+  readonly itemId: number;
+  /** The content's name, or null when the id is not in the bundle. */
+  readonly name: string | null;
+  /** The count the server's save accounts for. */
+  readonly count: number;
+  /** The rules' level derived from the server's stored xp. */
+  readonly level: number;
+}
+
+/**
+ * The one portrait the popup may draw.
+ *
+ * The roster is a reading of the server's store and placed units, and the
+ * level comes from the rules' xp table — so no unit, count or level is chosen
+ * locally. A world with no accounted unit yields null, and the shell draws an
+ * explicit empty state rather than substituting a portrait.
+ */
+export function extendedPortraitPopup(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  now: number,
+): ExtendedPortraitPopupView | null {
+  const unit = rosterPanel(bundle, world, now).units.find(
+    (entry) =>
+      Number.isInteger(entry.itemId) && entry.itemId > 0 && entry.available > 0,
+  );
+  if (!unit) return null;
+  return {
+    itemId: unit.itemId,
+    name: unit.name,
+    count: unit.available,
+    level: unit.level,
+  };
+}
+
+/** One resource icon: the server's amount for one wallet slot. */
+export interface ResourceIconView {
+  /** The wire key, in the verified eight-slot order. */
+  readonly key: string;
+  /** The client's own label for the slot. */
+  readonly label: string;
+  /** The server's balance, printed verbatim. */
+  readonly amount: number;
+}
+
+/** The icon panel's body: finite wallet slots only, in wire order. */
+export interface IconPanelView {
+  readonly icons: readonly ResourceIconView[];
+  /** UI-only layout: how many columns the client draws. */
+  readonly columns: number;
+}
+
+/** The verified `[energy, xp, gold, wood, oil, steel, cash, mana]` wire order. */
+const ICON_RESOURCE_SLOTS: readonly (readonly [string, string])[] = [
+  ['e', 'Energy'],
+  ['x', 'XP'],
+  ['g', 'Gold'],
+  ['w', 'Wood'],
+  ['o', 'Oil'],
+  ['s', 'Steel'],
+  ['c', 'Cash'],
+  ['m', 'Mana'],
+];
+
+/**
+ * The icon layout's entries, read strictly from the server's wallet.
+ *
+ * A missing or non-finite slot is omitted, never replaced with a zero: the
+ * client cannot invent a balance. A wallet with no finite slot at all yields
+ * an empty body and the shell says so explicitly.
+ */
+export function resourceIconPanel(world: WorldSnapshot): IconPanelView {
+  const icons: ResourceIconView[] = [];
+  const resources = world.resources as Record<string, unknown> | undefined;
+  if (resources && typeof resources === 'object') {
+    for (const [key, label] of ICON_RESOURCE_SLOTS) {
+      const value = resources[key];
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        icons.push({ key, label, amount: Math.trunc(value) });
+      }
+    }
+  }
+  return { icons, columns: 4 };
+}
+
+/** One assault portrait: the server's army row plus its last receipt. */
+export interface AssaultPortraitView {
+  readonly itemId: number;
+  readonly name: string;
+  readonly available: number;
+  readonly allowed: boolean;
+  /** True only when the server actually settled the last assault. */
+  readonly settled: boolean;
+  /** The server's win flag, or null when no settled answer was published. */
+  readonly won: boolean | null;
+}
+
+/** The assault portrait strip's body. */
+export interface AssaultPortraitPanelView {
+  readonly portraits: readonly AssaultPortraitView[];
+  readonly opponent: string | null;
+}
+
+/**
+ * The army and receipt behind the assault portraits.
+ *
+ * The army comes from `armyPanel` (the server's store, placed units and
+ * finished queues), and the win/opponent from `lastAssaultResult`. An
+ * unsettled or absent receipt never becomes a win or a loss, and an empty
+ * army yields an empty strip with an explicit caption.
+ */
+export function assaultPortraitPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  now: number,
+): AssaultPortraitPanelView {
+  const result = lastAssaultResult(world);
+  const settled = result?.settled === true;
+  return {
+    portraits: armyPanel(bundle, world, now).map((unit) => ({
+      itemId: unit.itemId,
+      name: unit.name,
+      available: unit.available,
+      allowed: unit.allowed,
+      settled,
+      won: settled ? result!.won : null,
+    })),
+    opponent: result?.opponent ?? null,
+  };
+}

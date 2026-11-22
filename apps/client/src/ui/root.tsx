@@ -11,7 +11,7 @@
  * numbers are a **reading** of the world: the resources are the
  * server's, and the limits are the content's.
  */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import {
   CLOSED_DIALOG,
@@ -56,6 +56,14 @@ import { closeMarketPanel, MarketPanel, useMarket } from './market.tsx';
 import { MysteryLauncher, MysteryPanel, useMystery } from './mystery.tsx';
 import { Neighbours } from './neighbours.tsx';
 import { OnboardingLauncher, OnboardingPanel, useOnboarding } from './onboarding.tsx';
+import {
+  AssaultPortraits,
+  ExtendedPortraitButton,
+  IconPanel,
+  PORTRAIT_DIALOG_ID,
+  portraitDialog,
+  PortraitPopupBody,
+} from './portraitshells.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
 import { RecruitPanel } from './recruit.tsx';
 import {
@@ -71,6 +79,7 @@ import { TutorialOverlay, type TutorialOverlayProps } from './tutorial.tsx';
 import {
   assaultHistoryPanel,
   assaultHudPanel,
+  assaultPortraitPanel,
   assaultResultPanel,
   attackSymbolsPanel,
   atomFusionPanel,
@@ -80,6 +89,7 @@ import {
   categories,
   collectionsPanel,
   expansionPanel,
+  extendedPortraitPopup,
   hospitalPanel,
   goalList,
   hudInput,
@@ -91,6 +101,7 @@ import {
   questMinLevels,
   questRanks,
   recruitView,
+  resourceIconPanel,
   researchPanel,
   resourceButtonsDialog,
   resourceButtonsPanel,
@@ -285,15 +296,35 @@ export function Root({
     [bundle, world],
   );
 
-  // The one dialog's slot is shared. The market's and the resource chrome's
-  // UI-only gestures borrow the same primitive: when one is open it replaces
-  // the host's body for the moment and is given back on close. No second
-  // overlay is ever created.
-  const activeDialog: DialogState = resourceButtons.open
-    ? { dialog: resourceButtonsDialog() }
-    : market.open
-      ? { dialog: marketDialog() }
-      : (dialog ?? CLOSED_DIALOG);
+  // The extended portrait, the icon layout and the assault portraits are three
+  // more readings of the server's save. The portrait is a unit the server
+  // accounts for, the icons are its wallet's finite slots, and the assault
+  // tiles use the same army and receipt the result dialog draws. None of them
+  // owns a portrait, an amount or an outcome.
+  const portraitView = useMemo(
+    () => extendedPortraitPopup(bundle, world, now),
+    [bundle, world, now],
+  );
+  const iconView = useMemo(() => resourceIconPanel(world), [world]);
+  const assaultPortraitsView = useMemo(
+    () => assaultPortraitPanel(bundle, world, now),
+    [bundle, world, now],
+  );
+  // The launcher's open flag is UI state only; the body it hosts is the fresh
+  // reading above and the one dialog's single slot is borrowed for it.
+  const [portraitOpen, setPortraitOpen] = useState(false);
+
+  // The one dialog's slot is shared. The market's, the resource chrome's and
+  // the portrait launcher's UI-only gestures borrow the same primitive: when
+  // one is open it replaces the host's body for the moment and is given back
+  // on close. No second overlay is ever created.
+  const activeDialog: DialogState = portraitOpen
+    ? { dialog: portraitDialog() }
+    : resourceButtons.open
+      ? { dialog: resourceButtonsDialog() }
+      : market.open
+        ? { dialog: marketDialog() }
+        : (dialog ?? CLOSED_DIALOG);
 
   // The dialog's id selects which of the four assault-family screens to host.
   // Each view is a fresh reading of the server's answer: the interface keeps
@@ -383,19 +414,28 @@ export function Root({
       <OnboardingLauncher onOpen={onboarding.open ?? undefined} />
       {tutorial ? <TutorialOverlay {...tutorial} /> : null}
       <Feedback messages={feedback} />
+      {/* The icon layout and the extended portrait launcher are presentations
+          of the wallet and the army the server already published. */}
+      <IconPanel view={iconView} />
+      <ExtendedPortraitButton
+        view={portraitView}
+        onOpen={portraitView ? () => setPortraitOpen(true) : undefined}
+      />
       <Dialog
         state={activeDialog}
         onDismiss={
-          resourceButtons.open
-            ? closeResourceButtonsPanel
-            : market.open
-              ? closeMarketPanel
-              : onDialogDismiss ?? (() => {})
+          portraitOpen
+            ? () => setPortraitOpen(false)
+            : resourceButtons.open
+              ? closeResourceButtonsPanel
+              : market.open
+                ? closeMarketPanel
+                : onDialogDismiss ?? (() => {})
         }
       >
         {!market.open && !resourceButtons.open ? (
         <>
-        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && !dialogId?.startsWith('soulmixer-') && !dialogId?.startsWith('fusion-') && !dialogId?.startsWith('research-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
+        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && !dialogId?.startsWith('soulmixer-') && !dialogId?.startsWith('fusion-') && !dialogId?.startsWith('research-') && dialogId !== ROSTER_DIALOG_ID && dialogId !== PORTRAIT_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
             key={
               questPanel.kind === 'briefing'
@@ -425,16 +465,21 @@ export function Root({
           <ProductionSelector view={production} onActivate={onActivate} />
         ) : null}
         {!onboarding.view && assaultPanel ? (
-          <AssaultPanel
-            key={dialogId ?? undefined}
-            panel={assaultPanel}
-            // The one transport is a request, not a local decision: the host
-            // redraws from the server's answer, so no pending assault state is
-            // held here to disable the buttons.
-            busy={false}
-            onCommand={onCommand}
-            onCancel={onDialogDismiss ?? (() => {})}
-          />
+          <>
+            {dialogId === 'assault-result' ? (
+              <AssaultPortraits view={assaultPortraitsView} />
+            ) : null}
+            <AssaultPanel
+              key={dialogId ?? undefined}
+              panel={assaultPanel}
+              // The one transport is a request, not a local decision: the host
+              // redraws from the server's answer, so no pending assault state is
+              // held here to disable the buttons.
+              busy={false}
+              onCommand={onCommand}
+              onCancel={onDialogDismiss ?? (() => {})}
+            />
+          </>
         ) : null}
         {!onboarding.view && characterSetupPanel ? (
           <CharacterSetupPanel
@@ -473,6 +518,13 @@ export function Root({
             view={researchView}
             onCommand={onCommand}
             onClose={onDialogDismiss ?? (() => {})}
+          />
+        ) : null}
+        {!onboarding.view && dialogId === PORTRAIT_DIALOG_ID ? (
+          <PortraitPopupBody
+            key={`portrait:${portraitView?.itemId ?? 'empty'}`}
+            view={portraitView}
+            onClose={() => setPortraitOpen(false)}
           />
         ) : null}
         {onboarding.view ? (
