@@ -6,10 +6,11 @@ You are the autonomous engineering orchestrator responsible for continuing the d
 
 **Repository:** https://github.com/edisonmalasan/social-wars-legacy
 
-**Current verified baseline:** `main` at `8d492a4` — PRs #73–#80 merged, including
-the eight-screen implementation chain and PR #80's inventory fix; see the live
-checkpoint in section 12 below for the verified state and the counts aligned on its
-own documentation-only task branch.
+**Current verified baseline:** `main` at `b687d38` — PRs #73–#83 merged, including
+the eight-screen implementation chain, PR #80's inventory fix, PR #82's five
+resource-button/icon screens and PR #83's final three portrait/icon screens; see the
+live checkpoint in section 12 below for the verified state and the counts aligned on
+its own documentation-only task branch.
 
 **Primary source of truth:** `docs/ROADMAP.md`
 
@@ -506,15 +507,36 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main` (2026-11-23):** `8d492a4` — PRs #73, #74, #75, #76, #77,
+- **Last verified `main` (2026-11-23):** `b687d38` — PR #82 (`2484f8d`, five
+  resource-button/icon screens in `apps/client/src/ui/resourcebuttons.tsx`) and PR #83
+  (`b687d38`, the final three class-A portrait/icon screens in
+  `apps/client/src/ui/portraitshells.tsx`, bridged by `apps/client/src/ui/state.ts` and
+  alongside `apps/client/src/ui/assault.tsx`) are **MERGED**. This documentation-only
+  increment aligns the counts in `docs/ROADMAP.md` and `docs/GOAL.md` to the actual
+  checked inventory on merged `main`: **170 implemented / 52 dropped / 38 planned** of
+  260 in `re/data/ui-screens.json`, asserted by `packages/client/src/screens.test.ts`.
+  The eight screens added since the PR #80 alignment are the five resource buttons/icons
+  (`ButtonResourceMC.as`, `ButtonSmallLargeTextWithIconResourcesMC.as`,
+  `ButtonSmallWithIconResourcesMC.as`, `GUI/ResourcesTab.as`, `IconResourcesMC.as`, PR
+  #82) and the three final class-A screens (`GUI/ExtendedPortraitPopupButton.as`,
+  `GUI/IconPanel.as`, `GUI/PortraitAssault.as`, PR #83). Each is drawn from server-owned
+  state with original inline SVG geometry; every gesture sends only catalogue commands
+  such as `trade_resource`, no value is invented, and Zynga's proprietary art stays
+  excluded. No parity or release verdict follows. `node scripts/check-roadmap.mjs` still
+  reports **401 items, 22 open** (B 4, E 1, G 8, H 4, I 5); the B3/G3 boxes stay open
+  while 38 screens are planned, every genuine blocker is preserved, ADR 19/20/21
+  non-goals and the no-publication rule still hold, and no checkbox was ticked or
+  blocker removed. The same results are recorded in the 2026-11-23 entries of the
+  roadmap's Amendment Log.
+- **Historical checkpoint (superseded by `b687d38`): `8d492a4` — PRs #73, #74, #75, #76, #77,
   #78 and #80 are **MERGED**. PR #80 reclassified the three unit/training portrait
   screens in `re/data/ui-screens.json`; its four required checks were SUCCESS and
   the only failing check was the informational WebKit atlas-404 job. This
-  documentation-only increment aligns the counts recorded in `docs/ROADMAP.md` and
-  `docs/GOAL.md` with that fix. It owns only those two files: no code inventory was
+  documentation-only increment aligned the counts recorded in `docs/ROADMAP.md` and
+  `docs/GOAL.md` with that fix. It owned only those two files: no code inventory was
   edited, no checkbox was ticked, no blocker removed and no non-goal reversed.
-  `re/data/ui-screens.json` on merged `main` reads **162 implemented / 52 dropped /
-  46 planned** of 260, asserted by `packages/client/src/screens.test.ts`. PR #79 had
+  `re/data/ui-screens.json` on merged `main` read **162 implemented / 52 dropped /
+  46 planned** of 260 at that checkpoint, asserted by `packages/client/src/screens.test.ts`. PR #79 had
   recorded the three unit/training portrait screens (`GUI/Portrait.as`,
   `GUI/PortraitTrainQueue.as`, `GUI/AnimatedUnit.as`) as implemented in
   `apps/client/src/ui/unitportraits.tsx` from PR #75 while they still carried
@@ -534,8 +556,8 @@ verified checkpoint, not at every tool call.
   `NO DEVICE` with no touch test and `scripts/gpu-benchmark.mjs` gives one desktop
   single-host GPU observation only (PR #74, `docs/DEVICE-AND-GPU.md`).
   `node scripts/check-roadmap.mjs` still reports **401 items, 22 open** (B 4, E 1,
-  G 8, H 4, I 5); the B3/G3 boxes stay open while 46 screens are planned. Gates
-  re-run on this alignment branch: `node scripts/check-roadmap.mjs` → 401 items,
+  G 8, H 4, I 5); the B3/G3 boxes stayed open while 46 screens were planned at that checkpoint. Gates
+  re-run on that alignment branch: `node scripts/check-roadmap.mjs` → 401 items,
   22 open; `node scripts/check-report-sync.mjs` → the report set agrees with the
   implementation (4 claims, after `pnpm build:content`); `node scripts/check-adrs.mjs`
   → 21 ADRs, all well formed; `git diff --check` → clean (exit 0). The same results
@@ -631,7 +653,7 @@ verified checkpoint, not at every tool call.
   items is class-A or needs a new user decision — all are gated by licences,
   devices, credentials, the Flash rig or non-goals — so every blocker claim is
   preserved. Only the orchestrator merges; no worker merges its own branch.
-- **Next (honest, evidence-gated):** keep reducing the remaining 46 planned B6
+- **Next (honest, evidence-gated):** keep reducing the remaining 38 planned B6
   screens in coherent, player-facing families, with Zynga-art screens staying
   planned behind the licence gate; advance platform/release items only with real
   evidence (branded Safari, devices, signed installers, the Flash live rig).
@@ -658,7 +680,7 @@ verified checkpoint, not at every tool call.
   (PR #57 — inventory cells and the HUD info popup, 2 screens) to `911057e`
   was PR #58 (`7cda30e`, docs: correct the verified screen counts),
   PR #59 (`96a2ca8`, mystery-box screens, 4 screens) and PR #60 (`f0658fb`,
-  soul-mixer help and turbine, 3 screens). The verified screen inventory is
+  soul-mixer help and turbine, 3 screens). The verified screen inventory at that checkpoint was
   **151 implemented / 52 dropped / 57 planned**; `node scripts/check-roadmap.mjs`
   reports 401 items and 22 open (A 9/0, B 42/4, C 14/0, D 32/0, E 37/1,
   F 54/0, G 78/8, H 14/4, I 99/5), and
@@ -824,8 +846,8 @@ verified checkpoint, not at every tool call.
   checkpoint above) while the device and iOS halves remain open.
 - **Verified roadmap state (refreshed 2026-11-23; supersedes the earlier
   checkpoint claim):** `node scripts/check-roadmap.mjs` reports 401 items,
-  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **162 implemented /
-  52 dropped / 46 planned** in `re/data/ui-screens.json`. The Status Summary
+  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **170 implemented /
+  52 dropped / 38 planned** in `re/data/ui-screens.json`. The Status Summary
   still reads G 78/8. The G5 blocker row records Firefox and WebKit (Playwright)
   as verified, with **branded Safari and real devices still unrun**; the
   informational WebKit CI job in PR #73 failed on excluded proprietary atlas
@@ -837,8 +859,8 @@ verified checkpoint, not at every tool call.
   device row records `NO DEVICE` with no touch test and the GPU row one desktop
   single-host observation only (PR #74). The clean-room art package is a
   foundation, not a cleared licence gate. This documentation increment updates
-  `docs/ROADMAP.md` and `docs/GOAL.md` to the counts corrected in the data by
-  PR #80 and does not touch `re/data/ui-screens.json` or any code.
+  `docs/ROADMAP.md` and `docs/GOAL.md` to the counts on merged `main` at `b687d38`
+  (PR #83, after PR #82) and does not touch `re/data/ui-screens.json` or any code.
 - **Preserved WIP (mission timer):** the in-flight mission-timer changes are not
   lost, and have now landed. They were saved as a patch at
   `C:\Users\Edison\AppData\Local\Temp\opencode\mission-timer.patch` (13,682 bytes,
@@ -861,10 +883,11 @@ verified checkpoint, not at every tool call.
   is a documentation-only increment prepared on its own task branch for review,
   not a merge.
 - **Next, from the audit ranking:** re-audit the section 5 blockers before
-  treating any as final, and keep reducing the 46 planned B6 screens in
+  treating any as final, and keep reducing the 38 planned B6 screens in
   coherent, player-facing families — the eight screens recorded in the 2026-11-23
-  roadmap reclassification are the latest, and the screens that need Zynga's art
-  stay planned behind the licence gate. The gender/character-setup choice also
+  roadmap reclassification and the five resource-button/icon screens (PR #82) plus
+  the final three portrait/icon screens (PR #83) are the latest, and the screens
+  that need Zynga's art stay planned behind the licence gate. The gender/character-setup choice also
   stays planned: the save has no character-setup field and no command exists. The
   remaining platform and release items should be advanced only with evidence:
   branded Safari and real devices, signed installers, the Flash live captures
@@ -880,4 +903,4 @@ verified checkpoint, not at every tool call.
   build-artefact condition, not a source change. CI's Scan check passed.
 - **On resume:** re-read this file and `docs/ROADMAP.md`, check `git status`,
   `git stash list`, `git worktree list` and `gh pr checks`, then continue from the
-  verified `8d492a4` state and the worker results above.
+  verified `b687d38` state and the worker results above.
