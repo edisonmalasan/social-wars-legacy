@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 159,
+   "implemented": 162,
    "dropped": 52,
-   "planned": 49
+   "planned": 46
   }
  },
  "screens": [
@@ -256,8 +256,8 @@
    ],
    "overrides": [],
    "bytes": 6833,
-   "decision": "planned",
-   "decisionNote": "Deferred: the animated-unit panel has no rendered unit sprite or remove lifecycle; the frame-selection model exists, but no GUI panel draws its states and the frames await the art licence."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/unitportraits.tsx` draws the animated-unit panel's states as original inline SVG portraits. The unit id, count and ready/training state come from the server's TrainingView and the units the server owns — the panel never rolls a unit, decides readiness or sends a train/take command. Zynga's proprietary unit art and animation frames stay excluded; only the server-owned state and the original geometry are claimed."
   },
   {
    "class": "AnimatedUnitCentered",
@@ -874,8 +874,8 @@
    ],
    "overrides": [],
    "bytes": 4976,
-   "decision": "planned",
-   "decisionNote": "Deferred: the portrait's setElement, clickItem/overItem and UpdateImage states have no client model; unblock when a portrait-backed screen is rendered and the images are available."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/unitportraits.tsx` draws the portrait's framed figure, name, count and state as original inline SVG geometry. The unit id, count and ready flag are read from the server's TrainingView and the owned-unit rows — the portrait makes no client-side roll, grants no count and sends no command. Zynga's proprietary portrait art stays excluded; only the server-owned values and the original shapes drawn here are claimed."
   },
   {
    "class": "PortraitAssault",
@@ -981,8 +981,8 @@
    ],
    "overrides": [],
    "bytes": 4170,
-   "decision": "planned",
-   "decisionNote": "Deferred: the training-queue portrait has no startRefreshing/clickItem/setVisible model; unblock when a training panel is rendered and the portraits are licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/unitportraits.tsx` draws the training-queue portrait and its charging/ready states as original inline SVG geometry. The queued unit id, count and ready flag come from the server's TrainingView and the owned units — the panel never starts a refresh locally, rolls a unit or sends a train/take command. Zynga's proprietary portrait art stays excluded; only the server-owned queue state and the original shapes drawn here are claimed."
   },
   {
    "class": "PremiumCollectPanel",
