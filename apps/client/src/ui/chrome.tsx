@@ -54,6 +54,7 @@ import {
 } from './state.ts';
 import { EMPTY_TAB_STRIP } from './state.ts';
 import type { Categories, ProductionPanelView } from './state.ts';
+import { MarketLauncher } from './market.tsx';
 
 /** The host callbacks the chrome needs. `main.ts` publishes them once. */
 export interface ChromeHost {
@@ -259,17 +260,26 @@ export function ChromeDock({
       ) : null}
       <div className="swl-chrome-head">
         <span className="swl-chrome-title">Controls</span>
-        <button
-          ref={helpButton}
-          type="button"
-          className="swl-chrome-help"
-          aria-label="About these controls"
-          aria-expanded={popoverOpen}
-          aria-controls="swl-chrome-popover"
-          onClick={() => setPopoverOpen((open) => !open)}
-        >
-          ?
-        </button>
+        <div className="swl-chrome-head-actions">
+          {/*
+            The market gesture lives here, with the other chrome controls. It
+            only publishes a UI-only open flag; the panel is hosted by the one
+            shared dialog in `root.tsx` and every trade goes through the host's
+            one command transport.
+          */}
+          <MarketLauncher />
+          <button
+            ref={helpButton}
+            type="button"
+            className="swl-chrome-help"
+            aria-label="About these controls"
+            aria-expanded={popoverOpen}
+            aria-controls="swl-chrome-popover"
+            onClick={() => setPopoverOpen((open) => !open)}
+          >
+            ?
+          </button>
+        </div>
       </div>
       {popoverOpen ? (
         <div

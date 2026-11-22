@@ -67,6 +67,7 @@ import {
   buildTabs,
   completeGoal,
   expand,
+  hudState,
   lastAssaultResult,
   questResultActionChoice,
   specialAttackHud,
@@ -75,6 +76,7 @@ import {
   viewportOf,
   itemType,
   levelOf,
+  marketState,
   MAX_ZOOM,
   MIN_ZOOM,
   magicBook,
@@ -86,6 +88,7 @@ import {
   productionState,
   resourcePanel,
   storedItems,
+  tradeResource,
   trainingView,
   unitPanel,
 } from '@swl/client';
@@ -3208,4 +3211,203 @@ export function fusionDialog(kind: FusionDialogKind): DialogContent {
     1: RESEARCH_TITLE_ROBOTIC,
   };
   return { id: ids[kind], kind: 'alert', title: titles[kind] };
+}
+
+/* -------------------------------------------------------------------------
+ * The player's own resource market
+ *
+ * `ButtonMarketMC.as` is only a movieclip; the behaviour is in
+ * `popups/ButtonMarket.as`, and it is small: a buy button, a sell button, a
+ * refresh, and one 24-hour exhaustion sentence. The player's market is **not**
+ * the ADR 20 social marketplace — it trades the player's own wood, oil and
+ * steel against the server's own gold through `trade_resource`.
+ *
+ * Everything authoritative here is a *reading*: the counters the server keeps
+ * on its map, the wallet the HUD reads out of the same answer, and the price
+ * and period numbers the content publishes. This bridge never multiplies a
+ * content price by an amount, never predicts a gold balance, never decides
+ * whether a trade may happen, and never turns the exhaustion caption into a
+ * gate. A buy or sell is a command the server prices and grants.
+ * ---------------------------------------------------------------------- */
+
+/** The client's own literals on `popups/ButtonMarket.as`. */
+export const MARKET_TITLE = 'Market';
+export const MARKET_BUY = 'Buy';
+export const MARKET_SELL = 'sell';
+export const MARKET_EXHAUSTED =
+  'Market resources have been exhausted. Come back in 24 hours to trade more!';
+/** The three resource labels recovered from that same class. */
+export const MARKET_LEGACY_LABELS: readonly string[] = ['food', 'wood', 'stone'];
+
+/** Explicit empty states, shown instead of a fabricated number. */
+export const MARKET_NO_COUNTERS =
+  'The server has not published any market counters yet.';
+export const MARKET_NO_WALLET =
+  'The server has not published a market wallet yet.';
+export const MARKET_NO_AMOUNTS = 'The content lists no market trade amounts.';
+export const MARKET_NO_COSTS = 'The content lists no market base costs.';
+
+/** The market's wire keys, in the order of the eight-slot resource vector. */
+const MARKET_RESOURCES = ['w', 'o', 's'] as const;
+/** The clone's own names for those keys, used only as button captions. */
+const MARKET_RESOURCE_NAMES: Readonly<Record<string, string>> = {
+  w: 'wood',
+  o: 'oil',
+  s: 'steel',
+};
+
+/** The wallet field each market resource maps to in `hudState`. */
+const MARKET_WALLET_FIELD: Readonly<Record<string, 'wood' | 'oil' | 'steel'>> = {
+  w: 'wood',
+  o: 'oil',
+  s: 'steel',
+};
+
+/** The content's trade amounts, kept verbatim; anything else is not an amount. */
+function marketAmounts(globals: Record<string, unknown>): number[] {
+  const raw = globals['MARKET_AMOUNT_TRADE'];
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(
+    (value): value is number =>
+      typeof value === 'number' && Number.isInteger(value) && value > 0,
+  );
+}
+
+/** The server's counters, or null when the save holds none that can be read. */
+export interface MarketCountersView {
+  readonly tradesDone: number;
+  readonly resourcesTraded: Readonly<Record<string, number>>;
+  readonly lastTradeAt: number;
+  readonly firstTime: unknown;
+}
+
+/** The server's wallet, read through the same HUD model the top bar draws. */
+export interface MarketWalletView {
+  readonly gold: number;
+  readonly wood: number;
+  readonly oil: number;
+  readonly steel: number;
+}
+
+/** One market row: the server's numbers beside the content's own price text. */
+export interface MarketResourceView {
+  /** The wire key the `trade_resource` command carries. */
+  readonly resource: string;
+  /** The clone's own caption for that key. */
+  readonly label: string;
+  /** The content's base price for 100 units, verbatim; never a paid price. */
+  readonly baseCost: number | null;
+  /** The server's held amount, verbatim. */
+  readonly held: number | null;
+  /** The server's traded amount for this key, verbatim. */
+  readonly traded: number | null;
+  /** The content's amounts, verbatim. */
+  readonly amounts: readonly number[];
+  /** One buy per amount: `trade_resource(key, 0, amount)`. */
+  readonly buy: readonly NativeCommand[];
+  /** One sell per amount: `trade_resource(key, 1, amount)`. */
+  readonly sell: readonly NativeCommand[];
+}
+
+/** Content numbers shown as text; none of them is used to grant anything. */
+export interface MarketDisplayView {
+  readonly periodHours: number | null;
+  readonly maxTrades: number | null;
+  readonly baseCosts: Readonly<Record<string, number>>;
+}
+
+/** The body the one shared dialog draws for the player's own market. */
+export interface MarketPanelView {
+  readonly title: string;
+  readonly buyLabel: string;
+  readonly sellLabel: string;
+  readonly exhaustion: string;
+  /** A caption derived from the server's count, never a request gate. */
+  readonly exhausted: boolean;
+  readonly counters: MarketCountersView | null;
+  readonly wallet: MarketWalletView | null;
+  readonly display: MarketDisplayView;
+  readonly resources: readonly MarketResourceView[];
+  /** Explicit reasons a section is empty, never a placeholder number. */
+  readonly emptyMessages: readonly string[];
+}
+
+/**
+ * Read the market panel from the server's save and the content.
+ *
+ * `hudState` is the wallet's canonical reading: it already looks at exactly
+ * the resource keys the server publishes. The raw fields are checked as well,
+ * so a malformed wallet renders the empty state rather than a zero the server
+ * never sent. The content supplies only the display numbers and the amounts
+ * the command may name; the server settles every trade.
+ */
+export function marketPanel(bundle: ContentBundle, world: WorldSnapshot): MarketPanelView {
+  const market = marketState(world);
+  const counters: MarketCountersView | null =
+    market && market.tradesDone !== null && market.lastTradeAt !== null
+      ? {
+          tradesDone: market.tradesDone,
+          resourcesTraded: market.resourcesTraded,
+          lastTradeAt: market.lastTradeAt,
+          firstTime: market.firstTime,
+        }
+      : null;
+
+  const hud = hudState(hudInput(bundle, world));
+  const raw = world.resources ?? {};
+  const wallet: MarketWalletView | null =
+    ['g', 'w', 'o', 's'].every((key) => finite(raw[key]) !== null)
+      ? { gold: hud.gold, wood: hud.wood, oil: hud.oil, steel: hud.steel }
+      : null;
+
+  const globals = bundle.globals ?? {};
+  const baseCosts = numbersAt(globals, 'MARKET_BASE_COSTS');
+  const amounts = marketAmounts(globals);
+  const display: MarketDisplayView = {
+    periodHours: finite(globals['MARKET_PERIOD_HOURS']),
+    maxTrades: finite(globals['MARKET_MAX_NUM_TRADES']),
+    baseCosts,
+  };
+  const emptyMessages: string[] = [];
+  if (!counters) emptyMessages.push(MARKET_NO_COUNTERS);
+  if (!wallet) emptyMessages.push(MARKET_NO_WALLET);
+  if (amounts.length === 0) emptyMessages.push(MARKET_NO_AMOUNTS);
+  if (Object.keys(baseCosts).length === 0) emptyMessages.push(MARKET_NO_COSTS);
+
+  const resources: MarketResourceView[] = MARKET_RESOURCES.map((resource) => {
+    const field = MARKET_WALLET_FIELD[resource]!;
+    return {
+      resource,
+      label: MARKET_RESOURCE_NAMES[resource]!,
+      baseCost: Object.prototype.hasOwnProperty.call(baseCosts, resource)
+        ? baseCosts[resource]!
+        : null,
+      held: wallet ? wallet[field] : null,
+      traded: counters ? counters.resourcesTraded[resource] ?? null : null,
+      amounts,
+      buy: amounts.map((amount) => tradeResource(resource, false, amount)),
+      sell: amounts.map((amount) => tradeResource(resource, true, amount)),
+    };
+  });
+
+  return {
+    title: MARKET_TITLE,
+    buyLabel: MARKET_BUY,
+    sellLabel: MARKET_SELL,
+    exhaustion: MARKET_EXHAUSTED,
+    exhausted:
+      counters !== null &&
+      display.maxTrades !== null &&
+      counters.tradesDone >= display.maxTrades,
+    counters,
+    wallet,
+    display,
+    resources,
+    emptyMessages,
+  };
+}
+
+/** The player's market uses the one dialog's single slot, like every panel. */
+export function marketDialog(): DialogContent {
+  return { id: 'market-panel', kind: 'alert', title: MARKET_TITLE };
 }
