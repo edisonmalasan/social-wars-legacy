@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Shield pulse — frame 6 of 6</title>
+  <desc id="swl-desc">A banded shield under an expanding, brightening halo. Original, deterministic geometry; no input art is read.</desc>
+    <line x1="32" y1="6" x2="32" y2="1" stroke="#f7ecd7" stroke-width="2" stroke-linecap="round"/>
+    <line x1="58" y1="32" x2="63" y2="32" stroke="#f7ecd7" stroke-width="2" stroke-linecap="round"/>
+    <line x1="32" y1="58" x2="32" y2="63" stroke="#f7ecd7" stroke-width="2" stroke-linecap="round"/>
+    <line x1="6" y1="32" x2="1" y2="32" stroke="#f7ecd7" stroke-width="2" stroke-linecap="round"/>
+    <line x1="58" y1="6" x2="63" y2="1" stroke="#f7ecd7" stroke-width="2" stroke-linecap="round"/>
+    <line x1="58" y1="58" x2="63" y2="63" stroke="#f7ecd7" stroke-width="2" stroke-linecap="round"/>
+    <line x1="6" y1="58" x2="1" y2="63" stroke="#f7ecd7" stroke-width="2" stroke-linecap="round"/>
+    <line x1="6" y1="6" x2="1" y2="1" stroke="#f7ecd7" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="32" cy="32" r="24" fill="#f7ecd7"/>
+    <circle cx="32" cy="32" r="19" fill="#16242d"/>
+    <circle cx="32" cy="32" r="15" fill="#f7ecd7"/>
+    <polygon points="32,8 52,15 50,37 32,54 14,37 12,15" fill="#2c4654"/>
+    <polygon points="32,13 47,18 45,35 32,47 19,35 17,18" fill="#2f7d78"/>
+    <polygon points="19,25 32,34 45,25 45,30 32,39 19,30" fill="#e9a63f"/>
+    <circle cx="32" cy="32" r="4" fill="#f7ecd7"/>
+</svg>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Spark trail — frame 5 of 6</title>
+  <desc id="swl-desc">A bright spark travelling a fixed path with a seeded, cooling trail. Original, deterministic geometry; no input art is read.</desc>
+    <line x1="31" y1="31" x2="38" y2="24" stroke="#86cdbd" stroke-width="1" stroke-linecap="round"/>
+    <circle cx="10" cy="54" r="1" fill="#2f7d78"/>
+    <circle cx="8" cy="52" r="1" fill="#b65340"/>
+    <circle cx="18" cy="45" r="2" fill="#b65340"/>
+    <circle cx="24" cy="37" r="3" fill="#e9a63f"/>
+    <circle cx="30" cy="31" r="4" fill="#e9a63f"/>
+    <polygon points="38,15 40,21 46,19 42,24 46,29 40,27 38,33 36,27 30,29 34,24 30,19 36,21" fill="#e9a63f"/>
+    <circle cx="38" cy="24" r="5" fill="#f7ecd7"/>
+    <circle cx="38" cy="24" r="2" fill="#16242d"/>
+</svg>

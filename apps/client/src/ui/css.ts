@@ -2858,5 +2858,137 @@ export function uiCss(): string {
   background: var(--swl-surface-raised);
   color: var(--swl-ink);
 }
+
+/* --- The Original FX panel ---------------------------------------------
+ * Each stage stacks the generator's six inline frames. One CSS animation,
+ * offset per frame with a negative delay, cycles them without a client-side
+ * clock or any game state. The reduced-motion rule leaves a single still.
+ */
+.swl-ui button.swl-original-fx-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+  padding: 3px 8px;
+  border: 1px solid var(--swl-accent);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+  color: var(--swl-ink);
+}
+.swl-original-fx-launcher-count {
+  color: var(--swl-accent);
+  font-variant-numeric: tabular-nums;
+}
+.swl-original-fx {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--swl-gap);
+  max-width: 420px;
+}
+.swl-original-fx-heading { margin: 0; font-weight: 700; }
+.swl-original-fx-intro,
+.swl-original-fx-motion,
+.swl-original-fx-caption {
+  margin: 0;
+  color: var(--swl-ink-muted);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  text-align: center;
+}
+.swl-original-fx-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--swl-gap-lg);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.swl-original-fx-sequence {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+.swl-original-fx-stage {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--swl-surface);
+}
+.swl-original-fx-frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 64px;
+  height: 64px;
+  opacity: 0;
+  animation: swl-original-fx-cycle 1.2s steps(1, end) infinite;
+}
+.swl-original-fx-frame[data-swl-fx-frame='0'] { animation-delay: 0ms; }
+.swl-original-fx-frame[data-swl-fx-frame='1'] { animation-delay: -200ms; }
+.swl-original-fx-frame[data-swl-fx-frame='2'] { animation-delay: -400ms; }
+.swl-original-fx-frame[data-swl-fx-frame='3'] { animation-delay: -600ms; }
+.swl-original-fx-frame[data-swl-fx-frame='4'] { animation-delay: -800ms; }
+.swl-original-fx-frame[data-swl-fx-frame='5'] { animation-delay: -1000ms; }
+@keyframes swl-original-fx-cycle {
+  0% { opacity: 1; }
+  16.6667% { opacity: 0; }
+  100% { opacity: 0; }
+}
+.swl-original-fx-name {
+  color: var(--swl-ink);
+  font-weight: 700;
+}
+.swl-original-fx-detail {
+  color: var(--swl-ink-muted);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+.swl-original-fx-licence {
+  margin: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  color: var(--swl-accent);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  text-align: center;
+}
+.swl-original-fx-details {
+  width: 100%;
+  color: var(--swl-ink-muted);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+.swl-original-fx-details summary { cursor: pointer; }
+.swl-original-fx-notice {
+  max-height: 120px;
+  overflow: auto;
+  margin: 4px 0;
+  padding: 6px;
+  border-radius: 3px;
+  background: var(--swl-surface);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.swl-original-fx-statement { margin: 4px 0; }
+.swl-ui button.swl-original-fx-close {
+  padding: 5px 14px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+  color: var(--swl-ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .swl-original-fx-frame {
+    animation: none;
+    opacity: 0;
+  }
+  .swl-original-fx-frame[data-swl-fx-first='true'] { opacity: 1; }
+}
 `.trim();
 }

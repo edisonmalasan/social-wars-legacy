@@ -23,7 +23,7 @@ test('the manifest carries the licence, the version and an original-work stateme
 test('every generated file has a complete provenance entry', () => {
   const files = artifacts.filter((file) => file.path !== 'manifest.json');
   assert.equal(manifest.files.length, files.length);
-  assert.equal(manifest.files.length, 24); // 16 icons + 1 sheet + 6 sounds + the notice
+  assert.equal(manifest.files.length, 36); // 16 icons + 1 sheet + 12 FX frames + 6 sounds + the notice
   for (const file of files) {
     const entry = manifest.files.find((row) => row.path === file.path);
     assert.ok(entry, `${file.path} has no entry`);

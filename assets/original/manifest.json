@@ -160,6 +160,114 @@
       "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
     },
     {
+      "path": "fx/shield-pulse/frame-00.svg",
+      "bytes": 1615,
+      "sha256": "95f0929225847c2ca1341b527f4b0bef07df4e36073c5e151147e19d4f5f0e38",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/shield-pulse/frame-01.svg",
+      "bytes": 1616,
+      "sha256": "b04137f6884a659d35ac7d1d97e7672a66814204676905fa89e9aef76c348c5c",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/shield-pulse/frame-02.svg",
+      "bytes": 1617,
+      "sha256": "4871a48ecb9019d365c43bfd54944972c02ecc23ef7a887ac5b0e263edc82fdc",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/shield-pulse/frame-03.svg",
+      "bytes": 1611,
+      "sha256": "36bb07486e56ea2efa378e71af3aa0845b0039927f620840b4fcd18d21bc5936",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/shield-pulse/frame-04.svg",
+      "bytes": 1606,
+      "sha256": "c545479cb5a4134df5ec3483f419999de7749fbc6461c9bc1af094405e0231b9",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/shield-pulse/frame-05.svg",
+      "bytes": 1606,
+      "sha256": "21eb35f9b54a7375e85da4cb5d5020eaa509694cc14e72414c5f3677fdc05b51",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/spark-trail/frame-00.svg",
+      "bytes": 955,
+      "sha256": "afab34359f406f367f95e76a5e119396c49448002c903cdefce265e2297b1bde",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/spark-trail/frame-01.svg",
+      "bytes": 958,
+      "sha256": "62bae2acd6b56a470599fb43ef1227241ad18284d9892b48cad9f25158934c05",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/spark-trail/frame-02.svg",
+      "bytes": 960,
+      "sha256": "2131a4cd7c05e22f30ecc3e887e2f34ff47e69cc04cb4aa1e03659dd1ea29422",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/spark-trail/frame-03.svg",
+      "bytes": 959,
+      "sha256": "2549a8b08eeef920defbbecd9df4eb733f709d8e62e00ba2806169fcbed83124",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/spark-trail/frame-04.svg",
+      "bytes": 961,
+      "sha256": "08fffd65c07d43cc7d601581dcdebf1e7c8a78ac3b2204632e172fadd78bae83",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "fx/spark-trail/frame-05.svg",
+      "bytes": 960,
+      "sha256": "a39ad5de7bc2ddfe70ca7d1025a7bd472e45465c5f5c39e1e412561b468ce617",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
       "path": "sounds/click.wav",
       "bytes": 3130,
       "sha256": "ffeaa80809c87c9380b9730c651c2de92f9d8331dc18756ac95f257cfbae305b",
