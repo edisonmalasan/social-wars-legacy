@@ -101,6 +101,7 @@ import {
   dismissPopup,
   EMPTY_POPUP_SLOT,
   expansionResultPanel,
+  fusionDialog,
   missionInfoPanel,
   mysteryBoxes,
   mysteryBoxPanel,
@@ -123,12 +124,14 @@ import {
   type CharacterSetupPanelKind,
   type ChromePopupRequest,
   type ChromePopupSlot,
+  type FusionDialogKind,
   type MysteryKind,
   type MysteryLauncherView,
   type MysteryPurchase,
   type OnboardingPanelKind,
   type OnboardingPanelView,
 } from './ui/state.ts';
+import { setFusionHost } from './ui/fusion.tsx';
 import { setMysteryHost } from './ui/mystery.tsx';
 import { setSoulMixerHost } from './ui/soulmixerhelp.tsx';
 import { setChromeHost } from './ui/chrome.tsx';
@@ -351,6 +354,12 @@ export interface ClientHandle {
   showMystery?: (kind: MysteryKind) => void;
   /** Open the soul-mixer help and turbine in the one shared dialog. */
   showSoulMixer?: () => void;
+  /**
+   * Open Atom Fusion or one of the two research centres in the one dialog.
+   * The body is derived from the server's save; only the id, kind and title
+   * come from here, and every gesture uses the one command transport.
+   */
+  showFusion?: (kind: FusionDialogKind) => void;
   /** Shorthands for the five gestures above, for driving the client. */
   showIntro?: () => void;
   showHelp?: () => void;
@@ -1192,6 +1201,23 @@ async function main(): Promise<void> {
     drawInterface();
   }
 
+  /* ---------------------------------------------------------------------
+   * Atom Fusion and the research centres
+   *
+   * These open through the same one dialog primitive. The panel bodies are
+   * fresh readings of the server's save, so opening one keeps no outcome,
+   * roll or countdown of its own; every gesture goes through `run` below.
+   * ------------------------------------------------------------------- */
+
+  /** Open one of the three panels in the one shared dialog. */
+  function openFusion(kind: FusionDialogKind): void {
+    clearOnboarding();
+    questPanel = null;
+    const panel = fusionDialog(kind);
+    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    drawInterface();
+  }
+
   /** Send the composed team with the next mission the server has opened. */
   function submitRosterTeam(team: Army): void {
     if (questBusy) return;
@@ -1308,6 +1334,9 @@ async function main(): Promise<void> {
   setMysteryHost({ open: openMystery, buy: buyMystery });
   // The help panel owns no game state; the host only supplies the gesture.
   setSoulMixerHost({ open: openSoulMixer });
+  // The fusion and research panels own no game state either: the host supplies
+  // the open gesture and their requests use the same one command transport.
+  setFusionHost({ open: openFusion });
 
   const ui = UI ? mountUi(UI, content, onPick, onCollect, onCommand) : null;
   drawInterface();
@@ -1607,6 +1636,7 @@ async function main(): Promise<void> {
       else gestureRefusal('the server has no such mystery box');
     },
     showSoulMixer: () => openSoulMixer(),
+    showFusion: (kind) => openFusion(kind),
     showIntro: () => openOnboarding('intro'),
     showHelp: () => openOnboarding('help'),
     showMissionInfo: () => openOnboarding('mission'),

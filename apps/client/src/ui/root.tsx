@@ -47,6 +47,7 @@ import { ChromeDock, ChromePopupBody, useChrome } from './chrome.tsx';
 import { Dialog } from './dialog.tsx';
 import { Expansion } from './expansion.tsx';
 import { Feedback } from './feedback.tsx';
+import { AtomFusionPanel, FusionLauncher, ResearchPanel } from './fusion.tsx';
 import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
 import { InfoPanel, ProductionSelector, PRODUCTION_DIALOG_ID } from './info.tsx';
@@ -67,6 +68,7 @@ import {
   assaultHudPanel,
   assaultResultPanel,
   attackSymbolsPanel,
+  atomFusionPanel,
   battleOptionsPanel,
   buildingInfo,
   buildItems,
@@ -82,9 +84,12 @@ import {
   questMinLevels,
   questRanks,
   recruitView,
+  researchPanel,
   ROSTER_DIALOG_ID,
   rosterPanel,
   unitInfoPanel,
+  type AtomFusionPanelView,
+  type ResearchPanelView,
 } from './state.ts';
 
 /** The root's props. */
@@ -290,6 +295,19 @@ export function Root({
     return null;
   }, [dialogId, bundle, world]);
 
+  // The Atom Fusion and research panels are fresh readings of the server's
+  // save: the interface keeps no rolled power, granted item or countdown of
+  // its own. The dialog id selects which body the one dialog hosts.
+  const atomView = useMemo<AtomFusionPanelView | null>(
+    () => (dialogId === 'fusion-atom' ? atomFusionPanel(bundle, world) : null),
+    [dialogId, bundle, world],
+  );
+  const researchView = useMemo<ResearchPanelView | null>(() => {
+    if (dialogId === 'research-area51') return researchPanel(bundle, world, 0, now);
+    if (dialogId === 'research-robotic') return researchPanel(bundle, world, 1, now);
+    return null;
+  }, [dialogId, bundle, world, now]);
+
   return (
     <div className="swl-ui">
       <Hud state={state} placing={placingName} bonus={bonus} onClaimBonus={onClaimBonus} />
@@ -322,6 +340,7 @@ export function Root({
       <Store packs={store} onCommand={onCommand} />
       <MysteryLauncher bundle={bundle} />
       <SoulMixerLauncher />
+      <FusionLauncher />
       <MagicLab bundle={bundle} world={world} onCommand={onCommand} />
       <SpellBook bundle={bundle} world={world} onCommand={onCommand} />
       <Neighbours neighbours={neighbours} />
@@ -332,7 +351,7 @@ export function Root({
         state={dialog ?? CLOSED_DIALOG}
         onDismiss={onDialogDismiss ?? (() => {})}
       >
-        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && !dialogId?.startsWith('soulmixer-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
+        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && !dialogId?.startsWith('soulmixer-') && !dialogId?.startsWith('fusion-') && !dialogId?.startsWith('research-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
             key={
               questPanel.kind === 'briefing'
@@ -393,6 +412,22 @@ export function Root({
           <SoulMixerPanel
             key={`soulmixer:${dialogId}`}
             world={world}
+            onClose={onDialogDismiss ?? (() => {})}
+          />
+        ) : null}
+        {!onboarding.view && atomView ? (
+          <AtomFusionPanel
+            key={`fusion:${dialogId}`}
+            view={atomView}
+            onCommand={onCommand}
+            onClose={onDialogDismiss ?? (() => {})}
+          />
+        ) : null}
+        {!onboarding.view && researchView ? (
+          <ResearchPanel
+            key={`research:${dialogId}`}
+            view={researchView}
+            onCommand={onCommand}
             onClose={onDialogDismiss ?? (() => {})}
           />
         ) : null}
