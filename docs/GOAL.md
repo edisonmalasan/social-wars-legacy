@@ -504,14 +504,19 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main`:** `911057e` — PR #60
-  (`feat/soulmixer-help-turbina`, the soul-mixer help and turbine drawn from
-  recovered state, 3 screens) merged. The chain from the prior verified
-  checkpoint (`27f1dab`, PR #57 — inventory cells and the HUD info popup,
-  2 screens) is PR #58 (`7cda30e`, docs: correct the verified screen counts),
+- **Last verified `main`:** `1d1072c` — PR #62
+  (`docs/reclassify-exploration-cover`, the exploration cover reclassified as
+  the shared primitive — 1 screen reclassified, no new artwork) merged. The
+  chain from the prior verified checkpoint (`911057e`, PR #60 — soul-mixer
+  help and turbine drawn from recovered state, 3 screens) is PR #61
+  (`91165ae`, docs: refresh the verified screen counts and record PRs #59
+  and #60) and PR #62 (`1d1072c`, the `GuiCoverExplorationMC.as`
+  cover-primitive reclassification). The earlier chain from `27f1dab`
+  (PR #57 — inventory cells and the HUD info popup, 2 screens) to `911057e`
+  was PR #58 (`7cda30e`, docs: correct the verified screen counts),
   PR #59 (`96a2ca8`, mystery-box screens, 4 screens) and PR #60 (`f0658fb`,
   soul-mixer help and turbine, 3 screens). The verified screen inventory is
-  **150 implemented / 52 dropped / 58 planned**; `node scripts/check-roadmap.mjs`
+  **151 implemented / 52 dropped / 57 planned**; `node scripts/check-roadmap.mjs`
   reports 401 items and 22 open (A 9/0, B 42/4, C 14/0, D 32/0, E 37/1,
   F 54/0, G 78/8, H 14/4, I 99/5), and
   `node scripts/check-report-sync.mjs` agrees with the implementation (4 claims)
@@ -558,6 +563,16 @@ verified checkpoint, not at every tool call.
   `(inputA, inputB, powerupLevel) -> output` rule (raw AS3 absent), unpriced
   `soulmixer_speedup`, and breeding only as `PopupSoulMixer`'s art shell —
   keeps the fusion and breeding screens planned.
+- **The PR #62 cover correction (checked, honest scope):**
+  `GuiCoverExplorationMC.as` moved from `planned` to `implemented` because
+  `apps/client/src/ui/chrome.tsx` already provides the reusable `Cover` — a
+  dimming, click-to-dismiss layer, the same primitive that closes
+  `GuiCover.as`. The claim stops at that behaviour: the original exploration
+  cover art stays excluded, the clone has no exploration view to host it, and
+  this is a primitive, not an exploration screen. No artwork, view or new
+  screen family was added; only the last cover deferral closed, taking the
+  inventory from 150 / 52 / 58 to 151 / 52 / 57. The change touched tests and
+  `re/data/ui-screens.json`, not product source.
 - **Corrected research-centre gate:** the old note on `PopupResearchCenterMC.as`
   falsely called it the magic tech tree. It is really the late-era AREA 51 /
   ROBOTIC CENTER robot-research screen (Zynga build-process art, a 6-hour cycle,
@@ -622,8 +637,8 @@ verified checkpoint, not at every tool call.
   one shared `Dialog` via `showAssaultPanel(kind)` (31/31 focused tests,
   1786/1786 serial full suite, typecheck, e2e in Chrome and Edge). Nine screens
   were honestly reclassified as implemented in that batch; after PRs #51–#55,
-  #57, #59 and #60 the inventory now reads **150 implemented / 52 dropped /
-  58 planned**, with art-licence-blocked screens still planned. Three further
+  #57, #59, #60 and #62 the inventory now reads **151 implemented / 52 dropped
+  / 57 planned**, with art-licence-blocked screens still planned. Three further
   increments are on `main`: PR #47
   (`f4b4e69`) refreshed the verified-state documentation for the `6954a19`
   checkpoint; PR #48 (`608d940`) added `scripts/flash-differential.mjs`, a
@@ -638,8 +653,8 @@ verified checkpoint, not at every tool call.
   JDK/Android SDK/Xcode` — the config is coherent, but no native build or device
   run was performed. Neither script changes the item accounting.
 - **Verified roadmap state:** `node scripts/check-roadmap.mjs` reports 401 items,
-  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **150 implemented /
-  52 dropped / 58 planned**. The Status Summary still reads G 78/8. The G5
+  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **151 implemented /
+  52 dropped / 57 planned**. The Status Summary still reads G 78/8. The G5
   blocker row records Firefox and WebKit as verified, with branded Safari and
   real devices the only unrun browsers; the desktop and installer rows now
   record **Linux bundling in CI, unsigned** while staying open for macOS and
@@ -668,7 +683,7 @@ verified checkpoint, not at every tool call.
   is a documentation-only increment prepared on its own task branch for review,
   not a merge.
 - **Next, from the audit ranking:** re-audit the section 5 blockers before
-  treating any as final, and keep reducing the 58 planned B6 screens in
+  treating any as final, and keep reducing the 57 planned B6 screens in
   coherent, player-facing families — the six families in PRs #51–#55 and #57 are
   the latest, and the screens that need Zynga's art stay planned behind the licence
   gate. The gender/character-setup choice also stays planned: the save has no
