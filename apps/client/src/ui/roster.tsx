@@ -18,6 +18,7 @@ import { chooseArmyCount, initialArmySelection } from '@swl/client';
 import type { Army } from '@swl/rules';
 
 import type { RosterPanelView, RosterUnitView, UnitXpView } from './state.ts';
+import { UnitPortrait, ownedPortrait } from './unitportraits.tsx';
 
 /** The callbacks the host publishes for this family. */
 export interface RosterHost {
@@ -161,38 +162,50 @@ export function RosterPanel({
             <p className="swl-roster-note">No units are available in your army.</p>
           ) : (
             <ul className="swl-roster-units" data-swl-roster-units="">
-              {view.units.map((unit) => (
-                <li className="swl-roster-unit" key={unit.itemId} data-swl-unit={unit.itemId}>
-                  <button
-                    type="button"
-                    className={
-                      cardUnit?.itemId === unit.itemId
-                        ? 'swl-roster-inspect swl-roster-inspect-active'
-                        : 'swl-roster-inspect'
-                    }
-                    aria-pressed={cardUnit?.itemId === unit.itemId}
-                    onClick={() => setInspected(unit.itemId)}
-                  >
-                    <span className="swl-roster-unit-name">{unit.name}</span>
-                    <span className="swl-roster-unit-qty">×{unit.available}</span>
-                    <span className="swl-roster-unit-level">
-                      {unit.level > 0 ? '★'.repeat(unit.level) : '—'}
-                    </span>
-                  </button>
-                  <input
-                    type="number"
-                    min={0}
-                    max={unit.available}
-                    value={counts[unit.itemId] ?? 0}
-                    disabled={!unit.allowed || view.teamAccepted}
-                    aria-label={`${unit.name} team count`}
-                    onChange={(event) => choose(unit, Number(event.target.value))}
-                  />
-                  {unit.allowed ? null : (
-                    <span className="swl-roster-note">not allowed</span>
-                  )}
-                </li>
-              ))}
+              {view.units.map((unit) => {
+                const portrait = ownedPortrait({
+                  itemId: unit.itemId,
+                  name: unit.name,
+                  count: unit.available,
+                });
+                return (
+                  <li className="swl-roster-unit" key={unit.itemId} data-swl-unit={unit.itemId}>
+                    {portrait ? (
+                      <span className="swl-roster-unit-portrait">
+                        <UnitPortrait view={portrait} />
+                      </span>
+                    ) : null}
+                    <button
+                      type="button"
+                      className={
+                        cardUnit?.itemId === unit.itemId
+                          ? 'swl-roster-inspect swl-roster-inspect-active'
+                          : 'swl-roster-inspect'
+                      }
+                      aria-pressed={cardUnit?.itemId === unit.itemId}
+                      onClick={() => setInspected(unit.itemId)}
+                    >
+                      <span className="swl-roster-unit-name">{unit.name}</span>
+                      <span className="swl-roster-unit-qty">×{unit.available}</span>
+                      <span className="swl-roster-unit-level">
+                        {unit.level > 0 ? '★'.repeat(unit.level) : '—'}
+                      </span>
+                    </button>
+                    <input
+                      type="number"
+                      min={0}
+                      max={unit.available}
+                      value={counts[unit.itemId] ?? 0}
+                      disabled={!unit.allowed || view.teamAccepted}
+                      aria-label={`${unit.name} team count`}
+                      onChange={(event) => choose(unit, Number(event.target.value))}
+                    />
+                    {unit.allowed ? null : (
+                      <span className="swl-roster-note">not allowed</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )}
           <TeamStrip view={view} />
