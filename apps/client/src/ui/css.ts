@@ -2659,5 +2659,102 @@ export function uiCss(): string {
   background: #223047;
   color: var(--swl-ink);
 }
+
+/* --- The extended portrait popup, icon panel and assault portraits -------- */
+
+/* All three shells draw only server-owned values. Every mark is original
+   inline SVG geometry, so no art asset or image reference is needed here. */
+.swl-portrait-icons {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.swl-portrait-icon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 2px 4px;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  background: var(--swl-surface-raised);
+}
+
+.swl-portrait-icon-glyph { width: 18px; height: 18px; flex: 0 0 18px; }
+.swl-portrait-icon-label {
+  overflow: hidden;
+  color: var(--swl-ink-muted);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.swl-portrait-icon-amount {
+  margin-left: auto;
+  color: var(--swl-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.swl-portrait-icons-empty,
+.swl-portrait-launcher-empty,
+.swl-assault-portraits-empty {
+  margin: 4px 0;
+  color: var(--swl-ink-muted);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-ui button.swl-portrait-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+  padding: 3px 8px 3px 3px;
+  border: 1px solid var(--swl-accent);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+  color: var(--swl-ink);
+}
+.swl-ui button.swl-portrait-launcher:disabled {
+  border-color: var(--swl-border);
+  color: var(--swl-ink-muted);
+  cursor: not-allowed;
+}
+.swl-portrait-figure { width: 32px; height: 40px; flex: 0 0 32px; }
+.swl-portrait-launcher-name { font-weight: 700; }
+.swl-portrait-launcher-count { color: var(--swl-accent); font-variant-numeric: tabular-nums; }
+
+.swl-portrait-popup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.swl-portrait-popup .swl-portrait-figure { width: 72px; height: 88px; flex: 0 0 72px; }
+.swl-portrait-popup-name { margin: 0; font-weight: 700; }
+.swl-portrait-popup-count,
+.swl-portrait-popup-level,
+.swl-portrait-popup-note { margin: 0; color: var(--swl-ink-muted); }
+
+.swl-assault-portraits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+.swl-assault-portrait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+.swl-assault-portrait-excluded { opacity: 0.55; }
+.swl-assault-portrait-name { font-size: calc(10px * var(--swl-font-scale-body, 1)); }
+.swl-assault-portrait-count { color: var(--swl-accent); font-variant-numeric: tabular-nums; }
 `.trim();
 }

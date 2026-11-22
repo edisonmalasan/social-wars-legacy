@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 167,
+      implemented: 170,
       dropped: 52,
-      planned: 41,
+      planned: 38,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -523,18 +523,6 @@ describe('the roster, team-thumbnail and unit-XP screen family decisions', () =>
     assert.match(screen!.decisionNote, /`packages\/client\/src\/army\.ts`/);
   });
 
-  it('leaves the assault portrait planned', async () => {
-    // Its only remaining content is Zynga's portrait artwork: the clone
-    // draws text rows and state, so flipping this would claim art it does
-    // not render and model no new behaviour. PortraitTrainQueue is no
-    // longer in this guard — the unitportraits panel now draws its states.
-    const all = await screens();
-    const path = 'GUI/PortraitAssault.as';
-    const screen = all.find((entry) => entry.path === path);
-    assert.ok(screen, `${path} is not in the inventory`);
-    assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
-    assert.match(screen!.decisionNote, /licensed|portraits/i);
-  });
 });
 
 describe('the reusable UI-chrome screen family decisions', () => {
@@ -1045,6 +1033,62 @@ describe('the resource-button and icon-chrome screen family decisions', () => {
   it('leaves the art-only and ADR 20 screens alone', async () => {
     const all = await screens();
     for (const path of [
+      'PopupMarketMC.as',
+      'PopupMarketplaceAsset.as',
+      'popups/marketplace/PopupMarketplace.as',
+    ]) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.notEqual(screen!.decision, 'implemented', `${path} was reclassified`);
+    }
+  });
+});
+
+describe('the final three class-A portrait and icon screens', () => {
+  // These are the last three deferrals with real presentation behind them.
+  // The button needs a portrait-backed popup host, the icon panel is a layout
+  // primitive for hosts already drawn, and the assault portrait belongs to the
+  // assault roster already drawn. Only the server's army, wallet and assault
+  // receipt are read; the original's proprietary art stays excluded and the
+  // new shells use original inline SVG geometry only.
+  const RECLASSIFIED = [
+    'GUI/ExtendedPortraitPopupButton.as',
+    'GUI/IconPanel.as',
+    'GUI/PortraitAssault.as',
+  ];
+
+  it('records each rendered screen as implemented against the new shells', async () => {
+    const all = await screens();
+    for (const path of RECLASSIFIED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/portraitshells\.tsx`/);
+      assert.match(screen!.decisionNote, /server/i);
+      assert.match(screen!.decisionNote, /art/i);
+    }
+  });
+
+  it('names the server-owned state each shell reads', async () => {
+    const all = await screens();
+    const button = all.find(
+      (entry) => entry.path === 'GUI/ExtendedPortraitPopupButton.as',
+    )!;
+    assert.match(button.decisionNote, /army roster/i);
+    assert.match(button.decisionNote, /shared dialog/i);
+    const icons = all.find((entry) => entry.path === 'GUI/IconPanel.as')!;
+    assert.match(icons.decisionNote, /resource wallet/i);
+    assert.match(icons.decisionNote, /wire order/i);
+    const assault = all.find((entry) => entry.path === 'GUI/PortraitAssault.as')!;
+    assert.match(assault.decisionNote, /assault receipt/i);
+    assert.match(assault.decisionNote, /assault\.tsx/);
+  });
+
+  it('leaves the art-only portrait shells and ADR 20 screens alone', async () => {
+    const all = await screens();
+    for (const path of [
+      'GUI/ExtendedPortraitPopupButtonEmbeded.as',
+      'PopupBreedingMC.as',
       'PopupMarketMC.as',
       'PopupMarketplaceAsset.as',
       'popups/marketplace/PopupMarketplace.as',

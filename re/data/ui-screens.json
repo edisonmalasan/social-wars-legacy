@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 167,
+   "implemented": 170,
    "dropped": 52,
-   "planned": 41
+   "planned": 38
   }
  },
  "screens": [
@@ -474,8 +474,8 @@
    ],
    "overrides": [],
    "bytes": 1070,
-   "decision": "planned",
-   "decisionNote": "Deferred: the extended portrait button has no loadImage or click wiring in the clone; unblock when a portrait-backed popup is modelled and the artwork is available."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/portraitshells.tsx` draws the extended portrait popup button from the server-owned army roster and the rules' unit level, bridged by `apps/client/src/ui/state.ts`, and hosts its portrait-backed body in the one shared dialog. The click is a UI-only gesture: no portrait, name, count or level is invented and no command is added. The original's proprietary Zynga portrait art stays excluded; only original inline SVG geometry is drawn."
   },
   {
    "class": "ExtendedPortraitPopupButtonEmbeded",
@@ -680,8 +680,8 @@
    ],
    "overrides": [],
    "bytes": 6501,
-   "decision": "planned",
-   "decisionNote": "Deferred: the icon panel has no addIcon/removeIcon layout or tooltip-offset model in the client; unblock when a panel uses it and the icons are licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/portraitshells.tsx` draws the icon-panel layout primitive from the server's eight-slot resource wallet in the verified wire order, with original inline SVG marks and the client's own column count. Missing or malformed wallet slots are omitted rather than given a client-side amount; no command or trade is added. The original's proprietary icon art stays excluded."
   },
   {
    "class": "InfoPopup",
@@ -895,8 +895,8 @@
    ],
    "overrides": [],
    "bytes": 1337,
-   "decision": "planned",
-   "decisionNote": "Deferred: the assault portrait has no rendered UpdateImage/loadImage counterpart; unblock when an assault roster is drawn and the portraits are licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/portraitshells.tsx` draws the assault portraits from the server-owned army and last assault receipt, alongside the assault result panel in `apps/client/src/ui/assault.tsx`. The win/loss mark and opponent are read from the server's answer; an unsettled or absent receipt draws no invented outcome. The proprietary portrait art stays excluded; only original inline SVG geometry is drawn."
   },
   {
    "class": "PortraitSpecialAttack",
