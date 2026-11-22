@@ -20,7 +20,6 @@ import {
   bonusPanel,
   hudState,
   levelOf,
-  storePacks,
   questChoices,
   type DialogState,
   type FeedbackMessage,
@@ -90,6 +89,7 @@ import {
   researchPanel,
   ROSTER_DIALOG_ID,
   rosterPanel,
+  storeItemsPanel,
   unitInfoPanel,
   type AtomFusionPanelView,
   type ResearchPanelView,
@@ -216,10 +216,11 @@ export function Root({
     () => bonusPanel(world, now, tzOffsetHours),
     [world, now, tzOffsetHours],
   );
-  const store = useMemo(
-    () => storePacks(bundle.offerPacks ?? [], state.cash),
-    [bundle, state.cash],
-  );
+  // The store front is a reading of the content's offer packs and the
+  // server's cash. The bridge keeps no price or grant of its own: a missing
+  // content row or wallet becomes an explicit empty state, and every buy
+  // gesture is handed to the one command transport.
+  const storeView = useMemo(() => storeItemsPanel(bundle, world), [bundle, world]);
   const items = useMemo(() => buildItems(bundle), [bundle]);
   const tabs = useMemo(() => categories(bundle), [bundle]);
   const placingName = useMemo(() => {
@@ -353,7 +354,7 @@ export function Root({
         onOpenProduction={onOpenProduction}
       />
       <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
-      <Store packs={store} onCommand={onCommand} />
+      <Store view={storeView} onCommand={onCommand} />
       <MysteryLauncher bundle={bundle} />
       <SoulMixerLauncher />
       <FusionLauncher />

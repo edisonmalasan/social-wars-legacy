@@ -88,6 +88,8 @@ import {
   productionState,
   resourcePanel,
   storedItems,
+  storePacks,
+  type StorePackView,
   tradeResource,
   trainingView,
   unitPanel,
@@ -3410,4 +3412,114 @@ export function marketPanel(bundle: ContentBundle, world: WorldSnapshot): Market
 /** The player's market uses the one dialog's single slot, like every panel. */
 export function marketDialog(): DialogContent {
   return { id: 'market-panel', kind: 'alert', title: MARKET_TITLE };
+}
+
+/* -------------------------------------------------------------------------
+ * The store front's item-button chrome
+ *
+ * `StoreMC.as`, `GUI/ItemButtonLarge.as` and `GUI/ItemButtonLargeResources.as`
+ * present the offer packs the content publishes. Their names, prices and
+ * declared amounts are the **content's**; affordability is a reading of the
+ * server's cash and nothing else. This bridge never grants, prices or rolls
+ * anything: the only gesture is the catalogue's `buy_offer_pack`, built by the
+ * client model. Absent or malformed content or wallet fields render explicit
+ * empty states rather than a fabricated zero or a made-up pack.
+ *
+ * The original's Tower/Wall/Depot limit warnings are deliberately not drawn:
+ * the store owns no server-published limit, so claiming one would invent a
+ * rule the server does not have.
+ * ---------------------------------------------------------------------- */
+
+/** The client's own captions on `GUI/ItemButtonLarge.as`. */
+export const STORE_LIMITED_OFFER = 'Limited Offer';
+export const STORE_EARNINGS = 'EARNINGS:';
+export const STORE_BUY_FOR = 'BUY FOR:';
+
+/** Explicit empty states, shown instead of a fabricated number or pack. */
+export const STORE_NO_PACKS = 'The content bundle lists no offer packs.';
+export const STORE_NO_WALLET = 'The server has not published a cash balance yet.';
+
+/** The resource columns a content pack may declare, read verbatim. */
+const STORE_CONTENT_COLUMNS = ['gold', 'wood', 'oil', 'steel', 'mana', 'xp'] as const;
+
+/** One content-declared amount, shown as text and never granted by the client. */
+export interface StoreItemContentRow {
+  /** The content column's name. */
+  readonly key: string;
+  /** The content's own number, verbatim. */
+  readonly amount: number;
+}
+
+/** An offer pack as the item-button chrome draws it. */
+export interface StoreItemPackView extends StorePackView {
+  /** The pack's content-declared amounts, display only. */
+  readonly contents: readonly StoreItemContentRow[];
+}
+
+/** The body the store front draws. */
+export interface StoreItemsPanelView {
+  /** The server's cash, verbatim; null when absent or malformed. */
+  readonly cash: number | null;
+  /** The packs drawn from content, with affordability from the server's cash. */
+  readonly packs: readonly StoreItemPackView[];
+  /** The client's own captions, never game state. */
+  readonly limitedOffer: string;
+  readonly earnings: string;
+  readonly buyFor: string;
+  /** Explicit reasons a section is empty, never a placeholder number. */
+  readonly emptyMessages: readonly string[];
+}
+
+/** Read the finite, positive amounts a content row declares for one pack id. */
+function storeContents(raw: readonly unknown[], id: number): StoreItemContentRow[] {
+  for (const entry of raw) {
+    const row = recordOrNull(entry);
+    if (!row || row['id'] !== id) continue;
+    const contents: StoreItemContentRow[] = [];
+    for (const key of STORE_CONTENT_COLUMNS) {
+      const amount = finite(row[key]);
+      if (amount !== null && amount > 0) contents.push({ key, amount });
+    }
+    return contents;
+  }
+  return [];
+}
+
+/**
+ * Read the store front from the server's wallet and the content's offer packs.
+ *
+ * `storePacks` prices and shapes the packs from the content; this bridge only
+ * checks that the cash is a real server number and that the content really
+ * lists packs, then adds the content's declared amounts for display. Without
+ * either source it returns an explicit empty state and no buy button at all.
+ */
+export function storeItemsPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+): StoreItemsPanelView {
+  const rawCash = finite(world.resources?.['c']);
+  // A negative balance is not a balance the server could have published.
+  const cash = rawCash !== null && rawCash >= 0 ? rawCash : null;
+  const raw = bundle.offerPacks;
+  const rows: readonly unknown[] = Array.isArray(raw) ? raw : [];
+  const packs: StoreItemPackView[] =
+    cash === null || rows.length === 0
+      ? []
+      : storePacks(rows, cash).map((pack) => ({
+          ...pack,
+          contents: storeContents(rows, pack.id),
+        }));
+
+  const emptyMessages: string[] = [];
+  if (rows.length === 0) emptyMessages.push(STORE_NO_PACKS);
+  if (cash === null) emptyMessages.push(STORE_NO_WALLET);
+
+  return {
+    cash,
+    packs,
+    limitedOffer: STORE_LIMITED_OFFER,
+    earnings: STORE_EARNINGS,
+    buyFor: STORE_BUY_FOR,
+    emptyMessages,
+  };
 }
