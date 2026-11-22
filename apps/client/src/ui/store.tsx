@@ -2,16 +2,21 @@
  * The store panel.
  *
  * The packs, their prices and the buy requests are the model's
- * (`packages/client/src/store.ts`), which reads the content and the player's
- * cash. This file only draws them. A click sends a request; the server owns
- * the price, the roll and the reward, and its answer is drawn as feedback.
+ * (`packages/client/src/store.ts`), bridged by `apps/client/src/ui/state.ts`
+ * from the content and the server's cash. This file is the disclosure shell;
+ * the item buttons and all their art are drawn by `storeitems.tsx`. A click
+ * sends a request through the one command transport; the server owns the
+ * price, the roll and the reward, and its answer is drawn as feedback.
  */
-import type { NativeCommand, StorePackView } from '@swl/client';
+import type { NativeCommand } from '@swl/client';
+
+import type { StoreItemsPanelView } from './state.ts';
+import { StoreItems } from './storeitems.tsx';
 
 /** The store panel's props. */
 export interface StoreProps {
-  /** The packs the client may offer, from the content and the wallet. */
-  readonly packs: readonly StorePackView[];
+  /** The store front, read from the content and the server's wallet. */
+  readonly view: StoreItemsPanelView;
   /** Send the purchase through the client's one command transport. */
   readonly onCommand?: (command: NativeCommand) => void;
 }
@@ -22,43 +27,14 @@ export interface StoreProps {
  * The original's store is a movieclip behind a button; the clone's is a
  * labelled disclosure so it stays out of the way of play. Unaffordable tiers
  * are shown but disabled, so the player can see what the next pack costs.
+ * An empty bundle or wallet is drawn as an explicit empty state rather than
+ * hiding the panel, so the store never claims packs it cannot read.
  */
-export function Store({ packs, onCommand }: StoreProps): React.JSX.Element | null {
-  if (packs.length === 0) return null;
+export function Store({ view, onCommand }: StoreProps): React.JSX.Element {
   return (
     <details className="swl-store">
-      <summary className="swl-store-summary">Store · {packs.length} packs</summary>
-      <div className="swl-store-packs">
-        {packs.map((pack) => (
-          <div className="swl-store-pack" key={pack.id} data-swl-pack={pack.id}>
-            <div className="swl-store-pack-name">{pack.name}</div>
-            {pack.shape === 'super' ? (
-              <div className="swl-store-tiers">
-                {pack.tiers.map((tier) => (
-                  <button
-                    key={tier.count}
-                    type="button"
-                    className="swl-store-buy"
-                    disabled={!tier.affordable}
-                    onClick={() => onCommand?.(tier.command)}
-                  >
-                    {tier.count} item{tier.count === 1 ? '' : 's'} · {tier.price} cash
-                  </button>
-                ))}
-              </div>
-            ) : pack.command ? (
-              <button
-                type="button"
-                className="swl-store-buy"
-                disabled={!pack.affordable}
-                onClick={() => onCommand?.(pack.command!)}
-              >
-                {pack.price} cash
-              </button>
-            ) : null}
-          </div>
-        ))}
-      </div>
+      <summary className="swl-store-summary">Store · {view.packs.length} packs</summary>
+      <StoreItems view={view} onCommand={onCommand} />
     </details>
   );
 }

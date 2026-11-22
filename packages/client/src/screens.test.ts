@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 156,
+      implemented: 159,
       dropped: 52,
-      planned: 52,
+      planned: 49,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -912,6 +912,54 @@ describe('the player-owned resource market screen family decisions', () => {
   });
 
   it('leaves the ADR 20 marketplaces and the art-only market shells alone', async () => {
+    const all = await screens();
+    for (const path of [
+      'PopupMarketMC.as',
+      'PopupMarketplaceAsset.as',
+      'popups/marketplace/PopupMarketplace.as',
+    ]) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.notEqual(screen!.decision, 'implemented', `${path} was reclassified`);
+    }
+  });
+});
+
+describe('the store item-button screen family decisions', () => {
+  // These three deferrals had no rendered store front. They are reclassified
+  // only because a real panel now draws the item-button chrome from the
+  // content's offer packs and the server's cash, with original art only. The
+  // purchase gesture is the catalogue's buy_offer_pack; no limit warning is
+  // drawn because the store has no server-owned limit to read.
+  const STORE_SCREENS = [
+    'StoreMC.as',
+    'GUI/ItemButtonLarge.as',
+    'GUI/ItemButtonLargeResources.as',
+  ];
+
+  it('records each rendered screen as implemented against the store-item front', async () => {
+    const all = await screens();
+    for (const path of STORE_SCREENS) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/storeitems\.tsx`/);
+      assert.match(screen!.decisionNote, /art/i);
+    }
+  });
+
+  it('says the only purchase gesture is buy_offer_pack and no limit is claimed', async () => {
+    const all = await screens();
+    const large = all.find((entry) => entry.path === 'GUI/ItemButtonLarge.as');
+    assert.ok(large);
+    assert.match(large!.decisionNote, /buy_offer_pack/);
+    assert.match(large!.decisionNote, /server-owned limit/i);
+    const resources = all.find((entry) => entry.path === 'GUI/ItemButtonLargeResources.as');
+    assert.ok(resources);
+    assert.match(resources!.decisionNote, /server's cash/i);
+  });
+
+  it('leaves the ADR 20 marketplaces and the art-only shells alone', async () => {
     const all = await screens();
     for (const path of [
       'PopupMarketMC.as',

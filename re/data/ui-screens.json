@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 156,
+   "implemented": 159,
    "dropped": 52,
-   "planned": 52
+   "planned": 49
   }
  },
  "screens": [
@@ -757,8 +757,8 @@
    ],
    "overrides": [],
    "bytes": 18467,
-   "decision": "planned",
-   "decisionNote": "Deferred: the large item button's Limited Offer / EARNINGS / BUY FOR text and overUnlock/outUnlock hover states are not rendered; unblock when a store panel is modelled and the art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/storeitems.tsx` draws the large item button's Limited Offer / EARNINGS / BUY FOR captions around the content's own name, price and declared amounts, with original inline SVG geometry and no copied art. Its controls send only the catalogue's `buy_offer_pack` through the one command transport; no price, roll, reward or server-owned limit is computed or drawn."
   },
   {
    "class": "ItemButtonLargeExpand2",
@@ -800,8 +800,8 @@
    ],
    "overrides": [],
    "bytes": 5529,
-   "decision": "planned",
-   "decisionNote": "Deferred: the resource variant of the large item button has no rendered model; unblock when a resource purchase panel is modelled and the button art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/storeitems.tsx` draws the resource variant's button from the offer pack's content-declared gold, wood, oil, steel, mana and xp amounts as display-only text with original inline SVG marks; affordability comes from the server's cash and the only gesture is `buy_offer_pack` through the one command transport. The proprietary button art stays excluded."
   },
   {
    "class": "MagicEntry",
@@ -3620,8 +3620,8 @@
    ],
    "overrides": [],
    "bytes": 892,
-   "decision": "planned",
-   "decisionNote": "Deferred: the store movieclip has no rendered model; unblock when a store front is drawn from content and the button art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/storeitems.tsx` draws the store front's item-button chrome from the offer packs the content publishes, with the server's cash deciding affordability and original inline SVG art only; a missing bundle or wallet renders an explicit empty state. The proprietary movieclip art stays excluded; only the presentation is claimed."
   },
   {
    "class": null,

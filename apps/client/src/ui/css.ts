@@ -2504,5 +2504,65 @@ export function uiCss(): string {
 .swl-ui button.swl-market-sell { border-color: var(--swl-accent); color: var(--swl-accent); }
 .swl-market-footer { justify-content: flex-end; }
 .swl-ui button.swl-market-close { padding: 4px 12px; border-color: var(--swl-accent); }
+
+/* --- The store's item-button chrome ------------------------------------ */
+/* Original inline geometry only: no image files and no copied artwork. */
+.swl-store-items { display: flex; flex-direction: column; gap: var(--swl-gap); }
+.swl-store-cash { margin: 0; color: var(--swl-ink-muted); }
+.swl-store-cash [data-swl-server] { color: var(--swl-accent); font-weight: 700; }
+
+.swl-store-empty {
+  display: flex;
+  align-items: center;
+  gap: var(--swl-gap);
+  padding: var(--swl-gap);
+  border: 1px dashed var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+.swl-store-empty-list { margin: 0; padding-left: 16px; color: var(--swl-ink-muted); }
+.swl-store-art-empty { width: 56px; height: 42px; flex: 0 0 56px; }
+
+.swl-store-item-list { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.swl-store-item {
+  display: flex;
+  gap: var(--swl-gap);
+  padding: 6px;
+  border: 1px solid #4a6a8a;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #223047, #1d2430);
+}
+.swl-store-art-badge { width: 40px; height: 40px; flex: 0 0 40px; }
+.swl-store-item-main { flex: 1; min-width: 0; }
+.swl-store-item-name { margin: 0; color: var(--swl-ink); font-weight: 700; }
+.swl-store-item-flag {
+  margin-left: 6px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: #f5c542;
+  color: #1d2430;
+  font-size: calc(9px * var(--swl-font-scale-body, 1));
+}
+.swl-store-item-contents { margin: 2px 0 4px; color: var(--swl-ink-muted); }
+.swl-store-item-content-note { color: #8d97a8; font-style: italic; }
+.swl-store-item-tiers { display: flex; flex-wrap: wrap; gap: 4px; }
+.swl-store-art-cash { width: 16px; height: 16px; flex: 0 0 16px; vertical-align: middle; }
+.swl-ui button.swl-store-item-buy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: var(--swl-ink);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+.swl-ui button.swl-store-item-buy:disabled {
+  border-color: var(--swl-border);
+  background: #1d2430;
+  color: #5c6678;
+  cursor: not-allowed;
+}
 `.trim();
 }
