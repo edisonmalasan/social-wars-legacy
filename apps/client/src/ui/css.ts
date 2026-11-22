@@ -1011,6 +1011,48 @@ export function uiCss(): string {
   cursor: not-allowed;
 }
 
+/* --- The soul-mixer help and turbine ----------------------------------- */
+
+.swl-ui button.swl-soulmixer-launch {
+  position: absolute;
+  right: 8px;
+  bottom: 106px;
+  padding: 3px 6px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: #f2e6c8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  pointer-events: auto;
+}
+
+.swl-soulmixer-help {
+  margin: 4px 0 8px;
+  color: var(--swl-ink-muted);
+  white-space: pre-line;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-soulmixer-turbina {
+  margin: 6px 0;
+  padding: 6px 8px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: rgba(16, 21, 29, 0.92);
+}
+
+.swl-soulmixer-turbina-label { margin: 0; color: #f5c542; font-weight: 700; }
+.swl-soulmixer-turbina-state { margin: 2px 0 0; color: #f2e6c8; }
+.swl-soulmixer-turbina-empty { margin: 2px 0 0; color: var(--swl-ink-muted); font-style: italic; }
+
+.swl-ui button.swl-soulmixer-close {
+  padding: 4px 8px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: #f2e6c8;
+}
+
 /* --- The Research LAB --------------------------------------------------- */
 
 .swl-magiclab {

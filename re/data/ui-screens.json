@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 147,
+   "implemented": 150,
    "dropped": 52,
-   "planned": 61
+   "planned": 58
   }
  },
  "screens": [
@@ -3452,8 +3452,8 @@
    ],
    "overrides": [],
    "bytes": 450,
-   "decision": "planned",
-   "decisionNote": "Deferred: the soul mixer's help is in scope; its rules are not modelled yet, so no help panel can be drawn."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the soul-mixer help panel (`apps/client/src/ui/soulmixerhelp.tsx`) draws the four recovered steps verbatim in the one shared dialog; the original's MovieClip artwork stays excluded. The fusion rule remains the blocker — buy_powerups/soulmixer_speedup have no applier case, the output-item rule is unrecovered and soulmixer_speedup is unpriced."
   },
   {
    "class": null,
@@ -5444,8 +5444,8 @@
    ],
    "overrides": [],
    "bytes": 1303,
-   "decision": "planned",
-   "decisionNote": "Deferred: the soul mixer's help is in scope; its rules are not modelled yet, so no help panel can be drawn."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the help panel (`apps/client/src/ui/soulmixerhelp.tsx`) draws this popup's four-step literal verbatim in the one shared dialog. The static copy is now drawn; the fusion rule is still the blocker — buy_powerups/soulmixer_speedup have no applier case, the output-item rule is unrecovered and soulmixer_speedup is unpriced, so the POWERUP/SPEEDUP words are help text, not working gestures."
   },
   {
    "class": "PopupSuperMistery",
@@ -5648,8 +5648,8 @@
    ],
    "overrides": [],
    "bytes": 4025,
-   "decision": "planned",
-   "decisionNote": "Deferred: the soul mixer's turbine is in scope; its rules are not modelled yet, so the panel cannot be drawn."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the turbine display (`apps/client/src/ui/soulmixerhelp.tsx`) presents the server's own timer/state when the world publishes one and otherwise a clearly labelled placeholder — it never computes or fabricates a countdown. No Speedup gesture is offered: soulmixer_speedup has no applier case and is unpriced."
   },
   {
    "class": "AllianceInfoRendererItem",
