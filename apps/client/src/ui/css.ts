@@ -946,6 +946,71 @@ export function uiCss(): string {
   cursor: not-allowed;
 }
 
+/* --- The mystery-box popups -------------------------------------------- */
+
+.swl-mystery-launcher {
+  position: absolute;
+  right: 8px;
+  bottom: 132px;
+  max-width: 320px;
+  padding: 4px 8px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: rgba(16, 21, 29, 0.92);
+  color: #f2e6c8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  pointer-events: auto;
+}
+
+.swl-mystery-launcher-summary { cursor: pointer; color: #f5c542; font-weight: 700; }
+.swl-mystery-launcher-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+
+.swl-ui button.swl-mystery-launch {
+  padding: 3px 6px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: #f2e6c8;
+}
+
+.swl-ui button.swl-mystery-launch:disabled {
+  border-color: #38445a;
+  background: #1d2430;
+  color: #5c6678;
+  cursor: not-allowed;
+}
+
+.swl-mystery-title,
+.swl-mystery-win { font-weight: 700; color: #f5c542; margin: 2px 0; }
+.swl-mystery-prompt,
+.swl-mystery-storage { margin: 2px 0; color: var(--swl-ink-muted); white-space: pre-line; }
+.swl-mystery-banner,
+.swl-mystery-week { margin: 4px 0; color: #f2e6c8; white-space: pre-line; }
+.swl-mystery-rows { display: flex; flex-direction: column; gap: 4px; margin: 6px 0; }
+.swl-mystery-row { display: flex; gap: 6px; align-items: baseline; }
+.swl-mystery-rarity { color: #f5c542; min-width: 64px; }
+.swl-mystery-candidates { display: flex; flex-wrap: wrap; gap: 6px; }
+.swl-mystery-won { margin: 6px 0; padding-left: 18px; }
+.swl-mystery-price { color: #a9d7ff; margin: 2px 0; }
+.swl-mystery-unavailable { color: var(--swl-ink-muted); font-style: italic; }
+
+.swl-ui button.swl-mystery-buy,
+.swl-ui button.swl-mystery-ok {
+  padding: 4px 8px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: #f2e6c8;
+  margin: 2px 4px 0 0;
+}
+
+.swl-ui button.swl-mystery-buy:disabled {
+  border-color: #38445a;
+  background: #1d2430;
+  color: #5c6678;
+  cursor: not-allowed;
+}
+
 /* --- The Research LAB --------------------------------------------------- */
 
 .swl-magiclab {

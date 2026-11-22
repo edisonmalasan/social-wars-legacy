@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 143,
+      implemented: 147,
       dropped: 52,
-      planned: 65,
+      planned: 61,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -732,5 +732,44 @@ describe('the inventory-cell and info-popup screen family decisions', () => {
     assert.ok(popup);
     assert.equal(popup!.decision, 'planned');
     assert.match(popup!.decisionNote, /late-era progression/i);
+  });
+});
+
+describe('the mystery-box screen family decisions', () => {
+  // These four deferrals said the boxes' rules were not modelled. They are
+  // reclassified only because the one dialog now really draws both screens:
+  // pack 4's four candidates and a super pack's three rarity rows and tiers
+  // come from the content, the literals are the client's own, and the result
+  // is read from the store the server granted into — never rolled locally.
+  const RECLASSIFIED = [
+    'PopupMisteryMC.as',
+    'popups/PopupMistery.as',
+    'PopupSuperMisteryBoxMC.as',
+    'popups/PopupSuperMistery.as',
+  ];
+
+  it('records each rendered screen as implemented against the box panel', async () => {
+    const all = await screens();
+    for (const path of RECLASSIFIED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/mystery\.tsx`/);
+      assert.match(screen!.decisionNote, /server|store/i);
+      assert.match(screen!.decisionNote, /art/i);
+    }
+  });
+
+  it('leaves the unrelated screens with no modelled behaviour planned', async () => {
+    // Flipping a deferral must not become a general amnesty: these remain
+    // planned because no authoritative answer or modelled gesture exists.
+    const LEFT_PLANNED = ['popups/PopUpLost.as', 'PopupResearchCenterMC.as'];
+    const all = await screens();
+    for (const path of LEFT_PLANNED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
+      assert.match(screen!.decisionNote, /^Deferred: /);
+    }
   });
 });

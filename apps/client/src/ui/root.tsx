@@ -52,6 +52,7 @@ import { Hud } from './hud.tsx';
 import { InfoPanel, ProductionSelector, PRODUCTION_DIALOG_ID } from './info.tsx';
 import { Inventory } from './inventory.tsx';
 import { MagicLab } from './magiclab.tsx';
+import { MysteryLauncher, MysteryPanel, useMystery } from './mystery.tsx';
 import { Neighbours } from './neighbours.tsx';
 import { OnboardingLauncher, OnboardingPanel, useOnboarding } from './onboarding.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
@@ -199,6 +200,7 @@ export function Root({
   const onboarding = useOnboarding();
   const chrome = useChrome();
   const roster = useRoster();
+  const mystery = useMystery();
   const state = hudState(hudInput(bundle, world));
   const bonus = useMemo(
     () => bonusPanel(world, now, tzOffsetHours),
@@ -317,6 +319,7 @@ export function Root({
       />
       <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
       <Store packs={store} onCommand={onCommand} />
+      <MysteryLauncher bundle={bundle} />
       <MagicLab bundle={bundle} world={world} onCommand={onCommand} />
       <SpellBook bundle={bundle} world={world} onCommand={onCommand} />
       <Neighbours neighbours={neighbours} />
@@ -327,7 +330,7 @@ export function Root({
         state={dialog ?? CLOSED_DIALOG}
         onDismiss={onDialogDismiss ?? (() => {})}
       >
-        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
+        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
             key={
               questPanel.kind === 'briefing'
@@ -374,6 +377,14 @@ export function Root({
             panel={characterSetupPanel}
             onCommand={onCommand}
             onCancel={onDialogDismiss ?? (() => {})}
+          />
+        ) : null}
+        {!onboarding.view && dialogId?.startsWith('mystery-') ? (
+          <MysteryPanel
+            key={`mystery:${dialogId}`}
+            view={mystery.view}
+            result={mystery.result}
+            onClose={onDialogDismiss ?? (() => {})}
           />
         ) : null}
         {onboarding.view ? (

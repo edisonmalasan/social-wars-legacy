@@ -49,6 +49,7 @@ import {
   assaultCountdown,
   assaultHistory,
   battleOptions,
+  buyOfferPack,
   briefingView,
   buildingInfoView,
   buildTabs,
@@ -86,7 +87,13 @@ import {
   maxLevel,
   parseXpTable,
   xpForLevel,
+  isOfferPackAvailable,
+  offerPackCandidates,
+  offerPackPrice,
+  offerPackShape,
+  offerPackTierForCount,
   type Army,
+  type OfferPackData,
   type XpLevelRow,
 } from '@swl/rules';
 
@@ -2343,4 +2350,355 @@ export function repositionInfoPopup(
       ? below
       : Math.max(gap, anchor.y - height - gap);
   return { x: Math.round(x), y: Math.round(y) };
+}
+
+/* -------------------------------------------------------------------------
+ * The mystery boxes
+ *
+ * `popups/PopupMistery.as` is the display for pack 4, the random pack: its
+ * four content candidates are labelled Rare / Uncommon / Common / Common in
+ * the original. `popups/PopupSuperMistery.as` is the display for a super pack:
+ * the content's three rarity rows and its three priced tiers (see
+ * `re/docs/03-commands-quests-economy.md`, §2.15). Both screens only **ask**
+ * the server to buy a pack: `packages/rules/src/offerpacks.ts` decides the
+ * shape, tier and price, and `buyOfferPackCommand` rolls the reward from a
+ * server seed and grants it into the store.
+ *
+ * This bridge reads the content to show what *could* be won and reads the
+ * store in the server's answer to show what *was* won. It never rolls,
+ * prices or grants anything itself, and the original's box art stays out.
+ * ---------------------------------------------------------------------- */
+
+/** The client's own literals on the two box popups. */
+export const MYSTERY_TITLE = 'Mistery Box Pack';
+export const MYSTERY_PROMPT = 'You can get one of the following!\nTest your luck!';
+export const SUPER_TITLE = 'Super Mistery Box Pack';
+export const SUPER_VALUE = 'BEST\nVALUE & RARE UNIT GUARANTEED';
+export const SUPER_ONLY_THIS_WEEK = 'ONLY\nTHIS WEEK';
+export const SUPER_STORAGE = 'You will find your prizes in your storage!';
+export const MYSTERY_CONGRATULATIONS = 'CONGRATULATIONS!, You won:';
+export const RARITY_RARE = 'Rare';
+export const RARITY_UNCOMMON = 'Uncommon';
+export const RARITY_COMMON = 'Common';
+export const MYSTERY_BUY = 'Buy';
+export const MYSTERY_OK = 'OK';
+
+/** Which of the two box popups a pack belongs to. */
+export type MysteryKind = 'mystery' | 'super';
+
+/** A possible prize, named by the content. Never a granted reward. */
+export interface MysteryItemView {
+  readonly itemId: number;
+  readonly name: string;
+}
+
+/** One rarity row the popup draws. */
+export interface MysteryRarityRow {
+  readonly label: string;
+  readonly items: readonly MysteryItemView[];
+}
+
+/** One purchase gesture: the content's price and the request a click sends. */
+export interface MysteryTierView {
+  /** Selected-item count; the super tier the server reads from the request. */
+  readonly count: number;
+  /** The price from the content's own table, shown and never charged here. */
+  readonly price: number;
+  /** Presentation only: whether the server's wallet covers the price. */
+  readonly affordable: boolean;
+  /** The request; the server decides whether it applies. */
+  readonly command: NativeCommand;
+}
+
+/** The preview a box popup draws, from the content and the client's literals. */
+export interface MysteryBoxView {
+  readonly kind: MysteryKind;
+  readonly packId: number;
+  readonly title: string;
+  readonly prompt: string;
+  readonly rows: readonly MysteryRarityRow[];
+  readonly tiers: readonly MysteryTierView[];
+  readonly banner: string | null;
+  readonly weekNote: string | null;
+  readonly buy: string;
+}
+
+/** A launcher for one of the two box popups, from the content's own packs. */
+export interface MysteryLauncherView {
+  readonly kind: MysteryKind;
+  readonly packId: number;
+  readonly name: string;
+  readonly title: string;
+  /** Whether the content currently offers this pack; never a client gate. */
+  readonly available: boolean;
+}
+
+/** The purchase a click asks for, kept beside the store it may change. */
+export interface MysteryPurchase {
+  readonly kind: MysteryKind;
+  readonly packId: number;
+  readonly title: string;
+  /** The tier price the content published; display only. */
+  readonly price: number | null;
+  readonly command: NativeCommand;
+}
+
+/** One item the server actually granted, with the store's quantity delta. */
+export interface MysteryWonItemView extends MysteryItemView {
+  readonly quantity: number;
+}
+
+/** The server's answer, read out of the store it granted into. */
+export interface MysteryResultView {
+  readonly kind: MysteryKind;
+  readonly title: string;
+  readonly heading: string | null;
+  readonly message: string | null;
+  readonly ok: string;
+  readonly price: number | null;
+  readonly items: readonly MysteryWonItemView[];
+}
+
+/** A content row, read as an offer pack only when it has the right shape. */
+function asOfferPack(value: unknown): OfferPackData | null {
+  const row = recordOrNull(value);
+  if (!row) return null;
+  const id = finite(row['id']);
+  const name = row['name'];
+  const cash = finite(row['cost_cash']);
+  if (
+    id === null || !Number.isInteger(id) || id <= 0 ||
+    typeof name !== 'string' || name.length === 0 ||
+    cash === null || cash < 0
+  ) return null;
+  return {
+    id,
+    name,
+    type: typeof row['type'] === 'string' ? row['type'] : '',
+    enabled: typeof row['enabled'] === 'number' ? row['enabled'] : undefined,
+    position: typeof row['position'] === 'number' ? row['position'] : undefined,
+    cost_cash: cash,
+    gold: Number(row['gold']) || 0,
+    wood: Number(row['wood']) || 0,
+    oil: Number(row['oil']) || 0,
+    steel: Number(row['steel']) || 0,
+    mana: Number(row['mana']) || 0,
+    xp: Number(row['xp']) || 0,
+    items: Array.isArray(row['items']) ? (row['items'] as OfferPackData['items']) : null,
+  };
+}
+
+/** A positive integer content id, or null for a malformed row. */
+function packItemId(value: unknown): number | null {
+  return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : null;
+}
+
+/** The content's item names, used only to label ids the server answered. */
+function mysteryNames(bundle: ContentBundle): Map<number, string> {
+  const out = new Map<number, string>();
+  for (const item of bundle.items ?? []) out.set(item.id, item.name);
+  return out;
+}
+
+/** The one dialog descriptor for a box popup; there is no second modal. */
+export function mysteryDialog(kind: MysteryKind, title: string): DialogContent {
+  return { id: `mystery-${kind}`, kind: 'confirm', title };
+}
+
+/**
+ * The two box popups the content can open.
+ *
+ * The original opens the mystery popup from pack 4, its only random pack, and
+ * the super popup from a super pack. Both ids and names come from the content;
+ * the titles are the popups' own literals. A hidden historical pack is still
+ * listed so its screen can be seen, but a visible one is preferred as the
+ * super launcher.
+ */
+export function mysteryBoxes(bundle: ContentBundle): readonly MysteryLauncherView[] {
+  let mystery: MysteryLauncherView | null = null;
+  let superBox: MysteryLauncherView | null = null;
+  for (const raw of bundle.offerPacks ?? []) {
+    const pack = asOfferPack(raw);
+    if (!pack) continue;
+    const shape = offerPackShape(pack);
+    if (shape === 'random' && mystery === null) {
+      mystery = {
+        kind: 'mystery',
+        packId: pack.id,
+        name: pack.name,
+        title: MYSTERY_TITLE,
+        available: isOfferPackAvailable(pack),
+      };
+    } else if (shape === 'super') {
+      const view: MysteryLauncherView = {
+        kind: 'super',
+        packId: pack.id,
+        name: pack.name,
+        title: SUPER_TITLE,
+        available: isOfferPackAvailable(pack),
+      };
+      if (superBox === null || (!superBox.available && view.available)) superBox = view;
+    }
+  }
+  return [mystery, superBox].filter((entry): entry is MysteryLauncherView => entry !== null);
+}
+
+/**
+ * The preview a box popup draws, or null when the content has no such pack.
+ *
+ * The rows are the pack's own candidates, the prices are the rules' own
+ * prices, and each button is only a request. A pack the content currently
+ * hides still gets its preview, but no buy button: the server would refuse
+ * the purchase, so the client must not offer one.
+ */
+export function mysteryBoxPanel(
+  bundle: ContentBundle,
+  packId: number,
+  cash: number,
+): MysteryBoxView | null {
+  const pack = (bundle.offerPacks ?? [])
+    .map(asOfferPack)
+    .find((entry) => entry?.id === packId) ?? null;
+  if (!pack) return null;
+  const shape = offerPackShape(pack);
+  if (shape !== 'random' && shape !== 'super') return null;
+  const candidates = offerPackCandidates(pack);
+  if (candidates === null || candidates.length === 0) return null;
+  const names = mysteryNames(bundle);
+  const item = (id: number): MysteryItemView => ({
+    itemId: id,
+    name: names.get(id) ?? `item ${id}`,
+  });
+  const available = isOfferPackAvailable(pack);
+
+  if (shape === 'random') {
+    const pairs = pack.items;
+    if (!Array.isArray(pairs)) return null;
+    const rows: MysteryRarityRow[] = [];
+    for (const [index, pair] of pairs.entries()) {
+      if (!Array.isArray(pair)) return null;
+      const id = packItemId(pair[0]);
+      if (id === null) return null;
+      const label =
+        index === 0 ? RARITY_RARE : index === 1 ? RARITY_UNCOMMON : RARITY_COMMON;
+      rows.push({ label, items: [item(id)] });
+    }
+    const price = offerPackPrice(pack, null);
+    const tiers: MysteryTierView[] =
+      available && price !== null
+        ? [
+            {
+              count: candidates.length,
+              price,
+              affordable: cash >= price,
+              command: buyOfferPack(pack.id, candidates),
+            },
+          ]
+        : [];
+    return {
+      kind: 'mystery',
+      packId: pack.id,
+      title: MYSTERY_TITLE,
+      prompt: MYSTERY_PROMPT,
+      rows,
+      tiers,
+      banner: null,
+      weekNote: null,
+      buy: MYSTERY_BUY,
+    };
+  }
+
+  const items = pack.items;
+  if (!Array.isArray(items) || items.length !== 3) return null;
+  const labels = [RARITY_RARE, RARITY_UNCOMMON, RARITY_COMMON];
+  const rows: MysteryRarityRow[] = [];
+  for (const [index, row] of items.entries()) {
+    if (!Array.isArray(row)) return null;
+    const ids = row.map(packItemId);
+    if (ids.some((id) => id === null)) return null;
+    rows.push({
+      label: labels[index]!,
+      items: ids.map((id) => item(id!)),
+    });
+  }
+  const tiers: MysteryTierView[] = [];
+  if (available) {
+    for (const count of [1, 2, 4]) {
+      const tier = offerPackTierForCount(pack, count);
+      const price = tier === null ? null : offerPackPrice(pack, tier);
+      if (tier === null || price === null || candidates.length < count) continue;
+      tiers.push({
+        count,
+        price,
+        affordable: cash >= price,
+        command: buyOfferPack(pack.id, candidates.slice(0, count)),
+      });
+    }
+  }
+  return {
+    kind: 'super',
+    packId: pack.id,
+    title: SUPER_TITLE,
+    prompt: SUPER_STORAGE,
+    rows,
+    tiers,
+    banner: SUPER_VALUE,
+    weekNote: SUPER_ONLY_THIS_WEEK,
+    buy: MYSTERY_BUY,
+  };
+}
+
+/** The store's quantities before a request, read from the server's world. */
+export function storeQuantities(world: WorldSnapshot): Readonly<Record<string, number>> {
+  const store = world.maps[0]?.store;
+  const out: Record<string, number> = {};
+  if (!store || typeof store !== 'object' || Array.isArray(store)) return out;
+  for (const [key, value] of Object.entries(store)) {
+    const itemId = contentId(key);
+    const quantity = finite(value);
+    if (itemId !== null && quantity !== null) out[String(itemId)] = quantity;
+  }
+  return out;
+}
+
+/**
+ * The pack result the server answered, read as the growth of its store.
+ *
+ * `before` is the store in the world the buy request was sent with; the
+ * quantities here are the ones in the world the server returned. Items whose
+ * quantity did not grow are never claimed, so a refusal or a replay draws no
+ * result. The price is the content tier the player chose, shown beside the
+ * ids the server actually granted — never a locally rolled prize.
+ */
+export function mysteryResultPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  before: Readonly<Record<string, number>>,
+  purchase: MysteryPurchase,
+): MysteryResultView | null {
+  const after = storeQuantities(world);
+  const names = mysteryNames(bundle);
+  const items: MysteryWonItemView[] = [];
+  for (const [key, quantity] of Object.entries(after)) {
+    const itemId = contentId(key);
+    if (itemId === null) continue;
+    const gained = quantity - (finite(before[key]) ?? 0);
+    if (!Number.isFinite(gained) || gained <= 0) continue;
+    items.push({
+      itemId,
+      name: names.get(itemId) ?? `item ${itemId}`,
+      quantity: Math.trunc(gained),
+    });
+  }
+  if (items.length === 0) return null;
+  const superBox = purchase.kind === 'super';
+  return {
+    kind: purchase.kind,
+    title: purchase.title,
+    heading: superBox ? MYSTERY_CONGRATULATIONS : null,
+    message: superBox ? SUPER_STORAGE : null,
+    ok: MYSTERY_OK,
+    price: purchase.price,
+    items,
+  };
 }

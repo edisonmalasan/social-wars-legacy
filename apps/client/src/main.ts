@@ -102,6 +102,10 @@ import {
   EMPTY_POPUP_SLOT,
   expansionResultPanel,
   missionInfoPanel,
+  mysteryBoxes,
+  mysteryBoxPanel,
+  mysteryDialog,
+  mysteryResultPanel,
   nextMissionPanel,
   onboardingDialog,
   productionPanel,
@@ -111,15 +115,20 @@ import {
   requestPopup,
   rosterDialog,
   speakerNotice,
+  storeQuantities,
   tutorialHelpView,
   zoomFromPercent,
   type AssaultPanelKind,
   type CharacterSetupPanelKind,
   type ChromePopupRequest,
   type ChromePopupSlot,
+  type MysteryKind,
+  type MysteryLauncherView,
+  type MysteryPurchase,
   type OnboardingPanelKind,
   type OnboardingPanelView,
 } from './ui/state.ts';
+import { setMysteryHost } from './ui/mystery.tsx';
 import { setChromeHost } from './ui/chrome.tsx';
 import { setExpansionHost } from './ui/expansion.tsx';
 import { setOnboardingHost } from './ui/onboarding.tsx';
@@ -336,6 +345,8 @@ export interface ClientHandle {
   showOnboarding?: (kind: OnboardingPanelKind) => void;
   /** Open the army roster, team thumbnails and unit XP in the one dialog. */
   showRoster?: () => void;
+  /** Open a mystery-box popup in the one shared dialog. */
+  showMystery?: (kind: MysteryKind) => void;
   /** Shorthands for the five gestures above, for driving the client. */
   showIntro?: () => void;
   showHelp?: () => void;
@@ -637,6 +648,15 @@ async function main(): Promise<void> {
    * second notice waits rather than opening a second modal stack.
    */
   let popupSlot: ChromePopupSlot = EMPTY_POPUP_SLOT;
+  /**
+   * The mystery-box popup is UI state; the rolled items are not. `before` is
+   * the server's store in the world a buy request was sent with, so the
+   * result can be read from the store in the world the server answered.
+   */
+  let pendingMystery: {
+    readonly before: Readonly<Record<string, number>>;
+    readonly purchase: MysteryPurchase;
+  } | null = null;
 
   /** Publish the camera and the chrome's UI-only gestures to the view. */
   function publishChrome(): void {
@@ -720,6 +740,10 @@ async function main(): Promise<void> {
         // later notice can still be promoted instead of being stranded.
         if (dialogState.dialog?.id === 'chrome-notice') {
           popupSlot = dismissPopup(popupSlot);
+        }
+        if (dialogState.dialog?.id?.startsWith('mystery-')) {
+          setMysteryHost({ view: null, result: null });
+          pendingMystery = null;
         }
         dialogState = closeDialog(dialogState);
         questPanel = null;
@@ -1108,6 +1132,44 @@ async function main(): Promise<void> {
     drawInterface();
   }
 
+  /* ---------------------------------------------------------------------
+   * The mystery-box popups
+   *
+   * Both screens only ask the server to buy a pack. The preview is a reading
+   * of the content's pack and the client's own literals; the reward is a
+   * reading of the store in the server's answer. No roll or price is decided
+   * here, and the result shares the one dialog's slot with the preview.
+   * ------------------------------------------------------------------- */
+
+  /** The wallet the server published, used only to grey out a buy button. */
+  function mysteryCash(): number {
+    const cash = Number(world.resources?.['c'] ?? 0);
+    return Number.isFinite(cash) && cash > 0 ? cash : 0;
+  }
+
+  /** Open one of the two box popups in the one shared dialog. */
+  function openMystery(launch: MysteryLauncherView): void {
+    clearOnboarding();
+    questPanel = null;
+    const view = mysteryBoxPanel(content, launch.packId, mysteryCash());
+    if (!view) {
+      gestureRefusal('the server has no such mystery box');
+      return;
+    }
+    pendingMystery = null;
+    setMysteryHost({ view, result: null });
+    const panel = mysteryDialog(view.kind, view.title);
+    dialogState = openDialog(dialogState, panel.id, panel.kind, panel.title);
+    drawInterface();
+  }
+
+  /** Ask the server to buy a tier; its answer alone decides what was won. */
+  function buyMystery(purchase: MysteryPurchase): void {
+    if (pendingMystery) return;
+    pendingMystery = { before: storeQuantities(world), purchase };
+    void run([purchase.command]);
+  }
+
   /** Send the composed team with the next mission the server has opened. */
   function submitRosterTeam(team: Army): void {
     if (questBusy) return;
@@ -1219,6 +1281,9 @@ async function main(): Promise<void> {
   // The roster's launcher and its one team gesture use the same one dialog;
   // publishing them here keeps the panel free of its own transport.
   setRosterHost({ open: openRoster, submitTeam: submitRosterTeam });
+  // The box popups' two gestures use the same one dialog and transport; the
+  // host keeps only which box is open and which answer it is showing.
+  setMysteryHost({ open: openMystery, buy: buyMystery });
 
   const ui = UI ? mountUi(UI, content, onPick, onCollect, onCommand) : null;
   drawInterface();
@@ -1305,6 +1370,14 @@ async function main(): Promise<void> {
       ? feedbackFrom(result.response.outcomes, result.response.ok)
       : [{ tone: 'error', text: `The request failed (${result.reason}).` }];
     world = await fetchWorld();
+    // A mystery-box buy is read the same way as an expansion: the store the
+    // server answered is compared with the one the request was sent with.
+    // No reward is drawn unless that store actually grew.
+    if (pendingMystery) {
+      const { before, purchase } = pendingMystery;
+      pendingMystery = null;
+      setMysteryHost({ result: mysteryResultPanel(content, world, before, purchase) });
+    }
     // The growth result is drawn only when the server's list really grew. A
     // refusal or a replay leaves it null, and the next command clears it.
     setExpansionHost({ result: expansionResultPanel(content, world, ownedBefore.length) });
@@ -1470,6 +1543,10 @@ async function main(): Promise<void> {
       drawInterface();
     },
     dismissDialog: () => {
+      if (dialogState.dialog?.id?.startsWith('mystery-')) {
+        setMysteryHost({ view: null, result: null });
+        pendingMystery = null;
+      }
       dialogState = closeDialog(dialogState);
       drawInterface();
     },
@@ -1500,6 +1577,11 @@ async function main(): Promise<void> {
     },
     showOnboarding: (kind) => openOnboarding(kind),
     showRoster: () => openRoster(),
+    showMystery: (kind) => {
+      const box = mysteryBoxes(content).find((entry) => entry.kind === kind);
+      if (box) openMystery(box);
+      else gestureRefusal('the server has no such mystery box');
+    },
     showIntro: () => openOnboarding('intro'),
     showHelp: () => openOnboarding('help'),
     showMissionInfo: () => openOnboarding('mission'),
