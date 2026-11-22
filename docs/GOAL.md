@@ -504,11 +504,18 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main`:** `1d1072c` — PR #62
+- **Last verified `main`:** `96e8a7e` — PR #64
+  (`chore/provision-android-sdk`, the verified Android debug build — SDK
+  command-line tools provisioned non-interactively from Google's official zip,
+  Capacitor 8.6.2, `cap add android`, `assembleDebug` successful, 5,437,001-byte
+  debug APK; no device run, no iOS build, placeholder `server.url`) merged. The
+  chain from the prior verified checkpoint (`1d1072c`, PR #62) is PR #63
+  (`eccf9fa`, docs: refresh the verified screen counts after PR #62) and PR #64
+  (`96e8a7e`, the Android debug build). PR #62
   (`docs/reclassify-exploration-cover`, the exploration cover reclassified as
-  the shared primitive — 1 screen reclassified, no new artwork) merged. The
-  chain from the prior verified checkpoint (`911057e`, PR #60 — soul-mixer
-  help and turbine drawn from recovered state, 3 screens) is PR #61
+  the shared primitive — 1 screen reclassified, no new artwork) merged at
+  `1d1072c`. The chain from the prior verified checkpoint (`911057e`, PR #60 —
+  soul-mixer help and turbine drawn from recovered state, 3 screens) is PR #61
   (`91165ae`, docs: refresh the verified screen counts and record PRs #59
   and #60) and PR #62 (`1d1072c`, the `GuiCoverExplorationMC.as`
   cover-primitive reclassification). The earlier chain from `27f1dab`
@@ -525,6 +532,22 @@ verified checkpoint, not at every tool call.
   confirmed fusion blocker, is recorded in *Final screen-family refresh* in
   `docs/ROADMAP.md`. This checkpoint is a documentation-only increment; only
   the orchestrator merges branches.
+- **The PR #64 Android debug build (checked, honest scope):** a real Android
+  debug APK was produced on this Windows host — SDK command-line tools from
+  Google's official zip (HTTP 200, 153,583,359 bytes; sdkmanager 12.0; platforms
+  35/36 + build-tools at `%LOCALAPPDATA%\Android\Sdk`, outside the repo),
+  Capacitor 8.6.2 installed at native-work time (not committed), `cap add
+  android` (minSdk 24, compile/targetSdk 36, Gradle 8.14.3) and
+  `gradlew assembleDebug` → `BUILD SUCCESSFUL in 5m 32s`, 5,437,001-byte APK
+  with the auto-generated Android Debug certificate. This resolves only the
+  **toolchain/SDK half** of the G5 mobile blocker. The genuine blocker
+  categories are preserved: **no device or emulator run**, **no iOS build**
+  (no macOS/Xcode), and a placeholder `server.url` means the APK is not a
+  runnable client; no release signing material exists. `node
+  scripts/check-mobile-config.mjs` still exits 0 reporting config coherent and
+  `native Android/iOS device or emulator runs NOT VERIFIED`. No G5 checkbox was
+  ticked and `node scripts/check-roadmap.mjs` still reports 401 items; this is a
+  documentation-only increment, so only the orchestrator merges branches.
 - **Previously verified `main`:** `27f1dab` — PR #57
   (`feat/add-remaining-screens`, the sixth screen-family increment: inventory
   cells and the HUD info popup, 2 screens) merged. The chain from the earlier
@@ -651,14 +674,18 @@ verified checkpoint, not at every tool call.
   `capacitor.config.ts` against the `apps/client` build output with a 10-case
   tamper self-test and reports `native Android/iOS builds NOT RUN — no
   JDK/Android SDK/Xcode` — the config is coherent, but no native build or device
-  run was performed. Neither script changes the item accounting.
+  run was performed. Neither script changes the item accounting. That was the
+  state at PR #49; PR #64 later resolved the Android build half (recorded in the
+  checkpoint above) while the device and iOS halves remain open.
 - **Verified roadmap state:** `node scripts/check-roadmap.mjs` reports 401 items,
   22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **151 implemented /
   52 dropped / 57 planned**. The Status Summary still reads G 78/8. The G5
   blocker row records Firefox and WebKit as verified, with branded Safari and
   real devices the only unrun browsers; the desktop and installer rows now
   record **Linux bundling in CI, unsigned** while staying open for macOS and
-  signing. This checkpoint refresh records that state: the accompanying
+  signing; the mobile-build row now records the **verified Android debug build
+  (PR #64)** with device runs and iOS still open, so the box stays unticked.
+  This checkpoint refresh records that state: the accompanying
   documentation increment updates `docs/ROADMAP.md` to the same verified counts
   and does not touch `re/data/ui-screens.json` or any code.
 - **Preserved WIP (mission timer):** the in-flight mission-timer changes are not
