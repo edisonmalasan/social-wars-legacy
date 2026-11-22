@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 159,
+      implemented: 162,
       dropped: 52,
-      planned: 49,
+      planned: 46,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -523,17 +523,17 @@ describe('the roster, team-thumbnail and unit-XP screen family decisions', () =>
     assert.match(screen!.decisionNote, /`packages\/client\/src\/army\.ts`/);
   });
 
-  it('leaves the portrait-licence screens planned', async () => {
-    // Their only remaining content is Zynga's portrait artwork: the clone
-    // draws text rows and state, so flipping these would claim art it does
-    // not render and model no new behaviour.
+  it('leaves the assault portrait planned', async () => {
+    // Its only remaining content is Zynga's portrait artwork: the clone
+    // draws text rows and state, so flipping this would claim art it does
+    // not render and model no new behaviour. PortraitTrainQueue is no
+    // longer in this guard — the unitportraits panel now draws its states.
     const all = await screens();
-    for (const path of ['GUI/PortraitAssault.as', 'GUI/PortraitTrainQueue.as']) {
-      const screen = all.find((entry) => entry.path === path);
-      assert.ok(screen, `${path} is not in the inventory`);
-      assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
-      assert.match(screen!.decisionNote, /licensed|portraits/i);
-    }
+    const path = 'GUI/PortraitAssault.as';
+    const screen = all.find((entry) => entry.path === path);
+    assert.ok(screen, `${path} is not in the inventory`);
+    assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
+    assert.match(screen!.decisionNote, /licensed|portraits/i);
   });
 });
 
@@ -969,6 +969,41 @@ describe('the store item-button screen family decisions', () => {
       const screen = all.find((entry) => entry.path === path);
       assert.ok(screen, `${path} is not in the inventory`);
       assert.notEqual(screen!.decision, 'implemented', `${path} was reclassified`);
+    }
+  });
+});
+
+describe('the unit-portrait screen family decisions', () => {
+  // These three deferrals said no GUI panel drew the portrait states. They
+  // are reclassified only because unitportraits.tsx really draws them from
+  // the server's TrainingView and its owned-unit rows, with original SVG
+  // geometry. No proprietary art is claimed and no roll, grant or command
+  // is moved into the client. No other portrait screen is touched here.
+  const PORTRAIT_SCREENS = [
+    'GUI/Portrait.as',
+    'GUI/PortraitTrainQueue.as',
+    'GUI/AnimatedUnit.as',
+  ];
+
+  it('records each drawn portrait as implemented against the portrait panel', async () => {
+    const all = await screens();
+    for (const path of PORTRAIT_SCREENS) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/unitportraits\.tsx`/);
+    }
+  });
+
+  it('says the state is server-owned and no art or roll is claimed', async () => {
+    const all = await screens();
+    for (const path of PORTRAIT_SCREENS) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.match(screen!.decisionNote, /server/i);
+      assert.match(screen!.decisionNote, /art/i);
+      assert.match(screen!.decisionNote, /roll/i);
+      assert.match(screen!.decisionNote, /command/i);
     }
   });
 });
