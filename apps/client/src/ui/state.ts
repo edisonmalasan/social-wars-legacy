@@ -2848,6 +2848,45 @@ function serverArrayInteger(value: unknown, index: number): number | null {
   return serverInteger(value[index]);
 }
 
+/**
+ * The private-state key holding the server-owned research record.
+ *
+ * The migrated server writes its research here: `itemNumber`, `stepNumber`
+ * and `timestamp` are arrays indexed by the research type, while
+ * `roboticSocialHelp` is the Robotic Center's flat list of friend ids.
+ * Older saves still carry the typed migration fields, so every read prefers
+ * this record when it is well-formed and falls back to the legacy field.
+ */
+const RESEARCH_STATE_KEY = 'researchState';
+
+/** The two sources a research field may come from, both owned by the server. */
+function researchSources(privateState: Record<string, unknown> | undefined): {
+  own: Record<string, unknown> | null;
+  legacy: Record<string, unknown>;
+} {
+  const legacy = privateState ?? {};
+  const own = recordOrNull(legacy[RESEARCH_STATE_KEY]);
+  return { own, legacy };
+}
+
+/**
+ * Read one indexed research number from the server-owned record, falling back
+ * to the legacy typed field only when the record is absent or lacks that key.
+ * A malformed value reads as null in either source — never an invented number.
+ */
+function researchNumber(
+  privateState: Record<string, unknown> | undefined,
+  ownKey: string,
+  legacyKey: string,
+  index: number,
+): number | null {
+  const { own, legacy } = researchSources(privateState);
+  if (own && Object.prototype.hasOwnProperty.call(own, ownKey)) {
+    return serverArrayInteger(own[ownKey], index);
+  }
+  return serverArrayInteger(legacy[legacyKey], index);
+}
+
 /** Prepare the content's candidate list with the pure soul-mixer rules. */
 function fusionCatalog(bundle: ContentBundle) {
   return buildSoulMixerCatalog(
@@ -3065,10 +3104,12 @@ export function formatResearchTime(seconds: number): string {
 
 /**
  * Read one research centre's panel from the server's save, the content and
- * the rules. Only the timestamp the server wrote is turned into a wait: with
- * no published timestamp there is no countdown at all. The friend-help list
- * is the server's too, and the three actions are catalogue requests — paying
- * for a step sends the rules' cash price, which the server re-prices.
+ * the rules. The indexed numbers and the friend-help list come from the
+ * server-owned `researchState` record when the save carries it, falling back
+ * to the older typed migration fields. Only a timestamp the server wrote is
+ * turned into a wait: with no published timestamp there is no countdown at
+ * all. The three actions are catalogue requests — paying for a step sends the
+ * rules' cash price, which the server re-prices.
  */
 export function researchPanel(
   bundle: ContentBundle,
@@ -3077,9 +3118,9 @@ export function researchPanel(
   now: number,
 ): ResearchPanelView {
   const names = itemNames(bundle);
-  const step = serverArrayInteger(world.privateState?.['researchStepNumber'], type);
-  const itemNumber = serverArrayInteger(world.privateState?.['researchItemNumber'], type);
-  const timestamp = serverArrayInteger(world.privateState?.['timeStampDoResearch'], type);
+  const step = researchNumber(world.privateState, 'stepNumber', 'researchStepNumber', type);
+  const itemNumber = researchNumber(world.privateState, 'itemNumber', 'researchItemNumber', type);
+  const timestamp = researchNumber(world.privateState, 'timestamp', 'timeStampDoResearch', type);
   const current = itemNumber === null ? null : researchItemAt(type, itemNumber);
   const item =
     current === null
@@ -3099,7 +3140,11 @@ export function researchPanel(
 
   let friendHelp: ResearchFriendHelpView | null = null;
   if (type === 1) {
-    const raw = world.privateState?.['roboticSocialHelp'];
+    const { own, legacy } = researchSources(world.privateState);
+    const raw =
+      own && Object.prototype.hasOwnProperty.call(own, 'roboticSocialHelp')
+        ? own['roboticSocialHelp']
+        : legacy['roboticSocialHelp'];
     const friends = Array.isArray(raw)
       ? raw.filter((entry): entry is string => typeof entry === 'string' && entry.length > 0)
       : [];
