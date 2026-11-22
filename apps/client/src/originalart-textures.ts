@@ -10,13 +10,25 @@
  *   fetched and no file from the original game is ever read;
  * - the generated SVG has no external references of any kind.
  *
- * The renderer uses `motifFor` to choose a motif for each item on the map. A
- * later, richer motif catalogue can be handed to `createMotifMapper` without
- * changing the renderer: only the catalogue changes, not the identity
- * contract. Rasterising the SVG into a texture is the renderer's job; this
- * module never touches a DOM node.
+ * The renderer uses `motifFor` to choose a motif for each item on the map.
+ * When the caller supplies neutral content properties (item type, group,
+ * category/subcategory or key), `motifFor` selects the matching gameplay
+ * motif from `@swl/art/browser`. Every other identity keeps the seeded FNV
+ * mapping over the gallery motifs. Art-derived names — gallery symbols, atlas
+ * regions, frame names — are never used to choose a gameplay motif.
+ * Rasterising the SVG into a texture is the renderer's job; this module never
+ * touches a DOM node.
  */
-import { buildIcons, LICENCE } from '@swl/art/browser';
+import {
+  buildIcons,
+  GAMEPLAY_FALLBACK_KEY,
+  gameplayArtFor,
+  gameplayKey,
+  gameplayKeys,
+  LICENCE,
+  type GameplayCategory,
+  type GameplayContentProps,
+} from '@swl/art/browser';
 
 /** The exact URL prefix of every inline SVG this module produces. */
 export const SVG_DATA_PREFIX = 'data:image/svg+xml;charset=utf-8,';
@@ -63,6 +75,15 @@ export interface ArtIdentity {
   /** The atlas region, used as a fallback when only the art is known. */
   readonly atlasX?: number;
   readonly atlasY?: number;
+  /**
+   * Neutral content properties, when the caller has them. These — and only
+   * these — choose a gameplay motif. The art-derived fields above never do.
+   */
+  readonly type?: string;
+  readonly groupType?: string;
+  readonly categoryId?: number;
+  readonly subcategoryId?: number;
+  readonly key?: string;
 }
 
 /** One clean-room motif, ready to be rasterised by the renderer. */
@@ -130,11 +151,68 @@ export function buildDefaultMotifs(): readonly OriginalMotif[] {
   return motifs;
 }
 
-/** The generator's motifs, in the generator's own order. */
+/** The generator's gallery motifs, in the generator's own order. */
 export const DEFAULT_MOTIFS: readonly OriginalMotif[] = buildDefaultMotifs();
 
-/** The mapping the renderer uses. */
-export const motifFor = createMotifMapper(DEFAULT_MOTIFS);
+/** The id prefix that keeps a gameplay motif distinct from a gallery icon. */
+export const GAMEPLAY_MOTIF_PREFIX = 'gameplay:';
+
+/**
+ * Build the gameplay motif catalogue from `@swl/art/browser`.
+ *
+ * One motif per neutral gameplay category: terrain, buildings, units, markers,
+ * impact FX and the generic badge. Each is an inline CC0 SVG data URL, so no
+ * file is read and nothing is fetched. The prefixed ids can never collide
+ * with a gallery icon's id in a renderer's texture map.
+ */
+export function buildGameplayMotifs(): readonly OriginalMotif[] {
+  return gameplayKeys().map((key: GameplayCategory) => {
+    const svg = gameplayArtFor(key);
+    return {
+      id: `${GAMEPLAY_MOTIF_PREFIX}${key}`,
+      svg,
+      src: svgDataUri(svg),
+      licence: ORIGINAL_ART_LICENCE,
+    };
+  });
+}
+
+/** The gameplay motifs, in the art package's stable order. */
+export const GAMEPLAY_MOTIFS: readonly OriginalMotif[] = buildGameplayMotifs();
+
+/**
+ * Choose a gameplay motif from **neutral content properties only**.
+ *
+ * An art-derived field — the atlas region, frame, gallery symbol — is never
+ * consulted; only `type`, `groupType`, `categoryId`, `subcategoryId` and the
+ * caller's neutral `key` reach the art package's mapper. The neutral fallback
+ * badge is deliberately not a match: unmapped identities fall through to the
+ * seeded identity mapping instead.
+ */
+export function gameplayMotifFor(
+  props: GameplayContentProps | string | null | undefined,
+): OriginalMotif | null {
+  if (props === null || props === undefined) return null;
+  const key: GameplayCategory =
+    typeof props === 'string' ? gameplayKey({ key: props }) : gameplayKey(props);
+  if (key === GAMEPLAY_FALLBACK_KEY) return null;
+  const id = `${GAMEPLAY_MOTIF_PREFIX}${key}`;
+  return GAMEPLAY_MOTIFS.find((motif) => motif.id === id) ?? null;
+}
+
+const IDENTITY_MOTIF = createMotifMapper(DEFAULT_MOTIFS);
+
+/**
+ * The mapping the renderer uses.
+ *
+ * A caller that supplies neutral content properties gets the matching
+ * gameplay motif. Every other identity — including the renderer's current
+ * id/frame/atlas identity — keeps the seeded FNV mapping over the gallery
+ * motifs, unchanged.
+ */
+export function motifFor(identity: ArtIdentity): OriginalMotif | null {
+  return gameplayMotifFor(identity) ?? IDENTITY_MOTIF(identity);
+}
 
 /**
  * Pure decision: the atlas page to request next, or null.
