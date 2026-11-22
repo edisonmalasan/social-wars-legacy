@@ -215,9 +215,9 @@ first means guessing at the rules being cloned.
       (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
       attack interval, the velocity, the life and the population
 - [ ] The panels and the popups are **rendered**, and the popups that are not
-      implemented are recorded as dropped. The screen inventory now reads **151
-      implemented / 52 dropped / 57 planned**; the counts are checked by
-      `packages/client/src/screens.test.ts`, and this item stays open while **57
+      implemented are recorded as dropped. The screen inventory now reads **154
+      implemented / 52 dropped / 54 planned**; the counts are checked by
+      `packages/client/src/screens.test.ts`, and this item stays open while **54
       screens are planned** - a `Deferred: ` reason records honest scope, not a
       rendered screen or a drop
 - [x] The authoritative **item id → delegate** map is extracted from
@@ -1198,21 +1198,21 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **151 implemented** - the clone models the screen's behaviour, and the decision
+      - **154 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **52 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **57 planned** - in scope, the client's behaviour is real, and not modelled
+      - **54 planned** - in scope, the client's behaviour is real, and not modelled
         yet; each now carries a `Deferred: ` reason saying what is missing or how it
         unblocks
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
       exists, every dropped one must say why, and every planned one must start with
       `Deferred: ` and say what is missing or how it unblocks. The counts above are
-      checked by the same test. **This item stays open while 57 screens are planned**:
+      checked by the same test. **This item stays open while 54 screens are planned**:
       a deferral reason is neither an implementation nor a drop, and the earlier
       106/23/131 breakdown was a factual error, not a hidden batch of finished work
 - [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
@@ -1878,8 +1878,10 @@ pricing remain server-side.
 that followed the G5.2 and Expansion milestones, and supersedes their "remain
 planned" notes. It sits **outside** the `## Group X` sections, so
 `node scripts/check-roadmap.mjs` still counts the same **401** items (22 open:
-B 4, E 1, G 8, H 4, I 5). The inventory in `re/data/ui-screens.json` now reads
-**151 implemented / 52 dropped / 57 planned** out of 260; the `movieclip`
+B 4, E 1, G 8, H 4, I 5). The inventory in `re/data/ui-screens.json` read
+**151 implemented / 52 dropped / 57 planned** out of 260 at that refresh;
+PR #67 (`f096deb`) later moved the live inventory to
+**154 implemented / 52 dropped / 54 planned**, as recorded below. The `movieclip`
 count of 108 is a by-kind count, not a decision count. Nothing in those eight
 increments turns a `Deferred: ` reason into a completed screen; the PR #62
 correction recorded below is a separate reclassification of a primitive.*
@@ -1954,46 +1956,93 @@ correction recorded below is a separate reclassification of a primitive.*
   dialog. The turbine (`SoulMixerTurbina.as` has only `setState`) reads state
   from the server-owned save only when a well-formed record is published;
   otherwise it shows a clearly labelled placeholder — no computed or
-  fabricated countdown. **No Powerup, Speedup or Fusion gesture is offered**;
-  those words are recovered help text, not working controls. Only the two help
-  screens and the turbine were reclassified; the broader fusion and breeding
-  screens stay planned, and the original art stays excluded. This is the final
-  screen-family increment; with PR #62's cover-primitive reclassification the
-  inventory now reads **151 / 52 / 57**.
+  fabricated countdown. In that help/turbine panel **no Powerup, Speedup or
+  Fusion gesture is offered**; those words are recovered help text, not working
+  controls there. Only the two help screens and the turbine were reclassified in
+  PR #60, and the original art stays excluded; the broader fusion and research
+  screens were still deferred at that point. PR #66 supplied the pure rules and
+  PR #67 later drew the Atom Fusion and research panels in
+  `apps/client/src/ui/fusion.tsx` (recorded below), so those screens no longer
+  stay planned; only the art-only `PopupBreedingMC.as` shell does. With PR #62's
+  cover-primitive reclassification the inventory at that point read **151 / 52 /
+  57**; PR #67 moved the live inventory to **154 / 52 / 54**.
 
-**Read-only audit — the confirmed fusion blocker (fusion and breeding stay planned).**
-A read-only audit confirmed there is **no applier case** for `buy_powerups`,
-`soulmixer_speedup` or the research commands (such as `next_research_item`), so
-those commands have no authoritative answer. The output-item derivation rule
-`(inputA, inputB, powerupLevel) -> output` is not recovered anywhere — the raw
-AS3 is absent. `soulmixer_speedup` is unpriced. Breeding is only
-`PopupSoulMixer`'s art shell, not a separate feature. The turbine's
-well-formed-record gate and the help-only status of the POWERUP / SPEEDUP words
-follow directly from those facts; no parity is claimed.
+**PR #67 (`f096deb`) — Atom Fusion panels drawn from server state (supersedes the
+earlier fusion blocker).** A read-only audit once found no applier cases for
+`buy_powerups`, `soulmixer_speedup` or the research commands, no recovered
+`(inputA, inputB, powerupLevel) -> output` rule and an unpriced speed-up. PR #66
+(`462fb06`) supplied the pure, deterministic rules — the power derivation,
+speed-up cash price, power-up increments and research tracks with golden vectors
+— and PR #67 drew the behaviour in `apps/client/src/ui/fusion.tsx`, hosted in the
+one shared `Dialog`. `popups/PopupSoulMixer.as` is now **implemented**: it reads
+the two server-selected units, a rolled power only when the server published one,
+the rules' six-row power-up price table and the item the server actually granted;
+Powerup/Speedup only send `buy_powerups` and `soulmixer_speedup` through the one
+transport. There is no local roll, grant or invented countdown. What still holds
+is the art and state gate: the proprietary Zynga artwork stays excluded,
+`PopupBreedingMC.as` remains the art-only movieclip shell with no literals, state
+or gestures of its own, the turbine's well-formed-record gate and the help-only
+status of the POWERUP / SPEEDUP words in `soulmixerhelp.tsx` still follow from
+published state, and the panels render explicit empty states until the server
+publishes the optional `privateState.soulMixer` fields. No client-side parity is
+claimed by the client itself; the authoritative server appliers landed in PR #68
+(recorded below).
 
-**Corrected research-centre gate (both research-centre screens stay planned).**
-The old one-line note on `PopupResearchCenterMC.as` falsely identified it as the
-magic tech tree. It is in fact the shell of `popups/PopupResearchCenter.as` — the
-late-era **AREA 51 / ROBOTIC CENTER** robot-research screen, whose own Zynga
-build-process animation art is `popupResearchCenter_buildingProcess.swf` and
+**Corrected research-centre gate, now implemented (PR #67).** The old one-line
+note on `PopupResearchCenterMC.as` falsely identified it as the magic tech tree.
+It is in fact the shell of `popups/PopupResearchCenter.as` — the late-era **AREA
+51 / ROBOTIC CENTER** robot-research screen, whose own Zynga build-process
+animation art is `popupResearchCenter_buildingProcess.swf` and
 `popupResearchCenter_buildingProcess_3.swf`. Its literals describe a **6-hour**
 research cycle ("Press research every 6 hours to get a powerful robot.") and an
-[ADR 20](./adr/0020-social-services-server-only.md) social "Hire friends" gesture.
-Decisively, the new server keeps only the migration fields `researchItemNumber`
-/ `researchStepNumber` / `timeStampDoResearch` and applies **none** of
-`next_research_item`, `next_research_step`, `research_buy_step_cash`,
-`reset_research_item` or `finish_robotic_help`, so the screen's gestures have no
-authoritative answer. Both `PopupResearchCenterMC.as` and
-`popups/PopupResearchCenter.as` therefore stay `Deferred: `, unblocked only by
-robot-research rules, requests and licensed art. No parity is claimed, and the
-magic tech tree (`packages/client/src/magic.ts`) is not a substitute for it.
+[ADR 20](./adr/0020-social-services-server-only.md) social "Hire friends" gesture;
+that identification and the art exclusion still stand. What changed is the gate:
+PR #66 supplied the pure research rules and PR #67 reclassified both
+`PopupResearchCenterMC.as` and `popups/PopupResearchCenter.as` to **implemented**
+against `apps/client/src/ui/fusion.tsx`, which draws the server's 10-step
+progress, a countdown derived only from a published timestamp, the rules' six-
+item track and the Robotic Center friend-help prompt in the one shared dialog.
+Gestures send `next_research_step`, `research_buy_step_cash` at the rules' price,
+`next_research_item` on the tenth step and `finish_robotic_help` from the server's
+friend list; there is no local roll, grant or countdown. The build-process
+animation SWFs and the original art stay excluded, no parity is claimed, and the
+magic tech tree (`packages/client/src/magic.ts`) is still not a substitute for
+this screen.
+
+**PR #68 (`68e3bbb`) — authoritative Soul Mixer and research appliers (merged).**
+The server now answers the commands the panels above send, so the earlier
+"no applier case" rationale is fully closed. `packages/server/src/apply.ts`
+adds authoritative cases for `buy_powerups` (records a paid level in the
+server-owned `soulMixerPowerups` ledger; cash comes from the content's
+`SOUL_MIXER_POWERUPS_LEVELS`, never a client argument), `push_queue_unit2`
+(ignores the client's declared output id and derives the result from the two
+inputs in the mixer's own store, the paid power-ups and `deps.serverSeed` via
+`fuseWithPowerups`, including the level-20 gate), `soulmixer_speedup` (ignores
+the client's cash delta and charges `soulMixerSpeedupCost`, zeroing the timer
+only after the wallet settles), and the five research commands
+`next_research_step`, `research_buy_step_cash`, `next_research_item`,
+`reset_research_item` and `finish_robotic_help` (all on server-owned state).
+The server-owned keys are `soulMixerPowerups`, `researchState`
+(`itemNumber` / `stepNumber` / `timestamp` / `roboticSocialHelp`) and
+`roboticHelpConsumed`, with `smTrainingTime` and the queue fields on the
+building's own attribute bag; `research_buy_step_cash` ignores the client's
+`cashCost`, and friend help is de-duplicated by id and capped at ten steps.
+Refusals happen before mutation, so a replay or refusal leaves the save and
+wallet unchanged. Independently re-run on merged `main`: `pnpm test` 1959 pass /
+0 fail (the PR body reported 1945 on its own branch), `pnpm --filter @swl/server
+test` 533 pass / 0 fail, `pnpm typecheck` clean,
+`node scripts/verify-command-catalogue.mjs` 94/94, `node scripts/run-cheat-battery.mjs`
+11/11 attacks caught and `node scripts/golden-master.mjs` 50 scenarios / 0
+differences. The catalogue check ran without the decompiled client source
+present locally, so it compared the report's 94 rows with the protocol's 94
+names. No checkbox was ticked: 54 screens remain planned.
 
 **Verified gates for this refresh:** `node scripts/check-roadmap.mjs` reports
 401 items, 22 open (B 42/4, E 37/1, G 78/8, H 14/4, I 99/5, with A, C, D and F
 complete); `node scripts/check-report-sync.mjs` agrees with the implementation
 (4 claims) after `pnpm build:content`; and this documentation-only diff touches
 only `docs/ROADMAP.md` and `docs/GOAL.md`. The B6 and G3 checkbox items stay
-open while 57 screens are planned: a deferral is honest scope, not a finished
+open while 54 screens are planned: a deferral is honest scope, not a finished
 screen or a drop.
 
 **Post-refresh correction — PR #62 (`1d1072c`).** After the eight screen-family
@@ -3147,7 +3196,7 @@ be mistaken for unfinished work.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 57 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 57; the art gate applies to the drawn ones |
+| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 54 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 54; the art gate applies to the drawn ones |
 | B | PvP `end_attack` payload captured live | Needs a live second player and the original Flash client driven over CDP | A Flash test rig with two live accounts |
 | B | `attack_player` / `spy_player` payloads captured live | Same as above | The same Flash test rig |
 | B | Premium purchase flow captured live | Needs a real-money account, which the preservation project must not use | A funded test account and explicit approval |
@@ -3159,7 +3208,7 @@ be mistaken for unfinished work.*
 |---|---|---|---|
 | G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout, or a licensing decision |
 | G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented | Licence or re-create the art (I6) |
-| G | Every B6 screen implemented or explicitly dropped | 57 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 57 |
+| G | Every B6 screen implemented or explicitly dropped | 54 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 54 |
 | G | Client runs in Firefox and Safari | **Firefox and WebKit (Playwright) are verified**: full rendered gameplay sessions ran under Gecko via `scripts/e2e-test-firefox.py` and under WebKit via `scripts/e2e-test-webkit.py` (both Playwright engines, driven over Juggler/BiDi). Branded Safari and real devices have not been run — Playwright's WebKit is an engine test, not Safari | Play the same session in branded Safari and on real devices; this box closes once Safari passes |
 | G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux bundling is now in CI, unsigned** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` with `libwebkit2gtk-4.1-dev`, and its informational, non-required `linux-bundle` job produces unsigned `.deb`/`.AppImage` artefacts; macOS genuinely needs a host | Add a macOS runner and signed artefacts (Linux bundling is already in CI); this box closes once all three platforms are produced |
 | G | Mobile build runs on Android and iOS | The **Android debug build is verified** (PR #64): SDK command-line tools provisioned from Google's official zip (sdkmanager 12.0, platforms 35/36 + build-tools, SDK at `%LOCALAPPDATA%\Android\Sdk`), Capacitor 8.6.2 installed at native-work time, `cap add android` (minSdk 24, compile/targetSdk 36, Gradle 8.14.3) and `gradlew assembleDebug` → `BUILD SUCCESSFUL`, 5,437,001-byte debug APK with the auto-generated debug cert. Still open: **no iOS build** (no macOS/Xcode), **no device or emulator run**, and `server.url` is a placeholder, so the APK is not a runnable client | Build and run on iOS on a macOS/Xcode host, run on real devices with a real deployment URL, and produce a signed distributable if release is intended |
