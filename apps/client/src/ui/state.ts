@@ -3523,3 +3523,124 @@ export function storeItemsPanel(
     emptyMessages,
   };
 }
+
+/* -------------------------------------------------------------------------
+ * Resource buttons, resource icons and the resources tab
+ *
+ * `ButtonResourceMC.as`, `ButtonSmallLargeTextWithIconResourcesMC.as`,
+ * `ButtonSmallWithIconResourcesMC.as`, `IconResourcesMC.as` and
+ * `GUI/ResourcesTab.as` are all presentation over a readout the HUD already
+ * draws (`hudState`) and gestures the catalogue already prices. This bridge
+ * adds no behaviour: it reads the server's eight-slot resource vector verbatim,
+ * keeps the content's names and trade amounts as display text, and exposes the
+ * catalogue's `trade_resource` commands for the three player-tradeable keys.
+ *
+ * A missing or malformed key is skipped, not zeroed: with no readable server
+ * state there are no shortcuts, no values and no buttons. Nothing here grants,
+ * prices, predicts a balance or starts a countdown.
+ * ---------------------------------------------------------------------- */
+
+/** The client's own captions on the resource shortcut chrome. */
+export const RESOURCE_BUTTONS_TITLE = 'Resources';
+export const RESOURCE_BUTTONS_TAB = 'Resources';
+export const RESOURCE_BUTTONS_NOTE =
+  'Every value below is the server\'s. The server prices and settles every trade.';
+
+/** Explicit empty states, shown instead of a fabricated number or price. */
+export const RESOURCE_BUTTONS_NO_STATE =
+  'The server has not published any resource values yet.';
+export const RESOURCE_BUTTONS_NO_AMOUNTS =
+  'The content lists no market trade amounts.';
+
+/** The eight-slot resource vector, in the wire order the client must preserve. */
+const RESOURCE_BUTTON_KEYS = ['e', 'x', 'g', 'w', 'o', 's', 'c', 'm'] as const;
+
+/** The three keys the catalogue's `trade_resource` command may name. */
+const RESOURCE_BUTTON_TRADE_KEYS = ['w', 'o', 's'] as const;
+
+/** Display-only captions; the number beside each one is always the server's. */
+const RESOURCE_BUTTON_LABELS: Readonly<Record<string, string>> = {
+  e: 'Energy',
+  x: 'XP',
+  g: 'Gold',
+  w: 'Wood',
+  o: 'Oil',
+  s: 'Steel',
+  c: 'Cash',
+  m: 'Mana',
+};
+
+/** One drawn resource shortcut, carrying only values read from a source. */
+export interface ResourceShortcutView {
+  /** The wire key from the eight-slot vector. */
+  readonly key: string;
+  /** The client's own caption for that key, never game state. */
+  readonly label: string;
+  /** The server's value, verbatim. */
+  readonly value: number;
+  /** The content's base limit, shown as text; never a computed cap. */
+  readonly limit: number | null;
+  /** The exact `trade_resource` requests this shortcut may send. */
+  readonly trade: readonly NativeCommand[];
+}
+
+/** The resources-tab body hosted by the one shared dialog. */
+export interface ResourceButtonsPanelView {
+  readonly title: string;
+  readonly tab: string;
+  readonly note: string;
+  readonly shortcuts: readonly ResourceShortcutView[];
+  /** Explicit reasons a section is empty, never a placeholder number. */
+  readonly emptyMessages: readonly string[];
+}
+
+/**
+ * Read the resource shortcut chrome from the server's answer and the content.
+ *
+ * `hudState` is the canonical reading of the wallet, but it falls back to zero
+ * for a missing key; this bridge checks the raw key first so a malformed save
+ * renders nothing rather than a balance the server never sent. The content
+ * supplies only the display limit and the amounts its market globals publish;
+ * those amounts name a `trade_resource` request, not a locally paid price.
+ */
+export function resourceButtonsPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+): ResourceButtonsPanelView {
+  const raw = world.resources ?? {};
+  const limits = numbersAt(bundle.globals ?? {}, 'BASE_RESOURCE_LIMITS');
+  const amounts = marketAmounts(bundle.globals ?? {});
+  const emptyMessages: string[] = [];
+
+  const shortcuts: ResourceShortcutView[] = [];
+  for (const key of RESOURCE_BUTTON_KEYS) {
+    const value = finite(raw[key]);
+    // A negative balance is not a value the server could have published.
+    if (value === null || value < 0) continue;
+    const trade = (RESOURCE_BUTTON_TRADE_KEYS as readonly string[]).includes(key)
+      ? amounts.map((amount) => tradeResource(key, false, amount))
+      : [];
+    shortcuts.push({
+      key,
+      label: RESOURCE_BUTTON_LABELS[key] ?? key,
+      value,
+      limit: Object.prototype.hasOwnProperty.call(limits, key) ? limits[key]! : null,
+      trade,
+    });
+  }
+  if (shortcuts.length === 0) emptyMessages.push(RESOURCE_BUTTONS_NO_STATE);
+  if (amounts.length === 0) emptyMessages.push(RESOURCE_BUTTONS_NO_AMOUNTS);
+
+  return {
+    title: RESOURCE_BUTTONS_TITLE,
+    tab: RESOURCE_BUTTONS_TAB,
+    note: RESOURCE_BUTTONS_NOTE,
+    shortcuts,
+    emptyMessages,
+  };
+}
+
+/** The resource chrome borrows the one dialog's single slot, like the market. */
+export function resourceButtonsDialog(): DialogContent {
+  return { id: 'resourcebuttons-panel', kind: 'alert', title: RESOURCE_BUTTONS_TITLE };
+}

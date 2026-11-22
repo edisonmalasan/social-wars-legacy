@@ -2564,5 +2564,100 @@ export function uiCss(): string {
   color: #5c6678;
   cursor: not-allowed;
 }
+
+/* Resource buttons / icon chrome — original inline geometry only. */
+.swl-ui button.swl-resource-buttons-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px 2px 3px;
+  border: 1px solid #4a6a8a;
+  border-radius: 4px;
+  background: #223047;
+  color: var(--swl-ink);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+.swl-ui button.swl-resource-buttons-launcher[data-swl-open='true'] {
+  border-color: var(--swl-accent);
+  background: #2b3b55;
+}
+.swl-resource-buttons-art-badge { width: 26px; height: 26px; flex: 0 0 26px; }
+
+.swl-resource-buttons { display: flex; flex-direction: column; gap: var(--swl-gap); }
+.swl-resource-buttons-head { display: flex; align-items: center; gap: var(--swl-gap); }
+.swl-resource-buttons-head .swl-resource-buttons-art-badge { width: 40px; height: 40px; flex: 0 0 40px; }
+.swl-resource-buttons-title { margin: 0; color: var(--swl-ink); font-weight: 700; }
+.swl-resource-buttons-note { margin: 2px 0 0; color: var(--swl-ink-muted); }
+
+.swl-resource-buttons-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--swl-border);
+}
+.swl-resource-buttons-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 2px;
+  border: 1px solid var(--swl-accent);
+  border-bottom-color: transparent;
+  border-radius: 3px 3px 0 0;
+  background: #223047;
+  color: var(--swl-ink);
+}
+.swl-resource-buttons-art-tab { width: 28px; height: 14px; }
+
+.swl-resource-buttons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.swl-resource-buttons-shortcut {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--swl-gap);
+  padding: 5px 7px;
+  border: 1px solid #4a6a8a;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #223047, #1d2430);
+}
+.swl-resource-buttons-art-icon { width: 24px; height: 24px; flex: 0 0 24px; }
+.swl-resource-buttons-shortcut-main { flex: 1; min-width: 0; }
+.swl-resource-buttons-label { margin: 0; color: var(--swl-ink); font-weight: 700; }
+.swl-resource-buttons-numbers { margin: 2px 0; color: var(--swl-ink-muted); }
+.swl-resource-buttons-numbers [data-swl-server] { color: var(--swl-accent); font-weight: 700; }
+.swl-resource-buttons-limit { color: #8d97a8; font-style: italic; }
+.swl-resource-buttons-trades { display: flex; flex-wrap: wrap; gap: 4px; }
+.swl-ui button.swl-resource-buttons-trade {
+  padding: 2px 6px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #2b3b55;
+  color: var(--swl-ink);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+.swl-resource-buttons-empty {
+  display: flex;
+  align-items: center;
+  gap: var(--swl-gap);
+  padding: var(--swl-gap);
+  border: 1px dashed var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+.swl-resource-buttons-art-empty { width: 56px; height: 42px; flex: 0 0 56px; }
+.swl-resource-buttons-empty-list { margin: 0; padding-left: 16px; color: var(--swl-ink-muted); }
+.swl-resource-buttons-footer { display: flex; justify-content: flex-end; }
+.swl-ui button.swl-resource-buttons-close {
+  padding: 3px 10px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: var(--swl-ink);
+}
 `.trim();
 }
