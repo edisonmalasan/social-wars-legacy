@@ -11,7 +11,7 @@
  * the content's categories. They filter what is drawn; no tab grants, spends
  * or owns anything. The pure grouping lives in `@swl/client`.
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import {
   inventoryCategories,
@@ -22,8 +22,13 @@ import {
 } from '@swl/client';
 
 import { Collections } from './collections.tsx';
+import { InventoryGridCells } from './detailpanels.tsx';
 import { useRoster } from './roster.tsx';
-import type { CollectionsPanelView } from './state.ts';
+import {
+  inventoryGrid,
+  reconcileInventoryGrid,
+  type CollectionsPanelView,
+} from './state.ts';
 
 /** The inventory panel's tabs: All, a content category, or the collections tab. */
 type InventoryTab = number | 'collections' | null;
@@ -63,6 +68,11 @@ export function Inventory({
         ? tab
         : null;
   const visible = itemsForCategory(items, typeof active === 'number' ? active : null);
+  // The grid arrangement is UI state: dragging a cell calls setPos, and a new
+  // server answer keeps the arrangement for items that are still stored. The
+  // Place gesture below is unchanged and still asks the host for placement.
+  const [layout, setLayout] = useState(() => inventoryGrid(visible));
+  const grid = useMemo(() => reconcileInventoryGrid(layout, visible), [layout, visible]);
   // The roster is a gesture that opens the one shared dialog from this head;
   // opening a panel never changes the world.
   const roster = useRoster();
@@ -121,21 +131,12 @@ export function Inventory({
         ) : visible.length === 0 ? (
           <p className="swl-inventory-empty">Nothing in storage.</p>
         ) : (
-          <ul className="swl-inventory-list">
-            {visible.map((entry) => (
-              <li className="swl-inventory-item" key={entry.itemId}>
-                <span className="swl-inventory-name">{entry.name}</span>
-                <span className="swl-inventory-qty">×{entry.quantity}</span>
-                <button
-                  type="button"
-                  className="swl-inventory-place"
-                  onClick={() => onPlace?.(entry)}
-                >
-                  Place
-                </button>
-              </li>
-            ))}
-          </ul>
+          <InventoryGridCells
+            items={visible}
+            grid={grid}
+            onGrid={setLayout}
+            onPlace={onPlace}
+          />
         )}
         <div className="swl-inventory-title">Army</div>
         {army.length === 0 ? (

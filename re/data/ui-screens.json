@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 141,
+   "implemented": 143,
    "dropped": 52,
-   "planned": 67
+   "planned": 65
   }
  },
  "screens": [
@@ -703,8 +703,8 @@
    ],
    "overrides": [],
    "bytes": 2671,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P2) the HUD's popovers explain the readouts from the client's own model; the original info popup's timer and repositioning behaviour is not modelled."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.8: `apps/client/src/ui/detailpanels.tsx` draws the HUD's own popover as a timed info popup with anchor-relative `reposition` from `apps/client/src/ui/state.ts`; each readout's two lines come from `packages/client/src/hud.ts`, so no readout is invented. The original popup art stays excluded; only the timer and repositioning behaviour are claimed."
   },
   {
    "class": "InventoryItem",
@@ -723,8 +723,8 @@
    ],
    "overrides": [],
    "bytes": 1616,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P1) the storage panel draws each server-owned item as a row with a Place gesture; the original cell's drag positioning and grid layout are not modelled."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.8: `apps/client/src/ui/detailpanels.tsx` draws each server-owned stored item as a grid cell with drag positioning and `setPos` from `apps/client/src/ui/state.ts`. The arrangement is UI state only; the unchanged Place gesture still sends `place_stored_item` through the one transport and the server decides placement. The original cell art stays excluded; only the layout and drag behaviour are claimed."
   },
   {
    "class": "ItemButtonLarge",
@@ -3327,7 +3327,7 @@
    "overrides": [],
    "bytes": 1425,
    "decision": "planned",
-   "decisionNote": "Deferred: the tech tree is already modelled, but the research-centre screen is not rendered."
+   "decisionNote": "Deferred: the short note misidentified this as the magic tech tree. The movieclip is the shell of `popups/PopupResearchCenter.as` — the late-era AREA 51 / ROBOTIC CENTER robot-research screen whose own build-process animation art is `popupResearchCenter_buildingProcess.swf` and `popupResearchCenter_buildingProcess_3.swf`. The new server keeps only the migration fields `researchItemNumber`/`researchStepNumber`/`timeStampDoResearch` and applies none of the `next_research_item`, `next_research_step`, `research_buy_step_cash`, `reset_research_item` or `finish_robotic_help` commands, so its gestures would have no authoritative answer; its 'Hire friends' gesture is social (ADR 20). Unblock when the robot-research rules, requests and licensed art exist."
   },
   {
    "class": null,

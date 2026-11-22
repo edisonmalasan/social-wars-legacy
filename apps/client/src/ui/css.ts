@@ -273,6 +273,18 @@ export function uiCss(): string {
   color: #e0a33c;
 }
 
+/* GUI/InfoPopup.as: the HUD's popover with its display timer and
+   anchor-relative repositioning. The box is placed in viewport coordinates by
+   the model; the readout's own popover stays the source of both lines. No
+   original popup art is claimed. */
+.swl-info-popup {
+  position: fixed;
+  pointer-events: none;
+  z-index: 30;
+  max-width: 260px;
+  min-width: 180px;
+}
+
 /* --- The chapter map --------------------------------------------------- */
 
 .swl-chapters {
@@ -445,6 +457,50 @@ export function uiCss(): string {
 }
 
 .swl-ui button.swl-inventory-place:hover { background: #ffd75e; }
+
+/* GUI/InventoryItem.as: the stored items as a grid of draggable cells. The
+   column and row come from the UI-only setPos layout; the Place button is the
+   same request gesture as before, and no proprietary cell art is claimed. */
+.swl-inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swl-inventory-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 4px;
+  border: 1px dashed #38445a;
+  border-radius: 3px;
+  background: #10151d;
+}
+
+.swl-inventory-cell:hover { border-color: #f5c542; }
+
+.swl-inventory-cell-name {
+  overflow: hidden;
+  color: #e8e3d8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.swl-inventory-cell-qty {
+  color: #f5c542;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-ui .swl-inventory-cell .swl-inventory-place {
+  padding: 1px 4px;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
 
 /* --- The goal panel --------------------------------------------------- */
 
