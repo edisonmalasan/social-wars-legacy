@@ -53,6 +53,7 @@ import { Hud } from './hud.tsx';
 import { InfoPanel, ProductionSelector, PRODUCTION_DIALOG_ID } from './info.tsx';
 import { Inventory } from './inventory.tsx';
 import { MagicLab } from './magiclab.tsx';
+import { closeMarketPanel, MarketPanel, useMarket } from './market.tsx';
 import { MysteryLauncher, MysteryPanel, useMystery } from './mystery.tsx';
 import { Neighbours } from './neighbours.tsx';
 import { OnboardingLauncher, OnboardingPanel, useOnboarding } from './onboarding.tsx';
@@ -80,6 +81,8 @@ import {
   hudInput,
   infoPanel,
   inventoryItems,
+  marketDialog,
+  marketPanel,
   type ProductionPanelView,
   questMinLevels,
   questRanks,
@@ -207,6 +210,7 @@ export function Root({
   const chrome = useChrome();
   const roster = useRoster();
   const mystery = useMystery();
+  const market = useMarket();
   const state = hudState(hudInput(bundle, world));
   const bonus = useMemo(
     () => bonusPanel(world, now, tzOffsetHours),
@@ -259,10 +263,22 @@ export function Root({
     [bundle, world, now, activeTeam],
   );
 
+  // The market panel is a fresh reading of the server's counters and wallet.
+  // It keeps no price, grant or trade outcome of its own; the launcher's open
+  // flag is UI state and only decides which body the one dialog hosts.
+  const marketView = useMemo(() => marketPanel(bundle, world), [bundle, world]);
+
+  // The one dialog's slot is shared. The market's UI-only gesture borrows the
+  // same primitive: when it is open, it replaces the host's body for the
+  // moment and is given back on close. No second overlay is ever created.
+  const activeDialog: DialogState = market.open
+    ? { dialog: marketDialog() }
+    : (dialog ?? CLOSED_DIALOG);
+
   // The dialog's id selects which of the four assault-family screens to host.
   // Each view is a fresh reading of the server's answer: the interface keeps
   // no outcome, history row, strategy choice or charge of its own.
-  const dialogId = dialog?.dialog?.id ?? null;
+  const dialogId = activeDialog.dialog?.id ?? null;
   const assaultPanel = useMemo<AssaultPanelView | null>(() => {
     if (dialogId === 'assault-result') {
       const view = assaultResultPanel(bundle, world, now);
@@ -348,9 +364,11 @@ export function Root({
       {tutorial ? <TutorialOverlay {...tutorial} /> : null}
       <Feedback messages={feedback} />
       <Dialog
-        state={dialog ?? CLOSED_DIALOG}
-        onDismiss={onDialogDismiss ?? (() => {})}
+        state={activeDialog}
+        onDismiss={market.open ? closeMarketPanel : onDialogDismiss ?? (() => {})}
       >
+        {!market.open ? (
+        <>
         {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && !dialogId?.startsWith('soulmixer-') && !dialogId?.startsWith('fusion-') && !dialogId?.startsWith('research-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
             key={
@@ -447,6 +465,16 @@ export function Root({
             key={`chrome:${chrome.popup.id}`}
             request={chrome.popup}
             onAcknowledge={chrome.dismissNotice ?? undefined}
+          />
+        ) : null}
+        </>
+        ) : null}
+        {market.open ? (
+          <MarketPanel
+            key="market-player-owned"
+            view={marketView}
+            onCommand={onCommand}
+            onClose={closeMarketPanel}
           />
         ) : null}
       </Dialog>
