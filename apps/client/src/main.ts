@@ -26,7 +26,12 @@ import {
 import { questTitle, tutorialState, type Army } from '@swl/rules';
 
 import { buildScene, type SceneItem } from './scene.ts';
-import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH } from './renderer.ts';
+import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH, type ArtMode } from './renderer.ts';
+import {
+  ORIGINAL_ART_LICENCE,
+  resolveArtMode,
+  type ArtModeConfig,
+} from './originalart-textures.ts';
 import { applyFontScales, clientCss, type FontScaleFile } from './fonts.ts';
 import {
   authenticate,
@@ -158,6 +163,12 @@ const UI = document.getElementById('ui');
 const CONTENT_URL = '/content-bundle.json';
 const MANIFEST_URL = '/frame-manifest.json';
 const ATLAS_BASE = '/atlases';
+/**
+ * Where the art-mode choice lives. It is a file, not a probe of an atlas
+ * URL: a probe would itself make the failing request original art mode is
+ * meant to eliminate. A missing or invalid file falls back to atlas mode.
+ */
+const ART_MODE_URL = '/art-mode.json';
 /** Where the measured font scale lives. */
 const FONT_SCALE_URL = '/font-scale.json';
 /** Where the tutorial's steps live. */
@@ -401,6 +412,10 @@ export interface ClientHandle {
    * screen, so this is what says the player can see their town.
    */
   visibleSprites: () => number;
+  /** Which art mode the renderer was started in. */
+  artMode: () => ArtMode;
+  /** How many sprites the renderer actually added to the world container. */
+  drawnSprites: () => number;
   /** The tutorial step the client is showing, or null when it is not. */
   tutorialStep: () => number | null;
   /**
@@ -562,6 +577,11 @@ async function main(): Promise<void> {
   const manifest = await json<FrameManifest>(MANIFEST_URL);
   const content = await json<ContentBundle>(CONTENT_URL);
   const tutorialSteps = await json<{ steps: TutorialStep[] }>(TUTORIAL_URL);
+  // The art mode is chosen up front, from the shipped configuration. It is
+  // never inferred from whether an atlas page answers: that would make the
+  // very request we are trying to avoid.
+  const artModeConfig = await json<ArtModeConfig>(ART_MODE_URL).catch(() => null);
+  const artMode: ArtMode = resolveArtMode(artModeConfig);
 
   // The substitute fonts' scale. It is measured against the file that
   // ships, and it is **optional**: without it the text is a little
@@ -573,6 +593,7 @@ async function main(): Promise<void> {
     element: GAME,
     manifest,
     atlasBase: ATLAS_BASE,
+    artMode,
   });
   const atlas = new AtlasIndex(manifest);
 
@@ -1664,6 +1685,8 @@ async function main(): Promise<void> {
           sprite.y >= 0 &&
           sprite.y < STAGE_HEIGHT,
       ).length,
+    artMode: () => renderer.artMode,
+    drawnSprites: () => renderer.drawnSprites,
   };
   (window as unknown as { __swl?: ClientHandle }).__swl = handle;
 
@@ -1691,7 +1714,15 @@ async function main(): Promise<void> {
   fit();
   window.addEventListener('resize', fit);
 
-  if (renderer.missingAtlasPages.length > 0) {
+  if (artMode === 'original') {
+    // The licence named here is the generator's own dedication. This says
+    // what the world is drawn with; it is not a claim that the separate
+    // licence gate is closed.
+    status(
+      'started',
+      `original art mode - ${renderer.drawnSprites} sprites (${ORIGINAL_ART_LICENCE})`,
+    );
+  } else if (renderer.missingAtlasPages.length > 0) {
     status(
       'started',
       `${renderer.missingAtlasPages.length} atlas page(s) could not be loaded`,

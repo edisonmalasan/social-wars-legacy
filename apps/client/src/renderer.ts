@@ -10,18 +10,33 @@
  * sort and the frame choice — so that the rules can be tested without
  * one. What is left here is the drawing.
  *
- * ## The atlas pages are loaded on demand
+ * ## Two art modes, chosen before the first draw
  *
- * There are 3 590 atlas pages, 31.8 GB of them, and a scene of a few
- * hundred sprites touches a few dozen. So a page is fetched when a
- * sprite needs it and not before, and no more than a few are fetched at
- * once. Loading them all up front would fetch 31.8 GB to draw a
- * village.
+ * **Atlas mode** fetches the original game's atlas pages on demand. There
+ * are 3 590 pages, 31.8 GB of them, and a scene of a few hundred sprites
+ * touches a few dozen. So a page is fetched when a sprite needs it and not
+ * before, and no more than a few are fetched at once. Loading them all up
+ * front would fetch 31.8 GB to draw a village. This path stays intact for
+ * builds that ship the pages.
+ *
+ * **Original art mode** draws clean-room CC0 motifs instead. The motifs
+ * are generated in the browser from `@swl/art`, rasterised into canvases
+ * and uploaded as textures. Nothing is fetched at all: in this mode the
+ * renderer never asks for an atlas page, so a build without the pages has
+ * no missing resources and makes no failing request. The mode is fixed at
+ * construction, never probed with a request that could itself fail.
  */
 import { Application, Assets, Container, Rectangle, Sprite, Texture } from 'pixi.js';
 
 import type { CameraState, FrameManifest, Viewport, ViewportSize } from '@swl/client';
 
+import {
+  atlasPageRequest,
+  DEFAULT_MOTIFS,
+  motifFor,
+  svgDataUri,
+  type ArtMode,
+} from './originalart-textures.ts';
 import type { SceneSprite } from './scene.ts';
 import { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
 import { viewportOf, type StageLayout } from '@swl/client';
@@ -30,9 +45,52 @@ import { fitStage } from './viewport.ts';
 import { TouchGestureGuard, type TouchPoint } from './touch.ts';
 
 export { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
+export type { ArtMode } from './originalart-textures.ts';
 
 /** How many atlas pages are fetched at once. */
 export const MAX_CONCURRENT_PAGES = 8;
+
+/** The side of a generated motif, in stage pixels. */
+const MOTIF_SIZE = 64;
+
+/**
+ * Rasterise one generated SVG into a canvas.
+ *
+ * WebKit does not reliably upload an SVG data URL straight to a WebGL
+ * texture, so the SVG is decoded through an `HTMLImageElement` and painted
+ * into a plain canvas; the canvas is what Pixi uploads. A decode failure
+ * still yields a self-contained mark, so a flaky engine cannot turn into a
+ * missing texture or a console error. No network request is ever made:
+ * the image's source is a `data:` URL produced by the adapter.
+ */
+async function motifCanvas(svg: string): Promise<HTMLCanvasElement> {
+  const canvas = document.createElement('canvas');
+  canvas.width = MOTIF_SIZE;
+  canvas.height = MOTIF_SIZE;
+  const context = canvas.getContext('2d');
+  if (!context) return canvas;
+  try {
+    const image = new Image();
+    image.decoding = 'sync';
+    image.src = svgDataUri(svg);
+    if (typeof image.decode === 'function') {
+      await image.decode();
+    } else {
+      await new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error('the SVG image could not be decoded'));
+      });
+    }
+    context.drawImage(image, 0, 0, MOTIF_SIZE, MOTIF_SIZE);
+  } catch {
+    // A plain, original mark: still a real texture, and still no fetch.
+    context.fillStyle = '#2c4654';
+    context.fillRect(0, 0, MOTIF_SIZE, MOTIF_SIZE);
+    context.fillStyle = '#e9a63f';
+    context.fillRect(8, 8, MOTIF_SIZE - 16, MOTIF_SIZE - 16);
+  }
+  return canvas;
+}
 
 /** What the renderer needs to start. */
 export interface RendererOptions {
@@ -42,6 +100,8 @@ export interface RendererOptions {
   manifest: FrameManifest;
   /** Where the atlas pages are. */
   atlasBase: string;
+  /** Which art to draw: fetched atlas pages or generated CC0 motifs. */
+  artMode: ArtMode;
 }
 
 /** The world renderer. */
@@ -51,6 +111,8 @@ export class WorldRenderer {
   private readonly pages = new Map<string, Texture>();
   private readonly pending = new Map<string, Promise<void>>();
   private readonly missing = new Set<string>();
+  /** One texture per generated motif, ready before the first scene is drawn. */
+  private readonly originalTextures = new Map<string, Texture>();
   private readonly options: RendererOptions;
   private readonly queue: string[] = [];
   private scene: readonly SceneSprite[] = [];
@@ -72,6 +134,19 @@ export class WorldRenderer {
     this.options = options;
   }
 
+  /**
+   * Rasterise every generated motif once, before any scene is drawn.
+   *
+   * `draw()` is synchronous, so the textures must already exist by the time
+   * it runs. Decoding is done here, while `start()` is awaiting anyway.
+   */
+  private async prepareOriginalArt(): Promise<void> {
+    for (const motif of DEFAULT_MOTIFS) {
+      const canvas = await motifCanvas(motif.svg);
+      this.originalTextures.set(motif.id, Texture.from(canvas));
+    }
+  }
+
   /** Start the renderer. */
   static async start(options: RendererOptions): Promise<WorldRenderer> {
     const app = new Application();
@@ -91,6 +166,10 @@ export class WorldRenderer {
     options.element.appendChild(app.canvas);
 
     const renderer = new WorldRenderer(app, options);
+
+    // Original art needs no atlas pages, but its textures must exist before
+    // the first draw. Atlas mode needs no preparation: pages arrive later.
+    if (options.artMode === 'original') await renderer.prepareOriginalArt();
 
     // The gesture guard. A mouse click keeps the original, immediate path;
     // touch is deferred to release so a pinch or the second tap of a double
@@ -163,8 +242,10 @@ export class WorldRenderer {
    * has already sorted them, and sorting twice would be sorting once too
    * many.
    *
-   * A sprite whose page has not arrived yet is not drawn, and the page
-   * is fetched. When it arrives the scene is drawn again.
+   * In atlas mode a sprite whose page has not arrived yet is not drawn,
+   * and the page is fetched; when it arrives the scene is drawn again.
+   * In original art mode every sprite is drawn from a motif rasterised
+   * before the first draw, with no page request at all.
    */
   draw(scene: readonly SceneSprite[]): void {
     this.scene = scene;
@@ -176,8 +257,26 @@ export class WorldRenderer {
     }
   }
 
-  /** One sprite, or null when its page has not arrived. */
+  /** One sprite, or null when its art is not available yet. */
   private spriteFor(scene: SceneSprite): Sprite | null {
+    if (this.options.artMode === 'original') {
+      // No page, no Assets.load: the motif is a pure function of the item's
+      // identity and the texture was rasterised at start-up.
+      const motif = motifFor({
+        id: scene.id,
+        frame: scene.frame?.frame,
+        atlasX: scene.art?.atlas.x,
+        atlasY: scene.art?.atlas.y,
+      });
+      const texture = motif ? this.originalTextures.get(motif.id) : undefined;
+      if (!texture) return null;
+      const sprite = new Sprite(texture);
+      sprite.anchor.set(0.5, 0.5);
+      sprite.x = scene.x;
+      sprite.y = scene.y - scene.elevation;
+      return sprite;
+    }
+
     if (!scene.art) return null;
     const region = scene.art.atlas;
     const page = this.pages.get(region.file);
@@ -201,10 +300,12 @@ export class WorldRenderer {
     return sprite;
   }
 
-  /** Fetch a page, at most a few at a time. */
+  /** Fetch a page, at most a few at a time. Original art never fetches. */
   private requestPage(file: string): void {
-    if (this.pages.has(file) || this.pending.has(file) || this.missing.has(file)) return;
-    if (!this.queue.includes(file)) this.queue.push(file);
+    const known = new Set([...this.pages.keys(), ...this.pending.keys(), ...this.missing]);
+    const next = atlasPageRequest(this.options.artMode, file, known);
+    if (!next) return;
+    if (!this.queue.includes(next)) this.queue.push(next);
     this.pump();
   }
 
@@ -239,6 +340,22 @@ export class WorldRenderer {
   /** How many pages have been fetched. */
   get loadedPages(): number {
     return this.pages.size;
+  }
+
+  /** Which art mode this renderer was started in (read-only). */
+  get artMode(): ArtMode {
+    return this.options.artMode;
+  }
+
+  /**
+   * How many sprites were actually added to the world container.
+   *
+   * This is not the scene's length: a sprite waiting for a page is in the
+   * scene but not drawn. In original art mode it is the number of generated
+   * motifs on the stage, which is what an end-to-end check can assert.
+   */
+  get drawnSprites(): number {
+    return this.world.children.length;
   }
 
   /** The canvas, for the interface to sit over. */
