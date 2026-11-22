@@ -8,7 +8,12 @@
     "types": ["node"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      "@swl/art/browser": [
+        "../../packages/art/browser.ts"
+      ]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

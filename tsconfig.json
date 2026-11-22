@@ -16,6 +16,9 @@
       ],
       "@swl/content": [
         "./packages/content/src/index.ts"
+      ],
+      "@swl/art/browser": [
+        "./packages/art/browser.ts"
       ]
     }
   },

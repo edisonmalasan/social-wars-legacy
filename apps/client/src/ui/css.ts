@@ -2756,5 +2756,107 @@ export function uiCss(): string {
 .swl-assault-portrait-excluded { opacity: 0.55; }
 .swl-assault-portrait-name { font-size: calc(10px * var(--swl-font-scale-body, 1)); }
 .swl-assault-portrait-count { color: var(--swl-accent); font-variant-numeric: tabular-nums; }
+
+/* --- The Original art gallery -------------------------------------------
+ * The marks are inline data URLs generated at render time, so the grid needs
+ * no image files and no network. It stays inside the shared dialog and keeps
+ * the CC0 notice beside the work it covers.
+ */
+.swl-ui button.swl-original-art-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+  padding: 3px 8px;
+  border: 1px solid var(--swl-accent);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+  color: var(--swl-ink);
+}
+.swl-original-art-launcher-count {
+  color: var(--swl-accent);
+  font-variant-numeric: tabular-nums;
+}
+.swl-original-art {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--swl-gap);
+  max-width: 420px;
+}
+.swl-original-art-heading { margin: 0; font-weight: 700; }
+.swl-original-art-intro,
+.swl-original-art-caption {
+  margin: 0;
+  color: var(--swl-ink-muted);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  text-align: center;
+}
+.swl-original-art-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 64px);
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.swl-original-art-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+.swl-original-art-img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  image-rendering: auto;
+}
+.swl-original-art-name {
+  max-width: 64px;
+  overflow: hidden;
+  color: var(--swl-ink-muted);
+  font-size: calc(9px * var(--swl-font-scale-body, 1));
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.swl-original-art-licence {
+  margin: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  color: var(--swl-accent);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  text-align: center;
+}
+.swl-original-art-details {
+  width: 100%;
+  color: var(--swl-ink-muted);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+.swl-original-art-details summary { cursor: pointer; }
+.swl-original-art-notice {
+  max-height: 120px;
+  overflow: auto;
+  margin: 4px 0;
+  padding: 6px;
+  border-radius: 3px;
+  background: var(--swl-surface);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.swl-original-art-statement { margin: 4px 0; }
+.swl-ui button.swl-original-art-close {
+  padding: 5px 14px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+  color: var(--swl-ink);
+}
 `.trim();
 }

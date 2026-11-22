@@ -1,3 +1,4 @@
+import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -17,6 +18,16 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   base: './',
   plugins: [react()],
+  resolve: {
+    // @swl/art is a workspace package the client does not depend on, so pnpm
+    // does not link it here. Point the browser-only subpath at its source.
+    // The entry itself imports no `node:` built-in, so the bundle stays pure.
+    alias: {
+      '@swl/art/browser': fileURLToPath(
+        new URL('../../packages/art/browser.ts', import.meta.url),
+      ),
+    },
+  },
   build: {
     target: 'es2022',
     outDir: 'dist',
