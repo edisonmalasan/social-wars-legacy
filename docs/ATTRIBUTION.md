@@ -8,8 +8,17 @@ ask for.
 
 **Social Wars** was made by **Zynga**. The game's code, art, audio,
 configuration and trademarks are Zynga's property. This project is a
-preservation and a study; it does not claim the game's assets and does
-not redistribute them. See [`LICENSING.md`](LICENSING.md).
+preservation and a study; it does not claim those assets, and it does not
+redistribute the **original media or runtime files** — no SWF, sound file or
+proprietary font face is present in the shipped trees, which
+`scripts/check-licensing.mjs:34-38` checks. **Data derived** from the
+proprietary configuration and art *does* ship with the client:
+`apps/client/public/content-bundle.json` (1.19 MB, 900 items, built from the
+upstream `config/main.json`, the five patches, quest snapshots and
+decompiled-derived maps) and `apps/client/public/frame-manifest.json` (4 MB
+of atlas regions measured from the client's SWFs). That derived data is not
+rights-clean: the asset-licensing release gate stays open and no publication
+is authorised. See [`LICENSING.md`](LICENSING.md).
 
 The **preservation** was started by the **Social Warriors** team, whose
 project this one follows:
@@ -39,7 +48,9 @@ are original work generated from primitives by `packages/art` and dedicated
 to **CC0-1.0**. They are not Zynga's art and were not traced, sampled or
 copied from it; the manifest records a hash and an original-work statement
 for every file. Zynga remains the author and owner of the original game's
-art, audio and configuration, which this project does not redistribute.
+art, audio and configuration; the original media files are not redistributed,
+but data derived from them ships in the client's content bundle and frame
+manifest (see above and [`LICENSING.md`](LICENSING.md)).
 
 This is the first increment of a clean-room replacement, not the finished
 set. It does not make the game distributable on its own — see
