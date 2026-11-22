@@ -6,8 +6,8 @@ You are the autonomous engineering orchestrator responsible for continuing the d
 
 **Repository:** https://github.com/edisonmalasan/social-wars-legacy
 
-**Current verified baseline:** `main` at `1a6a89e` — PR #31 merged; see the live
-checkpoint in section 12 below for the in-flight increment.
+**Current verified baseline:** `main` at `c77e6fa` — PR #70 merged; see the live
+checkpoint in section 12 below for the verified state.
 
 **Primary source of truth:** `docs/ROADMAP.md`
 
@@ -504,7 +504,36 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main` (2026-11-22):** `68e3bbb` — PR #67 (`f096deb`, client
+- **Last verified `main` (2026-11-22):** `c77e6fa` — PR #69 (`a619325`, docs
+  correction) and PR #70 (`c77e6fa`, server-published fusion state + client
+  research selector) are both **MERGED** with all four required CI checks green.
+  PR #69 corrected the stale verified-status notes to the PR #67/#68 state (the
+  154/52/54 inventory, 401 items / 22 open, and the closed "no applier" and
+  fusion-blocker claims). PR #70 closed the remaining state-publication gap:
+  `packages/server/src/apply.ts` now publishes `privateState.soulMixer` from
+  server-owned data only (two inputs, the seeded fuse result, the paid power-up
+  level and the validated building id), rebuilt from a whitelist so a stale or
+  tampered record cannot survive and a fresh save publishes no record;
+  `apps/client/src/ui/state.ts` reads the server-owned `researchState` record by
+  type, preferring it to the legacy typed fields and falling back only when
+  malformed. Panels render those published values and fall back to explicit
+  empty states on a fresh save or malformed/absent/tampered fields — no local
+  roll, grant, price or countdown. Independently re-run on merged `main`:
+  `node --test packages/server/src/soulmixer-panel-state.test.ts
+  apps/client/src/ui/fusion.test.ts` → **24 tests / 24 pass / 0 fail**;
+  `node scripts/check-roadmap.mjs` → **401 items, 22 open** (B 4, E 1, G 8, H 4,
+  I 5); working tree clean. PR #70's worker reported a full suite 1972/1972,
+  golden master 50 scenarios / 0 differences and command catalogue 94/94.
+  **Audit verdict (read-only worker, terminal):** of the 22 open items, ZERO are
+  independently actionable now and ZERO need a new user decision — every one is
+  gated by art licensing, the Flash rig/live captures, devices/macOS/iOS hosts,
+  signing credentials, a funded purchase account, a GPU fixture, a rights-holder
+  request, or an approved non-goal (ADR 19; GPL upstream data). Verified against
+  `re/data/ui-screens.json`: the 54 planned screens are 44 art/licence, 9 ADR-20
+  scope and 1 cosmetic. This is a valid terminal state for autonomous execution:
+  no work invented, no non-checkbox note promoted into an item, no checkbox
+  ticked and no blocker removed.
+- **Historical checkpoint (superseded by `c77e6fa`): `68e3bbb` — PR #67 (`f096deb`, client
   panels) and PR #68 (server appliers) both merged with green CI. PR #67
   (`feat/soulmixer-research-screens`, "draw Atom Fusion and research panels from
   server state") added `apps/client/src/ui/fusion.tsx` (launcher plus
