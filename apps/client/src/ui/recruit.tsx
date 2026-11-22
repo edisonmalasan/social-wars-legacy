@@ -9,6 +9,8 @@
  */
 import type { RecruitView } from '@swl/client';
 
+import { TrainingQueuePortraits } from './unitportraits.tsx';
+
 /** The recruitment panel's props. */
 export interface RecruitPanelProps {
   /** The derived view, or null when the selection is not a training building. */
@@ -54,6 +56,7 @@ export function RecruitPanel({
         </ul>
       ) : null}
       <div className="swl-recruit-queue">
+        <TrainingQueuePortraits queue={view.queue} units={view.units} />
         <span className="swl-recruit-countdown">
           {queue.queued <= 0
             ? 'No units queued'
