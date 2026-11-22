@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 154,
+   "implemented": 156,
    "dropped": 52,
-   "planned": 54
+   "planned": 52
   }
  },
  "screens": [
@@ -32,8 +32,8 @@
    ],
    "overrides": [],
    "bytes": 546,
-   "decision": "planned",
-   "decisionNote": "Deferred: the market entry button is a Flash movieclip; the clone has no click or hover gesture wired to a market panel, and the button art is still under the Zynga licence gate."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/market.tsx` draws the market launcher gesture in the chrome and opens the player-owned resource market in the one shared dialog. The movieclip's proprietary button art stays excluded; only the gesture is claimed."
   },
   {
    "class": null,
@@ -3712,8 +3712,8 @@
    ],
    "overrides": [],
    "bytes": 5793,
-   "decision": "planned",
-   "decisionNote": "Deferred: the market button's buy/sell refresh and 24-hour exhaustion text have no client model; unblock when the market flow is rendered and the art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/market.tsx` draws the buy and sell buttons and the recovered 24-hour exhaustion sentence as display only; `apps/client/src/ui/state.ts` reads the server's counters and wallet for the display. Every gesture sends `trade_resource` through the one command transport, and the proprietary button art stays excluded."
   },
   {
    "class": "InventoryTabCollections",

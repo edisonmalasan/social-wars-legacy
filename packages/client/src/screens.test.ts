@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 154,
+      implemented: 156,
       dropped: 52,
-      planned: 54,
+      planned: 52,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -878,6 +878,49 @@ describe('the soul-mixer help and turbine screen decisions', () => {
       assert.ok(screen, `${path} is not in the inventory`);
       assert.equal(screen!.decision, 'planned', `${path} should stay planned`);
       assert.match(screen!.decisionNote, /^Deferred: /);
+    }
+  });
+});
+
+describe('the player-owned resource market screen family decisions', () => {
+  // Only the two class-A screens are reclassified. `ButtonMarketMC.as` has no
+  // behaviour of its own: its gesture is now drawn in the chrome and its panel
+  // is hosted by the one dialog. `popups/ButtonMarket.as` has the buy/sell
+  // refresh and the 24-hour sentence, now drawn from the server's counters and
+  // wallet with the exhaustion caption kept display-only. The ADR 20 auction
+  // screens and every art-only shell are untouched.
+  const MARKET_SCREENS = ['ButtonMarketMC.as', 'popups/ButtonMarket.as'];
+
+  it('records each rendered screen as implemented against the market panel', async () => {
+    const all = await screens();
+    for (const path of MARKET_SCREENS) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/market\.tsx`/);
+      assert.match(screen!.decisionNote, /art/i);
+    }
+  });
+
+  it('says the exhaustion text is display-only and the request is authoritative', async () => {
+    const all = await screens();
+    const button = all.find((entry) => entry.path === 'popups/ButtonMarket.as');
+    assert.ok(button);
+    assert.match(button!.decisionNote, /display only/i);
+    assert.match(button!.decisionNote, /server/i);
+    assert.match(button!.decisionNote, /trade_resource/);
+  });
+
+  it('leaves the ADR 20 marketplaces and the art-only market shells alone', async () => {
+    const all = await screens();
+    for (const path of [
+      'PopupMarketMC.as',
+      'PopupMarketplaceAsset.as',
+      'popups/marketplace/PopupMarketplace.as',
+    ]) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.notEqual(screen!.decision, 'implemented', `${path} was reclassified`);
     }
   });
 });

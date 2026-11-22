@@ -2410,5 +2410,99 @@ export function uiCss(): string {
 .swl-attack-symbols-stat dd { margin: 0; }
 .swl-attack-symbols-classes { columns: 2; font-size: calc(10px * var(--swl-font-scale-body, 1)); }
 .swl-character-setup-actions { display: flex; justify-content: flex-end; }
+
+/* --- The player-owned resource market --------------------------------- */
+/* The chrome's head keeps the market gesture beside the help button. */
+.swl-chrome-head-actions { display: flex; align-items: center; gap: 4px; }
+
+.swl-ui button.swl-market-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 4px;
+  color: var(--swl-accent);
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  white-space: nowrap;
+}
+
+.swl-market-art-badge { width: 24px; height: 24px; flex: 0 0 24px; }
+.swl-market-art-empty { width: 56px; height: 42px; flex: 0 0 56px; }
+.swl-market-art-resource { width: 28px; height: 28px; flex: 0 0 28px; }
+.swl-market-art-exhausted { width: 18px; height: 18px; flex: 0 0 18px; vertical-align: middle; }
+
+.swl-market {
+  max-width: 540px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--swl-gap);
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-market-head { display: flex; align-items: center; gap: var(--swl-gap); }
+.swl-market-title { margin: 0; color: var(--swl-accent); font-weight: 700; font-size: 1.2em; }
+.swl-market-note { margin: 2px 0 0; color: var(--swl-ink-muted); }
+
+.swl-market-empty {
+  display: flex;
+  align-items: center;
+  gap: var(--swl-gap);
+  padding: var(--swl-gap);
+  border: 1px dashed var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+.swl-market-empty-list { margin: 0; padding-left: 16px; color: var(--swl-ink-muted); }
+
+.swl-market-counters,
+.swl-market-wallet {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px var(--swl-gap-lg);
+  margin: 0;
+  padding: var(--swl-gap);
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: rgba(16, 21, 29, 0.92);
+}
+.swl-market-counters > div,
+.swl-market-wallet > div { display: flex; justify-content: space-between; gap: 6px; }
+.swl-market-counters dt,
+.swl-market-wallet dt { color: var(--swl-ink-muted); }
+.swl-market-counters dd,
+.swl-market-wallet dd { margin: 0; color: var(--swl-accent); font-weight: 700; text-align: right; }
+
+.swl-market-display { margin: 0; color: var(--swl-ink-muted); white-space: pre-line; }
+.swl-market-exhaustion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--swl-danger);
+}
+
+.swl-market-rows { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.swl-market-row {
+  display: flex;
+  gap: var(--swl-gap);
+  padding: 6px;
+  border: 1px solid var(--swl-border);
+  border-radius: 4px;
+  background: var(--swl-surface-raised);
+}
+.swl-market-row-main { flex: 1; min-width: 0; }
+.swl-market-row-name { margin: 0; color: var(--swl-ink); font-weight: 700; }
+.swl-market-row-key { color: var(--swl-ink-muted); font-weight: 400; }
+.swl-market-row-numbers { margin: 2px 0 4px; color: var(--swl-ink-muted); }
+.swl-market-actions { display: flex; flex-wrap: wrap; gap: 4px; }
+.swl-ui button.swl-market-trade {
+  padding: 3px 6px;
+  border: 1px solid var(--swl-border);
+  border-radius: 3px;
+  background: var(--swl-surface);
+}
+.swl-ui button.swl-market-buy { border-color: var(--swl-success); color: var(--swl-success); }
+.swl-ui button.swl-market-sell { border-color: var(--swl-accent); color: var(--swl-accent); }
+.swl-market-footer { justify-content: flex-end; }
+.swl-ui button.swl-market-close { padding: 4px 12px; border-color: var(--swl-accent); }
 `.trim();
 }
