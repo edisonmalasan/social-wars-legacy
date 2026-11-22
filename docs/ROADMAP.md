@@ -215,9 +215,9 @@ first means guessing at the rules being cloned.
       (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
       attack interval, the velocity, the life and the population
 - [ ] The panels and the popups are **rendered**, and the popups that are not
-      implemented are recorded as dropped. The screen inventory now reads **141
-      implemented / 52 dropped / 67 planned**; the counts are checked by
-      `packages/client/src/screens.test.ts`, and this item stays open while **67
+      implemented are recorded as dropped. The screen inventory now reads **143
+      implemented / 52 dropped / 65 planned**; the counts are checked by
+      `packages/client/src/screens.test.ts`, and this item stays open while **65
       screens are planned** - a `Deferred: ` reason records honest scope, not a
       rendered screen or a drop
 - [x] The authoritative **item id → delegate** map is extracted from
@@ -1198,21 +1198,21 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **141 implemented** - the clone models the screen's behaviour, and the decision
+      - **143 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **52 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **67 planned** - in scope, the client's behaviour is real, and not modelled
+      - **65 planned** - in scope, the client's behaviour is real, and not modelled
         yet; each now carries a `Deferred: ` reason saying what is missing or how it
         unblocks
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
       exists, every dropped one must say why, and every planned one must start with
       `Deferred: ` and say what is missing or how it unblocks. The counts above are
-      checked by the same test. **This item stays open while 67 screens are planned**:
+      checked by the same test. **This item stays open while 65 screens are planned**:
       a deferral reason is neither an implementation nor a drop, and the earlier
       106/23/131 breakdown was a factual error, not a hidden batch of finished work
 - [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
@@ -1872,14 +1872,14 @@ pricing remain server-side.
 
 ---
 
-## Final screen-family refresh — verified inventory at 4551edd
+## Final screen-family refresh — verified inventory at 27f1dab
 
-*Status: **verified**. This section records the five screen-family increments
+*Status: **verified**. This section records the six screen-family increments
 that followed the G5.2 and Expansion milestones, and supersedes their "remain
 planned" notes. It sits **outside** the `## Group X` sections, so
 `node scripts/check-roadmap.mjs` still counts the same **401** items (22 open:
 B 4, E 1, G 8, H 4, I 5). The inventory in `re/data/ui-screens.json` now reads
-**141 implemented / 52 dropped / 67 planned** out of 260; the `movieclip`
+**143 implemented / 52 dropped / 65 planned** out of 260; the `movieclip`
 count of 108 is a by-kind count, not a decision count. Nothing here turns a
 `Deferred: ` reason into a completed screen.*
 
@@ -1923,13 +1923,40 @@ count of 108 is a by-kind count, not a decision count. Nothing here turns a
   revival is decided locally and no proprietary art is claimed. Still planned:
   the gender/character-setup choice — the save has no character-setup field
   and no command exists, so there is nothing authoritative to render.
+- **PR #57 (`27f1dab`) — inventory cells and the HUD info popup (2 screens).**
+  `apps/client/src/ui/detailpanels.tsx` draws each server-owned stored item as
+  a grid cell with drag positioning and `setPos` from `apps/client/src/ui/state.ts`.
+  The arrangement is UI state only: the unchanged Place gesture still sends
+  `place_stored_item` through the one transport and the server decides placement.
+  The same module draws the HUD's own popover as a timed info popup with
+  anchor-relative `reposition`, each readout's two lines coming from
+  `packages/client/src/hud.ts`, so no readout is invented. Still excluded: the
+  original cell and popup art — only the layout, drag, display timer and
+  repositioning behaviour are claimed.
+
+**Corrected research-centre gate (both research-centre screens stay planned).**
+The old one-line note on `PopupResearchCenterMC.as` falsely identified it as the
+magic tech tree. It is in fact the shell of `popups/PopupResearchCenter.as` — the
+late-era **AREA 51 / ROBOTIC CENTER** robot-research screen, whose own Zynga
+build-process animation art is `popupResearchCenter_buildingProcess.swf` and
+`popupResearchCenter_buildingProcess_3.swf`. Its literals describe a **6-hour**
+research cycle ("Press research every 6 hours to get a powerful robot.") and an
+[ADR 20](./adr/0020-social-services-server-only.md) social "Hire friends" gesture.
+Decisively, the new server keeps only the migration fields `researchItemNumber`
+/ `researchStepNumber` / `timeStampDoResearch` and applies **none** of
+`next_research_item`, `next_research_step`, `research_buy_step_cash`,
+`reset_research_item` or `finish_robotic_help`, so the screen's gestures have no
+authoritative answer. Both `PopupResearchCenterMC.as` and
+`popups/PopupResearchCenter.as` therefore stay `Deferred: `, unblocked only by
+robot-research rules, requests and licensed art. No parity is claimed, and the
+magic tech tree (`packages/client/src/magic.ts`) is not a substitute for it.
 
 **Verified gates for this refresh:** `node scripts/check-roadmap.mjs` reports
 401 items, 22 open (B 42/4, E 37/1, G 78/8, H 14/4, I 99/5, with A, C, D and F
 complete); `node scripts/check-report-sync.mjs` agrees with the implementation
 (4 claims) after `pnpm build:content`; and this documentation-only diff touches
 only `docs/ROADMAP.md` and `docs/GOAL.md`. The B6 and G3 checkbox items stay
-open while 67 screens are planned: a deferral is honest scope, not a finished
+open while 65 screens are planned: a deferral is honest scope, not a finished
 screen or a drop.
 
 ---
@@ -3051,7 +3078,7 @@ be mistaken for unfinished work.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 67 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 67; the art gate applies to the drawn ones |
+| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 65 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 65; the art gate applies to the drawn ones |
 | B | PvP `end_attack` payload captured live | Needs a live second player and the original Flash client driven over CDP | A Flash test rig with two live accounts |
 | B | `attack_player` / `spy_player` payloads captured live | Same as above | The same Flash test rig |
 | B | Premium purchase flow captured live | Needs a real-money account, which the preservation project must not use | A funded test account and explicit approval |
@@ -3063,7 +3090,7 @@ be mistaken for unfinished work.*
 |---|---|---|---|
 | G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout, or a licensing decision |
 | G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented | Licence or re-create the art (I6) |
-| G | Every B6 screen implemented or explicitly dropped | 67 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 67 |
+| G | Every B6 screen implemented or explicitly dropped | 65 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 65 |
 | G | Client runs in Firefox and Safari | **Firefox and WebKit (Playwright) are verified**: full rendered gameplay sessions ran under Gecko via `scripts/e2e-test-firefox.py` and under WebKit via `scripts/e2e-test-webkit.py` (both Playwright engines, driven over Juggler/BiDi). Branded Safari and real devices have not been run — Playwright's WebKit is an engine test, not Safari | Play the same session in branded Safari and on real devices; this box closes once Safari passes |
 | G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux bundling is now in CI, unsigned** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` with `libwebkit2gtk-4.1-dev`, and its informational, non-required `linux-bundle` job produces unsigned `.deb`/`.AppImage` artefacts; macOS genuinely needs a host | Add a macOS runner and signed artefacts (Linux bundling is already in CI); this box closes once all three platforms are produced |
 | G | Mobile build runs on Android and iOS | No Capacitor, Android SDK or Xcode on this machine | Install the Capacitor toolchain and SDKs |
