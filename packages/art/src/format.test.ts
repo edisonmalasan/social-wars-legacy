@@ -31,7 +31,7 @@ test('sixteen distinct icon motifs and one sprite sheet are generated', () => {
 
 test('every SVG has a declaration, a namespaced root and a closing tag', () => {
   const svgs = artifacts.filter((f) => f.path.endsWith('.svg'));
-  assert.equal(svgs.length, 29); // 16 icons + 1 sheet + 12 FX frames
+  assert.equal(svgs.length, 46); // 16 icons + 1 sheet + 12 FX frames + 17 gameplay motifs
   for (const file of svgs) {
     const svg = new TextDecoder().decode(file.bytes);
     assert.ok(svg.startsWith('<?xml version="1.0" encoding="UTF-8"?>\n<svg'), file.path);

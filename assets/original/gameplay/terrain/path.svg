@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Town path</title>
+  <desc id="swl-desc">A repeating road tile with a straight band and seeded pebbles.</desc>
+    <rect x="0" y="0" width="64" height="64" rx="0" fill="#5e6b4a"/>
+    <g transform="translate(-64 -64)">
+    <rect x="0" y="22" width="64" height="22" rx="0" fill="#8a7c5a"/>
+    <rect x="0" y="24" width="64" height="2" rx="0" fill="#a99a72"/>
+    <rect x="0" y="40" width="64" height="2" rx="0" fill="#6d6147"/>
+    <ellipse cx="6" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="18" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    <ellipse cx="30" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="42" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    </g>
+    <g transform="translate(0 -64)">
+    <rect x="0" y="22" width="64" height="22" rx="0" fill="#8a7c5a"/>
+    <rect x="0" y="24" width="64" height="2" rx="0" fill="#a99a72"/>
+    <rect x="0" y="40" width="64" height="2" rx="0" fill="#6d6147"/>
+    <ellipse cx="6" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="18" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    <ellipse cx="30" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="42" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    </g>
+    <g transform="translate(64 -64)">
+    <rect x="0" y="22" width="64" height="22" rx="0" fill="#8a7c5a"/>
+    <rect x="0" y="24" width="64" height="2" rx="0" fill="#a99a72"/>
+    <rect x="0" y="40" width="64" height="2" rx="0" fill="#6d6147"/>
+    <ellipse cx="6" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="18" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    <ellipse cx="30" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="42" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    </g>
+    <g transform="translate(-64 0)">
+    <rect x="0" y="22" width="64" height="22" rx="0" fill="#8a7c5a"/>
+    <rect x="0" y="24" width="64" height="2" rx="0" fill="#a99a72"/>
+    <rect x="0" y="40" width="64" height="2" rx="0" fill="#6d6147"/>
+    <ellipse cx="6" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="18" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    <ellipse cx="30" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="42" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    </g>
+    <g transform="translate(0 0)">
+    <rect x="0" y="22" width="64" height="22" rx="0" fill="#8a7c5a"/>
+    <rect x="0" y="24" width="64" height="2" rx="0" fill="#a99a72"/>
+    <rect x="0" y="40" width="64" height="2" rx="0" fill="#6d6147"/>
+    <ellipse cx="6" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="18" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    <ellipse cx="30" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="42" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    </g>
+    <g transform="translate(64 0)">
+    <rect x="0" y="22" width="64" height="22" rx="0" fill="#8a7c5a"/>
+    <rect x="0" y="24" width="64" height="2" rx="0" fill="#a99a72"/>
+    <rect x="0" y="40" width="64" height="2" rx="0" fill="#6d6147"/>
+    <ellipse cx="6" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="18" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    <ellipse cx="30" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="42" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    </g>
+    <g transform="translate(-64 64)">
+    <rect x="0" y="22" width="64" height="22" rx="0" fill="#8a7c5a"/>
+    <rect x="0" y="24" width="64" height="2" rx="0" fill="#a99a72"/>
+    <rect x="0" y="40" width="64" height="2" rx="0" fill="#6d6147"/>
+    <ellipse cx="6" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="18" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    <ellipse cx="30" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="42" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    </g>
+    <g transform="translate(0 64)">
+    <rect x="0" y="22" width="64" height="22" rx="0" fill="#8a7c5a"/>
+    <rect x="0" y="24" width="64" height="2" rx="0" fill="#a99a72"/>
+    <rect x="0" y="40" width="64" height="2" rx="0" fill="#6d6147"/>
+    <ellipse cx="6" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="18" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    <ellipse cx="30" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="42" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    </g>
+    <g transform="translate(64 64)">
+    <rect x="0" y="22" width="64" height="22" rx="0" fill="#8a7c5a"/>
+    <rect x="0" y="24" width="64" height="2" rx="0" fill="#a99a72"/>
+    <rect x="0" y="40" width="64" height="2" rx="0" fill="#6d6147"/>
+    <ellipse cx="6" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="18" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    <ellipse cx="30" cy="30" rx="3" ry="1.6" fill="#c1b18a"/>
+    <ellipse cx="42" cy="37" rx="3" ry="1.6" fill="#5f5540"/>
+    </g>
+</svg>

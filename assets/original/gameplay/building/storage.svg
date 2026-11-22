@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Storage</title>
+  <desc id="swl-desc">A banded warehouse with stacked crates.</desc>
+    <rect x="9" y="22" width="46" height="32" rx="0" fill="#2c4654"/>
+    <polygon points="9,22 32,9 55,22" fill="#e9a63f"/>
+    <rect x="25" y="36" width="14" height="18" rx="1" fill="#b65340"/>
+    <line x1="32" y1="36" x2="32" y2="54" stroke="#f7ecd7" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="12" y="28" width="9" height="9" rx="1" fill="#f7ecd7"/>
+    <rect x="23" y="28" width="9" height="9" rx="1" fill="#f7ecd7"/>
+</svg>

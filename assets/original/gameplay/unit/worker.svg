@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Worker unit</title>
+  <desc id="swl-desc">A figure with a pick, a crate and seeded sparks.</desc>
+    <circle cx="24" cy="15" r="7" fill="#f7ecd7"/>
+    <rect x="19" y="22" width="11" height="21" rx="3" fill="#e9a63f"/>
+    <rect x="15" y="41" width="7" height="14" rx="2" fill="#2c4654"/>
+    <rect x="28" y="41" width="7" height="14" rx="2" fill="#2c4654"/>
+    <line x1="33" y1="44" x2="51" y2="22" stroke="#b65340" stroke-width="4" stroke-linecap="round"/>
+    <path d="M36 18 Q45 10 54 18" fill="none" stroke="#2c4654" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="40" y="50" width="16" height="10" rx="1" fill="#f7ecd7"/>
+    <circle cx="50" cy="26" r="1.5" fill="#86cdbd"/>
+    <circle cx="53" cy="22" r="1.5" fill="#86cdbd"/>
+    <circle cx="56" cy="18" r="1.5" fill="#86cdbd"/>
+</svg>
