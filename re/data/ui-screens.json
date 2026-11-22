@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 143,
+   "implemented": 147,
    "dropped": 52,
-   "planned": 65
+   "planned": 61
   }
  },
  "screens": [
@@ -3095,8 +3095,8 @@
    ],
    "overrides": [],
    "bytes": 1109,
-   "decision": "planned",
-   "decisionNote": "Deferred: the mystery box is in scope; its rules are not modelled yet, so its popup cannot be drawn."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the mystery-box screen (`apps/client/src/ui/mystery.tsx`) draws pack 4's four content candidates with the client's own Rare/Uncommon/Common literals and a Buy request; the rolled reward is read from the store the server granted into, never rolled locally. The original's box artwork stays excluded."
   },
   {
    "class": null,
@@ -3473,8 +3473,8 @@
    ],
    "overrides": [],
    "bytes": 1451,
-   "decision": "planned",
-   "decisionNote": "Deferred: the super mystery box is in scope; its rules are not modelled yet, so its popup cannot be drawn."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the super mystery-box screen (`apps/client/src/ui/mystery.tsx`) draws the content's three rarity rows and three priced tiers with the client's own BEST VALUE / ONLY THIS WEEK / CONGRATULATIONS literals; the Buy is a request and the won ids come from the server's store answer. The original's box artwork stays excluded."
   },
   {
    "class": null,
@@ -4830,8 +4830,8 @@
    ],
    "overrides": [],
    "bytes": 3944,
-   "decision": "planned",
-   "decisionNote": "Deferred: the mystery box is in scope; its rules are not modelled yet, so its popup cannot be drawn."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the mystery-box screen (`apps/client/src/ui/mystery.tsx`) draws pack 4's four content candidates with the client's own Rare/Uncommon/Common literals and a Buy request; the rolled reward is read from the store the server granted into, never rolled locally. The original's box artwork stays excluded."
   },
   {
    "class": "PopupNeighbors",
@@ -5478,8 +5478,8 @@
    ],
    "overrides": [],
    "bytes": 15384,
-   "decision": "planned",
-   "decisionNote": "Deferred: the super mystery box is in scope; its rules are not modelled yet, so its popup cannot be drawn."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the super mystery-box screen (`apps/client/src/ui/mystery.tsx`) draws the content's three rarity rows and three priced tiers with the client's own BEST VALUE / ONLY THIS WEEK / CONGRATULATIONS literals; the Buy is a request and the won ids come from the server's store answer. The original's box artwork stays excluded."
   },
   {
    "class": "PopupTutorial",
