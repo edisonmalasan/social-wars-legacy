@@ -9,11 +9,13 @@
  *
  * This file is deliberately a plain object: capacitor.config.ts is read by
  * the Capacitor CLI, which is only installed when native work begins. There
- * are no native projects here — `cap add android` / `cap add ios` generate
- * them, and they are not run as part of this scaffold.
+ * are no committed native projects — `cap add android` / `cap add ios`
+ * generate them locally and they are gitignored. A real Android debug APK
+ * build was verified with the placeholder URL below; the APK is a build
+ * artifact, not a runnable client, until the URL names a real deployment.
  */
 
-/** The deployed game server. Replace before generating a native project. */
+/** The deployed game server. Replace before shipping a runnable native app. */
 const serverUrl = 'https://REPLACE-WITH-YOUR-SERVER.example';
 
 const config = {
