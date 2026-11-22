@@ -28,6 +28,7 @@ import type {
   HudRules,
   ItemPopulation,
   NativeCommand,
+  Popover,
   QuestBriefing,
   QuestChoice,
   QuestResultOptions,
@@ -2111,4 +2112,235 @@ export function characterSetupDialog(kind: CharacterSetupPanelKind): DialogConte
     'attack-symbols': 'Attack symbols',
   };
   return { id: `charactersetup-${kind}`, kind: 'alert', title: titles[kind] };
+}
+
+/* -------------------------------------------------------------------------
+ * The inventory cell and the info popup
+ *
+ * These are the last two GUI panels whose behaviour is presentation only.
+ * The inventory grid arranges the **server's** stored items into cells and
+ * lets one cell be dragged onto another slot: that is `setPos` from
+ * `GUI/InventoryItem.as` as UI state. It never places an item — the Place
+ * gesture is unchanged and still sends `place_stored_item` through the one
+ * transport, with the tile chosen on the map.
+ *
+ * The info popup is `GUI/InfoPopup.as`: the HUD's own `Popover` shown for a
+ * client-side display lifetime, with a `reposition` that keeps the box inside
+ * the viewport. It invents no readout and owns no game rule: the first and
+ * warning lines are the HUD model's, verbatim.
+ * ---------------------------------------------------------------------- */
+
+/** The inventory grid's column count. UI-only layout, not a server rule. */
+export const INVENTORY_GRID_COLUMNS = 2;
+
+/** The cell order of the inventory grid. UI state, never saved to the server. */
+export interface InventoryGridState {
+  readonly columns: number;
+  /** Content item ids, in the order their cells are drawn. */
+  readonly order: readonly number[];
+}
+
+/** One stored item drawn in a grid cell, with its UI-only column and row. */
+export interface InventoryCellView extends StoredItemView {
+  /** The cell's linear index in the grid. */
+  readonly index: number;
+  readonly col: number;
+  readonly row: number;
+}
+
+/**
+ * Seed a grid from the server's stored items, in the order `storedItems`
+ * already gives them. Unknown or duplicate ids are skipped: a cell must name
+ * exactly one server-owned item.
+ */
+export function inventoryGrid(
+  items: readonly StoredItemView[],
+  columns = INVENTORY_GRID_COLUMNS,
+): InventoryGridState {
+  const count =
+    Number.isInteger(columns) && columns > 0 ? columns : INVENTORY_GRID_COLUMNS;
+  const seen = new Set<number>();
+  const order: number[] = [];
+  for (const entry of items) {
+    if (!Number.isInteger(entry.itemId) || seen.has(entry.itemId)) continue;
+    seen.add(entry.itemId);
+    order.push(entry.itemId);
+  }
+  return { columns: count, order };
+}
+
+/**
+ * Keep a layout across a new server answer: cells that still name a stored
+ * item keep their relative order, vanished items drop out, and new items
+ * append. The store's content is the server's; only the arrangement is ours.
+ */
+export function reconcileInventoryGrid(
+  grid: InventoryGridState,
+  items: readonly StoredItemView[],
+): InventoryGridState {
+  const fresh = inventoryGrid(items, grid.columns);
+  const present = new Set(fresh.order);
+  const kept = grid.order.filter((id) => present.has(id));
+  const added = fresh.order.filter((id) => !kept.includes(id));
+  return { columns: grid.columns, order: [...kept, ...added] };
+}
+
+/** Pair the stored items with their grid cells. */
+export function inventoryCells(
+  items: readonly StoredItemView[],
+  grid: InventoryGridState,
+): InventoryCellView[] {
+  const byId = new Map<number, StoredItemView>();
+  for (const entry of items) byId.set(entry.itemId, entry);
+  const cells: InventoryCellView[] = [];
+  grid.order.forEach((itemId, index) => {
+    const entry = byId.get(itemId);
+    if (!entry) return;
+    cells.push({
+      ...entry,
+      index,
+      col: index % grid.columns,
+      row: Math.floor(index / grid.columns),
+    });
+  });
+  return cells;
+}
+
+/** Where one item's cell currently sits, or null when it is not in the grid. */
+export function inventoryCellAt(
+  grid: InventoryGridState,
+  itemId: number,
+): { index: number; col: number; row: number } | null {
+  const index = grid.order.indexOf(itemId);
+  if (index < 0) return null;
+  return {
+    index,
+    col: index % grid.columns,
+    row: Math.floor(index / grid.columns),
+  };
+}
+
+/**
+ * The cell's `setPos`: move one item to a column and row, swapping with the
+ * cell already there. The target is clamped to the grid the server's item
+ * count actually fills; a malformed position or an unknown id is a no-op.
+ * Nothing here places an item or changes a quantity.
+ */
+export function setInventoryCellPos(
+  grid: InventoryGridState,
+  itemId: number,
+  col: number,
+  row: number,
+): InventoryGridState {
+  const from = inventoryCellAt(grid, itemId);
+  if (!from || grid.order.length === 0) return grid;
+  const rows = Math.max(1, Math.ceil(grid.order.length / grid.columns));
+  const wantedCol = Number.isFinite(col) ? Math.trunc(col) : from.col;
+  const wantedRow = Number.isFinite(row) ? Math.trunc(row) : from.row;
+  const targetCol = Math.min(grid.columns - 1, Math.max(0, wantedCol));
+  const targetRow = Math.min(rows - 1, Math.max(0, wantedRow));
+  const to = Math.min(
+    grid.order.length - 1,
+    targetRow * grid.columns + targetCol,
+  );
+  if (to === from.index) return grid;
+  const order = [...grid.order];
+  const moved = order[from.index]!;
+  // A drop onto an occupied slot gives that cell the dragged cell's old
+  // position: one `setPos` exchanges the two, it does not shift the row.
+  order[from.index] = order[to]!;
+  order[to] = moved;
+  return { ...grid, order };
+}
+
+/**
+ * The info popup's display lifetime in seconds. A presentation duration for
+ * the tooltip, not a rule: it never gates a request or a resource.
+ */
+export const INFO_POPUP_LIFETIME_SECONDS = 6;
+
+/** The readout the popup explains, with the anchor point it was opened at. */
+export interface InfoPopupAnchor {
+  /** Which HUD readout owns this popup; a stable UI id, not a game id. */
+  readonly id: string;
+  /** Viewport x of the readout's centre. */
+  readonly x: number;
+  /** Viewport y of the readout's bottom edge. */
+  readonly y: number;
+}
+
+/** The info popup's UI state: its anchor and the time it has left. */
+export interface InfoPopupState {
+  readonly anchor: InfoPopupAnchor | null;
+  readonly secondsRemaining: number;
+}
+
+/** Nothing open. */
+export const CLOSED_INFO_POPUP: InfoPopupState = Object.freeze({
+  anchor: null,
+  secondsRemaining: 0,
+});
+
+/** Open a popup for one HUD readout with its full display lifetime. */
+export function openInfoPopup(
+  anchor: InfoPopupAnchor,
+  seconds = INFO_POPUP_LIFETIME_SECONDS,
+): InfoPopupState {
+  if (
+    typeof anchor.id !== 'string' ||
+    anchor.id.length === 0 ||
+    !Number.isFinite(anchor.x) ||
+    !Number.isFinite(anchor.y)
+  ) {
+    return CLOSED_INFO_POPUP;
+  }
+  return { anchor, secondsRemaining: Math.max(0, seconds) };
+}
+
+/**
+ * The popup's `update`/timer: advance by the elapsed seconds and close when
+ * the lifetime is spent. A closed popup stays closed.
+ */
+export function tickInfoPopup(
+  state: InfoPopupState,
+  elapsedSeconds: number,
+): InfoPopupState {
+  if (!state.anchor) return state;
+  const elapsed = Number.isFinite(elapsedSeconds)
+    ? Math.max(0, elapsedSeconds)
+    : 0;
+  const remaining = Math.max(0, state.secondsRemaining - elapsed);
+  return remaining <= 0 ? CLOSED_INFO_POPUP : { ...state, secondsRemaining: remaining };
+}
+
+/** The viewport the popup must stay inside, and the box's measured size. */
+export interface InfoPopupBounds {
+  readonly width: number;
+  readonly height: number;
+  readonly popupWidth: number;
+  readonly popupHeight: number;
+}
+
+/**
+ * The popup's `reposition`: centre it on its anchor, keep it inside the
+ * viewport, and flip it above the readout when it would overflow below.
+ * Pure geometry over the anchor and the measured box; no readout is changed.
+ */
+export function repositionInfoPopup(
+  anchor: InfoPopupAnchor,
+  bounds: InfoPopupBounds,
+): { x: number; y: number } {
+  const gap = 8;
+  const width = Math.max(1, bounds.popupWidth);
+  const height = Math.max(1, bounds.popupHeight);
+  const x = Math.min(
+    Math.max(0, bounds.width - width - gap),
+    Math.max(gap, anchor.x - width / 2),
+  );
+  const below = anchor.y + gap;
+  const y =
+    below + height + gap <= bounds.height
+      ? below
+      : Math.max(gap, anchor.y - height - gap);
+  return { x: Math.round(x), y: Math.round(y) };
 }

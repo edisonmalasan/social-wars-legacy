@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 141,
+      implemented: 143,
       dropped: 52,
-      planned: 67,
+      planned: 65,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -570,16 +570,14 @@ describe('the reusable UI-chrome screen family decisions', () => {
     }
   });
 
-  it('leaves the ones that need capture state, exploration or a distinct popup planned', async () => {
+  it('leaves the ones that need capture state, exploration or popup art planned', async () => {
     // A cover primitive now exists, but there is still no exploration view to
     // cover; a capture icon has no server capture outcome to model; and the
-    // info popup's timer/repositioning and multiline art are not the popover
-    // the chrome draws. Flipping these would grow the count without modelling
-    // anything new.
+    // info popup movieclips still need their multiline popup art. The timed,
+    // repositioned readout panel itself is implemented in detailpanels.tsx.
     const LEFT_PLANNED = [
       'IconoCapturadoMC.as',
       'GuiCoverExplorationMC.as',
-      'GUI/InfoPopup.as',
       'InfoPopupMC.as',
       'InfoPopupManaMc.as',
       'GUI/ResourcesTab.as',
@@ -640,11 +638,10 @@ describe('the expansion and collections screen family decisions', () => {
   });
 
   it('leaves the screens with no modelled behaviour planned', async () => {
-    // The drag-to-position cell and the lost-item discovery share flow have
-    // no server outcome to read and no behaviour the new panels draw. Flipping
-    // either would grow the count while claiming art and gestures we do not
-    // render.
-    const LEFT_PLANNED = ['GUI/InventoryItem.as', 'popups/PopUpLost.as'];
+    // The lost-item discovery share flow has no server outcome to read and no
+    // behaviour the new panels draw. The drag-to-position cell is now a real
+    // presentation in detailpanels.tsx, so it is no longer in this list.
+    const LEFT_PLANNED = ['popups/PopUpLost.as'];
     const all = await screens();
     for (const path of LEFT_PLANNED) {
       const screen = all.find((entry) => entry.path === path);
@@ -692,5 +689,48 @@ describe('the character-setup, recovery and attack-tooltip screen family decisio
       assert.match(screen!.decisionNote, /set_sex_player\.php/);
       assert.match(screen!.decisionNote, /no .*field|not a field/i);
     }
+  });
+});
+
+describe('the inventory-cell and info-popup screen family decisions', () => {
+  // Both deferrals said a behaviour was not modelled, not that art or a rule
+  // was missing. Each is reclassified only because a real inline panel now
+  // draws it from the server's store / the HUD's own popover model. Neither
+  // owns an outcome: Place still sends a request and the popup invents no
+  // readout.
+  const RECLASSIFIED = [
+    'GUI/InventoryItem.as',
+    'GUI/InfoPopup.as',
+  ];
+
+  it('records each rendered screen as implemented against the detail panel', async () => {
+    const all = await screens();
+    for (const path of RECLASSIFIED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/detailpanels\.tsx`/);
+      assert.match(screen!.decisionNote, /art/i);
+    }
+  });
+
+  it('leaves the research-centre shell planned with a corrected note', async () => {
+    // The short note called this the magic tech tree. The actual screen is
+    // the AREA 51 / ROBOTIC CENTER robot research: the new server stores its
+    // counters but applies none of its commands, its animation art is two
+    // Zynga SWFs, and its friend-help gesture is social (ADR 20). Flipping it
+    // would render a screen with no authoritative answer behind it.
+    const all = await screens();
+    const shell = all.find((entry) => entry.path === 'PopupResearchCenterMC.as');
+    assert.ok(shell);
+    assert.equal(shell!.decision, 'planned');
+    assert.match(shell!.decisionNote, /^Deferred: /);
+    assert.match(shell!.decisionNote, /misidentified|not the magic tech tree/i);
+    assert.match(shell!.decisionNote, /ROBOTIC CENTER|AREA 51/);
+    assert.match(shell!.decisionNote, /none of the .*research/i);
+    const popup = all.find((entry) => entry.path === 'popups/PopupResearchCenter.as');
+    assert.ok(popup);
+    assert.equal(popup!.decision, 'planned');
+    assert.match(popup!.decisionNote, /late-era progression/i);
   });
 });

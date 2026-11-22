@@ -8,7 +8,7 @@
  * is where the number formatting, the thresholds and the texts live, and
  * where they are tested. This is the drawing of it.
  */
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import {
   armyText,
@@ -24,6 +24,9 @@ import {
   type HudState,
   type Popover,
 } from '@swl/client';
+
+import { InfoPopupBody } from './detailpanels.tsx';
+import type { InfoPopupAnchor } from './state.ts';
 
 /** The resources the bar shows, in the client's order. */
 const RESOURCES: readonly { key: HudResource; label: string }[] = [
@@ -41,19 +44,7 @@ function wait(seconds: number): string {
   return minutes > 0 ? `${minutes}m ${rest}s` : `${rest}s`;
 }
 
-/** A popover, in the markup. */
-function PopoverBox({ popover }: { popover: Popover }): React.JSX.Element {
-  return (
-    <div className="swl-popover" role="tooltip">
-      <p className="swl-popover-first">{popover.firstLine}</p>
-      {popover.warningLine ? (
-        <p className="swl-popover-warning">{popover.warningLine}</p>
-      ) : null}
-    </div>
-  );
-}
-
-/** One number on the bar, with its popover. */
+/** One number on the bar, with its timed info popup. */
 function Readout({
   label,
   value,
@@ -65,19 +56,36 @@ function Readout({
   popover: Popover;
   className?: string;
 }): React.JSX.Element {
-  const [open, setOpen] = useState(false);
+  // The anchor is both the open flag and the popup's stable placement input:
+  // it is measured on entry, so a re-render never restarts the display timer.
+  const [anchor, setAnchor] = useState<InfoPopupAnchor | null>(null);
+  const host = useRef<HTMLDivElement>(null);
+
+  function show(): void {
+    const rect = host.current?.getBoundingClientRect();
+    if (!rect) return;
+    setAnchor({ id: label, x: rect.left + rect.width / 2, y: rect.bottom });
+  }
+
   return (
     <div
+      ref={host}
       className={`swl-readout${className ? ` ${className}` : ''}`}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      onFocus={() => setOpen(true)}
-      onBlur={() => setOpen(false)}
+      onMouseEnter={show}
+      onMouseLeave={() => setAnchor(null)}
+      onFocus={show}
+      onBlur={() => setAnchor(null)}
       tabIndex={0}
     >
       <span className="swl-readout-label">{label}</span>
       <span className="swl-readout-value">{value}</span>
-      {open ? <PopoverBox popover={popover} /> : null}
+      {anchor ? (
+        <InfoPopupBody
+          popover={popover}
+          anchor={anchor}
+          onExpire={() => setAnchor(null)}
+        />
+      ) : null}
     </div>
   );
 }
