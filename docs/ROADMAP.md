@@ -2017,8 +2017,10 @@ source; the eight family increments above stand as recorded.
 the same **401** items (Group G: 81 items, 73 done / 8 open) and the
 device-dependent Group G5 boxes stay open. The G5.1, G5.2 and expansion
 records above are preserved unchanged. Every browser result below is
-**EMULATION** in a real Chromium browser — never physical-device verification,
-never an Android or iOS build, and never a Firefox or Safari run.*
+**EMULATION** in a real Chromium browser — never physical-device verification
+and never a Firefox or Safari run. PR #64 later verified an Android debug build
+(recorded below), which is a native build, not a browser result; no iOS build or
+device run is claimed.*
 
 **Implemented and verified by EMULATION (not by device):**
 
@@ -2064,15 +2066,28 @@ never an Android or iOS build, and never a Firefox or Safari run.*
   never as a failure, and the run fails only if a drivable browser fails or
   none runs. Firefox and Safari were **not run**: they are not on this host and
   these CDP harnesses cannot drive them.
-- **The Capacitor shell is scaffolded, not built.** `apps/mobile/` carries a
-  config-only `capacitor.config.ts`, a dependency-free `package.json`, a README
-  with the exact prerequisites and commands, and an empty lockfile importer.
-  No native project, `cap add`, `cap sync`, JDK, Android SDK, Xcode, APK, IPA
-  or signing was produced. `scripts/check-mobile-config.mjs` (PR #49) now
+- **The Capacitor shell is configured, and an Android debug build is verified —
+  but there was no device run.** `apps/mobile/` carries the committed
+  `capacitor.config.ts`, a dependency-free `package.json`, a README with the
+  exact prerequisites and commands, and a `.gitignore`; the generated `android/`
+  project and installed `node_modules/` are gitignored and regenerable. **PR #64
+  (`f740025`) proved a real Android debug build on this Windows host:** the
+  Android SDK command-line tools were provisioned non-interactively from
+  Google's official zip (HTTP 200, 153,583,359 bytes; sdkmanager 12.0), with
+  platforms 35/36 and matching build-tools installed under
+  `%LOCALAPPDATA%\Android\Sdk` (outside the repo, removable). Capacitor 8.6.2
+  was installed at native-work time (not committed), `cap add android`
+  generated a project with minSdk 24 and compile/targetSdk 36 (Gradle 8.14.3),
+  and `gradlew assembleDebug` reported `BUILD SUCCESSFUL in 5m 32s`, producing
+  a **5,437,001-byte** debug APK signed with the standard auto-generated
+  `CN=Android Debug` certificate; no release signing key exists. The APK is
+  **not a runnable client** — `server.url` is still the documented placeholder
+  and no device or emulator was used; iOS was not built (no macOS/Xcode).
+  `scripts/check-mobile-config.mjs` (PR #49, updated by PR #64) still
   independently validates `capacitor.config.ts` against `apps/client`'s build
-  output, with a 10-case tamper self-test proving the check detects drift; it
-  reports `native Android/iOS builds NOT RUN — no JDK/Android SDK/Xcode`. The
-  config is coherent, but this is not a native build or a device run.
+  output with a tamper self-test (now 11 cases), tolerating a locally generated
+  `android/`, and reports `native Android/iOS device or emulator runs NOT
+  VERIFIED`.
 
 **Gates (all run on the final tree; none skipped):**
 
@@ -2094,20 +2109,25 @@ never an Android or iOS build, and never a Firefox or Safari run.*
 | Client build | `pnpm --filter @swl/app-client build` | **PASS** — only the pre-existing chunk-size warning |
 | Desktop e2e | `node scripts/e2e-test.mjs` | **PASS** — `browsers that ran: chrome, edge`; full play session and restart |
 | Emulated phone | `node scripts/e2e-mobile-layout.mjs` | **PASS (EMULATION)** — five-viewport matrix (390x844@dpr2, 360x640@dpr2, 414x896@dpr3, 320x568@dpr2, 760x600@dpr1) in chrome and edge; synthetic touch, no device or phone build claimed |
-| Mobile config | `node scripts/check-mobile-config.mjs` | **PASS** — config coherent; native builds NOT RUN |
+| Mobile config | `node scripts/check-mobile-config.mjs` | **PASS** — config check PASS; Android debug build verified (PR #64); device runs and iOS NOT RUN |
 
 **Externally blocked — the device boxes are deliberately NOT ticked:**
 
-- The mobile build (Capacitor) runs on Android and iOS: no Android SDK, JDK,
-  Xcode or Capacitor CLI on this host, so no native project was generated.
+- The mobile build (Capacitor) runs on Android and iOS: the **Android debug
+  build is verified (PR #64)** — SDK command-line tools provisioned
+  non-interactively, Capacitor 8.6.2, `cap add android` and `assembleDebug`
+  produced a debug-cert APK — but the box stays open because iOS was not built
+  (no macOS/Xcode here) and the APK still carries the placeholder `server.url`,
+  so it is not a runnable client.
 - The game is played on an actual phone with touch controls: no device or
   emulator is available; emulated touch in a desktop browser is not a device
   run.
 - Firefox and Safari: absent from this host and not drivable by a CDP harness.
 
 **Explicit non-claims:** no device verification, no physical phone, no
-Android/iOS build, no emulator, no Firefox/Safari run, no native touch
-gesture, no new runtime dependency and no proprietary asset. Nothing in this
+Android release/signed build and no iOS build (a debug-only Android APK was
+built in PR #64), no emulator, no Firefox/Safari run, no native touch
+gesture, no new committed runtime dependency and no proprietary asset. Nothing in this
 increment weakens server authority, the 94-command catalogue, the strict
 two-argument `set_quest_var`, or the licensing/no-Flash ordering.
 
@@ -3142,7 +3162,7 @@ be mistaken for unfinished work.*
 | G | Every B6 screen implemented or explicitly dropped | 57 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 57 |
 | G | Client runs in Firefox and Safari | **Firefox and WebKit (Playwright) are verified**: full rendered gameplay sessions ran under Gecko via `scripts/e2e-test-firefox.py` and under WebKit via `scripts/e2e-test-webkit.py` (both Playwright engines, driven over Juggler/BiDi). Branded Safari and real devices have not been run — Playwright's WebKit is an engine test, not Safari | Play the same session in branded Safari and on real devices; this box closes once Safari passes |
 | G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux bundling is now in CI, unsigned** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` with `libwebkit2gtk-4.1-dev`, and its informational, non-required `linux-bundle` job produces unsigned `.deb`/`.AppImage` artefacts; macOS genuinely needs a host | Add a macOS runner and signed artefacts (Linux bundling is already in CI); this box closes once all three platforms are produced |
-| G | Mobile build runs on Android and iOS | No Capacitor, Android SDK or Xcode on this machine | Install the Capacitor toolchain and SDKs |
+| G | Mobile build runs on Android and iOS | The **Android debug build is verified** (PR #64): SDK command-line tools provisioned from Google's official zip (sdkmanager 12.0, platforms 35/36 + build-tools, SDK at `%LOCALAPPDATA%\Android\Sdk`), Capacitor 8.6.2 installed at native-work time, `cap add android` (minSdk 24, compile/targetSdk 36, Gradle 8.14.3) and `gradlew assembleDebug` → `BUILD SUCCESSFUL`, 5,437,001-byte debug APK with the auto-generated debug cert. Still open: **no iOS build** (no macOS/Xcode), **no device or emulator run**, and `server.url` is a placeholder, so the APK is not a runnable client | Build and run on iOS on a macOS/Xcode host, run on real devices with a real deployment URL, and produce a signed distributable if release is intended |
 | G | Playable at the original resolutions and phone scales | The stage model exists; real-device verification does not | Test on the target devices |
 | G | Played on an actual phone with touch controls | No device here | A phone and touch-control implementation |
 | H | A player with no server cannot play | **Non-goal** — the product is pure online (ADR 19) | A reversal of ADR 19 |
@@ -3454,6 +3474,28 @@ reviewed without reconstructing the conversation that led to it.*
   build host), code signing and notarisation, and publication; the desktop and
   installer boxes stay **unticked**. *Evidence:* the job definition in
   `.github/workflows/ci.yml` and its first green run on PR #40.
+- **2026-11-22 — Android debug build verified; G5 device/iOS boxes stay open
+  (Group G5, PR #64).** Recorded here, outside the `## Group X` sections, so
+  `node scripts/check-roadmap.mjs` still counts the same **401** items and the
+  open-box accounting is unchanged; no checkbox was ticked and the device and
+  iOS blockers are preserved. PR #64 (`f740025`, merged as `96e8a7e`) proved a
+  real Android debug build on this Windows host: Android SDK command-line tools
+  were provisioned non-interactively from Google's official zip (HTTP 200,
+  153,583,359 bytes; sdkmanager 12.0), platforms 35/36 and matching build-tools
+  were installed under `%LOCALAPPDATA%\Android\Sdk` (outside the repository and
+  removable), Capacitor 8.6.2 was installed at native-work time (not committed),
+  `cap add android` generated a project with minSdk 24 / compile+targetSdk 36 on
+  Gradle 8.14.3, and `gradlew assembleDebug` reported `BUILD SUCCESSFUL in 5m
+  32s` with a 5,437,001-byte APK signed by the auto-generated Android Debug
+  certificate. *Rationale:* the roadmap claimed no native build was possible;
+  the Android half of that blocker is now resolved with reproducible evidence,
+  so leaving the old claim would understate verified progress. The honest
+  residual stays open: no device or emulator run, no iOS build (no macOS/Xcode),
+  and the placeholder `server.url` means the APK is not a runnable client.
+  *Evidence:* the `apps/mobile/README.md` provisioning/build transcript and
+  `scripts/check-mobile-config.mjs` output in PR #64; `node
+  scripts/check-mobile-config.mjs` exits 0 reporting the config coherent and
+  `native Android/iOS device or emulator runs NOT VERIFIED`.
 
 ---
 
