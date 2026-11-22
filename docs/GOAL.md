@@ -6,8 +6,8 @@ You are the autonomous engineering orchestrator responsible for continuing the d
 
 **Repository:** https://github.com/edisonmalasan/social-wars-legacy
 
-**Current verified baseline:** `main` at `c77e6fa` — PR #70 merged; see the live
-checkpoint in section 12 below for the verified state.
+**Current verified baseline:** `main` at `2a17ead` — PR #71 (the final checkpoint
+docs PR) merged; see the live checkpoint in section 12 below for the verified state.
 
 **Primary source of truth:** `docs/ROADMAP.md`
 
@@ -504,7 +504,18 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main` (2026-11-22):** `c77e6fa` — PR #69 (`a619325`, docs
+- **Last verified `main` (2026-11-22):** `2a17ead` — PR #71 (the final checkpoint
+  docs PR) is **MERGED** with all four required CI checks green. Documentation
+  only: it records the already-merged PR #69 (`a619325`, docs correction) and PR
+  #70 (`c77e6fa`, server-published fusion state + client research selector) and
+  the read-only worker's terminal audit verdict, preserving the `c77e6fa`
+  checkpoint below as history. No roadmap checkbox, blocker, count or screen
+  classification changed. Final verification on merged `main`:
+  `node scripts/check-roadmap.mjs` → **401 items, 22 open** (unchanged);
+  `node scripts/check-report-sync.mjs` → the report set agrees with the
+  implementation (4 claims); `node scripts/check-adrs.mjs` → **20 ADRs, all well
+  formed**; git status clean.
+- **Historical checkpoint (superseded by `2a17ead`): `c77e6fa` — PR #69 (`a619325`, docs
   correction) and PR #70 (`c77e6fa`, server-published fusion state + client
   research selector) are both **MERGED** with all four required CI checks green.
   PR #69 corrected the stale verified-status notes to the PR #67/#68 state (the
