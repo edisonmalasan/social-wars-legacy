@@ -121,30 +121,36 @@ against the vendored assets and **not distributable**.
 geometry and a seeded generator: it reads no input file, and only its own
 output tree is read back by its `--check` mode. Nothing is sampled, traced
 or copied from the game's art, the SWFs, the atlases or a proprietary font.
-The committed output in `assets/original/` is **37 files**: 29 SVG — sixteen
-Foundry icon motifs, one sprite sheet, and twelve frames of two six-frame
-original FX sequences, `shield-pulse` and `spark-trail` — six short WAV
-effects synthesised from a fixed sine table and a seeded generator, and the
-`LICENSE` and `manifest.json`. The manifest enumerates 36 of them (every
-file except itself) with each file's relative path, byte size, SHA-256,
-generator version, licence and an explicit original-work statement.
+The committed output in `assets/original/` is **54 generated files**: **46
+SVG** — sixteen Foundry icon motifs, one sprite sheet, the twelve frames of
+two six-frame original FX sequences, `shield-pulse` and `spark-trail`, and
+**seventeen original gameplay motifs** (four terrain, five building, four
+unit, two marker, one impact-FX and one fallback, under
+`assets/original/gameplay/`) — six short WAV effects synthesised from a fixed
+sine table and a seeded generator, and the `LICENSE` and `manifest.json`.
+The manifest enumerates the other **53** (every file except itself) with each
+file's relative path, byte size, SHA-256, generator version, licence and an
+explicit original-work statement. A tracked `.gitattributes` pins LF line
+endings so a checkout cannot change the bytes the manifest hashes.
 `node packages/art/src/cli.ts --check` verifies the committed files against
 a fresh generation, and the package's tests prove determinism, header
 validity, distinct hashes and that no upstream or reverse-engineering file
 is read.
 
-The motifs and the FX frames are also consumed in the client **UI only**:
-two galleries, "Original art" and "Original FX", render them from the same
-pure generator as inline data URLs, with the CC0 notice and original-work
+The Foundry motifs and the FX frames are also consumed in the client **UI
+only**: two galleries, "Original art" and "Original FX", render them from the
+same pure generator as inline data URLs, with the CC0 notice and original-work
 statement carried alongside the artwork. The FX panel cycles each sequence
 with CSS keyframes and falls back to a single still frame under
 `prefers-reduced-motion: reduce`. These galleries own no game state, send
 no command and read no price; the built bundle carries their titles and the
-`foundry-anvil`, `shield-pulse` and `spark-trail` identifiers. They do not
-supply the PixiJS game world's art, and no proprietary atlas has been
+`foundry-anvil`, `shield-pulse` and `spark-trail` identifiers. The seventeen
+gameplay motifs are generated, hashed and re-exported to the browser by
+`@swl/art`, but no gallery or renderer consumes them yet: original art still
+does not supply the PixiJS game world's art, and no proprietary atlas has been
 replaced there.
 
-This is the **first increment, not the finished set**. It does not replace
+These are **early increments, not the finished set**. They do not replace
 the client's gameplay art or close the release gate: wiring original art
 into the gameplay renderer and replacing the proprietary content with
 rights-clean data remain open work. The proprietary configuration is a
