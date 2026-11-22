@@ -2,11 +2,12 @@
 /**
  * Validate the mobile shell's Capacitor configuration — config only, no build.
  *
- * `apps/mobile/` is a deliberately config-only scaffold: a plain
- * `capacitor.config.ts`, a dependency-free `package.json` and a README. A
- * read-only audit established that native Android/iOS builds are blocked on
- * this host (no JDK, Android SDK or Xcode), but the **configuration** is
- * independently verifiable. This script does exactly that, and nothing more.
+ * The committed scaffold is a plain `capacitor.config.ts`, a dependency-free
+ * `package.json`, a README and a .gitignore. At native-work time a developer
+ * may install the Capacitor toolchain and generate `android/` locally; both
+ * are gitignored. A real Android debug build was verified on a Windows host
+ * (see the README), but this script only checks the committed configuration
+ * and stays independent of any installed toolchain.
  *
  * It proves, from the files on disk:
  *   1. the config is present, parseable and exports a real object with an
@@ -14,12 +15,12 @@
  *   2. the webDir resolves to the output the shared web client actually
  *      builds to (apps/client's `build.outDir`), so `cap sync` would copy the
  *      shipped client — this does NOT require a build to be present;
- *   3. the package declares the scripts the README documents and stays
- *      dependency-free (the Capacitor toolchain is installed only at native
- *      work time, as the README says);
+ *   3. the package declares the scripts the README documents and either stays
+ *      dependency-free or declares the full Capacitor toolchain used for the
+ *      native build;
  *   4. the README's factual claims match what is actually on disk — the
- *      three-file scaffold, no native project, the shared client files it
- *      points at, and the workspace prerequisites.
+ *      committed scaffold files, the shared client files it points at, and
+ *      the workspace prerequisites.
  *
  * A malformed, dangling or incoherent config fails loudly. This script never
  * runs `cap`, never generates a native project, and never claims a device or
@@ -42,10 +43,10 @@ const VITE = path.join(ROOT, 'apps/client/vite.config.ts');
 const ROOT_PKG = path.join(ROOT, 'package.json');
 
 /** The honest, always-printed boundary of what this check proves. */
-const NOT_RUN = 'native Android/iOS builds NOT RUN — no JDK/Android SDK/Xcode';
+const NOT_RUN = 'native Android/iOS device or emulator runs NOT VERIFIED — this is a config check (see apps/mobile/README.md for the verified Android debug build)';
 
-/** The three files the README says are the whole scaffold. */
-const SCAFFOLD_FILES = ['README.md', 'capacitor.config.ts', 'package.json'];
+/** The files that are committed; generated native projects are gitignored. */
+const SCAFFOLD_FILES = ['.gitignore', 'README.md', 'capacitor.config.ts', 'package.json'];
 
 /** Scripts the README documents and the package must therefore declare. */
 const SCRIPTS = {
@@ -192,18 +193,24 @@ function validatePackage(pkg, problems, notes) {
 
   const installed = Object.keys(pkg.dependencies ?? {}).concat(Object.keys(pkg.devDependencies ?? {}));
   const capacitor = installed.filter((name) => name.startsWith('@capacitor/'));
-  if (capacitor.length > 0) {
-    problems.push(
-      `apps/mobile/package.json declares Capacitor dependencies (${capacitor.join(', ')}), ` +
-        'but the README says they are installed only at native-work time',
-    );
+  const REQUIRED_CAPACITOR = ['@capacitor/android', '@capacitor/cli', '@capacitor/core'];
+  if (capacitor.length === 0) {
+    notes.push('the committed package is dependency-free; the Capacitor toolchain is installed at native-work time (see README)');
   } else {
-    notes.push('the package is dependency-free; the Capacitor toolchain is installed only at native-work time');
+    const missing = REQUIRED_CAPACITOR.filter((name) => !capacitor.includes(name));
+    if (missing.length > 0) {
+      problems.push(
+        `apps/mobile/package.json declares some Capacitor packages (${capacitor.join(', ')}) ` +
+          `but not all of ${REQUIRED_CAPACITOR.join(', ')} — missing ${missing.join(', ')}`,
+      );
+    } else {
+      notes.push('Capacitor android/core/cli are declared for the native Android build');
+    }
   }
 }
 
 /** The README's factual claims must match the files actually present. */
-function validateReadme(text, ctx, problems) {
+function validateReadme(text, ctx, problems, notes) {
   if (!text.includes('@swl/app-mobile')) {
     problems.push('README: does not name the @swl/app-mobile package its commands target');
   }
@@ -223,10 +230,19 @@ function validateReadme(text, ctx, problems) {
     problems.push('README: does not state the workspace Node.js >= 22 / pnpm 12.6.0 prerequisites');
   }
 
+  if (!text.includes('assembleDebug')) {
+    problems.push('README: does not document the assembleDebug build it claims was verified');
+  }
+
   const want = SCAFFOLD_FILES.slice().sort();
   const got = ctx.entries.slice().sort();
-  if (JSON.stringify(got) !== JSON.stringify(want)) {
-    problems.push(`README claims the scaffold is ${want.join(', ')}; apps/mobile/ holds ${got.join(', ')}`);
+  const missing = want.filter((file) => !got.includes(file));
+  if (missing.length > 0) {
+    problems.push(`README claims the scaffold includes ${want.join(', ')}; apps/mobile/ is missing ${missing.join(', ')}`);
+  }
+  const generated = got.filter((file) => !want.includes(file));
+  if (generated.length > 0) {
+    notes.push(`apps/mobile/ also holds locally generated entries (${generated.join(', ')}); native output and dependencies are gitignored`);
   }
   for (const file of SHARED_CLIENT_FILES) {
     if (!ctx.sharedPresent.includes(file)) {
@@ -273,7 +289,7 @@ function validateAll(inputs) {
     webDir: cfg.webDir,
     entries: inputs.entries,
     sharedPresent: inputs.sharedPresent,
-  }, problems);
+  }, problems, notes);
 
   return { problems, notes };
 }
@@ -290,7 +306,8 @@ function selfTest(inputs) {
     ['script missing', { ...inputs, pkgText: inputs.pkgText.replace(/"sync"\s*:\s*"cap sync"\s*,?/, '') }, true],
     ['package malformed', { ...inputs, pkgText: '{' }, true],
     ['no-device claim removed', { ...inputs, readmeText: inputs.readmeText.replace(/no\s+device\s+or\s+emulator/gi, '') }, true],
-    ['native project appears', { ...inputs, entries: [...inputs.entries, 'android'] }, true],
+    ['build claim removed', { ...inputs, readmeText: inputs.readmeText.replace(/assembleDebug/g, '') }, true],
+    ['scaffold file removed', { ...inputs, entries: inputs.entries.filter((entry) => entry !== 'package.json') }, true],
   ];
 
   let ran = 0;
