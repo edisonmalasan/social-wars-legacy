@@ -2991,9 +2991,12 @@ product.*
       - the **approved route is clean-room re-creation** ([ADR 0021](adr/0021-clean-room-assets.md)):
         `packages/art` deterministically generates original SVG/WAV files into
         `assets/original/`, dedicated CC0-1.0 with a per-file provenance manifest.
-        The first increment — sixteen motifs, a sprite sheet and six effects — is
-        **not** the finished set, does not implement a screen and does not close
-        this gate. The proprietary configuration is handled separately
+        The increments so far — sixteen Foundry icon motifs, a sprite sheet, the
+        twelve original FX frames and seventeen gameplay motifs (54 generated
+        files, 53 of them enumerated in the manifest) — are **not** the finished
+        set, do not implement a screen and do not close this gate. The gameplay
+        motifs are not consumed by the client's gameplay renderer, which still
+        uses the excluded proprietary art. The proprietary configuration is handled separately
 - [x] The position's claims are **checked**, not asserted
       (`node scripts/check-licensing.mjs`): the upstream's licence is the GPL v3, **no
       package imports from the upstream**, and the shipped tree carries no SWF, no
@@ -3012,7 +3015,7 @@ product.*
       JavaScript and TypeScript dependencies, the direct Rust crates, the size of the
       crate tree, the two substitute **fonts** and the project's own CC0-1.0 original
       assets in `assets/original/` with their per-file provenance entries. The licence
-      gate is unchanged: this first increment is not the finished set
+      gate is unchanged: these increments are not the finished set
 - [x] The enumeration is **checked**, not asserted: a dependency that is not classified
       **fails the build**, so a new one has to be looked at before it can be used, and a
       licence that is not one that may be shipped fails it too
@@ -3274,8 +3277,8 @@ owner and a precise condition for closing it.*
 
 **Inventory discrepancy — found in PR #79, fixed by PR #80.** PR #79 recorded these three portrait screens as implemented from PR #75 while the checked inventory still read **159 / 52 / 49** and carried `GUI/Portrait.as`, `GUI/PortraitTrainQueue.as` and `GUI/AnimatedUnit.as` as `planned` with `Deferred: ` notes. PR #80 corrected the data: those three entries are now `implemented` against `apps/client/src/ui/unitportraits.tsx`, with notes that only server-owned unit id, count and ready state from `TrainingView` and the original inline-SVG art are drawn, while Zynga's proprietary unit art and animation frames stay excluded. The count on merged `main` at that merge was **162 / 52 / 46**, asserted by `packages/client/src/screens.test.ts`. This alignment owns only `docs/ROADMAP.md` and `docs/GOAL.md`; no parity claim follows from any of the eight entries.
 
-**Clean-room art foundation (PR #76, ADR 0021).** The clean-room route is approved in
-[ADR 0021](./adr/0021-clean-room-assets.md): the dependency-free generator in `packages/art/` deterministically emits a regenerated set of **37 CC0-1.0 files** into `assets/original/` — 29 SVG (16 Foundry icons, one sprite sheet and the 12 frames of two six-frame original FX sequences, `shield-pulse` and `spark-trail`), six WAV effects, `LICENSE` and `manifest.json` (the manifest enumerates the other 36) — with a per-file provenance manifest and its own tests. PR #86 wired the FX frames into an "Original FX" client panel that cycles one frame at a time under a `prefers-reduced-motion` still-frame fallback, shown under the generator's CC0 provenance. This is a **foundation, not a cleared gate**: Zynga's proprietary config remains a separate data problem, the release-licence gate (I6) stays open, no rights-holder request has been received, and no publication is authorised. No screen is claimed implemented by the existence of this package.
+**Clean-room art foundation (PR #76, ADR 0021).** The clean-room route was approved in
+[ADR 0021](./adr/0021-clean-room-assets.md): the dependency-free generator in `packages/art/` deterministically emitted a first regenerated set of **37 CC0-1.0 files** into `assets/original/` — 29 SVG (16 Foundry icons, one sprite sheet and the 12 frames of two six-frame original FX sequences, `shield-pulse` and `spark-trail`), six WAV effects, `LICENSE` and `manifest.json` (the manifest enumerated the other 36) — with a per-file provenance manifest and its own tests. PR #86 wired the FX frames into an "Original FX" client panel that cycles one frame at a time under a `prefers-reduced-motion` still-frame fallback, shown under the generator's CC0 provenance. PR #89 has since extended the inventory to **54 generated files** (46 SVG, 53 manifest entries), adding 17 original gameplay motifs under `assets/original/gameplay/`; the current state is recorded in the amendment log below and in `docs/LICENSING.md`. This remains a **foundation, not a cleared gate**: Zynga's proprietary config remains a separate data problem, the release-licence gate (I6) stays open, no rights-holder request has been received, and no publication is authorised. The gameplay motifs are not wired into the gameplay renderer. No screen is claimed implemented by the existence of this package.
 
 **Apple-platform CI results (PR #73).** Informational, non-required macOS, WebKit and iOS jobs were added to CI. The unsigned **macOS `.app`/`.dmg`** build and the unsigned **iOS simulator** build succeeded on macOS runners. A **WebKit CI attempt failed honestly** on HTTP 404s for excluded proprietary atlas assets; it did not affect the four protected checks and does not replace the earlier verified Playwright WebKit session. **Branded Safari remains unrun**, as do real devices; no result here is a platform-verification or release verdict.
 
@@ -3339,6 +3342,33 @@ a milestone needs a written rationale. This is that record. Each entry names the
 what changed, why, and the evidence that makes the change verifiable, so a decision can be
 reviewed without reconstructing the conversation that led to it.*
 
+- **2026-11-23 — asset inventory corrected after the PR #89 merge (Groups G and I,
+  ADR 0021).** PR #89 (`b158409`, `feat/gameplay-art-motifs`) added seventeen original
+  CC0-1.0 gameplay motifs under `assets/original/gameplay/` — four terrain, five
+  building, four unit, two marker, one impact-FX and one fallback. The generated
+  inventory in `assets/original/` is now **54 files / 53 manifest entries**: 46 SVG
+  (16 Foundry icons, one sprite sheet, the 12 FX frames and the 17 gameplay motifs),
+  six WAV effects, `LICENSE` and `manifest.json`, plus a tracked `.gitattributes`
+  that pins LF for the manifest's hashes. This documentation-only increment updates
+  every current-state asset count in `docs/ROADMAP.md`, `docs/GOAL.md` and
+  `docs/LICENSING.md`, and leaves the older 37-file statements as past-tense history.
+  *Rationale:* the merged generator output changed, so present-tense counts that
+  still read 37 files, 29 SVG and 36 manifest entries are factual drift. *Evidence:*
+  the generated `assets/original/manifest.json` (53 entries), the checked tree and
+  PR #89's diff. *What did not change:* no checkbox was ticked, no blocker was
+  removed, no non-goal reversed — ADR 19/20/21 and the no-publication rule still
+  hold — the genuine blockers are all preserved, the B3/G3 boxes stay open at
+  401 items / 22 open with 38 screens planned, and no parity or release verdict is
+  claimed. The gameplay motifs are generated and browser-exported but are **not**
+  wired into the client's gameplay renderer; original art still appears only in the
+  two UI galleries, and that integration is separate, unmerged work. The
+  release-licence gate (I6) stays open, no rights-holder request exists, and no
+  publication is authorised. Gates re-run on this docs branch: `git diff --check` →
+  clean (exit 0); `node scripts/check-roadmap.mjs` → 401 items, 22 open;
+  `node scripts/check-report-sync.mjs` → the report set agrees with the implementation
+  (4 claims, after `pnpm build:content`, build id `63e067bd…`);
+  `node scripts/check-adrs.mjs` → 21 ADRs, all well formed;
+  `node scripts/check-licensing.mjs` → OK, the licensing position holds.
 - **2026-11-23 — final docs-only count alignment to the merged 170/52/38 inventory
   (Groups B3, G3).** The checked inventory on merged `main` at `b687d38` (the PR #83
   merge) reads **170 implemented / 52 dropped / 38 planned** of 260 in
@@ -3389,11 +3419,11 @@ reviewed without reconstructing the conversation that led to it.*
   (exit 0).
 - **2026-11-23 — clean-room art foundation recorded; the art gate stays open
   (Groups G and I, ADR 0021; PR #76, inventory refreshed after PR #86).** The approved
-  clean-room route has a working generator (`packages/art/`) and a regenerated
-  **37-file CC0-1.0 inventory** in `assets/original/`: 29 SVG (16 Foundry icons, one
-  sprite sheet and the `shield-pulse` and `spark-trail` six-frame original FX
-  sequences), six WAV effects, `LICENSE` and `manifest.json` (the manifest enumerates
-  the other 36), with a per-file provenance manifest. PR #86 wired the FX frames into
+  clean-room route had a working generator (`packages/art/`) and a regenerated
+  **37-file CC0-1.0 inventory** in `assets/original/` at that checkpoint: 29 SVG (16
+  Foundry icons, one sprite sheet and the `shield-pulse` and `spark-trail` six-frame
+  original FX sequences), six WAV effects, `LICENSE` and `manifest.json` (the manifest
+  enumerated the other 36), with a per-file provenance manifest. PR #86 wired the FX frames into
   an "Original FX" client panel that cycles one frame at a time under a
   `prefers-reduced-motion` still-frame fallback, shown under CC0 provenance.
   *Rationale:* the foundation is real, verified
