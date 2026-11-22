@@ -3,9 +3,10 @@
  *
  * This module re-exports only the generator's pure, platform-free modules:
  * the version constants, the seeded random generator, the SVG primitives,
- * the Foundry motifs, the original FX frames and the WAV synthesiser. Every one of them is a pure
- * function of its arguments, uses only web-standard globals (`Math`,
- * `TextEncoder`, `DataView`, `Int16Array`) and imports nothing from `node:`.
+ * the Foundry motifs, the original FX frames, the gameplay motifs and the WAV
+ * synthesiser. Every one of them is a pure function of its arguments, uses only
+ * web-standard globals (`Math`, `TextEncoder`, `DataView`, `Int16Array`) and
+ * imports nothing from `node:`.
  *
  * The package's other modules are deliberately **not** re-exported here:
  *
@@ -23,4 +24,5 @@ export * from './src/random.ts';
 export * from './src/svg.ts';
 export * from './src/icons.ts';
 export * from './src/fx.ts';
+export * from './src/gameplay.ts';
 export * from './src/wav.ts';

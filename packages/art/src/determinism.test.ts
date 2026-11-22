@@ -14,7 +14,7 @@ test('two generations give the same paths and the same bytes', () => {
     first.map((file) => file.path),
     second.map((file) => file.path),
   );
-  assert.equal(first.length, 37); // 29 SVG + 6 WAV + the notice + the manifest
+  assert.equal(first.length, 54); // 46 SVG + 6 WAV + the notice + the manifest
   for (let i = 0; i < first.length; i += 1) {
     const a = first[i];
     const b = second[i];

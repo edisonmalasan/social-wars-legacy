@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Ranged unit</title>
+  <desc id="swl-desc">An archer with a bow and seeded fletched arrows.</desc>
+    <circle cx="28" cy="14" r="7" fill="#f7ecd7"/>
+    <rect x="23" y="21" width="11" height="22" rx="3" fill="#b65340"/>
+    <rect x="19" y="41" width="7" height="14" rx="2" fill="#2c4654"/>
+    <rect x="32" y="41" width="7" height="14" rx="2" fill="#2c4654"/>
+    <path d="M44 14 Q57 32 44 50" fill="none" stroke="#e9a63f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="44" y1="14" x2="44" y2="50" stroke="#f7ecd7" stroke-width="1" stroke-linecap="round"/>
+    <line x1="12" y1="48" x2="8" y2="28" stroke="#2c4654" stroke-width="1.5" stroke-linecap="round"/>
+    <polygon points="8,28 6,32 10,32" fill="#86cdbd"/>
+    <line x1="16" y1="48" x2="12" y2="28" stroke="#2c4654" stroke-width="1.5" stroke-linecap="round"/>
+    <polygon points="12,28 10,32 14,32" fill="#86cdbd"/>
+    <line x1="20" y1="48" x2="16" y2="28" stroke="#2c4654" stroke-width="1.5" stroke-linecap="round"/>
+    <polygon points="16,28 14,32 18,32" fill="#86cdbd"/>
+    <line x1="24" y1="48" x2="20" y2="28" stroke="#2c4654" stroke-width="1.5" stroke-linecap="round"/>
+    <polygon points="20,28 18,32 22,32" fill="#86cdbd"/>
+</svg>
