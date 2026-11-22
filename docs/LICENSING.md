@@ -19,9 +19,20 @@ request and every answer is recorded there.
 
 ## The short version
 
-1. The **shipped product contains no Zynga asset and no Zynga code.**
-   The client's art, its sounds, its fonts and its configuration are not
-   in the shipped tree, and the shipped tree is scanned for them.
+1. The **shipped product contains no Zynga media or runtime files, and no
+   Zynga code.**
+   The client's art, sounds and fonts are not shipped as files: no SWF, no
+   sound file and no proprietary font face is present in the shipped trees,
+   which `scripts/check-licensing.mjs:34-38` scans for. **Data derived** from
+   the proprietary configuration and art *does* ship in the client:
+   `apps/client/public/content-bundle.json` (1.19 MB, 900 items, built from
+   `config/main.json`, the five patches, quest snapshots and
+   decompiled-derived maps — `packages/content/src/build.ts:4-7,460-473,740`)
+   and `apps/client/public/frame-manifest.json` (4 MB of atlas regions
+   measured from the client's SWFs —
+   `scripts/build-client-manifest.mjs:5-13,28-30,133-139`). Those are data,
+   not the original media files, and they are not rights-clean: the release
+   gate below stays open.
 2. The **upstream project** — the Python server, which is GPL v3 — is
    vendored **unmodified**, as a reference and a test fixture. It is not
    linked into the shipped product, and it is not a runtime dependency
@@ -106,26 +117,40 @@ against the vendored assets and **not distributable**.
 
 ### The clean-room increment
 
-`packages/art` generates an original "Foundry" family: sixteen UI/unit
-motifs and a sprite sheet drawn from fixed integer geometry, plus six short
-WAV effects synthesised from a fixed sine table and a seeded generator. It
-reads no input file, and only its own output tree is read back by its
-`--check` mode. Nothing is sampled, traced or copied from the game's art,
-the SWFs, the atlases or a proprietary font.
-
-The output in `assets/original/` carries a CC0-1.0 dedication and a
-provenance manifest: each file's relative path, byte size, SHA-256,
+`packages/art` generates an original "Foundry" family from fixed integer
+geometry and a seeded generator: it reads no input file, and only its own
+output tree is read back by its `--check` mode. Nothing is sampled, traced
+or copied from the game's art, the SWFs, the atlases or a proprietary font.
+The committed output in `assets/original/` is **37 files**: 29 SVG — sixteen
+Foundry icon motifs, one sprite sheet, and twelve frames of two six-frame
+original FX sequences, `shield-pulse` and `spark-trail` — six short WAV
+effects synthesised from a fixed sine table and a seeded generator, and the
+`LICENSE` and `manifest.json`. The manifest enumerates 36 of them (every
+file except itself) with each file's relative path, byte size, SHA-256,
 generator version, licence and an explicit original-work statement.
 `node packages/art/src/cli.ts --check` verifies the committed files against
 a fresh generation, and the package's tests prove determinism, header
 validity, distinct hashes and that no upstream or reverse-engineering file
 is read.
 
+The motifs and the FX frames are also consumed in the client **UI only**:
+two galleries, "Original art" and "Original FX", render them from the same
+pure generator as inline data URLs, with the CC0 notice and original-work
+statement carried alongside the artwork. The FX panel cycles each sequence
+with CSS keyframes and falls back to a single still frame under
+`prefers-reduced-motion: reduce`. These galleries own no game state, send
+no command and read no price; the built bundle carries their titles and the
+`foundry-anvil`, `shield-pulse` and `spark-trail` identifiers. They do not
+supply the PixiJS game world's art, and no proprietary atlas has been
+replaced there.
+
 This is the **first increment, not the finished set**. It does not replace
-the client's art, implement a screen or close the release gate. The
-proprietary configuration is a separate problem: the content bundle is
-still derived from the upstream's `config/main.json` and its deltas, and a
-public release needs that data re-created too.
+the client's gameplay art or close the release gate: wiring original art
+into the gameplay renderer and replacing the proprietary content with
+rights-clean data remain open work. The proprietary configuration is a
+separate problem: the content bundle is still derived from the upstream's
+`config/main.json` and its deltas, and a public release needs that data
+re-created too.
 
 ### The fonts
 
