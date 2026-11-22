@@ -43,7 +43,19 @@ import type {
   UnitPanel,
   WorldSnapshot,
 } from '@swl/client';
-import { DAMAGE_CLASSES } from '@swl/rules';
+import {
+  DAMAGE_CLASSES,
+  RESEARCH_FRIENDS_MULTIPLIER,
+  RESEARCH_STEP_SECONDS,
+  RESEARCH_TOTAL_STEPS,
+  SOUL_MIXER_POWERUPS,
+  buildSoulMixerCatalog,
+  checkSoulMixerLevel20Gate,
+  researchItemAt,
+  researchItemsFor,
+  soulMixerCashCost,
+  type ResearchType,
+} from '@swl/rules';
 import {
   armyView,
   assaultCountdown,
@@ -2794,4 +2806,361 @@ export function formatTurbinaRemaining(seconds: number): string {
 /** The one dialog descriptor for the help/turbine panel. */
 export function soulMixerDialog(): DialogContent {
   return { id: 'soulmixer-help', kind: 'alert', title: 'Soul Mixer Help' };
+}
+
+/* -------------------------------------------------------------------------
+ * Atom Fusion and the robot-research centres
+ *
+ * The pure rules for both screens now live in `@swl/rules` (`soulmixer.ts` and
+ * `research.ts`). The decompiled AS3 supplies the literals and the shape of the
+ * panels; the rules supply the power-up price table and the research track.
+ *
+ * Everything below is a **reading**. The two selected units, the rolled power,
+ * the granted item and the research timestamps are copied only when the
+ * server's save actually publishes them — a fresh world reads as empty, and
+ * nothing here rolls, prices, grants or counts down on its own. Every gesture
+ * is the catalogue command the host sends through the one command transport;
+ * the server still decides what, if anything, happens.
+ * ---------------------------------------------------------------------- */
+
+/** The server key the Atom Fusion record is read from, when one is published. */
+const ATOM_FUSION_STATE_KEY = 'soulMixer';
+
+/** The client's own literals from `popups/PopupSoulMixer.as`. */
+export const ATOM_FUSION_TITLE = 'ATOM FUSION';
+export const ATOM_FUSION_DESCRIPTION =
+  'Insert 2 units, powerUP the fusion and get a third stronger unit!';
+export const ATOM_FUSION_POWERUP_LABEL = 'Powerup';
+export const ATOM_FUSION_SPEEDUP_LABEL = 'Speedup';
+export const ATOM_FUSION_NO_POWER = 'No fusion power has been published by the server.';
+export const ATOM_FUSION_NO_RESULT = 'No fusion result has been granted by the server.';
+export const ATOM_FUSION_NO_INPUTS = 'Select two units to prepare a fusion.';
+
+/** A non-negative integer the server actually wrote, or null. */
+function serverInteger(value: unknown): number | null {
+  const number = finite(value);
+  return number !== null && Number.isInteger(number) && number >= 0 ? number : null;
+}
+
+/** One element of a server array, read as a non-negative integer or null. */
+function serverArrayInteger(value: unknown, index: number): number | null {
+  if (!Array.isArray(value)) return null;
+  return serverInteger(value[index]);
+}
+
+/** Prepare the content's candidate list with the pure soul-mixer rules. */
+function fusionCatalog(bundle: ContentBundle) {
+  return buildSoulMixerCatalog(
+    (bundle.items ?? []).map((item) => {
+      const raw: unknown = item.extra?.['breeding_order'];
+      return {
+        id: item.id,
+        breeding_order: typeof raw === 'number' || typeof raw === 'string' ? raw : 0,
+      };
+    }),
+  );
+}
+
+/** The content's item names, used only to label ids the server published. */
+function itemNames(bundle: ContentBundle): Map<number, string> {
+  const out = new Map<number, string>();
+  for (const item of bundle.items ?? []) out.set(item.id, item.name);
+  return out;
+}
+
+/** One breeding candidate, from the content's `breeding_order`. */
+export interface FusionCandidateView {
+  readonly itemId: number;
+  readonly name: string;
+  readonly power: number;
+}
+
+/** One of the two units the server says are in the mixer. */
+export interface FusionInputView {
+  readonly itemId: number;
+  readonly name: string;
+  /** The content's breeding_order, or null when the content cannot name it. */
+  readonly power: number | null;
+}
+
+/** One row of the power-up price table, priced by the pure rules. */
+export interface FusionPowerupRow {
+  /** One-based level, for display; the command carries the zero-based index. */
+  readonly level: number;
+  readonly cashCost: number;
+  readonly orderIncrement: number;
+  readonly current: boolean;
+  readonly command: NativeCommand;
+}
+
+/** The item the server actually granted, or null while none was granted. */
+export interface FusionResultView {
+  readonly itemId: number;
+  readonly name: string;
+  readonly power: number | null;
+}
+
+/** The Atom Fusion panel's body. */
+export interface AtomFusionPanelView {
+  readonly title: string;
+  readonly description: string;
+  /** The whole content candidate list, sorted ascending by power. */
+  readonly candidates: readonly FusionCandidateView[];
+  readonly inputs: readonly FusionInputView[];
+  /** The server's rolled power, or null when it published none. */
+  readonly powerPreview: number | null;
+  readonly powerupRows: readonly FusionPowerupRow[];
+  readonly result: FusionResultView | null;
+  /** The server's iso id, needed for the Speedup request; null when absent. */
+  readonly speedup: NativeCommand | null;
+  /** The pure rules' level-20 refusal, when the two inputs trigger it. */
+  readonly gateMessage: string | null;
+}
+
+/**
+ * Read the Atom Fusion panel from the content and the server's save.
+ *
+ * The candidate list is the content's own; the two inputs, the rolled power,
+ * the granted item and the building iso id are copied from the `soulMixer`
+ * record only when the server wrote them. The record's optional fields are
+ * `inputA`/`inputB` (or `inputIds`), `resultPower`, `resultItemId`,
+ * `powerUpLevel` and `isoId`; none is required, and a malformed or missing
+ * field reads as absent rather than as an invented value. The price table
+ * comes from `SOUL_MIXER_POWERUPS` in the rules, and each Powerup button sends
+ * the catalogue's `buy_powerups` request — the server charges and decides the
+ * new unit.
+ */
+export function atomFusionPanel(bundle: ContentBundle, world: WorldSnapshot): AtomFusionPanelView {
+  const catalog = fusionCatalog(bundle);
+  const names = itemNames(bundle);
+  const record = recordOrNull(world.privateState?.[ATOM_FUSION_STATE_KEY]);
+
+  // The AS3 keeps the two chosen units in the building's attribute bag; when
+  // the server publishes the same state in its save, read only its ids.
+  let inputIds: number[] = [];
+  const first = serverInteger(record?.['inputA']);
+  const second = serverInteger(record?.['inputB']);
+  if (first !== null) inputIds.push(first);
+  if (second !== null) inputIds.push(second);
+  if (inputIds.length === 0 && Array.isArray(record?.['inputIds'])) {
+    for (const value of (record as Record<string, unknown>)['inputIds'] as unknown[]) {
+      const id = serverInteger(value);
+      if (id !== null) inputIds.push(id);
+    }
+    inputIds = inputIds.slice(0, 2);
+  }
+  const inputs: FusionInputView[] = inputIds.map((itemId) => ({
+    itemId,
+    name: names.get(itemId) ?? `item ${itemId}`,
+    power: catalog.powerById.get(itemId) ?? null,
+  }));
+
+  const level = serverInteger(record?.['powerUpLevel']);
+  const powerPreview = serverInteger(record?.['resultPower']);
+  const resultId = serverInteger(record?.['resultItemId']);
+  const result: FusionResultView | null =
+    resultId === null
+      ? null
+      : {
+          itemId: resultId,
+          name: names.get(resultId) ?? `item ${resultId}`,
+          power: catalog.powerById.get(resultId) ?? null,
+        };
+
+  const isoId = serverInteger(record?.['isoId']);
+  const gate =
+    inputs.length === 2 ? checkSoulMixerLevel20Gate(levelOf(world), inputs[0]!.itemId, inputs[1]!.itemId) : null;
+
+  return {
+    title: ATOM_FUSION_TITLE,
+    description: ATOM_FUSION_DESCRIPTION,
+    candidates: catalog.candidates.map((candidate) => ({
+      itemId: candidate.id,
+      name: names.get(candidate.id) ?? `item ${candidate.id}`,
+      power: candidate.power,
+    })),
+    inputs,
+    powerPreview,
+    powerupRows: SOUL_MIXER_POWERUPS.map((powerup, index) => ({
+      level: index + 1,
+      cashCost: soulMixerCashCost(index),
+      orderIncrement: powerup.order_increment,
+      current: level === index,
+      command: { map: 0, name: 'buy_powerups', args: [index] },
+    })),
+    result,
+    speedup: isoId === null ? null : { map: 0, name: 'soulmixer_speedup', args: [isoId] },
+    gateMessage: gate && !gate.allowed ? gate.message : null,
+  };
+}
+
+/** The client's own literals from `popups/PopupResearchCenter.as`. */
+export const RESEARCH_TITLE_AREA_51 = 'AREA 51';
+export const RESEARCH_TITLE_ROBOTIC = 'ROBOTIC CENTER';
+export const RESEARCH_PROGRESS_LABEL = 'Progress';
+export const RESEARCH_FINISHES_IN = 'Finishes in:';
+export const RESEARCH_RESEARCHING = 'Researching';
+export const RESEARCH_HINT = 'Press research every 6 hours to get a powerful robot.';
+export const RESEARCH_HIRE_TITLE = 'Hire new friends to progress faster';
+export const RESEARCH_HIRE_HINT = `For each new friend you hire, you will progress ${RESEARCH_FRIENDS_MULTIPLIER} steps instantly!`;
+export const RESEARCH_HIRE_BUTTON = 'Hire friends';
+export const RESEARCH_RESEARCH_BUTTON = 'Research';
+export const RESEARCH_GET_BUTTON = 'Get it!';
+export const RESEARCH_NO_TIMESTAMP = 'No research countdown has been published by the server.';
+
+/** One of the six items in a research track. */
+export interface ResearchTrackItemView {
+  readonly id: number;
+  readonly name: string;
+  readonly cash: number;
+  readonly current: boolean;
+}
+
+/** A countdown read from the server's research timestamp. */
+export interface ResearchCountdownView {
+  readonly secondsRemaining: number;
+  readonly due: boolean;
+  readonly label: string;
+}
+
+/** The pending friend-help record from the Robotic Center's private state. */
+export interface ResearchFriendHelpView {
+  readonly friends: readonly string[];
+  readonly message: string;
+  readonly hint: string;
+  readonly button: string;
+  readonly command: NativeCommand;
+}
+
+/** The research panel's body. */
+export interface ResearchPanelView {
+  readonly type: ResearchType;
+  readonly title: string;
+  /** The server's step count, or null when it published none. */
+  readonly step: number | null;
+  readonly totalSteps: number;
+  readonly stepSeconds: number;
+  /** The item the server's item number points at, in the rules' track. */
+  readonly item: { readonly id: number; readonly name: string; readonly cash: number } | null;
+  readonly track: readonly ResearchTrackItemView[];
+  readonly countdown: ResearchCountdownView | null;
+  readonly hint: string;
+  readonly friendHelp: ResearchFriendHelpView | null;
+  readonly progressLabel: string;
+  readonly finishesInLabel: string;
+  readonly researchingLabel: string;
+  readonly researchCommand: NativeCommand;
+  readonly speedupCommand: NativeCommand | null;
+  readonly collectCommand: NativeCommand | null;
+}
+
+/** Format a server-derived research wait as the client's `H:MM:SS`. */
+export function formatResearchTime(seconds: number): string {
+  const whole = Math.max(0, Math.floor(seconds));
+  const hours = Math.floor(whole / 3600);
+  const minutes = Math.floor((whole % 3600) / 60);
+  const remainder = whole % 60;
+  return `${hours}:${String(minutes).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
+}
+
+/**
+ * Read one research centre's panel from the server's save, the content and
+ * the rules. Only the timestamp the server wrote is turned into a wait: with
+ * no published timestamp there is no countdown at all. The friend-help list
+ * is the server's too, and the three actions are catalogue requests — paying
+ * for a step sends the rules' cash price, which the server re-prices.
+ */
+export function researchPanel(
+  bundle: ContentBundle,
+  world: WorldSnapshot,
+  type: ResearchType,
+  now: number,
+): ResearchPanelView {
+  const names = itemNames(bundle);
+  const step = serverArrayInteger(world.privateState?.['researchStepNumber'], type);
+  const itemNumber = serverArrayInteger(world.privateState?.['researchItemNumber'], type);
+  const timestamp = serverArrayInteger(world.privateState?.['timeStampDoResearch'], type);
+  const current = itemNumber === null ? null : researchItemAt(type, itemNumber);
+  const item =
+    current === null
+      ? null
+      : { id: current.id, name: names.get(current.id) ?? `item ${current.id}`, cash: current.cash };
+
+  let countdown: ResearchCountdownView | null = null;
+  if (timestamp !== null && timestamp > 0) {
+    const elapsed = Math.max(0, now - timestamp);
+    const remaining = Math.max(0, RESEARCH_STEP_SECONDS - elapsed);
+    countdown = {
+      secondsRemaining: remaining,
+      due: remaining === 0,
+      label: formatResearchTime(remaining),
+    };
+  }
+
+  let friendHelp: ResearchFriendHelpView | null = null;
+  if (type === 1) {
+    const raw = world.privateState?.['roboticSocialHelp'];
+    const friends = Array.isArray(raw)
+      ? raw.filter((entry): entry is string => typeof entry === 'string' && entry.length > 0)
+      : [];
+    if (friends.length > 0) {
+      friendHelp = {
+        friends,
+        message: RESEARCH_HIRE_TITLE,
+        hint: RESEARCH_HIRE_HINT,
+        button: RESEARCH_HIRE_BUTTON,
+        command: {
+          map: 0,
+          name: 'finish_robotic_help',
+          args: [JSON.stringify(friends)],
+        },
+      };
+    }
+  }
+
+  return {
+    type,
+    title: type === 0 ? RESEARCH_TITLE_AREA_51 : RESEARCH_TITLE_ROBOTIC,
+    step,
+    totalSteps: RESEARCH_TOTAL_STEPS,
+    stepSeconds: RESEARCH_STEP_SECONDS,
+    item,
+    track: researchItemsFor(type).map((entry) => ({
+      id: entry.id,
+      name: names.get(entry.id) ?? `item ${entry.id}`,
+      cash: entry.cash,
+      current: item !== null && entry.id === item.id,
+    })),
+    countdown,
+    hint: RESEARCH_HINT,
+    friendHelp,
+    progressLabel: RESEARCH_PROGRESS_LABEL,
+    finishesInLabel: RESEARCH_FINISHES_IN,
+    researchingLabel: RESEARCH_RESEARCHING,
+    researchCommand: { map: 0, name: 'next_research_step', args: [type, true] },
+    speedupCommand:
+      item === null ? null : { map: 0, name: 'research_buy_step_cash', args: [item.cash, type] },
+    collectCommand:
+      step !== null && step >= RESEARCH_TOTAL_STEPS
+        ? { map: 0, name: 'next_research_item', args: [type] }
+        : null,
+  };
+}
+
+/** The one dialog's kind for each of the three newly drawn panels. */
+export type FusionDialogKind = 'atom' | ResearchType;
+
+/** The one dialog's descriptors. Each screen has its own id; none opens a second modal. */
+export function fusionDialog(kind: FusionDialogKind): DialogContent {
+  const ids: Record<FusionDialogKind, string> = {
+    atom: 'fusion-atom',
+    0: 'research-area51',
+    1: 'research-robotic',
+  };
+  const titles: Record<FusionDialogKind, string> = {
+    atom: ATOM_FUSION_TITLE,
+    0: RESEARCH_TITLE_AREA_51,
+    1: RESEARCH_TITLE_ROBOTIC,
+  };
+  return { id: ids[kind], kind: 'alert', title: titles[kind] };
 }

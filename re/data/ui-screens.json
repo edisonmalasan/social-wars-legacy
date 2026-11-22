@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 151,
+   "implemented": 154,
    "dropped": 52,
-   "planned": 57
+   "planned": 54
   }
  },
  "screens": [
@@ -2424,7 +2424,7 @@
    "overrides": [],
    "bytes": 1425,
    "decision": "planned",
-   "decisionNote": "Deferred: the breeding popup has no breeding-rule model in the client; unblock when the breeding flow is implemented and its art is licensed."
+   "decisionNote": "Deferred: this is the art-only movieclip shell that `popups/PopupSoulMixer.as` extends; the fusion behaviour behind it is now drawn by `apps/client/src/ui/fusion.tsx`, but this class itself has no literals, state or gestures beyond its artwork. The Zynga art stays under the licence gate, so it stays planned rather than claiming an asset the clone does not draw; there is no separate breeding flow to model."
   },
   {
    "class": null,
@@ -3326,8 +3326,8 @@
    ],
    "overrides": [],
    "bytes": 1425,
-   "decision": "planned",
-   "decisionNote": "Deferred: the short note misidentified this as the magic tech tree. The movieclip is the shell of `popups/PopupResearchCenter.as` — the late-era AREA 51 / ROBOTIC CENTER robot-research screen whose own build-process animation art is `popupResearchCenter_buildingProcess.swf` and `popupResearchCenter_buildingProcess_3.swf`. The new server keeps only the migration fields `researchItemNumber`/`researchStepNumber`/`timeStampDoResearch` and applies none of the `next_research_item`, `next_research_step`, `research_buy_step_cash`, `reset_research_item` or `finish_robotic_help` commands, so its gestures would have no authoritative answer; its 'Hire friends' gesture is social (ADR 20). Unblock when the robot-research rules, requests and licensed art exist."
+   "decision": "implemented",
+   "decisionNote": "Implemented: the shell is hosted by the research panel (`apps/client/src/ui/fusion.tsx`), which draws the server's 10-step progress, the countdown derived only from its published timestamp, the six-item track from `packages/rules/src/research.ts` and the Robotic Center friend-help prompt in the one shared dialog. The build-process animation SWFs stay excluded; only the behaviour is claimed."
   },
   {
    "class": null,
@@ -5227,8 +5227,8 @@
    ],
    "overrides": [],
    "bytes": 23945,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P2) a late-era progression screen outside the G5.1 playable slice."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/fusion.tsx` draws AREA 51 / ROBOTIC CENTER from the server's researchItemNumber/researchStepNumber/timeStampDoResearch and the rules' track — a countdown only when the server published a timestamp, a rules-priced `research_buy_step_cash` request, `next_research_item` on the tenth step and `finish_robotic_help` from the server's friend list. No local roll, grant or countdown; the animation art stays excluded."
   },
   {
    "class": "PopupRewards",
@@ -5421,8 +5421,8 @@
    ],
    "overrides": [],
    "bytes": 41931,
-   "decision": "planned",
-   "decisionNote": "Deferred: (P2) a late-era feature screen outside the G5.1 playable slice."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/fusion.tsx` draws the ATOM FUSION panel — breeding_order candidates and names from the content, the two server-selected units, the rolled power only when the server published one, the power-up price table from `packages/rules/src/soulmixer.ts` and the item the server actually granted. Powerup/Speedup only send `buy_powerups`/`soulmixer_speedup` through the one transport; no local roll or outcome, and the original art stays excluded."
   },
   {
    "class": "PopupSoulMixerHelp",

@@ -1053,6 +1053,70 @@ export function uiCss(): string {
   color: #f2e6c8;
 }
 
+/* --- Atom Fusion and the robot-research centres ----------------------- */
+
+.swl-fusion-launcher { position: absolute; right: 8px; bottom: 130px; }
+
+.swl-fusion-launcher-summary {
+  cursor: pointer;
+  color: #f5c542;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+.swl-fusion-launcher-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+
+.swl-ui button.swl-fusion-launch {
+  padding: 3px 6px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: #f2e6c8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+.swl-fusion { max-width: 560px; font-size: calc(11px * var(--swl-font-scale-body, 1)); }
+.swl-fusion-title { margin: 2px 0; color: #f5c542; font-weight: 700; }
+.swl-fusion-description { margin: 2px 0 8px; color: var(--swl-ink-muted); white-space: pre-line; }
+.swl-fusion section { margin: 8px 0; padding: 6px 8px; border: 1px solid #38445a; border-radius: 4px; background: rgba(16, 21, 29, 0.92); }
+.swl-fusion h3 { margin: 0 0 4px; color: #f5c542; font-size: 1em; }
+.swl-fusion-empty { margin: 2px 0; color: var(--swl-ink-muted); font-style: italic; }
+.swl-fusion-gate { margin: 4px 0 0; color: var(--swl-danger); }
+.swl-fusion-input-list, .swl-fusion-candidate-list { margin: 2px 0; padding-left: 18px; }
+.swl-fusion-candidate-list { max-height: 130px; overflow-y: auto; }
+.swl-fusion-power-value { margin: 2px 0; color: #a9d7ff; font-weight: 700; }
+.swl-fusion-result-value { margin: 2px 0; color: #8fd694; font-weight: 700; }
+.swl-fusion-powerup-table { width: 100%; border-collapse: collapse; }
+.swl-fusion-powerup-table th, .swl-fusion-powerup-table td { padding: 2px 4px; text-align: left; border-bottom: 1px solid #2b3444; }
+.swl-fusion-powerup-table tr[data-swl-current='true'] td { color: #f5c542; }
+
+.swl-ui button.swl-fusion-action {
+  padding: 3px 8px;
+  border: 1px solid #4a6a8a;
+  border-radius: 3px;
+  background: #223047;
+  color: #f2e6c8;
+}
+.swl-ui button.swl-fusion-close { margin-top: 8px; }
+
+.swl-research { max-width: 560px; font-size: calc(11px * var(--swl-font-scale-body, 1)); }
+.swl-research-title { margin: 2px 0 8px; color: #f5c542; font-weight: 700; }
+.swl-research section { margin: 8px 0; padding: 6px 8px; border: 1px solid #38445a; border-radius: 4px; background: rgba(16, 21, 29, 0.92); }
+.swl-research h3 { margin: 0 0 4px; color: #f5c542; font-size: 1em; }
+.swl-research-progress-label { margin: 0 0 4px; }
+.swl-research-bar { height: 8px; border: 1px solid #38445a; border-radius: 4px; background: #10131a; }
+.swl-research-bar-fill { display: block; height: 100%; background: #f5c542; }
+.swl-research-item-name { margin: 2px 0; color: #f2e6c8; font-weight: 700; }
+.swl-research-item-cash { margin: 2px 0; color: #a9d7ff; }
+.swl-research-track { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; padding-left: 18px; }
+.swl-research-track li[data-swl-current='true'] { color: #f5c542; font-weight: 700; }
+.swl-research-countdown-label { margin: 0; color: #f5c542; font-weight: 700; }
+.swl-research-countdown-value { margin: 2px 0; color: #a9d7ff; }
+.swl-research-hint { margin: 6px 0; color: var(--swl-ink-muted); }
+.swl-research-help-title { margin: 0; color: #f5c542; font-weight: 700; }
+.swl-research-help-hint { margin: 2px 0; color: var(--swl-ink-muted); }
+.swl-research-help-friends { margin: 4px 0; padding-left: 18px; }
+.swl-research-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
 /* --- The Research LAB --------------------------------------------------- */
 
 .swl-magiclab {
