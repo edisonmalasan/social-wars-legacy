@@ -64,7 +64,5 @@ shipped. The project's **own** replacement art is original work dedicated to
 | The dedication and provenance manifest | `assets/original/LICENSE`, `assets/original/manifest.json` | CC0-1.0 | per-file path, size, SHA-256 and generator version |
 
 This is the first increment, not the finished set: it does not close the
-licence gate and it is not yet wired into the client. The generator's
-template still describes the assets as "none"; keeping this section in sync
-with the generated file belongs to the change that owns
-`scripts/build-licence-report.mjs`. See [`LICENSING.md`](LICENSING.md).
+licence gate and it is not yet wired into the client. See
+[`LICENSING.md`](LICENSING.md).
