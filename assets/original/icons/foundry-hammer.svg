@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry hammer</title>
+  <desc id="swl-desc">A cross-peen hammer, angled for the forge.</desc>
+    <g transform="rotate(35 32 32)">
+    <rect x="29" y="22" width="6" height="36" rx="2" fill="#b65340"/>
+    <rect x="16" y="14" width="32" height="12" rx="2" fill="#2c4654"/>
+    <rect x="46" y="14" width="6" height="12" rx="1" fill="#e9a63f"/>
+    <circle cx="22" cy="20" r="1" fill="#f7ecd7"/>
+    <circle cx="30" cy="20" r="1" fill="#f7ecd7"/>
+    <circle cx="38" cy="20" r="1" fill="#f7ecd7"/>
+    </g>
+</svg>

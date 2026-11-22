@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry wrench</title>
+  <desc id="swl-desc">An open-ended spanner with a ring handle.</desc>
+    <line x1="18" y1="46" x2="43" y2="21" stroke="#2c4654" stroke-width="7" stroke-linecap="round"/>
+    <polygon points="40,9 55,9 55,19 49,19 49,14 44,14 44,19 38,19" fill="#e9a63f"/>
+    <rect x="50" y="10" width="2" height="4" rx="0" fill="#16242d"/>
+    <circle cx="16" cy="48" r="7" fill="#2c4654"/>
+    <circle cx="16" cy="48" r="3" fill="#16242d"/>
+</svg>

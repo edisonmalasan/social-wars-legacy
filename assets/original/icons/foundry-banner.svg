@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry banner</title>
+  <desc id="swl-desc">A notched pennant on a studded pole.</desc>
+    <line x1="20" y1="8" x2="20" y2="56" stroke="#16242d" stroke-width="4" stroke-linecap="round"/>
+    <polygon points="22,12 54,12 48,22 54,32 22,32" fill="#e9a63f"/>
+    <polygon points="25,16 48,16 44,22 48,28 25,28" fill="#b65340"/>
+    <circle cx="20" cy="8" r="3" fill="#f7ecd7"/>
+    <circle cx="20" cy="26" r="1" fill="#86cdbd"/>
+    <circle cx="20" cy="35" r="1" fill="#86cdbd"/>
+    <circle cx="20" cy="44" r="1" fill="#86cdbd"/>
+</svg>

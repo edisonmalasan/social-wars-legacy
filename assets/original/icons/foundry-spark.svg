@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry spark</title>
+  <desc id="swl-desc">A twelve-point spark with a bright core.</desc>
+    <polygon points="32,4 38,23 57,17 43,32 57,47 38,41 32,60 26,41 7,47 21,32 7,17 26,23" fill="#e9a63f"/>
+    <circle cx="32" cy="32" r="7" fill="#f7ecd7"/>
+    <circle cx="32" cy="32" r="3" fill="#16242d"/>
+</svg>

@@ -52,6 +52,17 @@ The client's own faces are **proprietary** and are not shipped.
 
 ## The assets
 
-There are none. The art, the sounds and the configuration are Zynga's,
-they cannot be shipped, and the clone re-creates them. See
+The original game's art, sounds and configuration are Zynga's and are not
+shipped. The project's **own** replacement art is original work dedicated to
+**CC0-1.0**:
+
+| What | Where | Licence | Why |
+| --- | --- | --- | --- |
+| The clean-room generator | `packages/art/` | CC0-1.0 | deterministic SVG and WAV synthesis from primitives |
+| The Foundry icon family and sprite sheet | `assets/original/icons/` | CC0-1.0 | sixteen original UI/unit motifs |
+| The six short effects | `assets/original/sounds/` | CC0-1.0 | synthesised from a fixed sine table, not recorded |
+| The dedication and provenance manifest | `assets/original/LICENSE`, `assets/original/manifest.json` | CC0-1.0 | per-file path, size, SHA-256 and generator version |
+
+This is the first increment, not the finished set: it does not close the
+licence gate and it is not yet wired into the client. See
 [`LICENSING.md`](LICENSING.md).

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry wagon</title>
+  <desc id="swl-desc">A covered wagon with spoked wheels.</desc>
+    <rect x="10" y="32" width="40" height="12" rx="2" fill="#b65340"/>
+    <path d="M12 32 Q32 12 48 32 Z" fill="#e9a63f"/>
+    <circle cx="18" cy="48" r="7" fill="#2c4654"/>
+    <circle cx="18" cy="48" r="2" fill="#16242d"/>
+    <line x1="13" y1="44" x2="23" y2="44" stroke="#f7ecd7" stroke-width="1" stroke-linecap="round"/>
+    <line x1="13" y1="46" x2="23" y2="46" stroke="#f7ecd7" stroke-width="1" stroke-linecap="round"/>
+    <line x1="13" y1="48" x2="23" y2="48" stroke="#f7ecd7" stroke-width="1" stroke-linecap="round"/>
+    <line x1="13" y1="50" x2="23" y2="50" stroke="#f7ecd7" stroke-width="1" stroke-linecap="round"/>
+    <circle cx="44" cy="48" r="7" fill="#2c4654"/>
+    <circle cx="44" cy="48" r="2" fill="#16242d"/>
+    <line x1="39" y1="44" x2="49" y2="44" stroke="#f7ecd7" stroke-width="1" stroke-linecap="round"/>
+    <line x1="39" y1="46" x2="49" y2="46" stroke="#f7ecd7" stroke-width="1" stroke-linecap="round"/>
+    <line x1="39" y1="48" x2="49" y2="48" stroke="#f7ecd7" stroke-width="1" stroke-linecap="round"/>
+    <line x1="39" y1="50" x2="49" y2="50" stroke="#f7ecd7" stroke-width="1" stroke-linecap="round"/>
+</svg>

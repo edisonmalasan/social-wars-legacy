@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry lantern</title>
+  <desc id="swl-desc">A hanging lantern with a luminous glass and a measured halo.</desc>
+    <path d="M24 14 Q32 5 40 14" fill="none" stroke="#16242d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="22" y="13" width="20" height="5" rx="1" fill="#2c4654"/>
+    <circle cx="32" cy="33" r="10" fill="#e9a63f"/>
+    <circle cx="32" cy="33" r="5" fill="#f7ecd7"/>
+    <rect x="22" y="41" width="20" height="5" rx="1" fill="#2c4654"/>
+    <line x1="46" y1="18" x2="54" y2="16" stroke="#e9a63f" stroke-width="2" stroke-linecap="round"/>
+    <line x1="46" y1="23" x2="57" y2="21" stroke="#e9a63f" stroke-width="2" stroke-linecap="round"/>
+    <line x1="46" y1="28" x2="54" y2="26" stroke="#e9a63f" stroke-width="2" stroke-linecap="round"/>
+    <line x1="46" y1="33" x2="57" y2="31" stroke="#e9a63f" stroke-width="2" stroke-linecap="round"/>
+    <line x1="46" y1="38" x2="54" y2="36" stroke="#e9a63f" stroke-width="2" stroke-linecap="round"/>
+    <line x1="46" y1="43" x2="57" y2="41" stroke="#e9a63f" stroke-width="2" stroke-linecap="round"/>
+</svg>

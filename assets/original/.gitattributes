@@ -1,0 +1,6 @@
+# The manifest hashes the exact bytes the generator writes. A checkout must
+# not turn LF into CRLF, or --check would fail on a clean Windows clone.
+* text eol=lf
+
+# WAV data is binary: never end-of-line convert it.
+*.wav -text
