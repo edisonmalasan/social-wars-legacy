@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Combat impact</title>
+  <desc id="swl-desc">A seeded radial burst with a hot core and scattered sparks.</desc>
+    <line x1="32" y1="20" x2="32" y2="12" stroke="#e9a63f" stroke-width="3" stroke-linecap="round"/>
+    <line x1="38" y1="21.8" x2="42" y2="15" stroke="#b65340" stroke-width="3" stroke-linecap="round"/>
+    <line x1="42.8" y1="26.6" x2="50" y2="23" stroke="#e9a63f" stroke-width="3" stroke-linecap="round"/>
+    <line x1="44" y1="32" x2="52" y2="32" stroke="#b65340" stroke-width="3" stroke-linecap="round"/>
+    <line x1="42.8" y1="37.4" x2="50" y2="41" stroke="#e9a63f" stroke-width="3" stroke-linecap="round"/>
+    <line x1="38" y1="42.2" x2="42" y2="49" stroke="#b65340" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="32" cy="32" r="13" fill="#e9a63f"/>
+    <circle cx="32" cy="32" r="8" fill="#f7ecd7"/>
+    <circle cx="32" cy="32" r="4" fill="#16242d"/>
+    <circle cx="18" cy="22" r="2" fill="#86cdbd"/>
+    <circle cx="30" cy="40" r="2" fill="#86cdbd"/>
+    <circle cx="42" cy="22" r="2" fill="#86cdbd"/>
+</svg>

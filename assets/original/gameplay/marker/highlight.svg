@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Highlight marker</title>
+  <desc id="swl-desc">Two rings, a drop chevron and seeded rays.</desc>
+    <circle cx="32" cy="32" r="20" fill="none" stroke="#2f7d78" stroke-width="2" stroke-dasharray="5 4"/>
+    <circle cx="32" cy="32" r="13" fill="none" stroke="#86cdbd" stroke-width="1.5"/>
+    <line x1="26" y1="4" x2="26" y2="12" stroke="#e9a63f" stroke-width="2" stroke-linecap="round"/>
+    <line x1="30" y1="4" x2="30" y2="12" stroke="#e9a63f" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="28,46 36,46 32,53" fill="#e9a63f"/>
+</svg>
