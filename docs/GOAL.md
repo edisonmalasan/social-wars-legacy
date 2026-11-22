@@ -504,9 +504,10 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main` (2026-11-22):** `f096deb` — PR #67
+- **Last verified `main` (2026-11-22):** `68e3bbb` — PR #67 (`f096deb`, client
+  panels) and PR #68 (server appliers) both merged with green CI. PR #67
   (`feat/soulmixer-research-screens`, "draw Atom Fusion and research panels from
-  server state") merged. It added `apps/client/src/ui/fusion.tsx` (launcher plus
+  server state") added `apps/client/src/ui/fusion.tsx` (launcher plus
   Atom Fusion and research panels hosted in the one shared `Dialog`), pure
   selectors in `apps/client/src/ui/state.ts` and 11 focused client tests. It
   reclassified three screens — `popups/PopupSoulMixer.as`,
@@ -524,27 +525,42 @@ verified checkpoint, not at every tool call.
   documentation increment independently re-ran `node scripts/check-roadmap.mjs`
   (401 items, 22 open: B 42/4, E 37/1, G 78/8, H 14/4, I 99/5),
   `node scripts/check-report-sync.mjs` (4 claims) and `node scripts/check-adrs.mjs`
-  (20 well-formed ADRs) on `f096deb`, ticked no checkbox and removed no blocker.
-- **PR #68 — pending CI at this checkpoint, not merged:** `feat(server):
-  authoritative soul-mixer and research appliers` (`t3/8669cac9`) is still
-  **OPEN** (`gh pr view 68 --json state` reported `OPEN`). It proposes
-  server-owned appliers for `buy_powerups`, `soulmixer_speedup`,
-  `push_queue_unit2` and the five research commands, charging from content/rules
-  prices and deriving results from server state and a server seed. Its PR body
-  reports 533 server tests, 1945 full-suite tests, 94/94 catalogue, 11/11 cheat
-  battery and 50 golden-master scenarios with 0 differences; those are **the PR's
-  own figures, not independently re-verified here**. Do not treat any of it as
-  merged fact until the state reads `MERGED` and the checks are re-run locally.
-- **Active worker threads:** an audit thread (re-checking the section 5 blocker
-  claims against the current tree) and a server-state publication thread (the
-  work behind PR #68) are active. The audit verdict is that none of the 22 open
+  (20 well-formed ADRs) first on `f096deb` and again on merged `68e3bbb`,
+  ticked no checkbox and removed no blocker.
+- **PR #68 — merged and independently verified:** `feat(server): authoritative
+  soul-mixer and research appliers` (`t3/8669cac9`) was **MERGED** at `68e3bbb`
+  with all four required CI checks green; this was confirmed with
+  `gh pr view 68 --json state` (`MERGED`). `packages/server/src/apply.ts` now has
+  authoritative cases for `buy_powerups`, `push_queue_unit2` (the Soul Mixer
+  variant), `soulmixer_speedup` and all five research commands
+  (`next_research_step`, `research_buy_step_cash`, `next_research_item`,
+  `reset_research_item`, `finish_robotic_help`). The server-owned state keys are
+  `soulMixerPowerups` (paid power-up levels), `researchState` (`itemNumber`,
+  `stepNumber`, `timestamp`, `roboticSocialHelp`) and `roboticHelpConsumed`
+  (friend ids already paid for), with `smTrainingTime` and the queue fields on
+  the building's own attribute bag. Results are derived from the mixer's own
+  inputs, the paid power-ups and `deps.serverSeed`; prices come from content and
+  rules, the client's declared output id / cashCost / cash delta are ignored,
+  friend help is de-duplicated and capped at ten steps, and refusals happen
+  before mutation. Independently re-run on merged `main`: `pnpm test` **1959 pass
+  / 0 fail** (the PR body reported 1945 on its own branch), `pnpm --filter
+  @swl/server test` **533 pass / 0 fail**, `pnpm typecheck` clean,
+  `node scripts/verify-command-catalogue.mjs` **94/94** (without the decompiled
+  client source present locally, so it compared the report's 94 rows with the
+  protocol's 94 names), `node scripts/run-cheat-battery.mjs` **11/11** attacks
+  caught and `node scripts/golden-master.mjs` **50 scenarios / 0 differences**.
+- **Active worker threads:** the server-state publication thread has delivered
+  PR #68 (merged); the audit thread is still re-checking the section 5 blocker
+  claims against the current tree. The audit verdict is that none of the 22 open
   items is class-A or needs a new user decision — all are gated by licences,
   devices, credentials, the Flash rig or non-goals — so every blocker claim is
   preserved. Only the orchestrator merges; no worker merges its own branch.
-- **Next (honest, evidence-gated):** verify PR #68 only after it actually merges
-  (state, then a local `pnpm test` and `node scripts/verify-command-catalogue.mjs`);
-  keep reducing the remaining 54 planned B6 screens in coherent, player-facing
-  families, with Zynga-art screens staying planned behind the licence gate. No
+- **Next (honest, evidence-gated):** keep reducing the remaining 54 planned B6
+  screens in coherent, player-facing families, with Zynga-art screens staying
+  planned behind the licence gate; advance platform/release items only with real
+  evidence (branded Safari, devices, signed installers, a macOS runner, the Flash
+  live rig). PR #66's rules and PR #68's appliers close the fusion and research
+  behaviour gaps, but they do not close any screen or platform box. No
   documentation change ticks a checkbox or rewrites a blocker.
 - **Previously verified `main`:** `96e8a7e` — PR #64
   (`chore/provision-android-sdk`, the verified Android debug build — SDK
@@ -651,8 +667,9 @@ verified checkpoint, not at every tool call.
   `apps/client/src/ui/fusion.tsx`, which draws the server's progress, a timestamp-
   only countdown and the rules' track in the one shared dialog. The panels read
   only published state and render empty states until the server publishes it;
-  authoritative appliers are separate tracked work. No parity is claimed and the
-  magic tech tree is not a substitute.
+  PR #68 merged the authoritative appliers, so the gestures now have a
+  server-side answer. No parity is claimed and the magic tech tree is not a
+  substitute.
 - **Previously verified `main`:** `e11cbca` — PR #49
   (`feat/check-mobile-capacitor-config`, the read-only mobile-config check)
   merged. The merge chain since the prior checkpoint (`6954a19`) is PR #47
@@ -777,4 +794,4 @@ verified checkpoint, not at every tool call.
   build-artefact condition, not a source change. CI's Scan check passed.
 - **On resume:** re-read this file and `docs/ROADMAP.md`, check `git status`,
   `git stash list`, `git worktree list` and `gh pr checks`, then continue from the
-  verified `911057e` state and the worker results above.
+  verified `68e3bbb` state and the worker results above.

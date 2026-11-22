@@ -1985,8 +1985,8 @@ or gestures of its own, the turbine's well-formed-record gate and the help-only
 status of the POWERUP / SPEEDUP words in `soulmixerhelp.tsx` still follow from
 published state, and the panels render explicit empty states until the server
 publishes the optional `privateState.soulMixer` fields. No client-side parity is
-claimed; authoritative appliers are separate tracked work (see the checkpoint in
-`docs/GOAL.md`).
+claimed by the client itself; the authoritative server appliers landed in PR #68
+(recorded below).
 
 **Corrected research-centre gate, now implemented (PR #67).** The old one-line
 note on `PopupResearchCenterMC.as` falsely identified it as the magic tech tree.
@@ -2008,6 +2008,34 @@ friend list; there is no local roll, grant or countdown. The build-process
 animation SWFs and the original art stay excluded, no parity is claimed, and the
 magic tech tree (`packages/client/src/magic.ts`) is still not a substitute for
 this screen.
+
+**PR #68 (`68e3bbb`) — authoritative Soul Mixer and research appliers (merged).**
+The server now answers the commands the panels above send, so the earlier
+"no applier case" rationale is fully closed. `packages/server/src/apply.ts`
+adds authoritative cases for `buy_powerups` (records a paid level in the
+server-owned `soulMixerPowerups` ledger; cash comes from the content's
+`SOUL_MIXER_POWERUPS_LEVELS`, never a client argument), `push_queue_unit2`
+(ignores the client's declared output id and derives the result from the two
+inputs in the mixer's own store, the paid power-ups and `deps.serverSeed` via
+`fuseWithPowerups`, including the level-20 gate), `soulmixer_speedup` (ignores
+the client's cash delta and charges `soulMixerSpeedupCost`, zeroing the timer
+only after the wallet settles), and the five research commands
+`next_research_step`, `research_buy_step_cash`, `next_research_item`,
+`reset_research_item` and `finish_robotic_help` (all on server-owned state).
+The server-owned keys are `soulMixerPowerups`, `researchState`
+(`itemNumber` / `stepNumber` / `timestamp` / `roboticSocialHelp`) and
+`roboticHelpConsumed`, with `smTrainingTime` and the queue fields on the
+building's own attribute bag; `research_buy_step_cash` ignores the client's
+`cashCost`, and friend help is de-duplicated by id and capped at ten steps.
+Refusals happen before mutation, so a replay or refusal leaves the save and
+wallet unchanged. Independently re-run on merged `main`: `pnpm test` 1959 pass /
+0 fail (the PR body reported 1945 on its own branch), `pnpm --filter @swl/server
+test` 533 pass / 0 fail, `pnpm typecheck` clean,
+`node scripts/verify-command-catalogue.mjs` 94/94, `node scripts/run-cheat-battery.mjs`
+11/11 attacks caught and `node scripts/golden-master.mjs` 50 scenarios / 0
+differences. The catalogue check ran without the decompiled client source
+present locally, so it compared the report's 94 rows with the protocol's 94
+names. No checkbox was ticked: 54 screens remain planned.
 
 **Verified gates for this refresh:** `node scripts/check-roadmap.mjs` reports
 401 items, 22 open (B 42/4, E 37/1, G 78/8, H 14/4, I 99/5, with A, C, D and F
