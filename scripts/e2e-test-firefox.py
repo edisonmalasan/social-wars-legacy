@@ -882,6 +882,7 @@ def run_browser(
     password = "correct horse"
     failures: list[str] = []
     console_errors: list[str] = []
+    atlas_requests: list[str] = []
     ran = False
     restart_port = free_port()
     restart_child = None
@@ -905,6 +906,15 @@ def run_browser(
             page.on("console", on_console)
             page.on("pageerror", on_page_error)
 
+            # Original art mode must not fetch atlas pages. Record the URLs
+            # so the assertion below can prove none were requested, without
+            # hiding a genuine console error from any other source.
+            def on_request(request):
+                if "/atlases/" in request.url:
+                    atlas_requests.append(request.url)
+
+            page.on("request", on_request)
+
             print(f"  {label}: ", end="", flush=True)
             server, _ = start_server(data_dir, server_port)
             try:
@@ -913,6 +923,38 @@ def run_browser(
                 player = play_session(page, context, server_port, player_id, password)
                 ran = True
                 print("session played", flush=True)
+
+                # --- the world must be drawn from generated CC0 art ---------
+                # The client declares its mode in public/art-mode.json. Read
+                # the renderer's own read-only getters through the same debug
+                # handle the rest of the harness uses for observations only.
+                art = page.evaluate("""() => {
+                  const h = window.__swl;
+                  return {
+                    artMode: h && typeof h.artMode === 'function' ? h.artMode() : null,
+                    drawnSprites: h && typeof h.drawnSprites === 'function' ? h.drawnSprites() : -1,
+                  };
+                }""")
+                if art.get("artMode") != "original":
+                    failures.append(
+                        f"{label}: the world renderer is not in original art mode "
+                        f"({art.get('artMode')!r})"
+                    )
+                if not isinstance(art.get("drawnSprites"), int) or art["drawnSprites"] <= 0:
+                    failures.append(
+                        f"{label}: the renderer drew no sprites ({art.get('drawnSprites')!r})"
+                    )
+                if atlas_requests:
+                    failures.append(
+                        f"{label}: {len(atlas_requests)} atlas page request(s) were made, "
+                        f"e.g. {atlas_requests[:3]}"
+                    )
+                else:
+                    print(
+                        f"  original art: {art.get('drawnSprites')} sprites drawn, "
+                        "no /atlases/ requests",
+                        flush=True,
+                    )
 
                 screenshot.parent.mkdir(parents=True, exist_ok=True)
                 page.screenshot(path=str(screenshot))
