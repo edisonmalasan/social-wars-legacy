@@ -32,7 +32,27 @@
  * Those live in the item's own attribute bag and in `privateState`, under the
  * names this module defines. A migration adds them to an upstream save.
  */
-import { Random, hashSeed, weeksBetween } from '@swl/rules';
+import {
+  Random,
+  SOUL_MIXER_POWERUPS,
+  breedingOrderFromLife,
+  buildSoulMixerCatalog,
+  checkSoulMixerLevel20Gate,
+  finishRoboticHelp,
+  fuseWithPowerups,
+  hashSeed,
+  initialResearchState,
+  nextResearchItem,
+  nextResearchStep,
+  researchBuyStepCash,
+  resetResearchItem,
+  soulMixerSpeedupCost,
+  soulMixerTrainingTime,
+  weeksBetween,
+  type ResearchState,
+  type SoulMixerCatalog,
+  type SoulMixerItemData,
+} from '@swl/rules';
 import {
   type QuestElement,
   type QuestSpec,
@@ -482,6 +502,25 @@ export const CHAPTER_AWARDS_KEY = 'chapterAwards';
 export const OFFER_PACK_ROLLS_KEY = 'offerPackRolls';
 
 /**
+ * The private-state key holding the Soul Mixer's pending power-up levels.
+ *
+ * The client buys power-ups while it is choosing a fusion result. The levels
+ * are recorded here, server-side, and consumed by `push_queue_unit2` when the
+ * server derives the result itself. The client's declared output id is never
+ * part of this ledger.
+ */
+export const SOUL_MIXER_POWERUPS_KEY = 'soulMixerPowerups';
+
+/** The private-state key holding the server-owned research state. */
+export const RESEARCH_STATE_KEY = 'researchState';
+
+/**
+ * The private-state key for the friend ids whose robotic help has already
+ * been consumed. A repeat request with the same ids grants nothing twice.
+ */
+export const ROBOTIC_HELP_CONSUMED_KEY = 'roboticHelpConsumed';
+
+/**
  * What the server's own simulation of an attack says.
  *
  * The client sends its own battle result with the `end_attack` command, and
@@ -536,6 +575,13 @@ export interface ApplierItem {
    * non-positive value falls back to 1, so every element starts killable.
    */
   life?: number;
+  /**
+   * The atom-fusion `breeding_order`, when the bundle carries it. Content
+   * stores it as text; a unit without it falls back to `breedingOrderFromLife`.
+   */
+  breedingOrder?: number | string;
+  /** The atom-fusion `sm_training_time` in seconds, when the bundle carries it. */
+  smTrainingTime?: number | string;
   /** The maximum copies of this exact building. -1 means unlimited. */
   buildingLimitSameId: number;
   /** The maximum copies per sub-category. -1 means unlimited. */
@@ -776,8 +822,15 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
       case 'place_stored_item':
         return placeCommand(world, command.args, deps);
       case 'push_queue_unit':
-      case 'push_queue_unit2':
         return pushQueueUnitCommand(world, command.args, deps);
+      case 'push_queue_unit2':
+        // The soul-mixer variant: when the building holds two units to fuse,
+        // the client's declared output id is a claim, not an instruction. The
+        // result comes from server state and a seed. A building with no mixer
+        // inputs keeps the legacy generic queue behaviour.
+        return isSoulMixerQueue(world, command.args)
+          ? pushQueueSoulMixerCommand(world, command.args, deps)
+          : pushQueueUnitCommand(world, command.args, deps);
       case 'pop_queue_unit':
         return popQueueUnitCommand(world, command.args, deps);
       case 'level_up':
@@ -790,6 +843,16 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return expandCommand(world, command.args, deps);
       case 'buy_offer_pack':
         return buyOfferPackCommand(world, command.args, deps);
+      case 'buy_powerups':
+        return buyPowerupsCommand(world, command.args, deps);
+      case 'soulmixer_speedup':
+        return soulMixerSpeedupCommand(world, command.args, deps);
+      case 'next_research_step':
+      case 'research_buy_step_cash':
+      case 'next_research_item':
+      case 'reset_research_item':
+      case 'finish_robotic_help':
+        return researchCommand(world, command.name, command.args, deps);
       case 'collect':
         return collectCommand(world, command.args, deps);
       case 'activate':
@@ -1605,6 +1668,339 @@ function pushQueueUnitCommand(
   writeQueue(attrs, queue);
 
   world.resources = settled.resources;
+  return { applied: true, world };
+}
+
+/** The server's seed, shared with the quest applier's deterministic rolls. */
+function serverSeedOf(deps: ApplierDeps): string {
+  return typeof deps.serverSeed === 'string' && deps.serverSeed.length > 0
+    ? deps.serverSeed
+    : 'swl-server';
+}
+
+/** Whether a `push_queue_unit2` targets a building holding two mixer inputs. */
+function isSoulMixerQueue(world: ShimWorld, args: readonly unknown[]): boolean {
+  const isoId = String(args[0] ?? '');
+  const tuple = mapItems(ownMap(world))[isoId];
+  return tuple !== undefined && soulMixerInputIds(tuple) !== null;
+}
+
+/**
+ * The two units the player put into the Soul Mixer, read from the building's
+ * own store on the server's save. The upstream keeps them as `[itemId, ...]`
+ * tuples (engine.push_unit appends a unit to `item[5]`). Nothing from the
+ * request is used to pick them.
+ */
+function soulMixerInputIds(tuple: MapItemTuple): [number, number] | null {
+  const store = tuple[5];
+  if (!Array.isArray(store)) return null;
+  const ids: number[] = [];
+  for (const entry of store) {
+    const id = Number(Array.isArray(entry) ? entry[0] : entry);
+    if (Number.isInteger(id) && id > 0) ids.push(id);
+    if (ids.length === 2) break;
+  }
+  return ids.length === 2 ? [ids[0]!, ids[1]!] : null;
+}
+
+/** The candidate catalog the mixer rolls over, derived from the content. */
+function soulMixerCatalog(deps: ApplierDeps): SoulMixerCatalog {
+  const data: SoulMixerItemData[] = [];
+  for (const item of deps.items?.values() ?? []) {
+    let order = item.breedingOrder;
+    if (order === undefined && item.type === 'u' && (item.life ?? 0) > 0) {
+      order = breedingOrderFromLife(item.life!);
+    }
+    if (order === undefined) continue;
+    data.push({ id: item.id, breeding_order: order });
+  }
+  return buildSoulMixerCatalog(data);
+}
+
+/** The server-owned list of power-up levels the client has paid for. */
+function soulMixerPowerups(privateState: Record<string, unknown>): number[] {
+  const raw = privateState[SOUL_MIXER_POWERUPS_KEY];
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(
+    (level): level is number =>
+      typeof level === 'number' &&
+      Number.isInteger(level) &&
+      level >= 0 &&
+      level < SOUL_MIXER_POWERUPS.length,
+  );
+}
+
+/**
+ * The training time of a fused unit. Content's `sm_training_time` is
+ * authoritative; when an older bundle does not carry it, the builder's
+ * formula (`2000 * breeding_order`) gives the same number.
+ */
+function soulMixerTrainingTimeFor(unit: ApplierItem, power: number): number {
+  const raw = unit.smTrainingTime;
+  if (raw !== undefined) {
+    const value = typeof raw === 'number' ? raw : Number(raw);
+    if (Number.isFinite(value) && value > 0) return value;
+  }
+  return soulMixerTrainingTime(power);
+}
+
+/**
+ * `buy_powerups` - record a paid power-up level.
+ *
+ * The cash is charged by the cost table from the content's
+ * `SOUL_MIXER_POWERUPS_LEVELS`, never from a client argument. This step owns
+ * only the server-side ledger the later `push_queue_unit2` consumes.
+ */
+function buyPowerupsCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const level = Number(args[0]);
+  if (!Number.isInteger(level) || level < 0 || level >= SOUL_MIXER_POWERUPS.length) {
+    return { applied: false, refused: 'bad-level', world };
+  }
+  const privateState = world.save.privateState;
+  const levels = soulMixerPowerups(privateState);
+  privateState[SOUL_MIXER_POWERUPS_KEY] = [...levels, level];
+  return { applied: true, world };
+}
+
+/**
+ * `push_queue_unit2` - the Soul Mixer's fuse-and-train command.
+ *
+ * The client names the unit it would like; the server ignores that name. The
+ * result comes from the two units in the mixer's own store, the paid power-up
+ * levels and a seed the client cannot influence. The result unit's content
+ * cost is charged, and its training time is recorded for `soulmixer_speedup`.
+ */
+function pushQueueSoulMixerCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const isoId = String(args[0] ?? '');
+  const tuple = mapItems(ownMap(world))[isoId];
+  if (!tuple) return { applied: false, refused: 'unknown-building', world };
+  const buildingId = tuple[0];
+  const building = typeof buildingId === 'number' ? deps.items?.get(buildingId) : undefined;
+  if (!building) return { applied: false, refused: 'unknown-building', world };
+
+  const inputs = soulMixerInputIds(tuple);
+  if (!inputs) return { applied: false, refused: 'no-mixer-inputs', world };
+
+  const gate = checkSoulMixerLevel20Gate(playerLevel(ownMap(world)), inputs[0], inputs[1]);
+  if (!gate.allowed) return { applied: false, refused: gate.message ?? 'level-20-gate', world };
+
+  const privateState = world.save.privateState;
+  const levels = soulMixerPowerups(privateState);
+  const rng = new Random(
+    hashSeed(`${serverSeedOf(deps)}:soulmixer:${isoId}:${world.nextCommandNumber}`),
+  );
+  let fuse;
+  try {
+    fuse = fuseWithPowerups(soulMixerCatalog(deps), inputs[0], inputs[1], levels, rng);
+  } catch {
+    return { applied: false, refused: 'unknown-mixer-input', world };
+  }
+  const resultId = fuse.result.id;
+  const unit = deps.items?.get(resultId);
+  if (!unit) return { applied: false, refused: 'unknown-item', world };
+
+  const cost: Record<string, number> = { ...unit.costs };
+  if (building.costUnitCash > 0) {
+    cost['c'] = (cost['c'] ?? 0) + building.costUnitCash;
+  }
+  const settled = applyCommandCost(world.resources, { cost, gain: {} });
+  if (!settled.ok) {
+    return { applied: false, refused: settled.reason ?? 'insufficient-resources', world };
+  }
+
+  const attrs = (tuple[6] ??= {}) as Record<string, unknown>;
+  const queue = readQueue(attrs);
+  queue.queued += 1;
+  if (queue.queued === 1) {
+    queue.startedAt = deps.now();
+    queue.unitItemId = resultId;
+  }
+  writeQueue(attrs, queue);
+  attrs['smTrainingTime'] = soulMixerTrainingTimeFor(unit, fuse.result.power);
+
+  world.resources = settled.resources;
+  privateState[SOUL_MIXER_POWERUPS_KEY] = [];
+  return { applied: true, world };
+}
+
+/**
+ * `soulmixer_speedup` - pay cash to finish the mixer's current training.
+ *
+ * The legacy command carried a cash delta; nothing here reads it. The price
+ * is `ceil(remainingSeconds / 3600)` from the pure rules, and the timer is
+ * zeroed (the upstream's own completion flag) only after the wallet settles.
+ */
+function soulMixerSpeedupCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const isoId = String(args[0] ?? '');
+  const tuple = mapItems(ownMap(world))[isoId];
+  if (!tuple) return { applied: false, refused: 'unknown-building', world };
+  const raw = tuple[6];
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return { applied: false, refused: 'no-training', world };
+  }
+  const attrs = raw as Record<string, unknown>;
+  const queue = readQueue(attrs);
+  if (queue.queued <= 0) return { applied: false, refused: 'no-training', world };
+  const trainingTime = Number(attrs['smTrainingTime'] ?? 0);
+  if (!Number.isFinite(trainingTime) || trainingTime <= 0) {
+    return { applied: false, refused: 'no-training', world };
+  }
+  const elapsed = Math.max(0, deps.now() - Number(attrs['ts'] ?? deps.now()));
+  const price = soulMixerSpeedupCost(trainingTime, elapsed);
+  const settled = applyCommandCost(world.resources, { cost: { c: price }, gain: {} });
+  if (!settled.ok) {
+    return { applied: false, refused: settled.reason ?? 'insufficient-resources', world };
+  }
+  attrs['ts'] = 0;
+  world.resources = settled.resources;
+  return { applied: true, world };
+}
+
+/**
+ * Read the server-owned research state, normalising malformed saves. Every
+ * transition returns a fresh state, so an untrusted value can never smuggle
+ * an array through by reference.
+ */
+function researchStateOf(privateState: Record<string, unknown>): ResearchState {
+  const stored = privateState[RESEARCH_STATE_KEY];
+  if (!stored || typeof stored !== 'object' || Array.isArray(stored)) {
+    return initialResearchState();
+  }
+  const value = stored as Partial<ResearchState>;
+  const pair = (raw: unknown, index: 0 | 1): number => {
+    const number = Array.isArray(raw) ? Number(raw[index]) : NaN;
+    return Number.isFinite(number) && number >= 0 ? Math.trunc(number) : 0;
+  };
+  const help = Array.isArray(value.roboticSocialHelp)
+    ? value.roboticSocialHelp.filter((id): id is string => typeof id === 'string')
+    : [];
+  return {
+    itemNumber: [pair(value.itemNumber, 0), pair(value.itemNumber, 1)],
+    stepNumber: [pair(value.stepNumber, 0), pair(value.stepNumber, 1)],
+    timestamp: [pair(value.timestamp, 0), pair(value.timestamp, 1)],
+    roboticSocialHelp: [...help],
+  };
+}
+
+function writeResearchState(privateState: Record<string, unknown>, state: ResearchState): void {
+  privateState[RESEARCH_STATE_KEY] = state;
+}
+
+/** Friend ids already consumed, so a repeated help request cannot pay twice. */
+function consumedRoboticHelp(privateState: Record<string, unknown>): string[] {
+  const raw = privateState[ROBOTIC_HELP_CONSUMED_KEY];
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((id): id is string => typeof id === 'string');
+}
+
+/**
+ * The five research commands.
+ *
+ * All state is server-owned. In particular `research_buy_step_cash` ignores
+ * the client's `cashCost` argument and `finish_robotic_help` de-duplicates
+ * friend ids against the server's own ledger before granting steps.
+ */
+function researchCommand(
+  world: ShimWorld,
+  name: string,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const map = ownMap(world);
+  if (!map) return { applied: false, refused: 'no-map', world };
+  const privateState = world.save.privateState;
+  const state = researchStateOf(privateState);
+  const typeOf = (value: unknown): number | null => {
+    const type = Number(value);
+    return type === 0 || type === 1 ? type : null;
+  };
+
+  if (name === 'next_research_step') {
+    const type = typeOf(args[0]);
+    if (type === null) return { applied: false, refused: 'bad-type', world };
+    const restart = args[1] === true || args[1] === 1 || args[1] === 'true';
+    writeResearchState(privateState, nextResearchStep(state, type, restart, deps.now()));
+    return { applied: true, world };
+  }
+
+  if (name === 'research_buy_step_cash') {
+    const type = typeOf(args[1]);
+    if (type === null) return { applied: false, refused: 'bad-type', world };
+    // args[0] is the client's claimed price. It is deliberately never read.
+    const { state: next, cashCost } = researchBuyStepCash(state, type);
+    const settled = applyCommandCost(world.resources, { cost: { c: cashCost }, gain: {} });
+    if (!settled.ok) {
+      return { applied: false, refused: settled.reason ?? 'insufficient-resources', world };
+    }
+    world.resources = settled.resources;
+    writeResearchState(privateState, next);
+    return { applied: true, world };
+  }
+
+  if (name === 'next_research_item') {
+    const type = typeOf(args[0]);
+    if (type === null) return { applied: false, refused: 'bad-type', world };
+    const { state: next, grantedItemId } = nextResearchItem(state, type);
+    if (grantedItemId !== null) {
+      addStoreItem(map, grantedItemId, 1);
+      if (type === 1) privateState[ROBOTIC_HELP_CONSUMED_KEY] = [];
+    }
+    writeResearchState(privateState, next);
+    return { applied: true, world };
+  }
+
+  if (name === 'reset_research_item') {
+    const type = typeOf(args[0]);
+    if (type === null) return { applied: false, refused: 'bad-type', world };
+    writeResearchState(privateState, resetResearchItem(state, type));
+    if (type === 1) privateState[ROBOTIC_HELP_CONSUMED_KEY] = [];
+    return { applied: true, world };
+  }
+
+  // finish_robotic_help: the client's JSON list is a request to record help,
+  // not a grant list. Only friend ids the server has not already consumed
+  // count, and duplicates within one request count once.
+  let requested: unknown = args[0];
+  if (typeof requested === 'string') {
+    try {
+      requested = JSON.parse(requested);
+    } catch {
+      requested = null;
+    }
+  }
+  if (!Array.isArray(requested)) return { applied: false, refused: 'bad-argument', world };
+  const consumed = new Set(consumedRoboticHelp(privateState));
+  const pending: string[] = [];
+  const seen = new Set<string>();
+  const addFriend = (value: unknown): void => {
+    const id =
+      typeof value === 'string'
+        ? value
+        : value !== null && typeof value === 'object'
+          ? String((value as { id?: unknown }).id ?? '')
+          : '';
+    if (id.length === 0 || consumed.has(id) || seen.has(id)) return;
+    seen.add(id);
+    pending.push(id);
+  };
+  for (const id of state.roboticSocialHelp) addFriend(id);
+  for (const id of requested) addFriend(id);
+
+  const result = finishRoboticHelp({ ...state, roboticSocialHelp: pending });
+  writeResearchState(privateState, result.state);
+  privateState[ROBOTIC_HELP_CONSUMED_KEY] = [...consumed, ...pending];
   return { applied: true, world };
 }
 
