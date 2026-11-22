@@ -143,6 +143,17 @@ describe('the Atom Fusion panel', () => {
       assert.equal(view.result, null);
     }
   });
+
+  it('renders no result, power or speedup from tampered/absent server values', () => {
+    const view = atomFusionPanel(
+      bundle(),
+      world({ soulMixer: { resultItemId: '999999', resultPower: 'soon', isoId: -1 } }),
+    );
+    assert.equal(view.powerPreview, null);
+    assert.equal(view.result, null);
+    assert.equal(view.speedup, null);
+    assert.deepEqual(view.inputs, []);
+  });
 });
 
 describe('the research-centre panel', () => {
@@ -255,6 +266,104 @@ describe('the research-centre panel', () => {
       assert.equal(view.item, null);
       assert.equal(view.countdown, null);
     }
+  });
+
+  it('reads the server-owned researchState record by type', () => {
+    const view = researchPanel(
+      bundle(),
+      world({
+        researchState: {
+          itemNumber: [2, 1],
+          stepNumber: [4, 10],
+          timestamp: [0, NOW - 7200],
+          roboticSocialHelp: ['friend-a', 'friend-b'],
+        },
+      }),
+      1,
+      NOW,
+    );
+    assert.equal(view.step, 10);
+    assert.deepEqual(view.item, { id: ROBOTIC_IDS[1], name: 'Robot unit 1', cash: 3 });
+    assert.equal(view.countdown?.secondsRemaining, RESEARCH_STEP_SECONDS - 7200);
+    assert.equal(view.countdown?.label, '4:00:00');
+    assert.deepEqual(view.friendHelp!.friends, ['friend-a', 'friend-b']);
+    assert.deepEqual(view.collectCommand, { map: 0, name: 'next_research_item', args: [1] });
+
+    const area51 = researchPanel(
+      bundle(),
+      world({ researchState: { itemNumber: [2, 1], stepNumber: [4, 10], timestamp: [NOW - 7200, 0] } }),
+      0,
+      NOW,
+    );
+    assert.equal(area51.step, 4);
+    assert.equal(area51.countdown?.secondsRemaining, RESEARCH_STEP_SECONDS - 7200);
+    assert.equal(area51.friendHelp, null);
+  });
+
+  it('prefers the server-owned record over the legacy typed fields', () => {
+    const view = researchPanel(
+      bundle(),
+      world({
+        researchState: {
+          itemNumber: [0, 1],
+          stepNumber: [0, 7],
+          timestamp: [0, 0],
+          roboticSocialHelp: [],
+        },
+        researchItemNumber: [5, 5],
+        researchStepNumber: [9, 9],
+        timeStampDoResearch: [NOW, NOW],
+        roboticSocialHelp: ['legacy'],
+      }),
+      1,
+      NOW,
+    );
+    assert.equal(view.step, 7);
+    assert.deepEqual(view.item, { id: ROBOTIC_IDS[1], name: 'Robot unit 1', cash: 3 });
+    assert.equal(view.countdown, null);
+    assert.equal(view.friendHelp, null);
+  });
+
+  it('falls back to the legacy fields when the server record is malformed', () => {
+    for (const raw of ['soon', 42, []]) {
+      const view = researchPanel(
+        bundle(),
+        world({
+          researchState: raw,
+          researchItemNumber: [2, 1],
+          researchStepNumber: [4, 10],
+          timeStampDoResearch: [0, NOW - 7200],
+          roboticSocialHelp: ['friend-a'],
+        }),
+        1,
+        NOW,
+      );
+      assert.equal(view.step, 10);
+      assert.equal(view.countdown?.secondsRemaining, RESEARCH_STEP_SECONDS - 7200);
+      assert.deepEqual(view.friendHelp!.friends, ['friend-a']);
+    }
+  });
+
+  it('renders tampered or absent server values as empty', () => {
+    const view = researchPanel(
+      bundle(),
+      world({
+        researchState: {
+          itemNumber: ['x', NaN],
+          stepNumber: [null, -1],
+          timestamp: [undefined, 'later'],
+          roboticSocialHelp: 42,
+        },
+      }),
+      1,
+      NOW,
+    );
+    assert.equal(view.step, null);
+    assert.equal(view.item, null);
+    assert.equal(view.countdown, null);
+    assert.equal(view.friendHelp, null);
+    assert.equal(view.speedupCommand, null);
+    assert.equal(view.collectCommand, null);
   });
 });
 

@@ -511,6 +511,15 @@ export const OFFER_PACK_ROLLS_KEY = 'offerPackRolls';
  */
 export const SOUL_MIXER_POWERUPS_KEY = 'soulMixerPowerups';
 
+/**
+ * The private-state key the Atom Fusion panel reads.
+ *
+ * It is the same key the turbine selector uses. This module writes only the
+ * fields it derives from its own save, its own fuse roll and an already
+ * validated building key — never a client-declared output id, cash or power.
+ */
+export const SOUL_MIXER_PANEL_KEY = 'soulMixer';
+
 /** The private-state key holding the server-owned research state. */
 export const RESEARCH_STATE_KEY = 'researchState';
 
@@ -1730,6 +1739,77 @@ function soulMixerPowerups(privateState: Record<string, unknown>): number[] {
   );
 }
 
+/** The only fields this module ever publishes for the Atom Fusion panel. */
+const SOUL_MIXER_PANEL_FIELDS = [
+  'inputA',
+  'inputB',
+  'resultItemId',
+  'resultPower',
+  'powerUpLevel',
+  'isoId',
+] as const;
+
+/** The server-owned fields the Atom Fusion panel may read. */
+interface SoulMixerPanelFields {
+  /** The two inputs, read from the mixer building's own store. */
+  readonly inputs?: readonly [number, number];
+  /** The server's fuse result: its id and its rolled power. */
+  readonly result?: { readonly id: number; readonly power: number };
+  /** The most recently paid power-up level from the server's ledger. */
+  readonly powerUpLevel?: number;
+  /** An already-validated building key the client may target for Speedup. */
+  readonly isoId?: number;
+  /** Forget a result the player has already collected. */
+  readonly clearResult?: boolean;
+}
+
+/**
+ * Publish the Atom Fusion panel's state from server-owned data only.
+ *
+ * Every value passed here comes from the server's own save, its own fuse roll
+ * or an already-validated building key. Nothing from the client's declared
+ * output id, cash delta or power is ever read. A malformed pre-existing record
+ * is replaced rather than trusted, and an empty patch writes nothing at all,
+ * so a fresh save publishes no record.
+ */
+function publishSoulMixerPanel(world: ShimWorld, fields: SoulMixerPanelFields): void {
+  const patchCount =
+    (fields.inputs ? 1 : 0) +
+    (fields.result ? 1 : 0) +
+    (fields.powerUpLevel !== undefined ? 1 : 0) +
+    (fields.isoId !== undefined ? 1 : 0) +
+    (fields.clearResult ? 1 : 0);
+  if (patchCount === 0) return;
+  const privateState = world.save.privateState;
+  const stored = privateState[SOUL_MIXER_PANEL_KEY];
+  const previous: Record<string, unknown> =
+    stored && typeof stored === 'object' && !Array.isArray(stored)
+      ? (stored as Record<string, unknown>)
+      : {};
+  // Rebuild from the whitelist: a stale value, an unknown key or a malformed
+  // type in an older save can never survive into a server-published record.
+  const record: Record<string, unknown> = {};
+  for (const key of SOUL_MIXER_PANEL_FIELDS) {
+    const value = previous[key];
+    if (typeof value === 'number' && Number.isFinite(value) && value >= 0) record[key] = value;
+  }
+  if (fields.inputs) {
+    record['inputA'] = fields.inputs[0];
+    record['inputB'] = fields.inputs[1];
+  }
+  if (fields.result) {
+    record['resultItemId'] = fields.result.id;
+    record['resultPower'] = fields.result.power;
+  }
+  if (fields.clearResult) {
+    delete record['resultItemId'];
+    delete record['resultPower'];
+  }
+  if (fields.powerUpLevel !== undefined) record['powerUpLevel'] = fields.powerUpLevel;
+  if (fields.isoId !== undefined) record['isoId'] = fields.isoId;
+  privateState[SOUL_MIXER_PANEL_KEY] = record;
+}
+
 /**
  * The training time of a fused unit. Content's `sm_training_time` is
  * authoritative; when an older bundle does not carry it, the builder's
@@ -1763,6 +1843,8 @@ function buyPowerupsCommand(
   const privateState = world.save.privateState;
   const levels = soulMixerPowerups(privateState);
   privateState[SOUL_MIXER_POWERUPS_KEY] = [...levels, level];
+  // Publish only the level the player paid for; a result is not granted here.
+  publishSoulMixerPanel(world, { powerUpLevel: level });
   return { applied: true, world };
 }
 
@@ -1827,7 +1909,16 @@ function pushQueueSoulMixerCommand(
   attrs['smTrainingTime'] = soulMixerTrainingTimeFor(unit, fuse.result.power);
 
   world.resources = settled.resources;
+  // The ledger is about to be consumed. Capture the level the player actually
+  // paid for before clearing it, then publish the whole record from server data.
+  const powerUpLevel = levels.length > 0 ? levels[levels.length - 1]! : 0;
   privateState[SOUL_MIXER_POWERUPS_KEY] = [];
+  publishSoulMixerPanel(world, {
+    inputs,
+    result: { id: resultId, power: fuse.result.power },
+    powerUpLevel,
+    isoId: Number(isoId),
+  });
   return { applied: true, world };
 }
 
@@ -1865,6 +1956,9 @@ function soulMixerSpeedupCommand(
   }
   attrs['ts'] = 0;
   world.resources = settled.resources;
+  // Reaffirm the validated building id so the panel's Speedup target is the
+  // one the server accepted, not a value the client claimed.
+  publishSoulMixerPanel(world, { isoId: Number(isoId) });
   return { applied: true, world };
 }
 
@@ -2040,6 +2134,20 @@ function popQueueUnitCommand(
     queue.startedAt = deps.now();
   }
   writeQueue(attrs, queue);
+
+  // A collected fusion is no longer a pending result. Clear the published
+  // grant only when this is the building the server itself published.
+  if (queue.queued === 0) {
+    const stored = world.save.privateState[SOUL_MIXER_PANEL_KEY];
+    if (
+      stored &&
+      typeof stored === 'object' &&
+      !Array.isArray(stored) &&
+      (stored as Record<string, unknown>)['isoId'] === Number(isoId)
+    ) {
+      publishSoulMixerPanel(world, { clearResult: true });
+    }
+  }
 
   return { applied: true, world };
 }
