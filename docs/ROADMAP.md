@@ -215,9 +215,9 @@ first means guessing at the rules being cloned.
       (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
       attack interval, the velocity, the life and the population
 - [ ] The panels and the popups are **rendered**, and the popups that are not
-      implemented are recorded as dropped. The screen inventory now reads **154
-      implemented / 52 dropped / 54 planned**; the counts are checked by
-      `packages/client/src/screens.test.ts`, and this item stays open while **54
+      implemented are recorded as dropped. The screen inventory now reads **159
+      implemented / 52 dropped / 49 planned**; the counts are checked by
+      `packages/client/src/screens.test.ts`, and this item stays open while **49
       screens are planned** - a `Deferred: ` reason records honest scope, not a
       rendered screen or a drop
 - [x] The authoritative **item id → delegate** map is extracted from
@@ -1198,21 +1198,21 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **154 implemented** - the clone models the screen's behaviour, and the decision
+      - **159 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **52 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **54 planned** - in scope, the client's behaviour is real, and not modelled
+      - **49 planned** - in scope, the client's behaviour is real, and not modelled
         yet; each now carries a `Deferred: ` reason saying what is missing or how it
         unblocks
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
       exists, every dropped one must say why, and every planned one must start with
       `Deferred: ` and say what is missing or how it unblocks. The counts above are
-      checked by the same test. **This item stays open while 54 screens are planned**:
+      checked by the same test. **This item stays open while 49 screens are planned**:
       a deferral reason is neither an implementation nor a drop, and the earlier
       106/23/131 breakdown was a factual error, not a hidden batch of finished work
 - [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
@@ -1880,8 +1880,10 @@ planned" notes. It sits **outside** the `## Group X` sections, so
 `node scripts/check-roadmap.mjs` still counts the same **401** items (22 open:
 B 4, E 1, G 8, H 4, I 5). The inventory in `re/data/ui-screens.json` read
 **151 implemented / 52 dropped / 57 planned** out of 260 at that refresh;
-PR #67 (`f096deb`) later moved the live inventory to
-**154 implemented / 52 dropped / 54 planned**, as recorded below. The `movieclip`
+PR #67 (`f096deb`) later moved the inventory at that point to
+**154 implemented / 52 dropped / 54 planned**, as recorded below. The current
+inventory is **159 implemented / 52 dropped / 49 planned**, recorded in the
+2026-11-23 amendment at the end of this file. The `movieclip`
 count of 108 is a by-kind count, not a decision count. Nothing in those eight
 increments turns a `Deferred: ` reason into a completed screen; the PR #62
 correction recorded below is a separate reclassification of a primitive.*
@@ -2046,9 +2048,10 @@ names. No checkbox was ticked: 54 screens remain planned.
 401 items, 22 open (B 42/4, E 37/1, G 78/8, H 14/4, I 99/5, with A, C, D and F
 complete); `node scripts/check-report-sync.mjs` agrees with the implementation
 (4 claims) after `pnpm build:content`; and this documentation-only diff touches
-only `docs/ROADMAP.md` and `docs/GOAL.md`. The B6 and G3 checkbox items stay
-open while 54 screens are planned: a deferral is honest scope, not a finished
-screen or a drop.
+only `docs/ROADMAP.md` and `docs/GOAL.md`. At that refresh the B6 and G3 checkbox
+items stayed open while 54 screens were planned: a deferral is honest scope,
+not a finished screen or a drop. The current count is recorded in the 2026-11-23
+amendment at the end of this file.
 
 **Post-refresh correction — PR #62 (`1d1072c`).** After the eight screen-family
 increments, `GuiCoverExplorationMC.as` was reclassified from `planned` to
@@ -3214,7 +3217,7 @@ be mistaken for unfinished work.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 54 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 54; the art gate applies to the drawn ones |
+| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 49 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 49; the art gate applies to the drawn ones |
 | B | PvP `end_attack` payload captured live | Needs a live second player and the original Flash client driven over CDP | A Flash test rig with two live accounts |
 | B | `attack_player` / `spy_player` payloads captured live | Same as above | The same Flash test rig |
 | B | Premium purchase flow captured live | Needs a real-money account, which the preservation project must not use | A funded test account and explicit approval |
@@ -3226,19 +3229,19 @@ be mistaken for unfinished work.*
 |---|---|---|---|
 | G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout (the ADR 0021 route), or a licensing decision |
 | G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented. The CC0-1.0 first increment does not cover these assets | Re-create the art through the ADR 0021 clean-room route, or licence it (I6); the gate stays open |
-| G | Every B6 screen implemented or explicitly dropped | 54 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 54 |
-| G | Client runs in Firefox and Safari | **Firefox and WebKit (Playwright) are verified**: full rendered gameplay sessions ran under Gecko via `scripts/e2e-test-firefox.py` and under WebKit via `scripts/e2e-test-webkit.py` (both Playwright engines, driven over Juggler/BiDi). Branded Safari and real devices have not been run — Playwright's WebKit is an engine test, not Safari | Play the same session in branded Safari and on real devices; this box closes once Safari passes |
-| G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux bundling is now in CI, unsigned** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` with `libwebkit2gtk-4.1-dev`, and its informational, non-required `linux-bundle` job produces unsigned `.deb`/`.AppImage` artefacts; macOS genuinely needs a host | Add a macOS runner and signed artefacts (Linux bundling is already in CI); this box closes once all three platforms are produced |
-| G | Mobile build runs on Android and iOS | The **Android debug build is verified** (PR #64): SDK command-line tools provisioned from Google's official zip (sdkmanager 12.0, platforms 35/36 + build-tools, SDK at `%LOCALAPPDATA%\Android\Sdk`), Capacitor 8.6.2 installed at native-work time, `cap add android` (minSdk 24, compile/targetSdk 36, Gradle 8.14.3) and `gradlew assembleDebug` → `BUILD SUCCESSFUL`, 5,437,001-byte debug APK with the auto-generated debug cert. Still open: **no iOS build** (no macOS/Xcode), **no device or emulator run**, and `server.url` is a placeholder, so the APK is not a runnable client | Build and run on iOS on a macOS/Xcode host, run on real devices with a real deployment URL, and produce a signed distributable if release is intended |
+| G | Every B6 screen implemented or explicitly dropped | 49 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 49 |
+| G | Client runs in Firefox and Safari | **Firefox and WebKit (Playwright) are verified**: full rendered gameplay sessions ran under Gecko via `scripts/e2e-test-firefox.py` and under WebKit via `scripts/e2e-test-webkit.py` (both Playwright engines, driven over Juggler/BiDi). The later informational WebKit CI job from PR #73 **failed honestly** on HTTP 404s for the excluded proprietary atlas assets; it is non-required, did not affect the four protected checks, and does not replace the verified Playwright WebKit session. Branded Safari and real devices have not been run — Playwright's WebKit is an engine test, not Safari | Play the same session in branded Safari and on real devices; this box closes once Safari passes |
+| G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux bundling is now in CI, unsigned** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` with `libwebkit2gtk-4.1-dev`, and its informational, non-required `linux-bundle` job produces unsigned `.deb`/`.AppImage` artefacts. The informational macOS job added in PR #73 has also produced an **unsigned `.app` and `.dmg`** on a macOS runner; all of these are build artefacts, not signed or notarised releases | Add signed artefacts and notarisation (Linux and macOS bundling already run in informational CI); this box closes once all three platforms are produced as release artefacts |
+| G | Mobile build runs on Android and iOS | The **Android debug build is verified** (PR #64): SDK command-line tools provisioned from Google's official zip (sdkmanager 12.0, platforms 35/36 + build-tools, SDK at `%LOCALAPPDATA%\Android\Sdk`), Capacitor 8.6.2 installed at native-work time, `cap add android` (minSdk 24, compile/targetSdk 36, Gradle 8.14.3) and `gradlew assembleDebug` → `BUILD SUCCESSFUL`, 5,437,001-byte debug APK with the auto-generated debug cert. The informational iOS job added in PR #73 has since produced an **unsigned iOS simulator build** on a macOS runner; that is a build artefact, not a device run, and this host still has no local macOS/Xcode. Still open: **no device or emulator run**, **no signed distributable**, and `server.url` is a placeholder, so neither build is a runnable client | Run on real devices with a real deployment URL, and produce signed distributables if release is intended |
 | G | Playable at the original resolutions and phone scales | The stage model exists; real-device verification does not | Test on the target devices |
-| G | Played on an actual phone with touch controls | No device here | A phone and touch-control implementation |
+| G | Played on an actual phone with touch controls | **No device here**: PR #74's `scripts/device-check.mjs` reports `NO DEVICE` (no Android device or emulator attached) and performs **no touch test**; emulated touch in a desktop browser is not a device run | A phone and touch-control implementation |
 | H | A player with no server cannot play | **Non-goal** — the product is pure online (ADR 19) | A reversal of ADR 19 |
 | H | Installers for Windows, macOS and Linux | **Unsigned Windows NSIS** (`Social Wars Legacy_0.1.0_x64-setup.exe`, 33.27 MiB) and **unsigned Windows MSI** (`Social Wars Legacy_0.1.0_x64_en-US.msi`, 49.88 MiB) were both built on this host with the npm Tauri CLI 2.12.3. The first MSI attempt failed on a config gap (`bundle.icon` listed only the PNG; the existing `icons/icon.ico` was not referenced); adding the `.ico` and retrying produced the MSI. NSIS 3.13 is cached, WiX 3.14.1 auto-downloads and hash-verifies, and WebView2 is present. Linux `.deb`/`.AppImage` bundling is now in CI on `ubuntu-latest` as an informational, non-required `linux-bundle` job producing **unsigned** artefacts; macOS genuinely needs a host | Signed artefacts and a macOS CI runner (Linux bundling is already in CI, unsigned); this row stays open until all three platforms are produced |
 | H | Code-signed binaries, notarised macOS build | No code-signing certificate or Apple developer account exists; the one built installer is unsigned | Obtain the credentials |
 | H | Auto-update with clean rollback | The pure decision/rollback logic exists and is mock-tested, but there is no signed release stream, HTTPS endpoint, installer hook or rollback executor | A signed release stream, endpoint and a real install/rollback layer |
 | I | A corrections request actually received and honoured | No rights holder has made a request; the policy and log exist | A real request through `docs/CORRECTIONS.md` |
-| I | Stable frame rate on the largest documented battle | Needs a real GPU and a large-battle fixture; a headless browser's frames are throttled | A GPU test host and the fixture |
-| I | Frame rate measured on a real GPU | Same as above | The same GPU test host |
+| I | Stable frame rate on the largest documented battle | Needs a real GPU and a large-battle fixture; a headless browser's frames are throttled. PR #74 supplies a deterministic battle fixture, but has not run it on a mobile device or produced a release verdict | A GPU test host and the fixture |
+| I | Frame rate measured on a real GPU | PR #74 took **one desktop GPU observation on this single host**, with the WebGL renderer recorded explicitly; it is not a mobile-device result, not a repeatable multi-host benchmark and not a release verdict | The same GPU test host, with repeat runs across hosts |
 | I | First production release published and monitored | Blocked by the art licence gate and by every release artefact above; the CC0-1.0 first increment is not a cleared gate | Clear the licence gate and the release checklist with the whole original set |
 | All deferred items | Facebook integration, the original PHP backend, missing builds/assets, 3D, clean-room art | Intentionally postponed; see *Deferred / Future Work*. Clean-room art has an approved route and a first increment, but remains open | A decision to take one on, and the full original set for the art item |
 
@@ -3254,6 +3257,40 @@ owner and a precise condition for closing it.*
 
 ---
 
+## Eight screen families reclassified in documentation — verified inventory 159/52/49
+
+*Status: **documentation-only**. This section records eight screens that were honestly implemented and verified in already-merged PRs #75, #77 and #78. It sits **outside** the `## Group X` sections, so `node scripts/check-roadmap.mjs` still counts the same **401** items and **22** open boxes (B 4, E 1, G 8, H 4, I 5). No checkbox was ticked, no blocker was removed and no non-goal was reversed. The counts here are read from `re/data/ui-screens.json` on merged `main` at `5c60b34`: **159 implemented / 52 dropped / 49 planned** out of 260.*
+
+| Screen | Merged PR | Model that implements it | Honest scope |
+| --- | --- | --- | --- |
+| `ButtonMarketMC.as` | #77 | `apps/client/src/ui/market.tsx` (with `market-art.tsx`) | Draws the market launcher gesture in the chrome and opens the player-owned resource market in the one shared dialog; proprietary button art excluded |
+| `popups/ButtonMarket.as` | #77 | `apps/client/src/ui/market.tsx`, `apps/client/src/ui/state.ts` | Buy/sell buttons and the recovered 24-hour exhaustion sentence are display only; counters and wallet come from the server; every gesture sends `trade_resource` through the one command transport |
+| `GUI/Portrait.as` | #75 | `apps/client/src/ui/unitportraits.tsx` | Portrait states are modelled and drawn from server state; still carries a `planned` decision in the inventory — see the discrepancy note below |
+| `GUI/PortraitTrainQueue.as` | #75 | `apps/client/src/ui/unitportraits.tsx` | Training-queue portrait model, wired through `roster.tsx` / `recruit.tsx`; still carries a `planned` inventory decision |
+| `GUI/AnimatedUnit.as` | #75 | `apps/client/src/ui/unitportraits.tsx` | Animated-unit panel with frame-selection and remove lifecycle; still carries a `planned` inventory decision |
+| `StoreMC.as` | #78 | `apps/client/src/ui/storeitems.tsx` | Store-front item-button chrome from content offer packs, server cash driving affordability, explicit empty states, original inline SVG art only |
+| `GUI/ItemButtonLarge.as` | #78 | `apps/client/src/ui/storeitems.tsx` | Limited Offer / EARNINGS / BUY FOR captions around content-owned name, price and amounts; sole gesture is `buy_offer_pack`; no local price, roll, reward or server-owned limit |
+| `GUI/ItemButtonLargeResources.as` | #78 | `apps/client/src/ui/storeitems.tsx` | Resource amounts are display-only text from content; affordability comes from the server's cash; proprietary button art excluded |
+
+**Inventory discrepancy, reported rather than hidden.** The checked inventory count after PR #78 is **159 / 52 / 49**. Its 49 `planned` entries still include `GUI/Portrait.as`, `GUI/PortraitTrainQueue.as` and `GUI/AnimatedUnit.as` with `Deferred: ` notes: PR #75 implemented and tested the models in `apps/client/src/ui/unitportraits.tsx` but did not edit `re/data/ui-screens.json`. The three screens are therefore implemented in code and recorded here as such, while the data file's authoritative count remains 159 / 52 / 49. This documentation increment owns only `docs/ROADMAP.md` and `docs/GOAL.md`, so it does not change the inventory; a future data edit must be made and checked separately. No parity claim follows from any of the eight entries.
+
+**Clean-room art foundation (PR #76, ADR 0021).** The clean-room route is approved in
+[ADR 0021](./adr/0021-clean-room-assets.md): the dependency-free generator in `packages/art/` deterministically emits **25 CC0-1.0 original assets** into `assets/original/` (icons, a sprite sheet and six synthesised effects) with a per-file provenance manifest and its own tests. This is a **foundation, not a cleared gate**: Zynga's proprietary config remains a separate data problem, the release-licence gate (I6) stays open, no rights-holder request has been received, and no publication is authorised. No screen is claimed implemented by the existence of this package.
+
+**Apple-platform CI results (PR #73).** Informational, non-required macOS, WebKit and iOS jobs were added to CI. The unsigned **macOS `.app`/`.dmg`** build and the unsigned **iOS simulator** build succeeded on macOS runners. A **WebKit CI attempt failed honestly** on HTTP 404s for excluded proprietary atlas assets; it did not affect the four protected checks and does not replace the earlier verified Playwright WebKit session. **Branded Safari remains unrun**, as do real devices; no result here is a platform-verification or release verdict.
+
+**Device and GPU results (PR #74).** `scripts/device-check.mjs` reports `NO DEVICE` — no Android device or emulator is attached — and performs **no touch test**; injected touch would be fabricated evidence. `scripts/gpu-benchmark.mjs` produced **one desktop WebGL/GPU observation on this single host**, recorded with `docs/DEVICE-AND-GPU.md`; it is not a mobile-device result, not a multi-host benchmark and not a performance or release verdict. The GPU and device boxes remain open.
+
+**Verified gates for this documentation increment (run on the rebased task branch):**
+`node scripts/check-roadmap.mjs` → **401 items in all, 22 open** (B 42/4, E 37/1,
+G 78/8, H 14/4, I 99/5); `node scripts/check-report-sync.mjs` → the report set
+agrees with the implementation (**4 claims**, after `pnpm build:content`, build id
+`63e067bd…`); `node scripts/check-adrs.mjs` → **21 ADRs**, all well formed;
+`git diff --check` → clean (exit 0). The B3 and G3 checkboxes remain open and the
+blocker register above retains every genuine blocker.
+
+---
+
 ## Roadmap Amendment Log
 
 *The Locked Decisions section is binding: changing it, closing a deferred item, or adding
@@ -3261,6 +3298,42 @@ a milestone needs a written rationale. This is that record. Each entry names the
 what changed, why, and the evidence that makes the change verifiable, so a decision can be
 reviewed without reconstructing the conversation that led to it.*
 
+- **2026-11-23 — documentation-only reclassification of eight implemented screens
+  (Groups B3, G3).** The current-state counts now follow `re/data/ui-screens.json` on
+  merged `main` at `5c60b34`: **159 implemented / 52 dropped / 49 planned** of 260,
+  replacing the earlier 154 / 52 / 54 claims. The eight screens and their modules are
+  recorded in *Eight screen families reclassified in documentation* above: the two
+  market screens (PR #77, `market.tsx`), three unit/training portraits (PR #75,
+  `unitportraits.tsx`) and three store item buttons (PR #78, `storeitems.tsx`).
+  *Rationale:* the behaviour was implemented and verified in merged PRs, so leaving the
+  roadmap's "current" counts at the old values would understate the checked data.
+  *Evidence:* `re/data/ui-screens.json` counts and decisions; the eight modules named
+  there. *What did not change:* no checkbox was ticked (the B3 and G3 boxes stay open
+  while 49 screens are planned), no blocker was removed, no non-goal reversed and no
+  parity or release claim made. The three portrait inventory entries remain `planned`
+  in the data despite their implementation — a discrepancy recorded explicitly in the
+  section above, not silently rewritten.
+- **2026-11-23 — clean-room art foundation recorded; the art gate stays open
+  (Groups G and I, ADR 0021; PR #76).** The approved clean-room route now has a working
+  generator (`packages/art/`) and **25 CC0-1.0 original assets** in `assets/original/`
+  with a per-file provenance manifest. *Rationale:* the foundation is real, verified
+  progress and should be visible in the roadmap's account of the art blocker.
+  *Evidence:* ADR 0021, the generated manifest and the generator's own tests and
+  `--check` mode. *What did not change:* proprietary config remains a separate
+  problem, the release-licence gate (I6) stays open, no rights-holder request exists,
+  and no publication is authorised.
+- **2026-11-23 — Apple-platform CI and device/GPU results recorded honestly
+  (Groups G and I; PRs #73 and #74).** Informational macOS and iOS CI jobs produced
+  unsigned macOS `.app`/`.dmg` and iOS simulator builds; a WebKit CI attempt failed on
+  excluded proprietary atlas 404s; branded Safari and real devices remain unrun. The
+  device detector reports `NO DEVICE` with no touch test, and one desktop GPU
+  observation was taken on a single host. *Rationale:* partial, labelled evidence must
+  not be read as platform verification or a performance verdict.
+  *Evidence:* `docs/DEVICE-AND-GPU.md`, `scripts/device-check.mjs`,
+  `scripts/gpu-benchmark.mjs` and the CI job definitions/results in PRs #73 and #74.
+  *What did not change:* the Firefox/WebKit, desktop, mobile, device and GPU blocker
+  rows stay open and worded as before except for the added honest scope; the four
+  protected CI checks are unchanged.
 - **2026-11-20 — offer packs and the item store (Groups B7, F1).** Closed the deferred
   B7 item and added two F1 outcomes. The upstream server credited whatever item list the
   client declared on `buy_offer_pack`; the list is now only a super-pack tier selector and
