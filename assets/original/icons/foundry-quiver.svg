@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry quiver</title>
+  <desc id="swl-desc">A leather quiver holding a variable number of fletched shafts.</desc>
+    <polygon points="22,22 40,22 38,54 24,54" fill="#b65340"/>
+    <ellipse cx="31" cy="22" rx="9" ry="4" fill="#e9a63f"/>
+    <line x1="26" y1="21" x2="26" y2="8" stroke="#2c4654" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="24,10 28,8 28,14" fill="#86cdbd"/>
+    <line x1="30" y1="21" x2="30" y2="8" stroke="#2c4654" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="28,10 32,8 32,14" fill="#86cdbd"/>
+    <line x1="24" y1="38" x2="38" y2="38" stroke="#16242d" stroke-width="2" stroke-linecap="round"/>
+</svg>

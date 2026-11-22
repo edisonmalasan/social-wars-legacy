@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry anvil</title>
+  <desc id="swl-desc">A workshop anvil on a short plinth, with a struck horn.</desc>
+    <polygon points="12,39 52,39 48,51 16,51" fill="#2c4654"/>
+    <rect x="9" y="29" width="46" height="10" rx="2" fill="#e9a63f"/>
+    <polygon points="55,31 63,34 55,37" fill="#e9a63f"/>
+    <rect x="17" y="51" width="30" height="6" rx="1" fill="#16242d"/>
+    <circle cx="16" cy="34" r="1.5" fill="#f7ecd7"/>
+    <circle cx="48" cy="34" r="1.5" fill="#f7ecd7"/>
+    <circle cx="22" cy="45" r="1" fill="#86cdbd"/>
+    <circle cx="29" cy="45" r="1" fill="#86cdbd"/>
+</svg>

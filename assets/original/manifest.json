@@ -1,0 +1,226 @@
+{
+  "name": "Social Wars Legacy original assets",
+  "generator": "@swl/art",
+  "generatorVersion": "1.0.0",
+  "licence": "CC0-1.0",
+  "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied.",
+  "method": "SVG geometry is assembled from fixed integer coordinate tables and WAV samples are synthesised from a seeded 32-bit generator. No input file is read.",
+  "files": [
+    {
+      "path": "icons/foundry-anvil.svg",
+      "bytes": 777,
+      "sha256": "311a4f7e5aa96f19ced382c1a56ec31f7cfe018ffe3ecff9dbdb3c999717af8b",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-banner.svg",
+      "bytes": 732,
+      "sha256": "37345758bc4374d4afce06a47c348b811c44a3c001cb160235b99aa817b6002d",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-cog.svg",
+      "bytes": 1098,
+      "sha256": "9a7f28f8d171a14672abe443eed0b67538d752caa9b786fe0669bbd0421d0cad",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-hammer.svg",
+      "bytes": 707,
+      "sha256": "57bb032873811919c625f74cc01291f0d5def77af245221fa1063cf8c6f1c8c9",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-shield.svg",
+      "bytes": 939,
+      "sha256": "6c504ce5a79f75f98ed7c4e6099d7489886314bd2875dcd9ee87d795f17d66f4",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-lantern.svg",
+      "bytes": 1293,
+      "sha256": "c7809525f0747266d3b9aaaddbe2ddd96a6998f3414b39b220d52d883cf38d5f",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-cauldron.svg",
+      "bytes": 795,
+      "sha256": "917d76b8654da3d00d140abe57a505966b798dfc28f9bd9c6df9c7491cda3fe1",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-compass.svg",
+      "bytes": 1388,
+      "sha256": "aacdb25461b60c409d3283324fa32e847b8b99b0c2ad46b170ee3ec6bcd9b4f2",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-pick.svg",
+      "bytes": 940,
+      "sha256": "87004cade39999a1d4c87f9991e381d1aafdc2cb7967dd0f11458019208356f0",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-quiver.svg",
+      "bytes": 853,
+      "sha256": "cd15d481f3b54016f2bb3fe92dd0971a3f2a2342e9802e473f2109be116bb471",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-spark.svg",
+      "bytes": 504,
+      "sha256": "2d8672ab8fa54c8614dafb4e950a295a902da4e0cd80690a93eba9dd049905d9",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-turret.svg",
+      "bytes": 804,
+      "sha256": "4106cc7dcf96e24bc57e22b4af329744ac3fc1e019ccfa255bf723bc2d64e50c",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-wagon.svg",
+      "bytes": 1425,
+      "sha256": "7dddc9eea4670a6edb19360a3c430fe95746f5f818fb73fecf30220cd9a14005",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-flask.svg",
+      "bytes": 792,
+      "sha256": "ca016ce89b3f489748aaa6b5accaceb39c89cdcce36055e3efc02b67e8d86b9a",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-wrench.svg",
+      "bytes": 653,
+      "sha256": "6245ac7af0220705fa06615e68aa6ceec1ffb5b382d14ce476b933313806e864",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/foundry-boot.svg",
+      "bytes": 707,
+      "sha256": "0673b2c6e480040474566c8660952af5a851e59853e215a59f9e9f711fb97c8f",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "icons/sprite-sheet.svg",
+      "bytes": 12219,
+      "sha256": "ba2fa469e8a86ea4a1f9e9e9e787680f577c51c750b61f708381ed6ad57b5362",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "sounds/click.wav",
+      "bytes": 3130,
+      "sha256": "ffeaa80809c87c9380b9730c651c2de92f9d8331dc18756ac95f257cfbae305b",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "sounds/confirm.wav",
+      "bytes": 12392,
+      "sha256": "b05a28d8e5e1751a778b5c56cc0dc248a81d8ade980b1509c3e7dbb0937fda1f",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "sounds/deny.wav",
+      "bytes": 9746,
+      "sha256": "52204f5a685a29cd17f8199377b2b82539fb5781df51de5cb2fc7b1cebd13b1c",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "sounds/step.wav",
+      "bytes": 5776,
+      "sha256": "f609acd9c2af34d54fb5d220fd3f0e092bd233c151132583af25e4dd5811cad4",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "sounds/impact.wav",
+      "bytes": 8864,
+      "sha256": "902586ff0a7828a4dc24c7ae634c523b5524eb9a07886c97702c0f4619c02ad2",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "sounds/complete.wav",
+      "bytes": 18566,
+      "sha256": "7a1a243544da98ad834f2b1d7017c5a4e9fc270c680bd68defe3b31a892dae7a",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 376,
+      "sha256": "93c4d313f067dad32b79aa0d289b7bb2a030ca2db630cc21768fabdca81bfbfe",
+      "generator": "@swl/art",
+      "generatorVersion": "1.0.0",
+      "licence": "CC0-1.0",
+      "statement": "Original work: drawn or synthesised from primitives by this generator. No file from the vendored upstream, the decompiled client, an atlas or a proprietary font was read, traced or copied."
+    }
+  ]
+}

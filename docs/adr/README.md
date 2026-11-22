@@ -29,3 +29,4 @@ reasoning.
 | 18 | [The roadmap's item counts are checked](./0018-the-roadmaps-item-counts-are-checked.md) | accepted |
 | 19 | [The product is pure online](./0019-pure-online.md) | accepted |
 | 20 | [The social services are server-only, and out of scope for the web client](./0020-social-services-server-only.md) | accepted |
+| 21 | [Clean-room original assets, generated and dedicated CC0-1.0](./0021-clean-room-assets.md) | accepted |
