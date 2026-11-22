@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 150,
+   "implemented": 151,
    "dropped": 52,
-   "planned": 58
+   "planned": 57
   }
  },
  "screens": [
@@ -1625,8 +1625,8 @@
    ],
    "overrides": [],
    "bytes": 290,
-   "decision": "planned",
-   "decisionNote": "Deferred: the exploration GUI cover has no dimming or click-to-dismiss model; unblock when the exploration view is rendered in the client."
+   "decision": "implemented",
+   "decisionNote": "Implemented in G5.7: `apps/client/src/ui/chrome.tsx` provides the reusable `Cover` — a dimming, click-to-dismiss layer (the same primitive that closes `GuiCover.as`); the original exploration cover art stays excluded, and the clone has no exploration view to host it, so this is a primitive, not an exploration screen."
   },
   {
    "class": null,

@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 150,
+      implemented: 151,
       dropped: 52,
-      planned: 58,
+      planned: 57,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -570,14 +570,31 @@ describe('the reusable UI-chrome screen family decisions', () => {
     }
   });
 
-  it('leaves the ones that need capture state, exploration or popup art planned', async () => {
-    // A cover primitive now exists, but there is still no exploration view to
-    // cover; a capture icon has no server capture outcome to model; and the
-    // info popup movieclips still need their multiline popup art. The timed,
-    // repositioned readout panel itself is implemented in detailpanels.tsx.
+  it('records the exploration cover as the shared primitive, not an exploration screen', async () => {
+    // Both cover movieclips are art-only overlays with no methods beyond their
+    // constructor. The reusable Cover draws the dimming + click-to-dismiss
+    // behaviour for both; the claim stops at the behaviour, so the note must
+    // exclude the exploration art and say there is no exploration view to host
+    // it rather than pretending a screen was rendered.
+    const all = await screens();
+    const cover = all.find((entry) => entry.path === 'GuiCoverExplorationMC.as');
+    assert.ok(cover, 'GuiCoverExplorationMC.as is not in the inventory');
+    assert.equal(cover!.decision, 'implemented');
+    assert.match(cover!.decisionNote, /`apps\/client\/src\/ui\/chrome\.tsx`/);
+    assert.match(cover!.decisionNote, /dimming, click-to-dismiss/i);
+    assert.match(cover!.decisionNote, /art stays excluded/i);
+    assert.match(cover!.decisionNote, /no exploration view/i);
+    assert.match(cover!.decisionNote, /primitive, not an exploration screen/i);
+  });
+
+  it('leaves the ones that need capture state or popup art planned', async () => {
+    // The cover primitive now closes both cover deferrals, even though the
+    // clone still has no exploration view to host the exploration one. A
+    // capture icon has no server capture outcome to model; the info popup
+    // movieclips still need their multiline popup art. The timed, repositioned
+    // readout panel itself is implemented in detailpanels.tsx.
     const LEFT_PLANNED = [
       'IconoCapturadoMC.as',
-      'GuiCoverExplorationMC.as',
       'InfoPopupMC.as',
       'InfoPopupManaMc.as',
       'GUI/ResourcesTab.as',
