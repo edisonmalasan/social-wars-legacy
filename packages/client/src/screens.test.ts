@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 151,
+      implemented: 154,
       dropped: 52,
-      planned: 57,
+      planned: 54,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -731,24 +731,70 @@ describe('the inventory-cell and info-popup screen family decisions', () => {
     }
   });
 
-  it('leaves the research-centre shell planned with a corrected note', async () => {
-    // The short note called this the magic tech tree. The actual screen is
-    // the AREA 51 / ROBOTIC CENTER robot research: the new server stores its
-    // counters but applies none of its commands, its animation art is two
-    // Zynga SWFs, and its friend-help gesture is social (ADR 20). Flipping it
-    // would render a screen with no authoritative answer behind it.
+  it('records the research-centre shell and popup as implemented against the panel', async () => {
+    // The old note called this the magic tech tree and said the server applied
+    // none of the research commands. The pure rules and the panel now draw the
+    // AREA 51 / ROBOTIC CENTER behaviour from the server's own save, so both
+    // the shell and its popup are implemented; the animation art stays out.
     const all = await screens();
-    const shell = all.find((entry) => entry.path === 'PopupResearchCenterMC.as');
+    for (const path of ['PopupResearchCenterMC.as', 'popups/PopupResearchCenter.as']) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/fusion\.tsx`/);
+      assert.match(screen!.decisionNote, /timestamp|server/i);
+      assert.match(screen!.decisionNote, /art|SWF/i);
+    }
+  });
+});
+
+describe('the Atom Fusion screen family decisions', () => {
+  // The popup's behaviour is now genuinely modelled: the content supplies the
+  // breeding_order candidates and names, the pure rules supply the power-up
+  // table, and the server's save supplies the two inputs, the rolled power and
+  // the granted item. The art-only movieclip and the already-reclassified
+  // help/turbina screens are asserted separately rather than flipped again.
+  const RECLASSIFIED = ['popups/PopupSoulMixer.as'];
+
+  it('records the fusion popup as implemented against the panel', async () => {
+    const all = await screens();
+    for (const path of RECLASSIFIED) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/fusion\.tsx`/);
+      assert.match(screen!.decisionNote, /server/i);
+      assert.match(screen!.decisionNote, /art/i);
+    }
+  });
+
+  it('leaves the art-only shell planned with a corrected note', async () => {
+    // `PopupBreedingMC.as` is the movieclip shell PopupSoulMixer extends. It
+    // has no literals, state or gestures of its own, so flipping it would
+    // claim the Zynga artwork rather than a modelled behaviour.
+    const all = await screens();
+    const shell = all.find((entry) => entry.path === 'PopupBreedingMC.as');
     assert.ok(shell);
-    assert.equal(shell!.decision, 'planned');
+    assert.equal(shell!.decision, 'planned', 'the art-only shell should stay planned');
     assert.match(shell!.decisionNote, /^Deferred: /);
-    assert.match(shell!.decisionNote, /misidentified|not the magic tech tree/i);
-    assert.match(shell!.decisionNote, /ROBOTIC CENTER|AREA 51/);
-    assert.match(shell!.decisionNote, /none of the .*research/i);
-    const popup = all.find((entry) => entry.path === 'popups/PopupResearchCenter.as');
-    assert.ok(popup);
-    assert.equal(popup!.decision, 'planned');
-    assert.match(popup!.decisionNote, /late-era progression/i);
+    assert.match(shell!.decisionNote, /art-only|artwork/i);
+    assert.match(shell!.decisionNote, /no separate breeding/i);
+  });
+
+  it('does not re-classify the already implemented help and turbine screens', async () => {
+    // Those three were flipped in the earlier help/turbina increment; the new
+    // fusion panel draws a different screen and must not change their state.
+    const all = await screens();
+    for (const path of [
+      'PopupSoulMixerHelpMC.as',
+      'popups/PopupSoulMixerHelp.as',
+      'popups/SoulMixer/SoulMixerTurbina.as',
+    ]) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} should stay implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/soulmixerhelp\.tsx`/);
+    }
   });
 });
 
@@ -780,7 +826,8 @@ describe('the mystery-box screen family decisions', () => {
   it('leaves the unrelated screens with no modelled behaviour planned', async () => {
     // Flipping a deferral must not become a general amnesty: these remain
     // planned because no authoritative answer or modelled gesture exists.
-    const LEFT_PLANNED = ['popups/PopUpLost.as', 'PopupResearchCenterMC.as'];
+    // The research-centre shell is no longer here — its panel is implemented.
+    const LEFT_PLANNED = ['popups/PopUpLost.as', 'PopupBreedingMC.as'];
     const all = await screens();
     for (const path of LEFT_PLANNED) {
       const screen = all.find((entry) => entry.path === path);
@@ -792,10 +839,10 @@ describe('the mystery-box screen family decisions', () => {
 });
 
 describe('the soul-mixer help and turbine screen decisions', () => {
-  // Only the presentation is drawn: the four help steps are the recovered
+  // Only the presentation is drawn here: the four help steps are the recovered
   // literal, and the turbine reads server-owned state when present (otherwise
-  // a labelled placeholder). No Powerup/Speedup/Fusion gesture is offered and
-  // no output item is guessed. The fusion and breeding screens stay planned.
+  // a labelled placeholder). The separate fusion panel now draws the fusion
+  // itself from server state; the art-only breeding shell stays planned.
   const RECLASSIFIED = [
     'PopupSoulMixerHelpMC.as',
     'popups/PopupSoulMixerHelp.as',
@@ -820,10 +867,11 @@ describe('the soul-mixer help and turbine screen decisions', () => {
     assert.match(turbine!.decisionNote, /server/);
   });
 
-  it('leaves the broader fusion and breeding screens planned', async () => {
-    // Reclassifying the presentation must not imply the fusion itself works:
-    // there is no applier case, no recovered output rule and no speedup price.
-    const LEFT_PLANNED = ['popups/PopupSoulMixer.as', 'PopupBreedingMC.as'];
+  it('leaves the art-only breeding shell planned', async () => {
+    // Reclassifying the help copy must not imply the art shell is drawn. The
+    // fusion popup itself now has a real panel and is asserted in its own
+    // family block above; only the movieclip with no behaviour stays planned.
+    const LEFT_PLANNED = ['PopupBreedingMC.as'];
     const all = await screens();
     for (const path of LEFT_PLANNED) {
       const screen = all.find((entry) => entry.path === path);
