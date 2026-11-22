@@ -215,9 +215,9 @@ first means guessing at the rules being cloned.
       (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
       attack interval, the velocity, the life and the population
 - [ ] The panels and the popups are **rendered**, and the popups that are not
-      implemented are recorded as dropped. The screen inventory now reads **162
-      implemented / 52 dropped / 46 planned**; the counts are checked by
-      `packages/client/src/screens.test.ts`, and this item stays open while **46
+      implemented are recorded as dropped. The screen inventory now reads **170
+      implemented / 52 dropped / 38 planned**; the counts are checked by
+      `packages/client/src/screens.test.ts`, and this item stays open while **38
       screens are planned** - a `Deferred: ` reason records honest scope, not a
       rendered screen or a drop
 - [x] The authoritative **item id → delegate** map is extracted from
@@ -1198,21 +1198,21 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **162 implemented** - the clone models the screen's behaviour, and the decision
+      - **170 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **52 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **46 planned** - in scope, the client's behaviour is real, and not modelled
+      - **38 planned** - in scope, the client's behaviour is real, and not modelled
         yet; each now carries a `Deferred: ` reason saying what is missing or how it
         unblocks
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
       exists, every dropped one must say why, and every planned one must start with
       `Deferred: ` and say what is missing or how it unblocks. The counts above are
-      checked by the same test. **This item stays open while 46 screens are planned**:
+      checked by the same test. **This item stays open while 38 screens are planned**:
       a deferral reason is neither an implementation nor a drop, and the earlier
       106/23/131 breakdown was a factual error, not a hidden batch of finished work
 - [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
@@ -1882,7 +1882,7 @@ B 4, E 1, G 8, H 4, I 5). The inventory in `re/data/ui-screens.json` read
 **151 implemented / 52 dropped / 57 planned** out of 260 at that refresh;
 PR #67 (`f096deb`) later moved the inventory at that point to
 **154 implemented / 52 dropped / 54 planned**, as recorded below. The current
-inventory is **162 implemented / 52 dropped / 46 planned**, recorded in the
+inventory is **170 implemented / 52 dropped / 38 planned**, recorded in the
 2026-11-23 amendments at the end of this file. The `movieclip`
 count of 108 is a by-kind count, not a decision count. Nothing in those eight
 increments turns a `Deferred: ` reason into a completed screen; the PR #62
@@ -2040,9 +2040,9 @@ test` 533 pass / 0 fail, `pnpm typecheck` clean,
 11/11 attacks caught and `node scripts/golden-master.mjs` 50 scenarios / 0
 differences. The catalogue check ran without the decompiled client source
 present locally, so it compared the report's 94 rows with the protocol's 94
-names. No checkbox was ticked: 54 screens remain planned.
+names. No checkbox was ticked: 54 screens remained planned at that point.
 
-**PR #70 (`c77e6fa`) — server publishes the panel state; client reads the server's research record (merged).** PR #68 gave the commands authoritative appliers, and PR #70 closes the remaining state-publication gap so the panels read values the server actually owns. `packages/server/src/apply.ts` adds `publishSoulMixerPanel`, which writes `privateState.soulMixer` using only the server's own save, its own seeded fuse roll and an already-validated building key — `inputA`, `inputB`, `resultItemId`, `resultPower`, `powerUpLevel` and `isoId` — rebuilt from a whitelist so a stale, unknown or malformed value can never survive and an empty patch writes nothing (a fresh save publishes no record). It is called from `buy_powerups`, `push_queue_unit2`, `soulmixer_speedup` and `pop_queue_unit`, the last clearing a collected result only for the building the server itself published. `apps/client/src/ui/state.ts` now reads the server-owned `researchState` record by type, preferring it to the legacy typed fields and falling back only when the record is malformed; a tampered or absent value reads as an explicit empty state, never an invented number. Independently re-run on merged `main`: the focused `node --test packages/server/src/soulmixer-panel-state.test.ts apps/client/src/ui/fusion.test.ts` → **24 tests / 24 pass / 0 fail**; PR #70's worker reported a full suite 1972/1972, golden master 50 scenarios / 0 differences and the command catalogue 94/94. No checkbox was ticked, no screen reclassified and no blocker removed: 54 screens remain planned.
+**PR #70 (`c77e6fa`) — server publishes the panel state; client reads the server's research record (merged).** PR #68 gave the commands authoritative appliers, and PR #70 closes the remaining state-publication gap so the panels read values the server actually owns. `packages/server/src/apply.ts` adds `publishSoulMixerPanel`, which writes `privateState.soulMixer` using only the server's own save, its own seeded fuse roll and an already-validated building key — `inputA`, `inputB`, `resultItemId`, `resultPower`, `powerUpLevel` and `isoId` — rebuilt from a whitelist so a stale, unknown or malformed value can never survive and an empty patch writes nothing (a fresh save publishes no record). It is called from `buy_powerups`, `push_queue_unit2`, `soulmixer_speedup` and `pop_queue_unit`, the last clearing a collected result only for the building the server itself published. `apps/client/src/ui/state.ts` now reads the server-owned `researchState` record by type, preferring it to the legacy typed fields and falling back only when the record is malformed; a tampered or absent value reads as an explicit empty state, never an invented number. Independently re-run on merged `main`: the focused `node --test packages/server/src/soulmixer-panel-state.test.ts apps/client/src/ui/fusion.test.ts` → **24 tests / 24 pass / 0 fail**; PR #70's worker reported a full suite 1972/1972, golden master 50 scenarios / 0 differences and the command catalogue 94/94. No checkbox was ticked, no screen reclassified and no blocker removed: 54 screens remained planned at that point.
 
 **Verified gates for this refresh:** `node scripts/check-roadmap.mjs` reports
 401 items, 22 open (B 42/4, E 37/1, G 78/8, H 14/4, I 99/5, with A, C, D and F
@@ -3217,7 +3217,7 @@ be mistaken for unfinished work.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 46 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 46; the art gate applies to the drawn ones |
+| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 38 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 38; the art gate applies to the drawn ones |
 | B | PvP `end_attack` payload captured live | Needs a live second player and the original Flash client driven over CDP | A Flash test rig with two live accounts |
 | B | `attack_player` / `spy_player` payloads captured live | Same as above | The same Flash test rig |
 | B | Premium purchase flow captured live | Needs a real-money account, which the preservation project must not use | A funded test account and explicit approval |
@@ -3229,7 +3229,7 @@ be mistaken for unfinished work.*
 |---|---|---|---|
 | G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout (the ADR 0021 route), or a licensing decision |
 | G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented. The CC0-1.0 first increment does not cover these assets | Re-create the art through the ADR 0021 clean-room route, or licence it (I6); the gate stays open |
-| G | Every B6 screen implemented or explicitly dropped | 46 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 46 |
+| G | Every B6 screen implemented or explicitly dropped | 38 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 38 |
 | G | Client runs in Firefox and Safari | **Firefox and WebKit (Playwright) are verified**: full rendered gameplay sessions ran under Gecko via `scripts/e2e-test-firefox.py` and under WebKit via `scripts/e2e-test-webkit.py` (both Playwright engines, driven over Juggler/BiDi). The later informational WebKit CI job from PR #73 **failed honestly** on HTTP 404s for the excluded proprietary atlas assets; it is non-required, did not affect the four protected checks, and does not replace the verified Playwright WebKit session. Branded Safari and real devices have not been run — Playwright's WebKit is an engine test, not Safari | Play the same session in branded Safari and on real devices; this box closes once Safari passes |
 | G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux bundling is now in CI, unsigned** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` with `libwebkit2gtk-4.1-dev`, and its informational, non-required `linux-bundle` job produces unsigned `.deb`/`.AppImage` artefacts. The informational macOS job added in PR #73 has also produced an **unsigned `.app` and `.dmg`** on a macOS runner; all of these are build artefacts, not signed or notarised releases | Add signed artefacts and notarisation (Linux and macOS bundling already run in informational CI); this box closes once all three platforms are produced as release artefacts |
 | G | Mobile build runs on Android and iOS | The **Android debug build is verified** (PR #64): SDK command-line tools provisioned from Google's official zip (sdkmanager 12.0, platforms 35/36 + build-tools, SDK at `%LOCALAPPDATA%\Android\Sdk`), Capacitor 8.6.2 installed at native-work time, `cap add android` (minSdk 24, compile/targetSdk 36, Gradle 8.14.3) and `gradlew assembleDebug` → `BUILD SUCCESSFUL`, 5,437,001-byte debug APK with the auto-generated debug cert. The informational iOS job added in PR #73 has since produced an **unsigned iOS simulator build** on a macOS runner; that is a build artefact, not a device run, and this host still has no local macOS/Xcode. Still open: **no device or emulator run**, **no signed distributable**, and `server.url` is a placeholder, so neither build is a runnable client | Run on real devices with a real deployment URL, and produce signed distributables if release is intended |
@@ -3257,9 +3257,9 @@ owner and a precise condition for closing it.*
 
 ---
 
-## Eight screen families reclassified in documentation — verified inventory 162/52/46
+## Eight screen families reclassified in documentation — verified inventory 162/52/46 at the PR #80 merge
 
-*Status: **documentation-only**. This section records eight screens that were honestly implemented and verified in already-merged PRs #75, #77 and #78. It sits **outside** the `## Group X` sections, so `node scripts/check-roadmap.mjs` still counts the same **401** items and **22** open boxes (B 4, E 1, G 8, H 4, I 5). No checkbox was ticked, no blocker was removed and no non-goal was reversed. The three portrait inventory decisions were subsequently corrected in the data by PR #80, so all eight screens now carry `implemented` decisions. The current counts are read from `re/data/ui-screens.json` on merged `main` at `8d492a4` (the PR #80 merge): **162 implemented / 52 dropped / 46 planned** out of 260.*
+*Status: **documentation-only**. This section records eight screens that were honestly implemented and verified in already-merged PRs #75, #77 and #78. It sits **outside** the `## Group X` sections, so `node scripts/check-roadmap.mjs` still counts the same **401** items and **22** open boxes (B 4, E 1, G 8, H 4, I 5). No checkbox was ticked, no blocker was removed and no non-goal was reversed. The three portrait inventory decisions were subsequently corrected in the data by PR #80, so all eight screens now carry `implemented` decisions. At the PR #80 merge (`8d492a4`) the counts read **162 implemented / 52 dropped / 46 planned** out of 260; the later increments are recorded in the 2026-11-23 amendments below.*
 
 | Screen | Merged PR | Model that implements it | Honest scope |
 | --- | --- | --- | --- |
@@ -3272,7 +3272,7 @@ owner and a precise condition for closing it.*
 | `GUI/ItemButtonLarge.as` | #78 | `apps/client/src/ui/storeitems.tsx` | Limited Offer / EARNINGS / BUY FOR captions around content-owned name, price and amounts; sole gesture is `buy_offer_pack`; no local price, roll, reward or server-owned limit |
 | `GUI/ItemButtonLargeResources.as` | #78 | `apps/client/src/ui/storeitems.tsx` | Resource amounts are display-only text from content; affordability comes from the server's cash; proprietary button art excluded |
 
-**Inventory discrepancy — found in PR #79, fixed by PR #80.** PR #79 recorded these three portrait screens as implemented from PR #75 while the checked inventory still read **159 / 52 / 49** and carried `GUI/Portrait.as`, `GUI/PortraitTrainQueue.as` and `GUI/AnimatedUnit.as` as `planned` with `Deferred: ` notes. PR #80 corrected the data: those three entries are now `implemented` against `apps/client/src/ui/unitportraits.tsx`, with notes that only server-owned unit id, count and ready state from `TrainingView` and the original inline-SVG art are drawn, while Zynga's proprietary unit art and animation frames stay excluded. The count on merged `main` is now **162 / 52 / 46**, asserted by `packages/client/src/screens.test.ts`. This alignment owns only `docs/ROADMAP.md` and `docs/GOAL.md`; no parity claim follows from any of the eight entries.
+**Inventory discrepancy — found in PR #79, fixed by PR #80.** PR #79 recorded these three portrait screens as implemented from PR #75 while the checked inventory still read **159 / 52 / 49** and carried `GUI/Portrait.as`, `GUI/PortraitTrainQueue.as` and `GUI/AnimatedUnit.as` as `planned` with `Deferred: ` notes. PR #80 corrected the data: those three entries are now `implemented` against `apps/client/src/ui/unitportraits.tsx`, with notes that only server-owned unit id, count and ready state from `TrainingView` and the original inline-SVG art are drawn, while Zynga's proprietary unit art and animation frames stay excluded. The count on merged `main` at that merge was **162 / 52 / 46**, asserted by `packages/client/src/screens.test.ts`. This alignment owns only `docs/ROADMAP.md` and `docs/GOAL.md`; no parity claim follows from any of the eight entries.
 
 **Clean-room art foundation (PR #76, ADR 0021).** The clean-room route is approved in
 [ADR 0021](./adr/0021-clean-room-assets.md): the dependency-free generator in `packages/art/` deterministically emits **25 CC0-1.0 original assets** into `assets/original/` (icons, a sprite sheet and six synthesised effects) with a per-file provenance manifest and its own tests. This is a **foundation, not a cleared gate**: Zynga's proprietary config remains a separate data problem, the release-licence gate (I6) stays open, no rights-holder request has been received, and no publication is authorised. No screen is claimed implemented by the existence of this package.
@@ -3291,6 +3291,47 @@ blocker register above retains every genuine blocker.
 
 ---
 
+## Final class-A screen chain — verified inventory 170/52/38
+
+*Status: **documentation-only**. This section records the eight screens that closed the
+class-A (implemented-model) backlog after the PR #80 alignment — five resource-button/icon
+screens in PR #82 and the last three portrait/icon screens in PR #83. It sits **outside**
+the `## Group X` sections, so `node scripts/check-roadmap.mjs` still counts the same **401**
+items and **22** open boxes (B 4, E 1, G 8, H 4, I 5). No checkbox was ticked, no blocker
+was removed and no non-goal was reversed: the B3 and G3 boxes stay open while 38 screens
+remain planned behind honest `Deferred: ` reasons and the licence gate. The counts below
+are read from `re/data/ui-screens.json` on merged `main` at `b687d38` (the PR #83 merge),
+not asserted from this prose: **170 implemented / 52 dropped / 38 planned** out of 260.
+The `movieclip` count of 108 is a by-kind count, not a decision count. No parity or release
+verdict follows from any entry here.*
+
+| Screen | Merged PR | Model that implements it | Honest scope |
+| --- | --- | --- | --- |
+| `ButtonResourceMC.as` | #82 | `apps/client/src/ui/resourcebuttons.tsx` | Resource-shortcut button in the chrome and its original inline-SVG icon in the one shared dialog; the only gesture is the catalogue's `trade_resource`, which the server prices and grants; proprietary button art excluded |
+| `ButtonSmallLargeTextWithIconResourcesMC.as` | #82 | `apps/client/src/ui/resourcebuttons.tsx` | Small labelled resource button: original inline-SVG icon, the client's own caption and the server's value; one shared dialog, only `trade_resource`; proprietary icon/text art excluded |
+| `ButtonSmallWithIconResourcesMC.as` | #82 | `apps/client/src/ui/resourcebuttons.tsx` | Small icon-plus-resource button with original inline geometry and the server's value; the one dialog emits only `trade_resource`, never a client-side price or grant; proprietary art excluded |
+| `GUI/ResourcesTab.as` | #82 | `apps/client/src/ui/resourcebuttons.tsx` | Resource tab with an original inline-SVG slot and the client's own caption in the one shared dialog; hosts only server wallet readings and `trade_resource` gestures; computes no grant, price or countdown; licensed tab art excluded |
+| `IconResourcesMC.as` | #82 | `apps/client/src/ui/resourcebuttons.tsx` | Resources icon as original inline SVG geometry, keyed by the wire resource but owning no game state; numbers come only from the server's wallet; any trade sends `trade_resource` to the one transport; proprietary icon art excluded |
+| `GUI/ExtendedPortraitPopupButton.as` | #83 | `apps/client/src/ui/portraitshells.tsx` (bridged by `apps/client/src/ui/state.ts`) | Extended portrait popup button drawn from the server-owned army roster and the rules' unit level, hosted in the one shared dialog; the click is UI-only, no command added and no portrait, name, count or level invented; proprietary Zynga portrait art excluded, only original inline SVG geometry drawn |
+| `GUI/IconPanel.as` | #83 | `apps/client/src/ui/portraitshells.tsx` | Icon-panel layout primitive drawn from the server's eight-slot resource wallet in the verified wire order, with original inline SVG marks and the client's own column count; missing or malformed slots are omitted, not given a client-side amount; no command or trade added; proprietary icon art excluded |
+| `GUI/PortraitAssault.as` | #83 | `apps/client/src/ui/portraitshells.tsx` (with `apps/client/src/ui/assault.tsx`) | Assault portraits drawn from the server-owned army and last assault receipt; the win/loss mark and opponent come from the server's answer and an unsettled or absent receipt draws no invented outcome; proprietary portrait art excluded, only original inline SVG geometry drawn |
+
+**Chain and inventory progression.** The class-A backlog was reduced across the merged
+increments already recorded above: the eight families of PRs #75/#77/#78 (corrected by
+#80) left the checked inventory at **162 / 52 / 46**; PR #82 (`2484f8d`, five
+resource-button/icon screens) moved it to **167 / 52 / 41**; PR #83 (`b687d38`, the final
+three portrait/icon screens above) moved it to the current **170 / 52 / 38**. The
+documentation-only PRs #79/#81 aligned the prose to the data without changing a decision.
+The other PRs in this chain are recorded where they belong: #67 (fusion/research panels),
+#73 (informational macOS `.app`/`.dmg` and iOS simulator builds; a WebKit CI attempt
+failed on excluded proprietary atlas 404s; branded Safari unrun), #74 (`NO DEVICE`, no
+touch test, one desktop single-host GPU observation) and #76 (`@swl/art` clean-room CC0
+assets, ADR 0021). None of those results is a platform-verification or release verdict,
+and the art/release licence, Flash rig/live captures, devices/macOS/iOS hosts, signing,
+funded account, GPU verdict and rights-holder request remain genuine, open blockers.
+
+---
+
 ## Roadmap Amendment Log
 
 *The Locked Decisions section is binding: changing it, closing a deferred item, or adding
@@ -3298,6 +3339,20 @@ a milestone needs a written rationale. This is that record. Each entry names the
 what changed, why, and the evidence that makes the change verifiable, so a decision can be
 reviewed without reconstructing the conversation that led to it.*
 
+- **2026-11-23 — final docs-only count alignment to the merged 170/52/38 inventory
+  (Groups B3, G3).** The checked inventory on merged `main` at `b687d38` (the PR #83
+  merge) reads **170 implemented / 52 dropped / 38 planned** of 260 in
+  `re/data/ui-screens.json`, asserted by `packages/client/src/screens.test.ts`; PR #82
+  (`2484f8d`) contributed five resource-button/icon screens and PR #83 (`b687d38`) the
+  final three portrait/icon screens, recorded in *Final class-A screen chain* above.
+  *Rationale:* the last class-A screens were implemented and verified in merged PRs, so
+  leaving the roadmap's present-tense counts at the PR #80 values would understate the
+  checked data. *Evidence:* the `byDecision` counts in `re/data/ui-screens.json` on merged
+  `main` and the eight model paths named there. *What did not change:* no checkbox was
+  ticked (the B3 and G3 boxes stay open while 38 screens are planned), no blocker was
+  removed, no non-goal reversed — ADR 19/20/21 and the no-publication rule still hold —
+  no parity or release verdict was claimed, and this increment owns only
+  `docs/ROADMAP.md` and `docs/GOAL.md`.
 - **2026-11-23 — documentation-only reclassification of eight implemented screens
   (Groups B3, G3).** At that checkpoint the counts followed `re/data/ui-screens.json`
   on merged `main` at `5c60b34`: **159 implemented / 52 dropped / 49 planned** of 260,
@@ -3324,7 +3379,7 @@ reviewed without reconstructing the conversation that led to it.*
   after the inventory was corrected and checked. *Evidence:* `re/data/ui-screens.json`
   counts on merged `main` at `8d492a4` (the PR #80 merge) and the count assertions in
   `packages/client/src/screens.test.ts`. *What did not change:* no checkbox was ticked
-  (the B3 and G3 boxes stay open while 46 screens are planned), no blocker was
+  (the B3 and G3 boxes stayed open while 46 screens were planned at that checkpoint), no blocker was
   removed, no non-goal reversed, and no new screen was claimed — the eight screens
   above are still the same eight. Gates re-run on this alignment branch:
   `node scripts/check-roadmap.mjs` → 401 items, 22 open (unchanged);
