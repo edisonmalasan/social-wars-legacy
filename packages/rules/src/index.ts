@@ -32,3 +32,5 @@ export * from './production.ts';
 export * from './premium.ts';
 export * from './tutorial.ts';
 export * from './xp.ts';
+export * from './soulmixer.ts';
+export * from './research.ts';
