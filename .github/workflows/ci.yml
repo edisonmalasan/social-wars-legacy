@@ -338,6 +338,287 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  # The three jobs below are INFORMATIONAL. Free GitHub Actions macOS runners
+  # let us compile and inspect Apple-platform artefacts, but nothing here
+  # signs, notarises, publishes or submits anything, and no credential is
+  # referenced. Every one has `continue-on-error: true` at the job level: the
+  # four required checks above (Verify, desktop shell, Assets, Scan) and the
+  # existing Linux bundle job are unchanged, and none of these attempts can
+  # turn the workflow red.
+  macos-bundle:
+    name: Unsigned macOS app/dmg (informational)
+    runs-on: macos-latest
+    continue-on-error: true
+    # A bound, so a stuck release compile cannot hold the run open all day.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The same inputs, in the same order, as the desktop and Linux bundle
+      # jobs: content, the server sidecar the shell bundles, the measured
+      # client manifest and the real web client in `frontendDist`.
+      - name: Build the content bundle
+        run: pnpm build:content
+
+      - name: Build the desktop server sidecar
+        run: node scripts/build-desktop-server.mjs
+
+      - name: Build the client's manifest
+        run: pnpm build:client
+
+      - name: Build the web client
+        run: pnpm --filter @swl/app-client build
+
+      - name: Prepare the desktop shell
+        run: node scripts/prepare-desktop.mjs
+
+      - name: The shell's frontend is the real client
+        run: node scripts/check-desktop-dist.mjs
+
+      # The same pinned npm Tauri CLI as the Windows/Linux bundles. macOS
+      # needs no extra system library on the runner. No APPLE_SIGNING_IDENTITY,
+      # APPLE_ID, APPLE_TEAM_ID or app-specific password is set anywhere, and
+      # tauri.conf.json declares no signing identity: the result is an
+      # unsigned, unnotarised .app and .dmg for inspection only.
+      - name: Build the unsigned .app and .dmg
+        working-directory: apps/desktop/src-tauri
+        run: npx --yes --package @tauri-apps/cli@2.12.3 tauri build --bundles app,dmg
+
+      - name: Confirm and label the unsigned macOS artefacts
+        run: |
+          set -eu
+          bundle=apps/desktop/src-tauri/target/release/bundle
+          app=( "$bundle"/macos/*.app )
+          dmg=( "$bundle"/dmg/*.dmg )
+          test -d "${app[0]}"
+          test -f "${dmg[0]}"
+          # `ditto` preserves the bundle structure (including symlinks) that a
+          # plain directory upload would flatten.
+          ditto -c -k --keepParent "${app[0]}" "$bundle/macos/UNSIGNED-app.zip"
+          echo "UNSIGNED macOS artefacts (for inspection only):"
+          echo "  app:  ${app[0]}"
+          echo "  dmg:  ${dmg[0]}"
+          printf '%s\n' \
+            'UNSIGNED - FOR INSPECTION ONLY' \
+            'These macOS artefacts carry no code signature and no notarisation,' \
+            'and were not published, notarised or submitted to the App Store.' \
+            "app: ${app[0]}" \
+            "dmg: ${dmg[0]}" \
+            > "$bundle/UNSIGNED.txt"
+
+      - name: Upload the unsigned macOS artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-bundles-UNSIGNED
+          path: |
+            apps/desktop/src-tauri/target/release/bundle/macos/UNSIGNED-app.zip
+            apps/desktop/src-tauri/target/release/bundle/dmg/*.dmg
+            apps/desktop/src-tauri/target/release/bundle/UNSIGNED.txt
+          if-no-files-found: error
+          retention-days: 7
+
+  # An attempt to run the repository's existing WebKit browser session on a
+  # macOS host. Playwright WebKit is an open-source engine, NOT branded Safari:
+  # this job can only report what the script itself verifies and must never be
+  # read as closing the branded-Safari gate. Kept non-required for that reason.
+  safari-webkit:
+    name: Safari / WebKit validation attempt (informational)
+    runs-on: macos-latest
+    continue-on-error: true
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Python Playwright is a test tool these repository scripts already
+      # require, not a dependency of the shipped client. Pin it to the exact
+      # version the repository's verified WebKit session used, in a throwaway
+      # venv so the runner's system Python is never modified.
+      - name: Provision the pinned Playwright WebKit test tool
+        run: |
+          set -eu
+          python3 -m venv "$RUNNER_TEMP/swl-playwright"
+          "$RUNNER_TEMP/swl-playwright/bin/python" -m pip install --quiet playwright==1.60.0
+          "$RUNNER_TEMP/swl-playwright/bin/python" -m playwright install webkit
+
+      - name: Build the content bundle
+        run: pnpm build:content
+
+      - name: Build the web client
+        run: pnpm --filter @swl/app-client build
+
+      - name: Run the existing WebKit browser session script
+        id: webkit_session
+        run: |
+          set -eu
+          mkdir -p "$GITHUB_WORKSPACE/artifacts"
+          "$RUNNER_TEMP/swl-playwright/bin/python" scripts/e2e-test-webkit.py \
+            --screenshot "$GITHUB_WORKSPACE/artifacts/swl-webkit-e2e.png"
+
+      - name: Report exactly what this run verified
+        if: always()
+        run: |
+          set -eu
+          mkdir -p "$GITHUB_WORKSPACE/artifacts"
+          {
+            echo 'Safari / WebKit validation attempt - INFORMATIONAL'
+            echo "WebKit session outcome: ${{ steps.webkit_session.outcome }}"
+            echo 'VERIFIED when the outcome is success (by scripts/e2e-test-webkit.py):'
+            echo '  a full gameplay session through rendered controls against the real'
+            echo '  authoritative server in headless Playwright WebKit: registration,'
+            echo '  building, training, the weekly quest, reward, refused replay,'
+            echo '  client reload and server restart.'
+            echo 'NOT VERIFIED:'
+            echo '  Branded Safari was NOT run. Headless WebKit is Playwright WebKit,'
+            echo '  not Safari; no real device was used. A real Safari host remains a'
+            echo '  separate gate and the G5 Safari checkbox stays open.'
+          } | tee "$GITHUB_WORKSPACE/artifacts/WEBKIT-REPORT.txt"
+
+      - name: Upload the WebKit proof and scope report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: webkit-session-INFORMATIONAL
+          path: |
+            artifacts/swl-webkit-e2e.png
+            artifacts/WEBKIT-REPORT.txt
+          if-no-files-found: warn
+          retention-days: 7
+
+  # An attempt at a Debug simulator build from the config-only mobile shell.
+  # There is no committed native iOS project (see apps/mobile/README.md), so
+  # the pinned Capacitor toolchain is installed in this ephemeral checkout and
+  # `cap add ios` generates the project. No signing, no device and no App Store
+  # build is attempted: success means a simulator .app was compiled, nothing
+  # more. Kept non-required because the exact failure is an honest outcome.
+  ios-simulator:
+    name: iOS simulator build attempt (informational)
+    runs-on: macos-latest
+    continue-on-error: true
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the content bundle
+        run: pnpm build:content
+
+      - name: Build the web client
+        run: pnpm --filter @swl/app-client build
+
+      - name: Validate the committed mobile configuration
+        run: node scripts/check-mobile-config.mjs
+
+      # The Capacitor 8.6.2 versions are the ones the repository's own README
+      # records for its verified native build. They are build tools in this
+      # temporary checkout, never a shipped or committed runtime dependency.
+      - name: Provision the pinned Capacitor toolchain
+        run: |
+          set -eu
+          pnpm --filter @swl/app-mobile add @capacitor/core@8.6.2 @capacitor/ios@8.6.2
+          pnpm --filter @swl/app-mobile add -D @capacitor/cli@8.6.2
+
+      - name: Sync the Capacitor client and add the iOS platform
+        id: cap_sync
+        run: |
+          set -eu
+          pnpm --filter @swl/app-mobile exec cap sync
+          pnpm --filter @swl/app-mobile exec cap add ios
+
+      - name: Build for the iOS simulator, unsigned
+        id: xcode_build
+        run: |
+          set -eu
+          cd apps/mobile/ios/App
+          project=(-workspace App.xcworkspace)
+          if [ ! -d App.xcworkspace ]; then project=(-project App.xcodeproj); fi
+          xcodebuild "${project[@]}" -scheme App -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/ios-derived-data" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
+            build
+
+      - name: Report the iOS simulator outcome and stage any artefact
+        if: always()
+        run: |
+          set -eu
+          mkdir -p "$GITHUB_WORKSPACE/artifacts"
+          {
+            echo 'iOS simulator build attempt - INFORMATIONAL'
+            echo "cap sync/add ios: ${{ steps.cap_sync.outcome }}"
+            echo "xcodebuild:       ${{ steps.xcode_build.outcome }}"
+            echo 'No signing identity, provisioning profile or credential was used.'
+            echo 'No device run and no App Store / distribution build was attempted.'
+            echo 'server.url stays the documented placeholder, so no runtime load is claimed.'
+            echo 'The exact failure, if any, is in the log of the failed step above.'
+          } > "$GITHUB_WORKSPACE/artifacts/IOS-REPORT.txt"
+          products="$RUNNER_TEMP/ios-derived-data/Build/Products/Debug-iphonesimulator"
+          if [ -d "$products" ]; then
+            app=""
+            for candidate in "$products"/*.app; do
+              if [ -d "$candidate" ]; then app="$candidate"; break; fi
+            done
+            if [ -n "$app" ]; then
+              ditto -c -k --keepParent "$app" "$GITHUB_WORKSPACE/artifacts/ios-simulator-UNSIGNED.app.zip"
+              echo "simulator .app: $app" >> "$GITHUB_WORKSPACE/artifacts/IOS-REPORT.txt"
+            fi
+          fi
+          cat "$GITHUB_WORKSPACE/artifacts/IOS-REPORT.txt"
+
+      - name: Upload the iOS simulator report and any artefact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator-INFORMATIONAL
+          path: |
+            artifacts/ios-simulator-UNSIGNED.app.zip
+            artifacts/IOS-REPORT.txt
+          if-no-files-found: warn
+          retention-days: 7
+
   assets:
     name: Assets
     runs-on: ubuntu-latest
