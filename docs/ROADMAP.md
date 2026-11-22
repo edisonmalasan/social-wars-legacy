@@ -215,9 +215,9 @@ first means guessing at the rules being cloned.
       (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
       attack interval, the velocity, the life and the population
 - [ ] The panels and the popups are **rendered**, and the popups that are not
-      implemented are recorded as dropped. The screen inventory now reads **159
-      implemented / 52 dropped / 49 planned**; the counts are checked by
-      `packages/client/src/screens.test.ts`, and this item stays open while **49
+      implemented are recorded as dropped. The screen inventory now reads **162
+      implemented / 52 dropped / 46 planned**; the counts are checked by
+      `packages/client/src/screens.test.ts`, and this item stays open while **46
       screens are planned** - a `Deferred: ` reason records honest scope, not a
       rendered screen or a drop
 - [x] The authoritative **item id → delegate** map is extracted from
@@ -1198,21 +1198,21 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **159 implemented** - the clone models the screen's behaviour, and the decision
+      - **162 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **52 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **49 planned** - in scope, the client's behaviour is real, and not modelled
+      - **46 planned** - in scope, the client's behaviour is real, and not modelled
         yet; each now carries a `Deferred: ` reason saying what is missing or how it
         unblocks
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
       exists, every dropped one must say why, and every planned one must start with
       `Deferred: ` and say what is missing or how it unblocks. The counts above are
-      checked by the same test. **This item stays open while 49 screens are planned**:
+      checked by the same test. **This item stays open while 46 screens are planned**:
       a deferral reason is neither an implementation nor a drop, and the earlier
       106/23/131 breakdown was a factual error, not a hidden batch of finished work
 - [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
@@ -1882,8 +1882,8 @@ B 4, E 1, G 8, H 4, I 5). The inventory in `re/data/ui-screens.json` read
 **151 implemented / 52 dropped / 57 planned** out of 260 at that refresh;
 PR #67 (`f096deb`) later moved the inventory at that point to
 **154 implemented / 52 dropped / 54 planned**, as recorded below. The current
-inventory is **159 implemented / 52 dropped / 49 planned**, recorded in the
-2026-11-23 amendment at the end of this file. The `movieclip`
+inventory is **162 implemented / 52 dropped / 46 planned**, recorded in the
+2026-11-23 amendments at the end of this file. The `movieclip`
 count of 108 is a by-kind count, not a decision count. Nothing in those eight
 increments turns a `Deferred: ` reason into a completed screen; the PR #62
 correction recorded below is a separate reclassification of a primitive.*
@@ -3217,7 +3217,7 @@ be mistaken for unfinished work.*
 
 | Group | Item | Blocker | Unblock condition |
 |---|---|---|---|
-| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 49 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 49; the art gate applies to the drawn ones |
+| B | The panels and popups are rendered; unimplemented ones recorded as dropped | 46 B6 screens are still *planned*, not modelled; several need the original's art | Model or record a decision for each of the 46; the art gate applies to the drawn ones |
 | B | PvP `end_attack` payload captured live | Needs a live second player and the original Flash client driven over CDP | A Flash test rig with two live accounts |
 | B | `attack_player` / `spy_player` payloads captured live | Same as above | The same Flash test rig |
 | B | Premium purchase flow captured live | Needs a real-money account, which the preservation project must not use | A funded test account and explicit approval |
@@ -3229,7 +3229,7 @@ be mistaken for unfinished work.*
 |---|---|---|---|
 | G | The original's walls-and-turrets starting ring | **Non-goal** — the layout exists only in the GPL-v3 upstream, and the shipped tree carries no GPL data | A clean-room layout (the ADR 0021 route), or a licensing decision |
 | G | Particles and the 205 FX assets | The art is Zynga's; only the flight models are implemented. The CC0-1.0 first increment does not cover these assets | Re-create the art through the ADR 0021 clean-room route, or licence it (I6); the gate stays open |
-| G | Every B6 screen implemented or explicitly dropped | 49 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 49 |
+| G | Every B6 screen implemented or explicitly dropped | 46 screens remain *planned*; dropping them to tick the box would misstate scope | Implement or honestly drop each of the 46 |
 | G | Client runs in Firefox and Safari | **Firefox and WebKit (Playwright) are verified**: full rendered gameplay sessions ran under Gecko via `scripts/e2e-test-firefox.py` and under WebKit via `scripts/e2e-test-webkit.py` (both Playwright engines, driven over Juggler/BiDi). The later informational WebKit CI job from PR #73 **failed honestly** on HTTP 404s for the excluded proprietary atlas assets; it is non-required, did not affect the four protected checks, and does not replace the verified Playwright WebKit session. Branded Safari and real devices have not been run — Playwright's WebKit is an engine test, not Safari | Play the same session in branded Safari and on real devices; this box closes once Safari passes |
 | G | Desktop build runs on Windows, macOS and Linux | Windows has produced the installers, and **Linux bundling is now in CI, unsigned** — `.github/workflows/ci.yml` runs the desktop job on `ubuntu-latest` with `libwebkit2gtk-4.1-dev`, and its informational, non-required `linux-bundle` job produces unsigned `.deb`/`.AppImage` artefacts. The informational macOS job added in PR #73 has also produced an **unsigned `.app` and `.dmg`** on a macOS runner; all of these are build artefacts, not signed or notarised releases | Add signed artefacts and notarisation (Linux and macOS bundling already run in informational CI); this box closes once all three platforms are produced as release artefacts |
 | G | Mobile build runs on Android and iOS | The **Android debug build is verified** (PR #64): SDK command-line tools provisioned from Google's official zip (sdkmanager 12.0, platforms 35/36 + build-tools, SDK at `%LOCALAPPDATA%\Android\Sdk`), Capacitor 8.6.2 installed at native-work time, `cap add android` (minSdk 24, compile/targetSdk 36, Gradle 8.14.3) and `gradlew assembleDebug` → `BUILD SUCCESSFUL`, 5,437,001-byte debug APK with the auto-generated debug cert. The informational iOS job added in PR #73 has since produced an **unsigned iOS simulator build** on a macOS runner; that is a build artefact, not a device run, and this host still has no local macOS/Xcode. Still open: **no device or emulator run**, **no signed distributable**, and `server.url` is a placeholder, so neither build is a runnable client | Run on real devices with a real deployment URL, and produce signed distributables if release is intended |
@@ -3257,22 +3257,22 @@ owner and a precise condition for closing it.*
 
 ---
 
-## Eight screen families reclassified in documentation — verified inventory 159/52/49
+## Eight screen families reclassified in documentation — verified inventory 162/52/46
 
-*Status: **documentation-only**. This section records eight screens that were honestly implemented and verified in already-merged PRs #75, #77 and #78. It sits **outside** the `## Group X` sections, so `node scripts/check-roadmap.mjs` still counts the same **401** items and **22** open boxes (B 4, E 1, G 8, H 4, I 5). No checkbox was ticked, no blocker was removed and no non-goal was reversed. The counts here are read from `re/data/ui-screens.json` on merged `main` at `5c60b34`: **159 implemented / 52 dropped / 49 planned** out of 260.*
+*Status: **documentation-only**. This section records eight screens that were honestly implemented and verified in already-merged PRs #75, #77 and #78. It sits **outside** the `## Group X` sections, so `node scripts/check-roadmap.mjs` still counts the same **401** items and **22** open boxes (B 4, E 1, G 8, H 4, I 5). No checkbox was ticked, no blocker was removed and no non-goal was reversed. The three portrait inventory decisions were subsequently corrected in the data by PR #80, so all eight screens now carry `implemented` decisions. The current counts are read from `re/data/ui-screens.json` on merged `main` at `8d492a4` (the PR #80 merge): **162 implemented / 52 dropped / 46 planned** out of 260.*
 
 | Screen | Merged PR | Model that implements it | Honest scope |
 | --- | --- | --- | --- |
 | `ButtonMarketMC.as` | #77 | `apps/client/src/ui/market.tsx` (with `market-art.tsx`) | Draws the market launcher gesture in the chrome and opens the player-owned resource market in the one shared dialog; proprietary button art excluded |
 | `popups/ButtonMarket.as` | #77 | `apps/client/src/ui/market.tsx`, `apps/client/src/ui/state.ts` | Buy/sell buttons and the recovered 24-hour exhaustion sentence are display only; counters and wallet come from the server; every gesture sends `trade_resource` through the one command transport |
-| `GUI/Portrait.as` | #75 | `apps/client/src/ui/unitportraits.tsx` | Portrait states are modelled and drawn from server state; still carries a `planned` decision in the inventory — see the discrepancy note below |
-| `GUI/PortraitTrainQueue.as` | #75 | `apps/client/src/ui/unitportraits.tsx` | Training-queue portrait model, wired through `roster.tsx` / `recruit.tsx`; still carries a `planned` inventory decision |
-| `GUI/AnimatedUnit.as` | #75 | `apps/client/src/ui/unitportraits.tsx` | Animated-unit panel with frame-selection and remove lifecycle; still carries a `planned` inventory decision |
+| `GUI/Portrait.as` | #75 (inventory fixed by #80) | `apps/client/src/ui/unitportraits.tsx` | Portrait states are modelled and drawn from server state; the inventory decision was corrected to `implemented` by PR #80 — see the discrepancy note below |
+| `GUI/PortraitTrainQueue.as` | #75 (inventory fixed by #80) | `apps/client/src/ui/unitportraits.tsx` | Training-queue portrait model, wired through `roster.tsx` / `recruit.tsx`; the inventory decision was corrected to `implemented` by PR #80 |
+| `GUI/AnimatedUnit.as` | #75 (inventory fixed by #80) | `apps/client/src/ui/unitportraits.tsx` | Animated-unit panel with frame-selection and remove lifecycle; the inventory decision was corrected to `implemented` by PR #80 |
 | `StoreMC.as` | #78 | `apps/client/src/ui/storeitems.tsx` | Store-front item-button chrome from content offer packs, server cash driving affordability, explicit empty states, original inline SVG art only |
 | `GUI/ItemButtonLarge.as` | #78 | `apps/client/src/ui/storeitems.tsx` | Limited Offer / EARNINGS / BUY FOR captions around content-owned name, price and amounts; sole gesture is `buy_offer_pack`; no local price, roll, reward or server-owned limit |
 | `GUI/ItemButtonLargeResources.as` | #78 | `apps/client/src/ui/storeitems.tsx` | Resource amounts are display-only text from content; affordability comes from the server's cash; proprietary button art excluded |
 
-**Inventory discrepancy, reported rather than hidden.** The checked inventory count after PR #78 is **159 / 52 / 49**. Its 49 `planned` entries still include `GUI/Portrait.as`, `GUI/PortraitTrainQueue.as` and `GUI/AnimatedUnit.as` with `Deferred: ` notes: PR #75 implemented and tested the models in `apps/client/src/ui/unitportraits.tsx` but did not edit `re/data/ui-screens.json`. The three screens are therefore implemented in code and recorded here as such, while the data file's authoritative count remains 159 / 52 / 49. This documentation increment owns only `docs/ROADMAP.md` and `docs/GOAL.md`, so it does not change the inventory; a future data edit must be made and checked separately. No parity claim follows from any of the eight entries.
+**Inventory discrepancy — found in PR #79, fixed by PR #80.** PR #79 recorded these three portrait screens as implemented from PR #75 while the checked inventory still read **159 / 52 / 49** and carried `GUI/Portrait.as`, `GUI/PortraitTrainQueue.as` and `GUI/AnimatedUnit.as` as `planned` with `Deferred: ` notes. PR #80 corrected the data: those three entries are now `implemented` against `apps/client/src/ui/unitportraits.tsx`, with notes that only server-owned unit id, count and ready state from `TrainingView` and the original inline-SVG art are drawn, while Zynga's proprietary unit art and animation frames stay excluded. The count on merged `main` is now **162 / 52 / 46**, asserted by `packages/client/src/screens.test.ts`. This alignment owns only `docs/ROADMAP.md` and `docs/GOAL.md`; no parity claim follows from any of the eight entries.
 
 **Clean-room art foundation (PR #76, ADR 0021).** The clean-room route is approved in
 [ADR 0021](./adr/0021-clean-room-assets.md): the dependency-free generator in `packages/art/` deterministically emits **25 CC0-1.0 original assets** into `assets/original/` (icons, a sprite sheet and six synthesised effects) with a per-file provenance manifest and its own tests. This is a **foundation, not a cleared gate**: Zynga's proprietary config remains a separate data problem, the release-licence gate (I6) stays open, no rights-holder request has been received, and no publication is authorised. No screen is claimed implemented by the existence of this package.
@@ -3299,8 +3299,8 @@ what changed, why, and the evidence that makes the change verifiable, so a decis
 reviewed without reconstructing the conversation that led to it.*
 
 - **2026-11-23 — documentation-only reclassification of eight implemented screens
-  (Groups B3, G3).** The current-state counts now follow `re/data/ui-screens.json` on
-  merged `main` at `5c60b34`: **159 implemented / 52 dropped / 49 planned** of 260,
+  (Groups B3, G3).** At that checkpoint the counts followed `re/data/ui-screens.json`
+  on merged `main` at `5c60b34`: **159 implemented / 52 dropped / 49 planned** of 260,
   replacing the earlier 154 / 52 / 54 claims. The eight screens and their modules are
   recorded in *Eight screen families reclassified in documentation* above: the two
   market screens (PR #77, `market.tsx`), three unit/training portraits (PR #75,
@@ -3308,11 +3308,30 @@ reviewed without reconstructing the conversation that led to it.*
   *Rationale:* the behaviour was implemented and verified in merged PRs, so leaving the
   roadmap's "current" counts at the old values would understate the checked data.
   *Evidence:* `re/data/ui-screens.json` counts and decisions; the eight modules named
-  there. *What did not change:* no checkbox was ticked (the B3 and G3 boxes stay open
-  while 49 screens are planned), no blocker was removed, no non-goal reversed and no
-  parity or release claim made. The three portrait inventory entries remain `planned`
-  in the data despite their implementation — a discrepancy recorded explicitly in the
-  section above, not silently rewritten.
+  there. *What did not change:* no checkbox was ticked (the B3 and G3 boxes stayed open
+  while 49 screens were planned at that checkpoint), no blocker was removed, no
+  non-goal reversed and no parity or release claim made. At that checkpoint the three
+  portrait inventory entries were still `planned` despite their implementation — a
+  discrepancy recorded explicitly in the section above and later fixed in the data by
+  PR #80, as recorded in the next entry.
+- **2026-11-23 — documentation counts aligned to the PR #80 inventory fix.** PR #80
+  reclassified `GUI/Portrait.as`, `GUI/PortraitTrainQueue.as` and `GUI/AnimatedUnit.as`
+  to `implemented` in `re/data/ui-screens.json`, taking the checked inventory from
+  159 / 52 / 49 to **162 implemented / 52 dropped / 46 planned** of 260. This
+  documentation-only increment updates every current-state count in `docs/ROADMAP.md`
+  and `docs/GOAL.md` to match and records that the discrepancy found in PR #79 was
+  fixed in the data. *Rationale:* the roadmap must not keep claiming a stale count
+  after the inventory was corrected and checked. *Evidence:* `re/data/ui-screens.json`
+  counts on merged `main` at `8d492a4` (the PR #80 merge) and the count assertions in
+  `packages/client/src/screens.test.ts`. *What did not change:* no checkbox was ticked
+  (the B3 and G3 boxes stay open while 46 screens are planned), no blocker was
+  removed, no non-goal reversed, and no new screen was claimed — the eight screens
+  above are still the same eight. Gates re-run on this alignment branch:
+  `node scripts/check-roadmap.mjs` → 401 items, 22 open (unchanged);
+  `node scripts/check-report-sync.mjs` → the report set agrees with the implementation
+  (4 claims, after `pnpm build:content`, build id `63e067bd…`);
+  `node scripts/check-adrs.mjs` → 21 ADRs, all well formed; `git diff --check` → clean
+  (exit 0).
 - **2026-11-23 — clean-room art foundation recorded; the art gate stays open
   (Groups G and I, ADR 0021; PR #76).** The approved clean-room route now has a working
   generator (`packages/art/`) and **25 CC0-1.0 original assets** in `assets/original/`
