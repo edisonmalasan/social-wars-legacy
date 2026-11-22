@@ -1983,10 +1983,13 @@ is the art and state gate: the proprietary Zynga artwork stays excluded,
 `PopupBreedingMC.as` remains the art-only movieclip shell with no literals, state
 or gestures of its own, the turbine's well-formed-record gate and the help-only
 status of the POWERUP / SPEEDUP words in `soulmixerhelp.tsx` still follow from
-published state, and the panels render explicit empty states until the server
-publishes the optional `privateState.soulMixer` fields. No client-side parity is
-claimed by the client itself; the authoritative server appliers landed in PR #68
-(recorded below).
+published state. Since PR #70 the server publishes `privateState.soulMixer` from
+server-owned data (the two inputs, the seeded fuse result, the paid power-up
+level and the validated building id), so the panels render those published
+values; on a fresh save or a malformed/absent record they render explicit empty
+states instead of a local roll, grant, price or countdown. No client-side parity
+is claimed by the client itself; the authoritative server appliers landed in PR
+#68 and the publication in PR #70 (both recorded below).
 
 **Corrected research-centre gate, now implemented (PR #67).** The old one-line
 note on `PopupResearchCenterMC.as` falsely identified it as the magic tech tree.
@@ -2036,6 +2039,8 @@ test` 533 pass / 0 fail, `pnpm typecheck` clean,
 differences. The catalogue check ran without the decompiled client source
 present locally, so it compared the report's 94 rows with the protocol's 94
 names. No checkbox was ticked: 54 screens remain planned.
+
+**PR #70 (`c77e6fa`) — server publishes the panel state; client reads the server's research record (merged).** PR #68 gave the commands authoritative appliers, and PR #70 closes the remaining state-publication gap so the panels read values the server actually owns. `packages/server/src/apply.ts` adds `publishSoulMixerPanel`, which writes `privateState.soulMixer` using only the server's own save, its own seeded fuse roll and an already-validated building key — `inputA`, `inputB`, `resultItemId`, `resultPower`, `powerUpLevel` and `isoId` — rebuilt from a whitelist so a stale, unknown or malformed value can never survive and an empty patch writes nothing (a fresh save publishes no record). It is called from `buy_powerups`, `push_queue_unit2`, `soulmixer_speedup` and `pop_queue_unit`, the last clearing a collected result only for the building the server itself published. `apps/client/src/ui/state.ts` now reads the server-owned `researchState` record by type, preferring it to the legacy typed fields and falling back only when the record is malformed; a tampered or absent value reads as an explicit empty state, never an invented number. Independently re-run on merged `main`: the focused `node --test packages/server/src/soulmixer-panel-state.test.ts apps/client/src/ui/fusion.test.ts` → **24 tests / 24 pass / 0 fail**; PR #70's worker reported a full suite 1972/1972, golden master 50 scenarios / 0 differences and the command catalogue 94/94. No checkbox was ticked, no screen reclassified and no blocker removed: 54 screens remain planned.
 
 **Verified gates for this refresh:** `node scripts/check-roadmap.mjs` reports
 401 items, 22 open (B 42/4, E 37/1, G 78/8, H 14/4, I 99/5, with A, C, D and F
