@@ -57,9 +57,9 @@ describe('the screen inventory', () => {
     const { counts, screens: all } = await inventory();
     assert.equal(counts.total, 260);
     assert.deepEqual(counts.byDecision, {
-      implemented: 162,
+      implemented: 167,
       dropped: 52,
-      planned: 46,
+      planned: 41,
     });
     const recomputed: Record<string, number> = {};
     for (const screen of all) {
@@ -597,7 +597,6 @@ describe('the reusable UI-chrome screen family decisions', () => {
       'IconoCapturadoMC.as',
       'InfoPopupMC.as',
       'InfoPopupManaMc.as',
-      'GUI/ResourcesTab.as',
       'TooltipMultilineMC.as',
     ];
     const all = await screens();
@@ -1004,6 +1003,55 @@ describe('the unit-portrait screen family decisions', () => {
       assert.match(screen!.decisionNote, /art/i);
       assert.match(screen!.decisionNote, /roll/i);
       assert.match(screen!.decisionNote, /command/i);
+    }
+  });
+});
+
+describe('the resource-button and icon-chrome screen family decisions', () => {
+  // All five deferrals said a shortcut/tab/icon had no rendered equivalent.
+  // They are reclassified only because a real panel now draws that
+  // presentation with original inline SVG. The readout stays the server's and
+  // the only gesture is the catalogue's trade_resource: no behaviour is added,
+  // and no proprietary art or ADR 20 screen is claimed.
+  const RESOURCE_BUTTON_SCREENS = [
+    'ButtonResourceMC.as',
+    'ButtonSmallLargeTextWithIconResourcesMC.as',
+    'ButtonSmallWithIconResourcesMC.as',
+    'IconResourcesMC.as',
+    'GUI/ResourcesTab.as',
+  ];
+
+  it('records each rendered screen as implemented against the chrome panel', async () => {
+    const all = await screens();
+    for (const path of RESOURCE_BUTTON_SCREENS) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.equal(screen!.decision, 'implemented', `${path} is not implemented`);
+      assert.match(screen!.decisionNote, /`apps\/client\/src\/ui\/resourcebuttons\.tsx`/);
+      assert.match(screen!.decisionNote, /art/i);
+    }
+  });
+
+  it('says the server keeps the values and the pricing', async () => {
+    const all = await screens();
+    for (const path of RESOURCE_BUTTON_SCREENS) {
+      const screen = all.find((entry) => entry.path === path)!;
+      assert.match(screen.decisionNote, /server/i);
+      assert.match(screen.decisionNote, /trade_resource/);
+      assert.match(screen.decisionNote, /no client-side|never a client|prices/i);
+    }
+  });
+
+  it('leaves the art-only and ADR 20 screens alone', async () => {
+    const all = await screens();
+    for (const path of [
+      'PopupMarketMC.as',
+      'PopupMarketplaceAsset.as',
+      'popups/marketplace/PopupMarketplace.as',
+    ]) {
+      const screen = all.find((entry) => entry.path === path);
+      assert.ok(screen, `${path} is not in the inventory`);
+      assert.notEqual(screen!.decision, 'implemented', `${path} was reclassified`);
     }
   });
 });

@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 162,
+   "implemented": 167,
    "dropped": 52,
-   "planned": 46
+   "planned": 41
   }
  },
  "screens": [
@@ -53,8 +53,8 @@
    ],
    "overrides": [],
    "bytes": 459,
-   "decision": "planned",
-   "decisionNote": "Deferred: the resource-shortcut button has no gesture or tooltip wiring in the clone; unblock when the resource panel it should open is modelled and the button art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/resourcebuttons.tsx` draws the resource-shortcut button in the chrome and its original inline-SVG icon in the one shared dialog. The button opens that panel and the panel sends only the catalogue's `trade_resource`; every value shown is read from the server and the server still prices and grants. The proprietary button art is excluded."
   },
   {
    "class": null,
@@ -74,8 +74,8 @@
    ],
    "overrides": [],
    "bytes": 616,
-   "decision": "planned",
-   "decisionNote": "Deferred: the small labelled resource button has no rendered equivalent or click wiring; unblock when the icon/text art is available and a resource action is modelled."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/resourcebuttons.tsx` draws the small labelled resource button as an original inline-SVG icon plus the client's own caption and the server's value. It opens the one shared dialog; the only gesture there is the catalogue's `trade_resource`, which the server prices and grants. The proprietary icon/text art stays excluded."
   },
   {
    "class": null,
@@ -116,8 +116,8 @@
    ],
    "overrides": [],
    "bytes": 597,
-   "decision": "planned",
-   "decisionNote": "Deferred: the small icon-plus-resource button has no click wiring or tooltip; unblock when the resource action it triggers is modelled and its art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/resourcebuttons.tsx` draws the small icon-plus-resource button with original inline geometry and the server's value beside it. Its click opens the one dialog; the trade controls there emit only the catalogue's `trade_resource`, never a client-side price or grant. The proprietary art is excluded; the resource readout stays the server's."
   },
   {
    "class": null,
@@ -1077,8 +1077,8 @@
    ],
    "overrides": [],
    "bytes": 4434,
-   "decision": "planned",
-   "decisionNote": "Deferred: the resource tab has no createButtons/resetWindow layout model; unblock when a window with resource tabs is rendered and the tab art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/resourcebuttons.tsx` draws a resource tab with an original inline-SVG slot and the client's own caption in the one shared dialog. The tab hosts only readings of the server's wallet and the catalogue's `trade_resource` gestures; it computes no grant, price or countdown and the server prices every trade. The licensed tab art stays excluded."
   },
   {
    "class": "SelectedMagic",
@@ -1730,8 +1730,8 @@
    ],
    "overrides": [],
    "bytes": 276,
-   "decision": "planned",
-   "decisionNote": "Deferred: the resources icon has no rendered counterpart; unblock when a resource readout is drawn and the icon art is licensed."
+   "decision": "implemented",
+   "decisionNote": "Implemented: `apps/client/src/ui/resourcebuttons.tsx` draws the resources icon as original inline SVG geometry, keyed by the wire resource but owning no game state. The numbers beside it come only from the server's wallet, and any trade gesture sends the catalogue's `trade_resource` to the one transport, which the server prices and grants. The proprietary icon art is excluded."
   },
   {
    "class": null,

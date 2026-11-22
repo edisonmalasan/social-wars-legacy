@@ -55,6 +55,7 @@ import {
 import { EMPTY_TAB_STRIP } from './state.ts';
 import type { Categories, ProductionPanelView } from './state.ts';
 import { MarketLauncher } from './market.tsx';
+import { ResourceButtonsLauncher } from './resourcebuttons.tsx';
 
 /** The host callbacks the chrome needs. `main.ts` publishes them once. */
 export interface ChromeHost {
@@ -268,6 +269,13 @@ export function ChromeDock({
             one command transport.
           */}
           <MarketLauncher />
+          {/*
+            The resource-shortcut/chrome gesture lives here with the other
+            interface controls. Like the market's, it only publishes a UI-only
+            open flag; the panel is hosted by the one shared dialog in
+            `root.tsx` and every trade goes through the host's one transport.
+          */}
+          <ResourceButtonsLauncher />
           <button
             ref={helpButton}
             type="button"

@@ -58,6 +58,11 @@ import { Neighbours } from './neighbours.tsx';
 import { OnboardingLauncher, OnboardingPanel, useOnboarding } from './onboarding.tsx';
 import { QuestPanel, type QuestPanelView } from './quests.tsx';
 import { RecruitPanel } from './recruit.tsx';
+import {
+  closeResourceButtonsPanel,
+  ResourceButtonsPanel,
+  useResourceButtons,
+} from './resourcebuttons.tsx';
 import { RosterPanel, useRoster } from './roster.tsx';
 import { SoulMixerLauncher, SoulMixerPanel } from './soulmixerhelp.tsx';
 import { SpellBook } from './spellbook.tsx';
@@ -87,6 +92,8 @@ import {
   questRanks,
   recruitView,
   researchPanel,
+  resourceButtonsDialog,
+  resourceButtonsPanel,
   ROSTER_DIALOG_ID,
   rosterPanel,
   storeItemsPanel,
@@ -211,6 +218,7 @@ export function Root({
   const roster = useRoster();
   const mystery = useMystery();
   const market = useMarket();
+  const resourceButtons = useResourceButtons();
   const state = hudState(hudInput(bundle, world));
   const bonus = useMemo(
     () => bonusPanel(world, now, tzOffsetHours),
@@ -269,12 +277,23 @@ export function Root({
   // flag is UI state and only decides which body the one dialog hosts.
   const marketView = useMemo(() => marketPanel(bundle, world), [bundle, world]);
 
-  // The one dialog's slot is shared. The market's UI-only gesture borrows the
-  // same primitive: when it is open, it replaces the host's body for the
-  // moment and is given back on close. No second overlay is ever created.
-  const activeDialog: DialogState = market.open
-    ? { dialog: marketDialog() }
-    : (dialog ?? CLOSED_DIALOG);
+  // The resource shortcut chrome is the same kind of reading: the wallet is
+  // the server's, the content names and trade amounts are display text, and
+  // the launcher's open flag is UI state that only selects a dialog body.
+  const resourceButtonsView = useMemo(
+    () => resourceButtonsPanel(bundle, world),
+    [bundle, world],
+  );
+
+  // The one dialog's slot is shared. The market's and the resource chrome's
+  // UI-only gestures borrow the same primitive: when one is open it replaces
+  // the host's body for the moment and is given back on close. No second
+  // overlay is ever created.
+  const activeDialog: DialogState = resourceButtons.open
+    ? { dialog: resourceButtonsDialog() }
+    : market.open
+      ? { dialog: marketDialog() }
+      : (dialog ?? CLOSED_DIALOG);
 
   // The dialog's id selects which of the four assault-family screens to host.
   // Each view is a fresh reading of the server's answer: the interface keeps
@@ -366,9 +385,15 @@ export function Root({
       <Feedback messages={feedback} />
       <Dialog
         state={activeDialog}
-        onDismiss={market.open ? closeMarketPanel : onDialogDismiss ?? (() => {})}
+        onDismiss={
+          resourceButtons.open
+            ? closeResourceButtonsPanel
+            : market.open
+              ? closeMarketPanel
+              : onDialogDismiss ?? (() => {})
+        }
       >
-        {!market.open ? (
+        {!market.open && !resourceButtons.open ? (
         <>
         {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && !dialogId?.startsWith('soulmixer-') && !dialogId?.startsWith('fusion-') && !dialogId?.startsWith('research-') && dialogId !== ROSTER_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
@@ -476,6 +501,14 @@ export function Root({
             view={marketView}
             onCommand={onCommand}
             onClose={closeMarketPanel}
+          />
+        ) : null}
+        {resourceButtons.open ? (
+          <ResourceButtonsPanel
+            key="resource-buttons-chrome"
+            view={resourceButtonsView}
+            onCommand={onCommand}
+            onClose={closeResourceButtonsPanel}
           />
         ) : null}
       </Dialog>
