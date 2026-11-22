@@ -504,7 +504,49 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main`:** `96e8a7e` — PR #64
+- **Last verified `main` (2026-11-22):** `f096deb` — PR #67
+  (`feat/soulmixer-research-screens`, "draw Atom Fusion and research panels from
+  server state") merged. It added `apps/client/src/ui/fusion.tsx` (launcher plus
+  Atom Fusion and research panels hosted in the one shared `Dialog`), pure
+  selectors in `apps/client/src/ui/state.ts` and 11 focused client tests. It
+  reclassified three screens — `popups/PopupSoulMixer.as`,
+  `PopupResearchCenterMC.as` and `popups/PopupResearchCenter.as` — to
+  **implemented** against that panel, taking the inventory to **154 implemented /
+  52 dropped / 54 planned** (was 151/52/57). `PopupBreedingMC.as` stays planned as
+  the art-only movieclip shell with no literals, state or gestures of its own; the
+  proprietary art and build-process SWFs stay excluded. The panels read only
+  server-published values and render explicit empty states until the server
+  publishes them — no local roll, grant, price or countdown. PR #66 (`462fb06`,
+  pure soul-mixer and research rules with golden vectors) precedes this merge;
+  PR #63 (`eccf9fa`) and PR #64 (`96e8a7e`, the verified Android debug build)
+  precede that. PR #67 reported a focused 64/64 pass, a full suite 1935/1935 pass,
+  a clean `pnpm typecheck` and passing Chrome/Edge end-to-end sessions; this
+  documentation increment independently re-ran `node scripts/check-roadmap.mjs`
+  (401 items, 22 open: B 42/4, E 37/1, G 78/8, H 14/4, I 99/5),
+  `node scripts/check-report-sync.mjs` (4 claims) and `node scripts/check-adrs.mjs`
+  (20 well-formed ADRs) on `f096deb`, ticked no checkbox and removed no blocker.
+- **PR #68 — pending CI at this checkpoint, not merged:** `feat(server):
+  authoritative soul-mixer and research appliers` (`t3/8669cac9`) is still
+  **OPEN** (`gh pr view 68 --json state` reported `OPEN`). It proposes
+  server-owned appliers for `buy_powerups`, `soulmixer_speedup`,
+  `push_queue_unit2` and the five research commands, charging from content/rules
+  prices and deriving results from server state and a server seed. Its PR body
+  reports 533 server tests, 1945 full-suite tests, 94/94 catalogue, 11/11 cheat
+  battery and 50 golden-master scenarios with 0 differences; those are **the PR's
+  own figures, not independently re-verified here**. Do not treat any of it as
+  merged fact until the state reads `MERGED` and the checks are re-run locally.
+- **Active worker threads:** an audit thread (re-checking the section 5 blocker
+  claims against the current tree) and a server-state publication thread (the
+  work behind PR #68) are active. The audit verdict is that none of the 22 open
+  items is class-A or needs a new user decision — all are gated by licences,
+  devices, credentials, the Flash rig or non-goals — so every blocker claim is
+  preserved. Only the orchestrator merges; no worker merges its own branch.
+- **Next (honest, evidence-gated):** verify PR #68 only after it actually merges
+  (state, then a local `pnpm test` and `node scripts/verify-command-catalogue.mjs`);
+  keep reducing the remaining 54 planned B6 screens in coherent, player-facing
+  families, with Zynga-art screens staying planned behind the licence gate. No
+  documentation change ticks a checkbox or rewrites a blocker.
+- **Previously verified `main`:** `96e8a7e` — PR #64
   (`chore/provision-android-sdk`, the verified Android debug build — SDK
   command-line tools provisioned non-interactively from Google's official zip,
   Capacitor 8.6.2, `cap add android`, `assembleDebug` successful, 5,437,001-byte
@@ -581,11 +623,14 @@ verified checkpoint, not at every tool call.
   from the server-owned save only when it is well-formed, otherwise a labelled
   placeholder with no fabricated countdown; they offer no Powerup, Speedup or
   Fusion gesture — those words are help text, not working controls. The
-  read-only audit's **confirmed fusion blocker** — no applier cases for
-  `buy_powerups` / `soulmixer_speedup` / research commands, no recovered
-  `(inputA, inputB, powerupLevel) -> output` rule (raw AS3 absent), unpriced
-  `soulmixer_speedup`, and breeding only as `PopupSoulMixer`'s art shell —
-  keeps the fusion and breeding screens planned.
+  read-only audit's **fusion blocker** described the pre-PR #66/#67 state: PR #66
+  supplied the pure soul-mixer and research rules (power derivation, speed-up
+  cash price, power-up increments and research tracks), and PR #67 drew the Atom
+  Fusion and research panels from server-published state in
+  `apps/client/src/ui/fusion.tsx`, so those screens are no longer planned.
+  Still true: `PopupBreedingMC.as` is only `PopupSoulMixer`'s art-only shell, the
+  original art stays excluded, and the panels render empty states until the
+  server publishes the values they read.
 - **The PR #62 cover correction (checked, honest scope):**
   `GuiCoverExplorationMC.as` moved from `planned` to `implemented` because
   `apps/client/src/ui/chrome.tsx` already provides the reusable `Cover` — a
@@ -596,15 +641,18 @@ verified checkpoint, not at every tool call.
   screen family was added; only the last cover deferral closed, taking the
   inventory from 150 / 52 / 58 to 151 / 52 / 57. The change touched tests and
   `re/data/ui-screens.json`, not product source.
-- **Corrected research-centre gate:** the old note on `PopupResearchCenterMC.as`
-  falsely called it the magic tech tree. It is really the late-era AREA 51 /
-  ROBOTIC CENTER robot-research screen (Zynga build-process art, a 6-hour cycle,
-  an ADR-20 social "Hire friends" gesture). The new server only stores
-  `researchItemNumber`/`researchStepNumber`/`timeStampDoResearch` and applies
-  **none** of `next_research_item`, `next_research_step`,
-  `research_buy_step_cash`, `reset_research_item` or `finish_robotic_help`, so
-  its gestures have no authoritative answer. Both research-centre screens stay
-  planned; no parity is claimed and the magic tech tree is not a substitute.
+- **Corrected research-centre gate, superseded by PR #67:** the old note on
+  `PopupResearchCenterMC.as` falsely called it the magic tech tree. It is really
+  the late-era AREA 51 / ROBOTIC CENTER robot-research screen (Zynga build-process
+  art, a 6-hour cycle, an ADR-20 social "Hire friends" gesture); that
+  identification and the art exclusion still stand. PR #66 supplied the pure
+  research rules, and PR #67 reclassified both `PopupResearchCenterMC.as` and
+  `popups/PopupResearchCenter.as` to **implemented** against
+  `apps/client/src/ui/fusion.tsx`, which draws the server's progress, a timestamp-
+  only countdown and the rules' track in the one shared dialog. The panels read
+  only published state and render empty states until the server publishes it;
+  authoritative appliers are separate tracked work. No parity is claimed and the
+  magic tech tree is not a substitute.
 - **Previously verified `main`:** `e11cbca` — PR #49
   (`feat/check-mobile-capacitor-config`, the read-only mobile-config check)
   merged. The merge chain since the prior checkpoint (`6954a19`) is PR #47
@@ -660,8 +708,10 @@ verified checkpoint, not at every tool call.
   one shared `Dialog` via `showAssaultPanel(kind)` (31/31 focused tests,
   1786/1786 serial full suite, typecheck, e2e in Chrome and Edge). Nine screens
   were honestly reclassified as implemented in that batch; after PRs #51–#55,
-  #57, #59, #60 and #62 the inventory now reads **151 implemented / 52 dropped
-  / 57 planned**, with art-licence-blocked screens still planned. Three further
+  #57, #59, #60 and #62 the inventory read **151 implemented / 52 dropped /
+  57 planned**, with art-licence-blocked screens still planned; PR #67 later
+  moved the live inventory to **154 implemented / 52 dropped / 54 planned**.
+  Three further
   increments are on `main`: PR #47
   (`f4b4e69`) refreshed the verified-state documentation for the `6954a19`
   checkpoint; PR #48 (`608d940`) added `scripts/flash-differential.mjs`, a
@@ -678,8 +728,8 @@ verified checkpoint, not at every tool call.
   state at PR #49; PR #64 later resolved the Android build half (recorded in the
   checkpoint above) while the device and iOS halves remain open.
 - **Verified roadmap state:** `node scripts/check-roadmap.mjs` reports 401 items,
-  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **151 implemented /
-  52 dropped / 57 planned**. The Status Summary still reads G 78/8. The G5
+  22 open (B 4, E 1, G 8, H 4, I 5); screen inventory is **154 implemented /
+  52 dropped / 54 planned**. The Status Summary still reads G 78/8. The G5
   blocker row records Firefox and WebKit as verified, with branded Safari and
   real devices the only unrun browsers; the desktop and installer rows now
   record **Linux bundling in CI, unsigned** while staying open for macOS and
@@ -710,7 +760,7 @@ verified checkpoint, not at every tool call.
   is a documentation-only increment prepared on its own task branch for review,
   not a merge.
 - **Next, from the audit ranking:** re-audit the section 5 blockers before
-  treating any as final, and keep reducing the 57 planned B6 screens in
+  treating any as final, and keep reducing the 54 planned B6 screens in
   coherent, player-facing families — the six families in PRs #51–#55 and #57 are
   the latest, and the screens that need Zynga's art stay planned behind the licence
   gate. The gender/character-setup choice also stays planned: the save has no
