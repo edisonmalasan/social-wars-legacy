@@ -1,0 +1,8 @@
+CC0 1.0 Universal
+
+To the extent possible under law, the contributors to this project have waived
+all copyright and related or neighbouring rights to the neutral content seed in
+this directory and to the design decisions recorded in it.
+
+The full legal code is at <https://creativecommons.org/publicdomain/zero/1.0/legalcode>.
+This dedication is not legal advice and carries no warranty.

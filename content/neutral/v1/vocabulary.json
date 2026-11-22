@@ -1,0 +1,57 @@
+{
+  "namespace": "v1",
+  "idRange": {
+    "start": 500001,
+    "end": 599999
+  },
+  "categories": {
+    "production": { "id": 5101, "name": "Production" },
+    "defense": { "id": 5102, "name": "Defense" },
+    "army": { "id": 5103, "name": "Army" },
+    "support": { "id": 5104, "name": "Support" },
+    "decoration": { "id": 5105, "name": "Decoration" }
+  },
+  "subcategories": {
+    "production": 5211,
+    "defense": 5212,
+    "army": 5213,
+    "support": 5214,
+    "decoration": 5215
+  },
+  "functionalRoles": {
+    "producer": 5311,
+    "defender": 5312,
+    "melee": 5313,
+    "ranged": 5314,
+    "mounted": 5315,
+    "supporter": 5316,
+    "decorator": 5317
+  },
+  "resources": {
+    "timber": "w",
+    "gold": "g",
+    "oil": "o",
+    "steel": "s"
+  },
+  "factions": {
+    "neutral": "n"
+  },
+  "counterClasses": ["melee", "ranged", "mounted", "structure", "support"],
+  "propertyKeys": ["counter_class", "decorative", "population_grant", "produces", "upgrade_tier"],
+  "keyMap": {},
+  "allocation": [
+    { "slug": "production.timber.yard", "id": 500001 },
+    { "slug": "production.grain.field", "id": 500002 },
+    { "slug": "production.ore.store", "id": 500003 },
+    { "slug": "defense.watch.tower", "id": 500004 },
+    { "slug": "defense.bastion.tower", "id": 500005 },
+    { "slug": "defense.stone.rampart", "id": 500006 },
+    { "slug": "army.shield.guard", "id": 500007 },
+    { "slug": "army.longbow.ranger", "id": 500008 },
+    { "slug": "army.scout.rider", "id": 500009 },
+    { "slug": "support.bunkhouse", "id": 500010 },
+    { "slug": "support.field.engineer", "id": 500011 },
+    { "slug": "decoration.garden.fountain", "id": 500012 },
+    { "slug": "decoration.banner.stand", "id": 500013 }
+  ]
+}
