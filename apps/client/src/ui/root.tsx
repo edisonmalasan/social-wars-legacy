@@ -62,6 +62,12 @@ import {
   originalArtDialog,
 } from './originalart.tsx';
 import {
+  ORIGINAL_FX_DIALOG_ID,
+  OriginalFxGallery,
+  OriginalFxLauncher,
+  originalFxDialog,
+} from './originalfx.tsx';
+import {
   AssaultPortraits,
   ExtendedPortraitButton,
   IconPanel,
@@ -322,20 +328,26 @@ export function Root({
   // fresh reading of the clean-room generator; it owns no game state and
   // borrows the one shared dialog rather than creating a second overlay.
   const [originalArtOpen, setOriginalArtOpen] = useState(false);
+  // The Original FX panel is the same kind of UI-only gesture. Its animated
+  // frames are a fresh reading of the clean-room generator; it owns no game
+  // state and borrows the one shared dialog rather than creating an overlay.
+  const [originalFxOpen, setOriginalFxOpen] = useState(false);
 
   // The one dialog's slot is shared. The market's, the resource chrome's, the
   // portrait launcher's and the art gallery's UI-only gestures borrow the same
   // primitive: when one is open it replaces the host's body for the moment and
   // is given back on close. No second overlay is ever created.
-  const activeDialog: DialogState = originalArtOpen
-    ? { dialog: originalArtDialog() }
-    : portraitOpen
-      ? { dialog: portraitDialog() }
-      : resourceButtons.open
-        ? { dialog: resourceButtonsDialog() }
-        : market.open
-          ? { dialog: marketDialog() }
-          : (dialog ?? CLOSED_DIALOG);
+  const activeDialog: DialogState = originalFxOpen
+    ? { dialog: originalFxDialog() }
+    : originalArtOpen
+      ? { dialog: originalArtDialog() }
+      : portraitOpen
+        ? { dialog: portraitDialog() }
+        : resourceButtons.open
+          ? { dialog: resourceButtonsDialog() }
+          : market.open
+            ? { dialog: marketDialog() }
+            : (dialog ?? CLOSED_DIALOG);
 
   // The dialog's id selects which of the four assault-family screens to host.
   // Each view is a fresh reading of the server's answer: the interface keeps
@@ -424,6 +436,7 @@ export function Root({
       <Neighbours neighbours={neighbours} />
       <OnboardingLauncher onOpen={onboarding.open ?? undefined} />
       <OriginalArtLauncher onOpen={() => setOriginalArtOpen(true)} />
+      <OriginalFxLauncher onOpen={() => setOriginalFxOpen(true)} />
       {tutorial ? <TutorialOverlay {...tutorial} /> : null}
       <Feedback messages={feedback} />
       {/* The icon layout and the extended portrait launcher are presentations
@@ -436,23 +449,28 @@ export function Root({
       <Dialog
         state={activeDialog}
         onDismiss={
-          originalArtOpen
-            ? () => setOriginalArtOpen(false)
-            : portraitOpen
-              ? () => setPortraitOpen(false)
-              : resourceButtons.open
-                ? closeResourceButtonsPanel
-                : market.open
-                  ? closeMarketPanel
-                  : onDialogDismiss ?? (() => {})
+          originalFxOpen
+            ? () => setOriginalFxOpen(false)
+            : originalArtOpen
+              ? () => setOriginalArtOpen(false)
+              : portraitOpen
+                ? () => setPortraitOpen(false)
+                : resourceButtons.open
+                  ? closeResourceButtonsPanel
+                  : market.open
+                    ? closeMarketPanel
+                    : onDialogDismiss ?? (() => {})
         }
       >
-        {originalArtOpen || (!market.open && !resourceButtons.open) ? (
+        {originalFxOpen || originalArtOpen || (!market.open && !resourceButtons.open) ? (
         <>
+        {originalFxOpen ? (
+          <OriginalFxGallery onClose={() => setOriginalFxOpen(false)} />
+        ) : null}
         {originalArtOpen ? (
           <OriginalArtGallery onClose={() => setOriginalArtOpen(false)} />
         ) : null}
-        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && !dialogId?.startsWith('soulmixer-') && !dialogId?.startsWith('fusion-') && !dialogId?.startsWith('research-') && dialogId !== ROSTER_DIALOG_ID && dialogId !== PORTRAIT_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
+        {!onboarding.view && !dialogId?.startsWith('assault-') && !dialogId?.startsWith('charactersetup-') && !dialogId?.startsWith('mystery-') && !dialogId?.startsWith('soulmixer-') && !dialogId?.startsWith('fusion-') && !dialogId?.startsWith('research-') && dialogId !== ROSTER_DIALOG_ID && dialogId !== PORTRAIT_DIALOG_ID && dialogId !== ORIGINAL_FX_DIALOG_ID && questPanel && onQuestStart && onQuestAction ? (
           <QuestPanel
             key={
               questPanel.kind === 'briefing'
