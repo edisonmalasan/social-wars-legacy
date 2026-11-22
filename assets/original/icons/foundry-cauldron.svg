@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry cauldron</title>
+  <desc id="swl-desc">A round pot on two feet, with a variable number of bubbles.</desc>
+    <path d="M13 28 Q12 51 32 51 Q52 51 51 28 Z" fill="#2c4654"/>
+    <ellipse cx="32" cy="28" rx="19" ry="7" fill="#16242d"/>
+    <ellipse cx="32" cy="28" rx="15" ry="4" fill="#2f7d78"/>
+    <rect x="17" y="50" width="6" height="6" rx="1" fill="#16242d"/>
+    <rect x="41" y="50" width="6" height="6" rx="1" fill="#16242d"/>
+    <circle cx="23" cy="20" r="2" fill="#86cdbd"/>
+    <circle cx="28" cy="15" r="3" fill="#86cdbd"/>
+    <circle cx="33" cy="20" r="2" fill="#86cdbd"/>
+</svg>

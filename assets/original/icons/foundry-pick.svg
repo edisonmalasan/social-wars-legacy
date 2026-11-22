@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry pick</title>
+  <desc id="swl-desc">A double-pointed pick with a curved head.</desc>
+    <line x1="17" y1="53" x2="45" y2="19" stroke="#b65340" stroke-width="5" stroke-linecap="round"/>
+    <path d="M18 18 Q32 9 50 18" fill="none" stroke="#2c4654" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="10,12 21,16 16,24" fill="#e9a63f"/>
+    <polygon points="54,12 43,16 48,24" fill="#e9a63f"/>
+    <line x1="20" y1="48" x2="24" y2="52" stroke="#16242d" stroke-width="1" stroke-linecap="round"/>
+    <line x1="22" y1="45" x2="26" y2="49" stroke="#16242d" stroke-width="1" stroke-linecap="round"/>
+    <line x1="24" y1="42" x2="28" y2="46" stroke="#16242d" stroke-width="1" stroke-linecap="round"/>
+</svg>

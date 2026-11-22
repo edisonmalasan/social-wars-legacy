@@ -2,7 +2,9 @@
 
 **Status:** the position for the shipped product is settled. What is *not*
 settled is the **release** of anything derived from Zynga's assets, and
-this document says exactly where that line is.
+this document says exactly where that line is. A **clean-room route** is
+approved ([ADR 0021](adr/0021-clean-room-assets.md)) and a first CC0-1.0
+increment exists in `assets/original/`; the release gate is still open.
 
 This is the document the roadmap's "the asset licensing position is
 settled and written down" asks for. It is written in terms of what the
@@ -30,7 +32,9 @@ request and every answer is recorded there.
 4. **The art and the audio are the open question.** The client's sprites
    and sounds are Zynga's. The clone needs art to be playable, and the
    art that exists is Zynga's. So the art must be **re-created** before
-   any public release, or licensed.
+   any public release, or licensed. The approved way to re-create it is
+   the clean-room generator in `packages/art`, dedicated CC0-1.0; the
+   first increment does not complete the set.
 
 ## What is in the repository
 
@@ -42,6 +46,8 @@ request and every answer is recorded there.
 | The rules engine | `packages/rules/` | This project's | **Yes** |
 | The server | `packages/server/`, `apps/server/` | This project's | **Yes** |
 | The client | `packages/client/`, `apps/client/` | This project's | **Yes** |
+| The clean-room generator | `packages/art/` | **CC0-1.0** | **No** — a development tool |
+| The generated original art and audio | `assets/original/` | **CC0-1.0** | Not yet — the set is incomplete |
 | The substitute fonts | (fetched at build time) | **SIL OFL 1.1** | **Yes** |
 
 ## The upstream, and why it is vendored
@@ -93,10 +99,33 @@ picked the third:
    not covered by the upstream's GPL v3 grant.
 3. **Re-create the art.** The clone's art is drawn from scratch, or
    generated, or replaced by a permissive stand-in. That is the path
-   this project takes.
+   this project takes — see *The clean-room increment* below.
 
 Until the art is re-created, the game is **playable in development**
 against the vendored assets and **not distributable**.
+
+### The clean-room increment
+
+`packages/art` generates an original "Foundry" family: sixteen UI/unit
+motifs and a sprite sheet drawn from fixed integer geometry, plus six short
+WAV effects synthesised from a fixed sine table and a seeded generator. It
+reads no input file, and only its own output tree is read back by its
+`--check` mode. Nothing is sampled, traced or copied from the game's art,
+the SWFs, the atlases or a proprietary font.
+
+The output in `assets/original/` carries a CC0-1.0 dedication and a
+provenance manifest: each file's relative path, byte size, SHA-256,
+generator version, licence and an explicit original-work statement.
+`node packages/art/src/cli.ts --check` verifies the committed files against
+a fresh generation, and the package's tests prove determinism, header
+validity, distinct hashes and that no upstream or reverse-engineering file
+is read.
+
+This is the **first increment, not the finished set**. It does not replace
+the client's art, implement a screen or close the release gate. The
+proprietary configuration is a separate problem: the content bundle is
+still derived from the upstream's `config/main.json` and its deltas, and a
+public release needs that data re-created too.
 
 ### The fonts
 
@@ -144,8 +173,10 @@ the clone's own tree carries no `.swf` and no Zynga media, and
 These are the gates, and none of them is optional:
 
 1. **The art is re-created or licensed.** Every sprite, every effect
-   and every sound. The clone's own art must be the game's art.
-2. **The audio is re-created or licensed** on the same terms.
+   and every sound. The clone's own art must be the game's art. The
+   CC0-1.0 Foundry family is a down payment on this, not the whole set.
+2. **The audio is re-created or licensed** on the same terms; the six
+   generated effects are likewise only a first increment.
 3. **The configuration is re-created.** The upstream's `config/main.json`
    is a data file describing the original's content; the clone's bundle
    is built from it, and a public release needs the bundle's content to
@@ -181,6 +212,12 @@ that *is* one.
 
 The check is proven to fire: it fails on a stylesheet that asks for
 Arial Rounded MT Bold, and on a `.swf` in a shipped tree.
+
+The clean-room increment is checked separately: `node packages/art/src/cli.ts
+--check` fails on a byte that differs from a fresh generation, and the
+package's tests fail on a changed hash, an invalid header, a missing
+licence field or a read outside the generator's own output tree. None of
+this asserts that the release gate is clear — that needs the whole set.
 
 ## A note on what this document is not
 

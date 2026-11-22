@@ -32,6 +32,19 @@ This project adds its own work on top: a rules engine reimplemented from
 the client's observed behaviour, a modern server, a Flash-free client,
 and a desktop shell. Those are this project's, under its own licence.
 
+## The project's own art
+
+The "Foundry" icons, sprite sheet and short effects in `assets/original/`
+are original work generated from primitives by `packages/art` and dedicated
+to **CC0-1.0**. They are not Zynga's art and were not traced, sampled or
+copied from it; the manifest records a hash and an original-work statement
+for every file. Zynga remains the author and owner of the original game's
+art, audio and configuration, which this project does not redistribute.
+
+This is the first increment of a clean-room replacement, not the finished
+set. It does not make the game distributable on its own — see
+[`LICENSING.md`](LICENSING.md).
+
 ## The analysis
 
 The reverse-engineering report set lives in `re/`. It is the project's

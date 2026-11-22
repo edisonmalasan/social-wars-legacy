@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="swl-title swl-desc">
+  <title id="swl-title">Foundry flask</title>
+  <desc id="swl-desc">A stoppered flask with liquid and a variable number of bubbles.</desc>
+    <rect x="29" y="8" width="6" height="18" rx="1" fill="#f7ecd7"/>
+    <rect x="28" y="4" width="8" height="6" rx="1" fill="#b65340"/>
+    <path d="M29 24 Q13 34 18 48 Q32 59 46 48 Q51 34 35 24 Z" fill="none" stroke="#2c4654" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M21 42 Q32 47 43 42 Q46 48 32 53 Q18 48 21 42 Z" fill="#2f7d78"/>
+    <circle cx="27" cy="36" r="2" fill="#86cdbd"/>
+    <circle cx="31" cy="30" r="2" fill="#86cdbd"/>
+</svg>
