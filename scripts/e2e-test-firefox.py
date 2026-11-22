@@ -383,8 +383,29 @@ def wait_js(page, js_bool: str, label: str, timeout: int = 15_000):
         raise RuntimeError(f"the interface never showed {label} ({error})") from error
 
 
+def wait_for_selector(page, selector: str, label: str, timeout: int = 15_000):
+    """Wait for a rendered control to mount, or fail with a clear message.
+
+    Playwright's own selector waits are not used here because the harness drives
+    the DOM through ``page.evaluate``; this keeps the same evaluation path and
+    simply polls until the control exists before a click is attempted.
+    """
+    try:
+        page.wait_for_function(
+            f"() => !!document.querySelector({json.dumps(selector)})",
+            timeout=timeout,
+        )
+    except Exception as error:
+        raise RuntimeError(f"the {label} selector {selector!r} never appeared ({error})") from error
+
+
 def click_and_wait(page, selector: str, signature: str, label: str, timeout: int = 15_000):
     """Click a rendered control and wait for a named signature to change."""
+    # A freshly signed-in client can still be mounting its interface: wait for
+    # the control itself before evaluating or clicking it, so a slow mount is
+    # not mistaken for a missing control. A genuinely absent control still
+    # fails (with a clear message) once the timeout elapses.
+    wait_for_selector(page, selector, label, timeout)
     before = page.evaluate(f"JSON.stringify(({signature}))")
     clicked = page.evaluate(
         """(s) => {
