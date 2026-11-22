@@ -1,0 +1,8 @@
+{
+  "startingLevel": 1,
+  "populationBase": 10,
+  "collectTickFrames": 30,
+  "buildCostScale": 100,
+  "maxLevel": 40,
+  "friendlyFaction": "n"
+}

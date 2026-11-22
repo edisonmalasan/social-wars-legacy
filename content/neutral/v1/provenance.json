@@ -1,0 +1,16 @@
+{
+  "specVersion": "v1",
+  "specRevision": "3fd7144796b410621a804c5c53b95547ae91c4f6cd2f019671c5bfebd39cfcda",
+  "revisionMethod": "sha256 of the path-sorted '<path>:<sha256>' lines joined by newline with a trailing newline",
+  "authoringMethod": "clean-room-authorship",
+  "licence": "CC0-1.0",
+  "artGenerator": "@swl/art@1.0.0",
+  "statement": "Original work: every value in this seed was designed for this project from its own rules. No file from the reference trees, the decompiled client, an atlas or a proprietary font was read, traced or copied.",
+  "buildInputs": [
+    { "path": "LICENSE-CC0.txt", "sha256": "e66d01987182f1f7ceac7097ea2daa053a63bebb7188bc98f0cb864ae5817c79" },
+    { "path": "globals.json", "sha256": "c529352df64a1d8fd90b74dde4051972290c33aa08f722645594b3a73b177426" },
+    { "path": "goals.json", "sha256": "d367d12ed18a9da317be820c220676a03de10d93454ef25f6591c190054cbc05" },
+    { "path": "items.json", "sha256": "42a628178feeff87d282f7aeca11ba552e6d7c6e0db7328add6c35b6745624e6" },
+    { "path": "vocabulary.json", "sha256": "27106e0369faef6d7ea10033ba292c311d5bb655ffacadb23c3cce0500caaa7e" }
+  ]
+}
