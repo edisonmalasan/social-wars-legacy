@@ -9,6 +9,7 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./browser": "./browser.ts",
     "./cli": "./src/cli.ts"
   },
   "scripts": {
