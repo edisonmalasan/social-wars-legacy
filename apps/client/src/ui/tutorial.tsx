@@ -107,7 +107,7 @@ export function TutorialOverlay({
         />
       ) : null}
       <div
-        className="swl-tutorial-box"
+        className="swl-tutorial-box swl-tutorial-bubble"
         style={{ left: `${box.left}px`, top: `${box.top}px` }}
       >
         <p className="swl-tutorial-step">
