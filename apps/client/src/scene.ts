@@ -20,7 +20,15 @@ import {
   animationFrame,
   type AnimationFrame,
 } from '@swl/client';
-import { tileToPixel, zIndex, type Viewport } from '@swl/client';
+import {
+  tileToPixel,
+  zIndex,
+  MAP_HEIGHT,
+  MAP_WIDTH,
+  STAGE_HEIGHT,
+  STAGE_WIDTH,
+  type Viewport,
+} from '@swl/client';
 import type { AtlasIndex, FrameLocation } from '@swl/client';
 
 /** An item on the map, as the scene sees it. */
@@ -81,6 +89,54 @@ export interface SceneSprite {
   groupType?: string;
   categoryId?: number;
   subcategoryId?: number;
+}
+
+/**
+ * The original game's field colour. The reference sets `bgcolor="#669C2C"`
+ * (`play.html`), and green dominates the other two channels. The renderer
+ * clears Pixi's background to this, so even the stage edges that no whole
+ * tile's top corner reaches still read as green field.
+ */
+export const GROUND_COLOUR = '#669C2C';
+
+/** A ground tile sits behind every item sprite. */
+const GROUND_DEPTH = -1;
+
+/**
+ * The deterministic isometric ground layer.
+ *
+ * The tiles are bounded by the **server-owned map dimensions** (`MAP_WIDTH`
+ * and `MAP_HEIGHT`, the client's mirror of `Config.EI_MAP_WIDTH/HEIGHT`) and
+ * placed with the very same `tileToPixel()` projection the items use. The
+ * viewport is derived from the camera, which the client centres on the
+ * server's world, so the field follows the player's town without the client
+ * inventing any gameplay. Only tiles whose projected top corner lands inside
+ * the fixed stage are emitted; the result is a pure function of the viewport.
+ */
+export function buildGround(viewport: Viewport): SceneSprite[] {
+  const ground: SceneSprite[] = [];
+  const seen = new Set<string>();
+
+  for (let tx = 0; tx < MAP_WIDTH; tx += 1) {
+    for (let ty = 0; ty < MAP_HEIGHT; ty += 1) {
+      const { x, y } = tileToPixel(tx, ty, viewport);
+      if (x < 0 || x >= STAGE_WIDTH || y < 0 || y >= STAGE_HEIGHT) continue;
+      const key = `${x},${y}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      ground.push({
+        id: `ground:${tx}:${ty}`,
+        x,
+        y,
+        depth: GROUND_DEPTH,
+        art: null,
+        frame: null,
+        elevation: 0,
+      });
+    }
+  }
+
+  return ground;
 }
 
 /**
