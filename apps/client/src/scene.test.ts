@@ -142,4 +142,42 @@ describe('the scene', () => {
     );
     assert.equal(scene[0]!.elevation, 12);
   });
+
+  it('carries the neutral content properties through to the sprite', () => {
+    // These are the fields the renderer hands to the art adapter, and the
+    // only ones allowed to choose a gameplay motif. None of them is an image
+    // name, an SWF symbol, an atlas region or a frame.
+    const scene = buildScene(
+      [
+        item({
+          id: 'house',
+          type: 'b',
+          groupType: 'HOUSING',
+          categoryId: 1,
+          subcategoryId: 11,
+        }),
+      ],
+      VIEWPORT,
+      new AtlasIndex(MANIFEST),
+    );
+    assert.equal(scene[0]!.type, 'b');
+    assert.equal(scene[0]!.groupType, 'HOUSING');
+    assert.equal(scene[0]!.categoryId, 1);
+    assert.equal(scene[0]!.subcategoryId, 11);
+  });
+
+  it('leaves the projection and depth unchanged by neutral properties', () => {
+    // Adding neutral art properties must not move a sprite or reorder it:
+    // the tile still decides the position, the footprint and the walkability.
+    const plain = buildScene([item()], VIEWPORT, new AtlasIndex(MANIFEST));
+    const withNeutral = buildScene(
+      [item({ type: 'u', groupType: 'CAVALRY', categoryId: 2, subcategoryId: 33 })],
+      VIEWPORT,
+      new AtlasIndex(MANIFEST),
+    );
+    assert.equal(withNeutral[0]!.x, plain[0]!.x);
+    assert.equal(withNeutral[0]!.y, plain[0]!.y);
+    assert.equal(withNeutral[0]!.depth, plain[0]!.depth);
+    assert.equal(withNeutral[0]!.frame?.frame, plain[0]!.frame?.frame);
+  });
 });

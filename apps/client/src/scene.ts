@@ -43,6 +43,18 @@ export interface SceneItem {
   orientation: number;
   /** The animation, for the frame choice. */
   animation: number;
+  /**
+   * Neutral content properties, used **only** to choose gameplay art.
+   *
+   * These come from the content definition: the item's type, its group and
+   * its numeric category/subcategory. They are the only properties allowed
+   * to select a gameplay motif. Art-derived names — an image name, an SWF
+   * symbol, an atlas frame or region — never take part in that choice.
+   */
+  type?: string;
+  groupType?: string;
+  categoryId?: number;
+  subcategoryId?: number;
 }
 
 /** One thing to draw. */
@@ -61,6 +73,14 @@ export interface SceneSprite {
   frame: AnimationFrame | null;
   /** The elevation, in pixels, which lifts the art off the ground. */
   elevation: number;
+  /**
+   * Neutral content properties, carried from the item so the renderer can
+   * choose a gameplay motif. Art-derived names are deliberately absent.
+   */
+  type?: string;
+  groupType?: string;
+  categoryId?: number;
+  subcategoryId?: number;
 }
 
 /**
@@ -107,6 +127,13 @@ export function buildScene(
       art,
       frame,
       elevation: item.elevation,
+      // The neutral content properties travel with the sprite unchanged. The
+      // renderer passes them to the art adapter, which is the only place a
+      // gameplay motif is chosen; art-derived fields are not copied here.
+      type: item.type,
+      groupType: item.groupType,
+      categoryId: item.categoryId,
+      subcategoryId: item.subcategoryId,
     });
   }
 
