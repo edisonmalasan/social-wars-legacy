@@ -22,9 +22,12 @@ Two things, both **generated** (neither is committed):
    and architecture, so a cross-build must set the variable.
 
 2. `src-tauri/server/runtime/` — a self-contained copy of the server:
-   - `start.mjs`, which makes the bundled content the working directory
-     and imports the server entry (the server reads its content from
-     `process.cwd()`);
+   - `start.mjs`, which makes the runtime directory the working directory
+     for relative data paths and imports the server entry. Content is **not**
+     read from `process.cwd()`: the server resolves the bundle from its own
+     module URL (`contentPathFrom(import.meta.url)` in
+     `apps/server/src/content-path.ts`), so the working directory no longer
+     decides where content comes from;
    - `apps/server/src/` and `node_modules/@swl/{protocol,rules,server}/`,
      the server and the three workspace packages it imports, with their
      `.ts` files stripped to `.mjs` by Node's own `stripTypeScriptTypes`
@@ -51,6 +54,18 @@ development the shell still runs `node apps/server/src/main.ts` from the
 repository, so both paths are exercised by the same code with different
 commands. The choice is `!tauri::is_dev()`, which is the packaged build's
 `custom-protocol` feature rather than a build-profile guess.
+
+Either way the shell starts the child with two environment variables:
+
+- `PORT` — the port selected by `--port` (default `8080`). Without this the
+  server would keep its own default while the web view and the health check
+  looked at the flag's port. The server's `HOST` is left alone, so it still
+  binds only `127.0.0.1`.
+- `SWL_DATA_DIR` — a writable `server-data/` directory under the current
+  user's application data directory (`app.path().app_data_dir()`). The
+  server keeps its PGlite database, saves and credentials there, so they
+  survive a restart. The shell only chooses the location; the server stays
+  authoritative and no client writes the save (ADR 19).
 
 A missing or stale sidecar is not hidden: the shell waits for the server's
 health check and reports a clear error instead of pointing the window at
