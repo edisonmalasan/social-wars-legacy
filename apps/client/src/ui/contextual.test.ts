@@ -106,33 +106,82 @@ describe('the olive-and-gold contextual panels', () => {
   });
 });
 
+/** The component tags rendered by a slice of JSX, in source order. */
+function components(block: string): string[] {
+  return [...block.matchAll(/<([A-Z][A-Za-z0-9]*)/g)].map((match) => match[1]!);
+}
+
+/** The one-surface focus wrapper added by the merged active-surface lane. */
+const WRAPPER = "<div style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 48 }}>";
+
 describe('contextual mounting stays unchanged', () => {
-  it('keeps the at-rest surface list in the root byte-for-byte in order and count', () => {
-    const start = root.indexOf('<div className="swl-ui">');
-    const end = root.indexOf('<Dialog', start);
-    assert.ok(start >= 0 && end > start, 'the root surface and the one dialog must exist');
-    const atRest = [...root.slice(start, end).matchAll(/<([A-Z][A-Za-z0-9]*)/g)].map(
-      (match) => match[1],
-    );
-    assert.deepEqual(atRest, [
-      'Hud', 'Goals', 'Expansion', 'Inventory', 'Chapters',
-      'InfoPanel', 'RecruitPanel', 'Store', 'MysteryLauncher',
-      'SoulMixerLauncher', 'FusionLauncher', 'MagicLab', 'SpellBook',
-      'Neighbours', 'OnboardingLauncher', 'OriginalArtLauncher',
-      'OriginalFxLauncher', 'TutorialOverlay', 'Feedback', 'IconPanel',
-      'ExtendedPortraitButton',
+  it('keeps only the HUD, neighbours and feedback at rest — no panel is unguarded', () => {
+    const rootStart = root.indexOf('<div className="swl-ui">');
+    const dialogStart = root.indexOf('<Dialog', rootStart);
+    const wrapperStart = root.indexOf(WRAPPER, rootStart);
+    assert.ok(rootStart >= 0 && wrapperStart > rootStart && dialogStart > wrapperStart,
+      'the root, its one focus wrapper and the one dialog must exist');
+    const wrapperInner = wrapperStart + WRAPPER.length;
+    const wrapperEnd = root.indexOf('</div>', wrapperInner);
+    assert.ok(wrapperEnd > wrapperInner && wrapperEnd < dialogStart,
+      'the focus wrapper must close before the dialog');
+
+    // Outside the wrapper nothing but the HUD, the at-rest neighbour strip and
+    // the two transient channels is mounted. A new at-rest panel would add a
+    // component here and fail this exact list.
+    assert.deepEqual(components(root.slice(rootStart, wrapperInner)), ['Hud', 'Neighbours']);
+    assert.deepEqual(components(root.slice(wrapperEnd, dialogStart)), [
+      'TutorialOverlay', 'Feedback',
     ]);
+
+    // Inside the wrapper every panel is one of the twelve gated surfaces, in
+    // the order the nav declares them. The order and the count are the point:
+    // one active surface, never a stack of at-rest panels.
+    assert.deepEqual(components(root.slice(wrapperInner, wrapperEnd)), [
+      'Goals', 'Expansion', 'Inventory', 'Chapters', 'InfoPanel', 'RecruitPanel',
+      'Store', 'MysteryLauncher', 'SoulMixerLauncher', 'FusionLauncher',
+      'OnboardingLauncher', 'OriginalArtLauncher', 'OriginalFxLauncher',
+      'IconPanel', 'ExtendedPortraitButton', 'MagicLab', 'SpellBook',
+      'BuildMenu', 'ChromeDock',
+    ]);
+
+    // The neighbour strip is the only panel allowed when no surface is open;
+    // the bottom nav is the only other at-rest control.
+    assert.match(root, /surface\.surface === 'none' \? <Neighbours\b/);
+    assert.match(root, /<nav\s+className="swl-surface-nav"/);
   });
 
-  it('keeps the contextual panels out of the at-rest chrome', () => {
-    // The info panel is the only one of the four mounted before the dialog,
-    // and it draws nothing until the player selects something.
+  it('mounts each contextual panel only for its own active surface', () => {
+    const gates: readonly (readonly [string, string])[] = [
+      ['goals', 'Goals'],
+      ['expansion', 'Expansion'],
+      ['inventory', 'Inventory'],
+      ['chapters', 'Chapters'],
+      ['info', 'InfoPanel'],
+      ['recruit', 'RecruitPanel'],
+      ['store', 'Store'],
+      ['launchers', 'MysteryLauncher'],
+      ['magiclab', 'MagicLab'],
+      ['spellbook', 'SpellBook'],
+      ['build', 'BuildMenu'],
+      ['controls', 'ChromeDock'],
+    ];
+    for (const [id, component] of gates) {
+      const gate = new RegExp(
+        `surface\\.surface === '${id}' \\?[\\s\\S]{0,240}?<${component}\\b`,
+      );
+      assert.match(root, gate, `${component} must be mounted only for '${id}'`);
+    }
+
+    // The four repainted panels keep a single surface root each, and the info
+    // panel still draws nothing on its own when there is no selection.
     assert.match(info, /if \(!resource && !unit && !building\) return null;/);
     assert.equal((info.match(/className="swl-info"/g) ?? []).length, 1);
     assert.equal((neighbours.match(/className="swl-neighbours"/g) ?? []).length, 1);
     assert.equal((storeitems.match(/className="swl-store-items"/g) ?? []).length, 1);
-    // Quest bodies are never top-level surfaces: all three live in the one
-    // shared dialog, so the dialog's priority and z-order do not move.
+
+    // Quest bodies are never top-level surfaces: all three stay in the one
+    // shared dialog, so its priority and z-order do not move.
     assert.equal((quests.match(/className="swl-quest-panel"/g) ?? []).length, 3);
     const dialogStart = root.indexOf('<Dialog');
     for (const name of ['QuestPanel', 'ProductionSelector']) {
