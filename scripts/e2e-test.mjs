@@ -587,6 +587,46 @@ async function domClickPlain(page, selector, label) {
 }
 
 /**
+ * Open one non-modal surface. Panels are no longer mounted at rest, so a step
+ * that inspects a panel asks for it first through the client's own surface
+ * API — the same gesture the rendered navigation control makes — and waits
+ * for the real panel before reading it. Assertions downstream are unchanged.
+ */
+async function openSurface(page, id, selector) {
+  const opened = await page.evaluate(
+    `(() => {
+       const handle = window.__swl;
+       if (!handle || typeof handle.setActiveSurface !== 'function') {
+         return {error: 'the client has no surface API'};
+       }
+       handle.setActiveSurface(${JSON.stringify(id)});
+       return {ok: true};
+     })()`,
+  );
+  if (!opened || opened.error) {
+    throw new Error(opened?.error ?? `the ${id} surface could not be opened`);
+  }
+  await domWait(
+    page,
+    `!!document.querySelector(${JSON.stringify(selector)})`,
+    (value) => value === true,
+    `the ${id} surface`,
+  );
+}
+
+/** Return to the at-rest surface so a canvas click is never covered. */
+async function closeSurface(page) {
+  await page.evaluate(`(() => { window.__swl?.setActiveSurface?.('none'); })()`);
+  await domWait(
+    page,
+    "Array.from(document.querySelectorAll('#ui [data-swl-surface]'))" +
+      ".every((b) => b.getAttribute('aria-pressed') !== 'true')",
+    (value) => value === true,
+    'the at-rest surface',
+  );
+}
+
+/**
  * Click a map tile as a player would: the canvas's own pointer gesture, at the
  * stage pixel the client's projection gives the tile. The target has to be the
  * canvas itself — a panel over the tile would swallow a real click.
@@ -677,7 +717,9 @@ async function playThroughDom(page, serverPort, browserName) {
   );
   console.log('  UI: skipped the tutorial with its rendered button');
 
-  // The 760x600 layout: the new HUD and inventory must not overlap.
+  // The 760x600 layout: the new HUD and inventory must not overlap. Storage
+  // is a requested surface now, so open it before measuring the same rects.
+  await openSurface(page, 'inventory', '#ui .swl-inventory');
   const layout = await page.evaluate(
     `(() => {
        const rect = (selector) => {
@@ -721,6 +763,8 @@ async function playThroughDom(page, serverPort, browserName) {
 
   // Build: pick the first unlocked item from the rendered menu, then click a
   // free tile. The server prices and places it; the client only draws it.
+  await closeSurface(page);
+  await openSurface(page, 'build', '#ui .swl-build-menu');
   const beforeBuild = await worldOf(serverPort, session.token);
   const beforeItems = Object.keys(beforeBuild?.maps?.[0]?.items ?? {}).length;
   await domClick(
@@ -729,8 +773,10 @@ async function playThroughDom(page, serverPort, browserName) {
     "document.querySelector('#ui .swl-placing')?.textContent ?? ''",
     'build-menu item',
   );
+  // Picking the item closes the menu again, so the tile is not covered.
   // The first unlocked item is a 4x4 Prison, so the tile has to clear the
   // Command Center's own 4x4 footprint at 48,48.
+  await closeSurface(page);
   await domTileClick(page, 52, 51);
   await domWait(
     page,
@@ -757,6 +803,8 @@ async function playThroughDom(page, serverPort, browserName) {
   console.log('  UI: picked a build-menu item and placed it on a tile through the canvas');
 
   // A Wood Factory I produces wood, so the Collect button has real work.
+  // Its entry lives in the build surface, opened on request like any other.
+  await openSurface(page, 'build', '#ui .swl-build-menu');
   const factoryPick = await page.evaluate(
     `(() => {
        const items = Array.from(document.querySelectorAll(
@@ -777,6 +825,7 @@ async function playThroughDom(page, serverPort, browserName) {
     (v) => typeof v === 'string' && v.includes('Wood Factory I'),
     'the Wood Factory placement',
   );
+  await closeSurface(page);
   await domTileClick(page, 46, 46);
   await domWait(
     page,
@@ -794,6 +843,7 @@ async function playThroughDom(page, serverPort, browserName) {
   }
 
   // Select that building on the map and collect its production.
+  await closeSurface(page);
   await domTileClick(page, 46, 46);
   await domWait(
     page,
@@ -977,7 +1027,11 @@ async function playThroughDom(page, serverPort, browserName) {
   );
 
   // Select the Command Center, which is the training building on a fresh save.
+  await closeSurface(page);
   await domTileClick(page, COMMAND_CENTER_TILE.x, COMMAND_CENTER_TILE.y);
+  // Selecting a building opens its detail surface; the army controls live on
+  // their own surface, so ask for that one before reading the training list.
+  await openSurface(page, 'recruit', '#ui .swl-recruit');
   await domWait(
     page,
     "document.querySelector('#ui .swl-recruit .swl-recruit-title')?.textContent ?? ''",
@@ -1010,6 +1064,7 @@ async function playThroughDom(page, serverPort, browserName) {
   // The training queue above is not yet a unit the player can field. Buy a
   // Worker I from the rendered build menu and place it on a free tile; the
   // server's save then owns it, and the army list must name that same unit.
+  await openSurface(page, 'build', '#ui .swl-build-menu');
   const workerPick = await page.evaluate(
     `(() => {
        const items = Array.from(document.querySelectorAll(
@@ -1032,6 +1087,7 @@ async function playThroughDom(page, serverPort, browserName) {
   );
   // 48,46 is a free 1x1 tile above the Command Center: the clear middle of
   // the canvas, not under the goals, chapters, inventory, build or info panels.
+  await closeSurface(page);
   await domTileClick(page, 48, 46);
   await domWait(
     page,
@@ -1047,6 +1103,7 @@ async function playThroughDom(page, serverPort, browserName) {
   ) {
     throw new Error('the rendered Worker I was not placed on the server\'s map');
   }
+  await openSurface(page, 'inventory', '#ui .swl-inventory');
   const armyRows = await domValue(
     page,
     `Array.from(document.querySelectorAll('#ui .swl-inventory [data-swl-army] .swl-inventory-item'))
@@ -1072,6 +1129,7 @@ async function playThroughDom(page, serverPort, browserName) {
   // through the game's own daily bonus the same rendered button buys the tile
   // and pays exactly the content price. Nothing here fabricates an owned tile
   // or a price.
+  await openSurface(page, 'expansion', '#ui .swl-expansion');
   const expansionView = await domValue(
     page,
     `(() => {
@@ -1204,6 +1262,8 @@ async function playThroughDom(page, serverPort, browserName) {
   console.log(`  UI: a forged team was refused on the non-team quest (HTTP ${forgedTeam.status})`);
 
   // Open the weekly quest from the chapter map, through the rendered slot.
+  // The map is a requested surface, not an always-mounted panel.
+  await openSurface(page, 'chapters', '#ui .swl-chapter');
   const slotSelector = '#ui .swl-chapter:first-child .swl-chapter-quests > button:first-child';
   const slot = await page.evaluate(
     `(() => { const e = document.querySelector(${JSON.stringify(slotSelector)});` +
@@ -1393,6 +1453,7 @@ async function playThroughDom(page, serverPort, browserName) {
     'reward dialog Close button',
   );
   const cashBeforeReplay = cashOf(await worldOf(serverPort, session.token));
+  await openSurface(page, 'chapters', '#ui .swl-chapter');
   await domClick(
     page,
     slotSelector,
@@ -1807,7 +1868,8 @@ async function main() {
 
         // The **build menu** is wired to the placement. Picking an item
         // begins a placement; it does not build anything, and the
-        // server still decides the outcome.
+        // server still decides the outcome. The menu is a requested surface.
+        await openSurface(page, 'build', '#ui .swl-build-item');
         const menu = await page.evaluate(
           `(() => {
              const item = document.querySelector('#ui .swl-build-item:not(.swl-build-locked) button');
@@ -1834,7 +1896,8 @@ async function main() {
 
         // The **goal panel** is drawn. The goals are the content's and
         // the player's progress is the server's, so the panel shows
-        // three slots with the goals' own titles.
+        // three slots with the goals' own titles. Goals are one surface.
+        await openSurface(page, 'goals', '#ui .swl-goals');
         const goals = await page.evaluate(
           `(() => {
              const panel = document.querySelector('#ui .swl-goals');
@@ -1859,7 +1922,8 @@ async function main() {
         console.log(`  the goal panel shows ${goals.titles.filter(Boolean).length} goal(s)`);
 
         // The **chapter map** is drawn: the four chapters and their
-        // quest slots, with the client's own titles.
+        // quest slots, with the client's own titles. One surface at a time.
+        await openSurface(page, 'chapters', '#ui .swl-chapter');
         const map = await page.evaluate(
           `(() => {
              const chapters = document.querySelectorAll('#ui .swl-chapter');
@@ -2370,7 +2434,9 @@ async function main() {
         questPlayer = { playerId: browserSession.playerId, password: 'correct horse' };
 
         // The **neighbour strip** lists the other players. The strip is
-        // the server's list, and the client draws it.
+        // the server's list, and the client draws it at rest: return there
+        // first so no requested surface is covering the bottom of the stage.
+        await closeSurface(page);
         const strip = await page.evaluate(
           `(() => {
              const entries = document.querySelectorAll('#ui .swl-neighbour');
