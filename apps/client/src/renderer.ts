@@ -38,8 +38,13 @@ import {
   svgDataUri,
   type ArtMode,
 } from './originalart-textures.ts';
-import type { SceneSprite } from './scene.ts';
-import { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
+import { buildGround, GROUND_COLOUR, type SceneSprite } from './scene.ts';
+import {
+  STAGE_HEIGHT,
+  STAGE_WIDTH,
+  TILE_HEIGHT_PIXELS,
+  TILE_WIDTH_PIXELS,
+} from '@swl/client';
 import { viewportOf, type StageLayout } from '@swl/client';
 import { initialCamera } from '@swl/client';
 import { fitStage } from './viewport.ts';
@@ -93,6 +98,30 @@ async function motifCanvas(svg: string): Promise<HTMLCanvasElement> {
   return canvas;
 }
 
+/**
+ * A solid green isometric diamond, generated in code: no file, no fetch, no
+ * proprietary art. The texture's top vertex sits at the sprite's anchor, so
+ * diamonds placed at consecutive `tileToPixel()` positions interlock edge to
+ * edge and cover the field.
+ */
+function groundCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = TILE_WIDTH_PIXELS;
+  canvas.height = TILE_HEIGHT_PIXELS;
+  const context = canvas.getContext('2d');
+  if (context) {
+    context.fillStyle = GROUND_COLOUR;
+    context.beginPath();
+    context.moveTo(TILE_WIDTH_PIXELS / 2, 0);
+    context.lineTo(TILE_WIDTH_PIXELS, TILE_HEIGHT_PIXELS / 2);
+    context.lineTo(TILE_WIDTH_PIXELS / 2, TILE_HEIGHT_PIXELS);
+    context.lineTo(0, TILE_HEIGHT_PIXELS / 2);
+    context.closePath();
+    context.fill();
+  }
+  return canvas;
+}
+
 /** What the renderer needs to start. */
 export interface RendererOptions {
   /** The element the canvas goes into. */
@@ -114,6 +143,8 @@ export class WorldRenderer {
   private readonly missing = new Set<string>();
   /** One texture per generated motif, ready before the first scene is drawn. */
   private readonly originalTextures = new Map<string, Texture>();
+  /** The solid-colour diamond used for every ground tile. */
+  private groundTexture!: Texture;
   private readonly options: RendererOptions;
   private readonly queue: string[] = [];
   private scene: readonly SceneSprite[] = [];
@@ -158,7 +189,7 @@ export class WorldRenderer {
     await app.init({
       width: STAGE_WIDTH,
       height: STAGE_HEIGHT,
-      background: '#10131a',
+      background: GROUND_COLOUR,
       antialias: true,
       // The game's art is pixel art at 1:1, so the canvas is not scaled
       // by the renderer: the **stage** is scaled, and the art keeps its
@@ -171,6 +202,7 @@ export class WorldRenderer {
     options.element.appendChild(app.canvas);
 
     const renderer = new WorldRenderer(app, options);
+    renderer.groundTexture = Texture.from(groundCanvas());
 
     // Original art needs no atlas pages, but its textures must exist before
     // the first draw. Atlas mode needs no preparation: pages arrive later.
@@ -255,6 +287,19 @@ export class WorldRenderer {
   draw(scene: readonly SceneSprite[]): void {
     this.scene = scene;
     this.world.removeChildren();
+
+    // The green field goes down first, so every item is drawn on top of it.
+    // Its tiles come from the server-owned map dimensions and the camera's
+    // viewport, not from any client-invented gameplay.
+    for (const tile of buildGround(this.viewport)) {
+      const sprite = new Sprite(this.groundTexture);
+      // `tileToPixel` gives the tile's top corner; the diamond texture's
+      // anchor is its top vertex, so the tiles interlock exactly.
+      sprite.anchor.set(0.5, 0);
+      sprite.x = tile.x;
+      sprite.y = tile.y;
+      this.world.addChild(sprite);
+    }
 
     for (const sprite of scene) {
       const drawn = this.spriteFor(sprite);
