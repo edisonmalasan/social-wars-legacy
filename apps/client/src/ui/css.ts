@@ -5,16 +5,18 @@
  * **absolutely positioned** inside it and never reflowed: a panel that
  * moved would be a panel that covered something else.
  *
- * The colours are the game's own: a dark slate ground, a warm gold for
- * the player's own numbers, and a muted grey for the ones that are
- * warnings.
+ * The colours are the game's own: an olive game bar with a golden
+ * selection, a white speech bubble for the mayor, and the dark slate
+ * surfaces of the contextual panels.
  */
 export function uiCss(): string {
   return `
 /*
- * The dialog and feedback tokens. They are the same slate, gold and muted
- * grey as the rest of the interface; naming them here keeps the new blocks
- * from growing another set of scattered literals.
+ * The dialog and feedback tokens stay on the contextual panels. The game
+ * bar and the mayor's bubble use their own tokens, named after the original
+ * colours: olive rgb(97,104,7), selection rgb(233,221,81) and white. Keeping
+ * them here means the HUD, the at-rest chrome and the tutorial share one
+ * palette without scattering literals through the rules.
  */
 :root {
   --swl-surface: #131a24;
@@ -28,6 +30,20 @@ export function uiCss(): string {
   --swl-scrim: #000a;
   --swl-gap: 8px;
   --swl-gap-lg: 12px;
+
+  /* The original game bar and its selected tab. */
+  --swl-olive: #616807;
+  --swl-ochre: #e9dd51;
+  --swl-game-bar: var(--swl-olive);
+  --swl-game-bar-hover: #454b06;
+  --swl-game-bar-selected: var(--swl-ochre);
+  --swl-game-ink: #fff8d0;
+  --swl-game-label: #dcd69a;
+
+  /* The mayor's speech bubble: white fill, blue title, dark body ink. */
+  --swl-bubble: #ffffff;
+  --swl-bubble-title: #143a9e;
+  --swl-bubble-ink: #1b2430;
 }
 
 .swl-ui {
@@ -96,9 +112,9 @@ export function uiCss(): string {
   display: flex;
   align-items: stretch;
   justify-content: space-between;
-  background: linear-gradient(#1d2430, #141a24);
-  border-bottom: 1px solid #000;
-  box-shadow: 0 1px 0 #2c3646;
+  background: linear-gradient(var(--swl-game-bar), var(--swl-olive));
+  border-bottom: 1px solid #2f3305;
+  box-shadow: 0 1px 0 var(--swl-game-bar-selected);
 }
 
 .swl-hud-resources,
@@ -134,27 +150,34 @@ export function uiCss(): string {
 
 .swl-readout:hover,
 .swl-readout:focus {
-  background: #263043;
+  background: var(--swl-game-bar-hover);
+}
+
+/* The pointer focus is restored here: .swl-readout suppresses the UA ring. */
+.swl-readout:focus-visible {
+  outline: 2px solid var(--swl-game-bar-selected);
+  outline-offset: 1px;
 }
 
 .swl-readout-label {
-  color: #8d97a8;
+  color: var(--swl-game-label);
   font-size: calc(10px * var(--swl-font-scale-body, 1));
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .swl-readout-value {
-  color: #f2e6c8;
+  color: var(--swl-game-ink);
   font-weight: 700;
 }
 
-.swl-resource-gold .swl-readout-value { color: #f5c542; }
-.swl-resource-wood .swl-readout-value { color: #b98a4e; }
-.swl-resource-oil .swl-readout-value { color: #7fb3d5; }
-.swl-resource-steel .swl-readout-value { color: #cfd6e0; }
-.swl-resource-cash .swl-readout-value { color: #86d38a; }
-.swl-resource-mana .swl-readout-value { color: #b48ef0; }
+/* Brighter tints than the panel palette: these sit on the dark olive bar. */
+.swl-resource-gold .swl-readout-value { color: var(--swl-ochre); }
+.swl-resource-wood .swl-readout-value { color: #f0d49a; }
+.swl-resource-oil .swl-readout-value { color: #b6def7; }
+.swl-resource-steel .swl-readout-value { color: #f3f6fb; }
+.swl-resource-cash .swl-readout-value { color: #b6eeb6; }
+.swl-resource-mana .swl-readout-value { color: #dcc4ff; }
 
 /*
  * The XP bar is a narrow track with a fill whose width is the fraction the
@@ -169,7 +192,7 @@ export function uiCss(): string {
 }
 
 .swl-xp-label {
-  color: #8d97a8;
+  color: var(--swl-game-label);
   font-size: calc(10px * var(--swl-font-scale-body, 1));
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -180,19 +203,19 @@ export function uiCss(): string {
   width: 72px;
   height: 7px;
   overflow: hidden;
-  border: 1px solid #38445a;
+  border: 1px solid #2f3305;
   border-radius: 4px;
-  background: #10151d;
+  background: #2b3004;
 }
 
 .swl-xp-fill {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #7fb3d5, #f5c542);
+  background: linear-gradient(90deg, #b6def7, var(--swl-ochre));
 }
 
 .swl-xp-value {
-  color: #f2e6c8;
+  color: var(--swl-game-ink);
   font-size: calc(11px * var(--swl-font-scale-body, 1));
   font-variant-numeric: tabular-nums;
 }
@@ -203,46 +226,48 @@ export function uiCss(): string {
   flex-direction: column;
   gap: 1px;
   padding: 2px 6px;
-  border-left: 1px solid #38445a;
-  color: #f2e6c8;
+  border-left: 1px solid #2f3305;
+  color: var(--swl-game-ink);
   font-size: calc(10px * var(--swl-font-scale-body, 1));
   font-variant-numeric: tabular-nums;
 }
 
-.swl-bonus-day { color: #f5c542; font-weight: 700; }
-.swl-bonus-weekly { color: #9fb3d1; }
+.swl-bonus-day { color: var(--swl-ochre); font-weight: 700; }
+.swl-bonus-weekly { color: var(--swl-game-label); }
 
 /* The bonus is a gesture: the client asks, and the server names the reward. */
 /* The button qualifier beats the generic .swl-ui button reset above. */
 .swl-ui button.swl-bonus {
   padding: 4px 8px;
-  border: 1px solid #f5c542;
+  border: 1px solid var(--swl-game-bar-selected);
   border-radius: 3px;
-  background: #f5c542;
-  color: #10151d;
+  background: var(--swl-game-bar-selected);
+  color: #1b2003;
   font-size: calc(11px * var(--swl-font-scale-body, 1));
   font-weight: 700;
 }
 
-.swl-ui button.swl-bonus:hover:not(:disabled) { background: #ffd75e; }
+.swl-ui button.swl-bonus:hover:not(:disabled) { background: #f4ea83; }
+
+.swl-ui button.swl-bonus:focus-visible { outline: 2px solid #fff8d0; outline-offset: 1px; }
 
 .swl-ui button.swl-bonus:disabled {
-  border-color: #38445a;
-  background: #1d2430;
-  color: #5c6678;
+  border-color: #2f3305;
+  background: var(--swl-game-bar-hover);
+  color: #a8a97a;
   cursor: not-allowed;
 }
 
 .swl-army {
   padding: 4px 8px;
-  color: #8d97a8;
+  color: var(--swl-game-label);
   font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
 .swl-placing {
   align-self: center;
   padding: 4px 8px;
-  color: #f5c542;
+  color: var(--swl-ochre);
   font-size: calc(11px * var(--swl-font-scale-body, 1));
   white-space: nowrap;
 }
@@ -1225,9 +1250,9 @@ export function uiCss(): string {
 .swl-neighbour {
   width: 74px;
   padding: 4px;
-  border: 1px solid #38445a;
+  border: 1px solid var(--swl-ochre);
   border-radius: 3px;
-  background: #131a24;
+  background: var(--swl-olive);
   text-align: center;
 }
 
@@ -1235,11 +1260,11 @@ export function uiCss(): string {
   height: 28px;
   margin-bottom: 3px;
   border-radius: 3px;
-  background: #1d2430;
+  background: #3d4305;
 }
 
 .swl-neighbour-name {
-  color: #e8e3d8;
+  color: var(--swl-game-ink);
   font-size: calc(11px * var(--swl-font-scale-body, 1));
   white-space: nowrap;
   overflow: hidden;
@@ -1248,7 +1273,7 @@ export function uiCss(): string {
 
 .swl-neighbour-level,
 .swl-neighbour-xp {
-  color: #8d97a8;
+  color: var(--swl-game-label);
   font-size: calc(10px * var(--swl-font-scale-body, 1));
 }
 
@@ -1288,8 +1313,8 @@ export function uiCss(): string {
 .swl-tab:hover { color: #e8e3d8; }
 
 .swl-tab-active {
-  color: #10151d;
-  background: #f5c542;
+  color: #1b2003;
+  background: var(--swl-game-bar-selected);
 }
 
 .swl-build-list {
@@ -1345,9 +1370,9 @@ export function uiCss(): string {
 
 .swl-tutorial-ring {
   position: absolute;
-  border: 3px solid #f5c542;
+  border: 3px solid var(--swl-ochre);
   border-radius: 50%;
-  box-shadow: 0 0 0 9999px #0000, 0 0 18px #f5c542cc;
+  box-shadow: 0 0 0 9999px #0000, 0 0 18px var(--swl-ochre);
   animation: swl-tutorial-pulse 1.6s ease-in-out infinite;
 }
 
@@ -1362,7 +1387,7 @@ export function uiCss(): string {
   height: 0;
   border-top: 13px solid transparent;
   border-bottom: 13px solid transparent;
-  border-left: 26px solid #f5c542;
+  border-left: 26px solid var(--swl-ochre);
   filter: drop-shadow(0 0 4px #000c);
   animation: swl-tutorial-nudge 0.9s ease-in-out infinite alternate;
 }
@@ -1372,16 +1397,87 @@ export function uiCss(): string {
   to { margin-left: 6px; }
 }
 
+/*
+ * The mayor's box keeps its original footprint: the step positions in the
+ * client were laid out for a 286 by 172 box on the 760 by 600 stage. Only
+ * its paint changes - a white speech bubble with a CSS tail pointing up
+ * towards the place the step marks. The tail is drawn with two triangles
+ * (an ochre outline under a white fill) so no image asset is needed.
+ */
 .swl-tutorial-box {
   position: absolute;
   width: 286px;
   box-sizing: border-box;
   padding: 10px 12px;
-  border: 1px solid #f5c542;
+  border: 1px solid var(--swl-ochre);
   border-radius: 5px;
-  background: linear-gradient(#1d2430f2, #131a24f2);
-  box-shadow: 0 8px 24px #000b, inset 0 1px 0 #ffffff14;
+  background: var(--swl-bubble);
+  box-shadow: 0 8px 24px #000b;
   pointer-events: auto;
+}
+
+.swl-tutorial-bubble {
+  background: var(--swl-bubble);
+  color: var(--swl-bubble-ink);
+}
+
+.swl-tutorial-bubble::before,
+.swl-tutorial-bubble::after {
+  content: '';
+  position: absolute;
+  left: 40px;
+  width: 0;
+  height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+}
+
+.swl-tutorial-bubble::before {
+  top: -12px;
+  border-bottom: 12px solid var(--swl-ochre);
+}
+
+.swl-tutorial-bubble::after {
+  top: -10px;
+  border-bottom: 10px solid var(--swl-bubble);
+}
+
+/* Scoped to the bubble: the help panel reuses these classes on dark slate. */
+.swl-tutorial-bubble .swl-tutorial-step {
+  color: #4a5570;
+}
+
+.swl-tutorial-bubble .swl-tutorial-title {
+  color: var(--swl-bubble-title);
+  font-weight: 800;
+}
+
+.swl-tutorial-bubble .swl-tutorial-lesson {
+  color: var(--swl-bubble-ink);
+}
+
+.swl-tutorial-bubble .swl-tutorial-skip {
+  color: var(--swl-bubble-title);
+}
+
+.swl-tutorial-bubble .swl-tutorial-next {
+  border-color: var(--swl-olive);
+  background: var(--swl-game-bar);
+  color: var(--swl-game-ink);
+}
+
+.swl-tutorial-bubble .swl-tutorial-next:hover {
+  background: var(--swl-game-bar-hover);
+}
+
+.swl-tutorial-bubble .swl-tutorial-next:focus-visible {
+  outline: 2px solid var(--swl-bubble-title);
+  outline-offset: 2px;
+}
+
+.swl-tutorial-bubble .swl-tutorial-skip:focus-visible {
+  outline: 2px solid var(--swl-bubble-title);
+  outline-offset: 2px;
 }
 
 .swl-tutorial-step {
