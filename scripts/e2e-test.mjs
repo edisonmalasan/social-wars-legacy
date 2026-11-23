@@ -44,6 +44,13 @@ import { QUESTS } from '../packages/rules/src/quest.ts';
 import { tileToPixel } from '../packages/client/src/iso.ts';
 import { BUILD_OUTLINE_OFFSET_Y, cameraCentredOn } from '../packages/client/src/camera.ts';
 
+import {
+  VISUAL_METRICS_EXPRESSION,
+  decodePng,
+  greenRatio,
+  visualFailures,
+} from './capture-ui.mjs';
+
 const ROOT = process.cwd();
 
 /** The sleep between DOM polls. */
@@ -617,6 +624,44 @@ async function domTileClick(page, tx, ty) {
 /** The cash in the server's wallet, for the reward assertions. */
 function cashOf(world) {
   return Number(world?.resources?.c ?? 0);
+}
+
+/**
+ * The Phase-1 visual probe. The DOM metrics come from the same expression the
+ * screenshot harness uses; the green ratio is sampled from a CDP screenshot
+ * clipped to the canvas with the interface temporarily hidden. This only
+ * reads the page: the interface is restored before any further gesture.
+ */
+async function visualProbe(page) {
+  const metrics = await page.evaluate(VISUAL_METRICS_EXPRESSION);
+  const canvasRect = await page.evaluate(
+    `(() => { const canvas = document.querySelector('#game canvas');
+       if (!canvas) return null;
+       const r = canvas.getBoundingClientRect();
+       return {x: r.left, y: r.top, width: r.width, height: r.height}; })()`,
+  );
+  if (!canvasRect || !canvasRect.width || !canvasRect.height) {
+    return { ...metrics, greenRatio: 0 };
+  }
+  await page.evaluate(
+    `(() => { const ui = document.querySelector('#ui');
+       if (ui) ui.style.visibility = 'hidden'; return true; })()`,
+  );
+  let ratio = 0;
+  try {
+    await sleep(150);
+    const shot = await page.send('Page.captureScreenshot', {
+      format: 'png', captureBeyondViewport: false,
+      clip: { ...canvasRect, scale: 1 },
+    });
+    ratio = greenRatio(decodePng(Buffer.from(shot.result.data, 'base64'))).ratio;
+  } finally {
+    await page.evaluate(
+      `(() => { const ui = document.querySelector('#ui');
+         if (ui) ui.style.visibility = ''; return true; })()`,
+    );
+  }
+  return { ...metrics, greenRatio: ratio };
 }
 
 /**
@@ -1979,6 +2024,26 @@ async function main() {
         console.log(
           `  the tutorial walked ${walked.seen.length} steps and the server recorded it`,
         );
+
+        // --- Phase 1: the game-first presentation, at rest ----------------
+        // These are ADDITIONS. None of the gameplay checks above or below is
+        // changed, skipped or relaxed. A failure is recorded and the session
+        // continues, so the existing assertions still run in full.
+        const visual = await visualProbe(page);
+        console.log(
+          `  UI visual: green ${(visual.greenRatio ?? 0).toFixed(3)}, ` +
+            `${visual.surfaceCount} surface(s), sprites ${visual.drawnSprites}, ` +
+            `centre ${visual.centreTarget}, rects intersect ${visual.neighbourBuildIntersect}`,
+        );
+        for (const problem of visualFailures(visual, entry.name)) {
+          failures.push(`${entry.name}: ${problem}`);
+          console.log(`FAILED (${problem})`);
+        }
+        if (visual.consoleErrors?.length) {
+          for (const error of visual.consoleErrors) {
+            failures.push(`${entry.name}: console error: ${error}`);
+          }
+        }
 
         // --- 3. The authoritative quest workflow --------------------------
         // The real client starts the smallest event quest, asks the server to
