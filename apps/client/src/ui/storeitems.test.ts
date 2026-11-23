@@ -176,4 +176,12 @@ describe("the store front's item-button chrome", () => {
     assert.doesNotMatch(source, /\.(png|jpe?g|gif|webp|svg)\b/i);
     assert.doesNotMatch(source, /https?:\/\//i);
   });
+
+  it('draws its item buttons in the game palette, not a second dark interface', async () => {
+    const stylesheet = await readFile(new URL('./css.ts', import.meta.url), 'utf8');
+    const item = /\.swl-store-item\s*\{([^}]*)\}/.exec(stylesheet);
+    assert.ok(item, '.swl-store-item has no stylesheet rule');
+    assert.match(item![1]!, /border:\s*1px solid var\(--swl-ochre\)/);
+    assert.match(item![1]!, /var\(--swl-olive\)/);
+  });
 });

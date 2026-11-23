@@ -6,8 +6,9 @@
  * moved would be a panel that covered something else.
  *
  * The colours are the game's own: an olive game bar with a golden
- * selection, a white speech bubble for the mayor, and the dark slate
- * surfaces of the contextual panels.
+ * selection, a white speech bubble for the mayor, and the same olive
+ * and gold on the contextual panels opened on demand. The dark slate
+ * tokens remain the reading surface of the one shared dialog.
  */
 export function uiCss(): string {
   return `
@@ -704,33 +705,36 @@ export function uiCss(): string {
 
 /* --- The info panel ---------------------------------------------------- */
 
+/* The selected building's card is a game surface, not a second interface:
+   the olive bar under the gold frame, cream ink for the readings. Only the
+   paint changes — the 220px card keeps its footprint and pointer contract. */
 .swl-info {
   position: absolute;
   right: 8px;
   bottom: 8px;
   width: 220px;
   padding: 8px 10px;
-  border: 1px solid #38445a;
+  border: 1px solid var(--swl-ochre);
   border-radius: 4px;
-  background: #131a24;
+  background: var(--swl-game-bar);
   pointer-events: auto;
 }
 
 .swl-info-name {
-  color: #f2e6c8;
+  color: var(--swl-ochre);
   font-size: calc(13px * var(--swl-font-scale-display, 1));
   font-weight: 700;
 }
 
 .swl-info-earns {
   margin-top: 3px;
-  color: #8d97a8;
+  color: var(--swl-game-label);
   font-size: calc(12px * var(--swl-font-scale-body, 1));
 }
 
 .swl-info-hint {
   margin-top: 5px;
-  color: #8d97a8;
+  color: var(--swl-game-label);
   font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
@@ -739,27 +743,44 @@ export function uiCss(): string {
   grid-template-columns: auto 1fr;
   gap: 2px 8px;
   margin: 5px 0 0;
-  color: #8d97a8;
+  color: var(--swl-game-label);
   font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
-.swl-info-stats dt { color: #8d97a8; }
+.swl-info-stats dt { color: var(--swl-game-label); }
 
 .swl-info-stats dd {
   margin: 0;
-  color: #e8e3d8;
+  color: var(--swl-game-ink);
   text-align: right;
 }
 
 .swl-info-collect {
   margin-top: 8px;
   padding: 4px 10px;
-  border: 1px solid #f5c542;
+  border: 1px solid var(--swl-ochre);
   border-radius: 3px;
-  background: #f5c542;
-  color: #10151d;
+  background: var(--swl-ochre);
+  color: #1b2003;
   font-size: calc(12px * var(--swl-font-scale-body, 1));
   font-weight: 700;
+}
+
+.swl-info-collect:hover { background: #f4ea83; }
+
+.swl-info-collect:focus-visible {
+  outline: 2px solid var(--swl-ochre);
+  outline-offset: 2px;
+}
+
+.swl-info-action-button:focus-visible {
+  outline: 2px solid var(--swl-ochre);
+  outline-offset: 2px;
+}
+
+.swl-info-period-button:focus-visible {
+  outline: 2px solid var(--swl-ochre);
+  outline-offset: 2px;
 }
 
 /* The Upgrade and Finish actions share the resource button's shape. */
@@ -773,19 +794,19 @@ export function uiCss(): string {
 .swl-info-action-button {
   width: 100%;
   padding: 4px 10px;
-  border: 1px solid #f5c542;
+  border: 1px solid var(--swl-ochre);
   border-radius: 3px;
-  background: #f5c542;
-  color: #10151d;
+  background: var(--swl-ochre);
+  color: #1b2003;
   font-size: calc(12px * var(--swl-font-scale-body, 1));
   font-weight: 700;
 }
 
-.swl-info-action-button:hover { background: #ffd75e; }
+.swl-info-action-button:hover { background: #f4ea83; }
 
 .swl-info-action-note {
   margin-top: 2px;
-  color: #8d97a8;
+  color: var(--swl-game-label);
   font-size: calc(10px * var(--swl-font-scale-body, 1));
 }
 
@@ -793,7 +814,7 @@ export function uiCss(): string {
 
 .swl-info-production {
   margin-top: 5px;
-  color: var(--swl-accent);
+  color: var(--swl-ochre);
   font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
@@ -801,14 +822,17 @@ export function uiCss(): string {
   width: 100%;
   margin-top: 5px;
   padding: 4px 10px;
-  border: 1px solid var(--swl-border);
+  border: 1px solid var(--swl-ochre);
   border-radius: 3px;
-  background: var(--swl-surface-raised);
-  color: var(--swl-ink);
+  background: var(--swl-olive);
+  color: var(--swl-game-ink);
   font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
-.swl-info-period-button:hover { border-color: var(--swl-accent); }
+.swl-info-period-button:hover {
+  border-color: var(--swl-ochre);
+  background: var(--swl-game-bar-hover);
+}
 
 .swl-production {
   display: flex;
@@ -1279,6 +1303,10 @@ export function uiCss(): string {
 
 /* --- The build menu ---------------------------------------------------- */
 
+/* The build list opens on request over the world, so it wears the game's
+   own olive and gold — the same bar as the HUD and the bottom nav, never a
+   second dark-slate interface. The footprint, flex order and z-index are
+   untouched; only these declarations change. */
 .swl-build-menu {
   position: absolute;
   left: 8px;
@@ -1287,8 +1315,8 @@ export function uiCss(): string {
   max-height: 420px;
   display: flex;
   flex-direction: column;
-  background: #131a24;
-  border: 1px solid #38445a;
+  background: var(--swl-game-bar);
+  border: 1px solid var(--swl-ochre);
   border-radius: 5px;
   box-shadow: 0 6px 20px #000a;
   pointer-events: auto;
@@ -1300,17 +1328,22 @@ export function uiCss(): string {
   flex-wrap: wrap;
   gap: 2px;
   padding: 6px 6px 0;
-  border-bottom: 1px solid #2b3546;
+  border-bottom: 1px solid var(--swl-game-bar-hover);
 }
 
 .swl-tab {
   padding: 4px 8px;
   border-radius: 3px 3px 0 0;
-  color: #8d97a8;
+  color: var(--swl-game-label);
   font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
-.swl-tab:hover { color: #e8e3d8; }
+.swl-tab:hover { color: var(--swl-game-ink); }
+
+.swl-tab:focus-visible {
+  outline: 2px solid var(--swl-ochre);
+  outline-offset: -2px;
+}
 
 .swl-tab-active {
   color: #1b2003;
@@ -1331,10 +1364,16 @@ export function uiCss(): string {
   width: 100%;
   padding: 4px 6px;
   border-radius: 3px;
+  color: var(--swl-game-ink);
   text-align: left;
 }
 
-.swl-build-item button:hover { background: #233047; }
+.swl-build-item button:hover { background: var(--swl-game-bar-hover); }
+
+.swl-build-item button:focus-visible {
+  outline: 2px solid var(--swl-ochre);
+  outline-offset: -2px;
+}
 
 .swl-build-item button:disabled {
   cursor: not-allowed;
@@ -1345,17 +1384,17 @@ export function uiCss(): string {
 .swl-build-name { flex: 1; }
 
 .swl-build-cost {
-  color: #8d97a8;
+  color: var(--swl-game-label);
   font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
 .swl-build-locked .swl-build-name,
 .swl-build-locked .swl-build-cost {
-  color: #5c6678;
+  color: #b8b98e;
 }
 
 .swl-build-lock {
-  color: #e0a33c;
+  color: var(--swl-ochre);
   font-size: calc(10px * var(--swl-font-scale-body, 1));
 }
 
@@ -1691,7 +1730,7 @@ export function uiCss(): string {
 /* The mission timer is the server's remaining seconds, not a local clock. */
 .swl-quest-timer {
   margin: 0;
-  color: #f5c542;
+  color: var(--swl-ochre);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -1700,7 +1739,7 @@ export function uiCss(): string {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  color: var(--swl-accent);
+  color: var(--swl-ochre);
 }
 
 .swl-quest-counters,
@@ -1728,7 +1767,7 @@ export function uiCss(): string {
 }
 
 .swl-quest-counter dt { color: var(--swl-ink-muted); }
-.swl-quest-counter dd { margin: 0; color: var(--swl-accent); font-weight: 700; }
+.swl-quest-counter dd { margin: 0; color: var(--swl-ochre); font-weight: 700; }
 
 .swl-quest-roster {
   display: flex;
@@ -1758,10 +1797,14 @@ export function uiCss(): string {
   background: var(--swl-surface-raised);
 }
 
-.swl-quest-buttons button:hover:not(:disabled) { border-color: var(--swl-accent); }
+.swl-quest-buttons button:hover:not(:disabled) { border-color: var(--swl-ochre); }
 .swl-quest-buttons button:disabled { color: var(--swl-ink-muted); cursor: not-allowed; }
-.swl-quest-buttons .swl-quest-primary { border-color: var(--swl-accent); color: var(--swl-accent); }
-.swl-quest-buttons button:focus-visible { outline: 2px solid var(--swl-accent); outline-offset: 1px; }
+.swl-quest-buttons .swl-quest-primary {
+  border-color: var(--swl-ochre);
+  background: var(--swl-game-bar);
+  color: var(--swl-game-ink);
+}
+.swl-quest-buttons button:focus-visible { outline: 2px solid var(--swl-ochre); outline-offset: 1px; }
 
 /* --- The assault result, history and combat HUD ------------------------- */
 
@@ -2620,27 +2663,29 @@ export function uiCss(): string {
 .swl-store-art-empty { width: 56px; height: 42px; flex: 0 0 56px; }
 
 .swl-store-item-list { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+/* Gold-framed olive item buttons: the store's own chrome follows the game
+   palette instead of a second blue-slate interface. Geometry is unchanged. */
 .swl-store-item {
   display: flex;
   gap: var(--swl-gap);
   padding: 6px;
-  border: 1px solid #4a6a8a;
+  border: 1px solid var(--swl-ochre);
   border-radius: 4px;
-  background: linear-gradient(180deg, #223047, #1d2430);
+  background: linear-gradient(180deg, var(--swl-olive), var(--swl-game-bar-hover));
 }
 .swl-store-art-badge { width: 40px; height: 40px; flex: 0 0 40px; }
 .swl-store-item-main { flex: 1; min-width: 0; }
-.swl-store-item-name { margin: 0; color: var(--swl-ink); font-weight: 700; }
+.swl-store-item-name { margin: 0; color: var(--swl-game-ink); font-weight: 700; }
 .swl-store-item-flag {
   margin-left: 6px;
   padding: 1px 4px;
   border-radius: 3px;
-  background: #f5c542;
-  color: #1d2430;
+  background: var(--swl-ochre);
+  color: #1b2003;
   font-size: calc(9px * var(--swl-font-scale-body, 1));
 }
-.swl-store-item-contents { margin: 2px 0 4px; color: var(--swl-ink-muted); }
-.swl-store-item-content-note { color: #8d97a8; font-style: italic; }
+.swl-store-item-contents { margin: 2px 0 4px; color: var(--swl-game-label); }
+.swl-store-item-content-note { color: var(--swl-game-label); font-style: italic; }
 .swl-store-item-tiers { display: flex; flex-wrap: wrap; gap: 4px; }
 .swl-store-art-cash { width: 16px; height: 16px; flex: 0 0 16px; vertical-align: middle; }
 .swl-ui button.swl-store-item-buy {
@@ -2648,16 +2693,21 @@ export function uiCss(): string {
   align-items: center;
   gap: 4px;
   padding: 3px 6px;
-  border: 1px solid #4a6a8a;
+  border: 1px solid var(--swl-ochre);
   border-radius: 3px;
-  background: #223047;
-  color: var(--swl-ink);
+  background: var(--swl-olive);
+  color: var(--swl-game-ink);
   font-size: calc(10px * var(--swl-font-scale-body, 1));
 }
+.swl-ui button.swl-store-item-buy:hover:not(:disabled) { background: var(--swl-game-bar-hover); }
+.swl-ui button.swl-store-item-buy:focus-visible {
+  outline: 2px solid var(--swl-ochre);
+  outline-offset: 2px;
+}
 .swl-ui button.swl-store-item-buy:disabled {
-  border-color: var(--swl-border);
-  background: #1d2430;
-  color: #5c6678;
+  border-color: var(--swl-game-bar-hover);
+  background: var(--swl-game-bar-hover);
+  color: var(--swl-game-label);
   cursor: not-allowed;
 }
 
