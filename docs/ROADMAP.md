@@ -2994,9 +2994,11 @@ product.*
         The increments so far — sixteen Foundry icon motifs, a sprite sheet, the
         twelve original FX frames and seventeen gameplay motifs (54 generated
         files, 53 of them enumerated in the manifest) — are **not** the finished
-        set, do not implement a screen and do not close this gate. The gameplay
-        motifs are not consumed by the client's gameplay renderer, which still
-        uses the excluded proprietary art. The proprietary configuration is handled separately
+        set and do not close this gate; original art alone implements no screen.
+        Since PR #96 the gameplay motifs are carried through neutral content
+        properties into the PixiJS gameplay renderer, and the WebKit and Firefox
+        end-to-end sessions pass with that original art. The proprietary
+        configuration is handled separately
 - [x] The position's claims are **checked**, not asserted
       (`node scripts/check-licensing.mjs`): the upstream's licence is the GPL v3, **no
       package imports from the upstream**, and the shipped tree carries no SWF, no
@@ -3278,7 +3280,7 @@ owner and a precise condition for closing it.*
 **Inventory discrepancy — found in PR #79, fixed by PR #80.** PR #79 recorded these three portrait screens as implemented from PR #75 while the checked inventory still read **159 / 52 / 49** and carried `GUI/Portrait.as`, `GUI/PortraitTrainQueue.as` and `GUI/AnimatedUnit.as` as `planned` with `Deferred: ` notes. PR #80 corrected the data: those three entries are now `implemented` against `apps/client/src/ui/unitportraits.tsx`, with notes that only server-owned unit id, count and ready state from `TrainingView` and the original inline-SVG art are drawn, while Zynga's proprietary unit art and animation frames stay excluded. The count on merged `main` at that merge was **162 / 52 / 46**, asserted by `packages/client/src/screens.test.ts`. This alignment owns only `docs/ROADMAP.md` and `docs/GOAL.md`; no parity claim follows from any of the eight entries.
 
 **Clean-room art foundation (PR #76, ADR 0021).** The clean-room route was approved in
-[ADR 0021](./adr/0021-clean-room-assets.md): the dependency-free generator in `packages/art/` deterministically emitted a first regenerated set of **37 CC0-1.0 files** into `assets/original/` — 29 SVG (16 Foundry icons, one sprite sheet and the 12 frames of two six-frame original FX sequences, `shield-pulse` and `spark-trail`), six WAV effects, `LICENSE` and `manifest.json` (the manifest enumerated the other 36) — with a per-file provenance manifest and its own tests. PR #86 wired the FX frames into an "Original FX" client panel that cycles one frame at a time under a `prefers-reduced-motion` still-frame fallback, shown under the generator's CC0 provenance. PR #89 has since extended the inventory to **54 generated files** (46 SVG, 53 manifest entries), adding 17 original gameplay motifs under `assets/original/gameplay/`; the current state is recorded in the amendment log below and in `docs/LICENSING.md`. This remains a **foundation, not a cleared gate**: Zynga's proprietary config remains a separate data problem, the release-licence gate (I6) stays open, no rights-holder request has been received, and no publication is authorised. The gameplay motifs are not wired into the gameplay renderer. No screen is claimed implemented by the existence of this package.
+[ADR 0021](./adr/0021-clean-room-assets.md): the dependency-free generator in `packages/art/` deterministically emitted a first regenerated set of **37 CC0-1.0 files** into `assets/original/` — 29 SVG (16 Foundry icons, one sprite sheet and the 12 frames of two six-frame original FX sequences, `shield-pulse` and `spark-trail`), six WAV effects, `LICENSE` and `manifest.json` (the manifest enumerated the other 36) — with a per-file provenance manifest and its own tests. PR #86 wired the FX frames into an "Original FX" client panel that cycles one frame at a time under a `prefers-reduced-motion` still-frame fallback, shown under the generator's CC0 provenance. PR #89 has since extended the inventory to **54 generated files** (46 SVG, 53 manifest entries), adding 17 original gameplay motifs under `assets/original/gameplay/`; the current state is recorded in the amendment log below and in `docs/LICENSING.md`. This remains a **foundation, not a cleared gate**: Zynga's proprietary config remains a separate data problem, the release-licence gate (I6) stays open, no rights-holder request has been received, and no publication is authorised. At the PR #89 checkpoint the gameplay motifs were not yet wired into the gameplay renderer; PR #96 later carried them into the PixiJS renderer through neutral content properties, and WebKit and Firefox sessions now pass with original art. No screen is claimed implemented by the existence of this package.
 
 **Apple-platform CI results (PR #73).** Informational, non-required macOS, WebKit and iOS jobs were added to CI. The unsigned **macOS `.app`/`.dmg`** build and the unsigned **iOS simulator** build succeeded on macOS runners. A **WebKit CI attempt failed honestly** on HTTP 404s for excluded proprietary atlas assets; it did not affect the four protected checks and does not replace the earlier verified Playwright WebKit session. **Branded Safari remains unrun**, as do real devices; no result here is a platform-verification or release verdict.
 
@@ -3335,6 +3337,55 @@ funded account, GPU verdict and rights-holder request remain genuine, open block
 
 ---
 
+## Final screen re-audit under clean-room art
+
+*Status: **documentation-only**. This re-audits the 38 still-`planned` B6 screens against
+the merged clean-room art work (PR #96), after the class-A backlog closed at 170 / 52 / 38.
+It sits **outside** the `## Group X` sections, so `node scripts/check-roadmap.mjs` still
+counts **401** items and **22** open boxes (B 4, E 1, G 8, H 4, I 5). No checkbox was
+ticked, no blocker removed, no gate or non-goal reversed; `re/data/ui-screens.json` still
+reads **170 implemented / 52 dropped / 38 planned** of 260.*
+
+**Why there was something to re-audit.** PRs #76/#86/#89 generated the CC0-1.0 art, and
+PR #96 carried 53 original assets — including the 17 gameplay motifs — through neutral
+content properties into the PixiJS renderer; WebKit and Firefox end-to-end sessions pass
+with the original art. The earlier notes that called the motifs "not wired" were true at
+the PR #89 checkpoint and are now past-tense history.
+
+**Verdict: A 0 / B 23 / C 15 of the 38.**
+
+- **A = 0 — implementable from existing state and commands: none.** Art alone adds no
+  command, save field or server outcome, so wiring the motifs into the renderer makes no
+  screen newly implementable. There is no art-only reclassification to make.
+- **B = 23 — blocked by a missing contract, not by art.** Representative reasons: the
+  social, market, messaging and monetisation screens are ADR 20 scope; the character-setup
+  choice needs a save field and a command that do not exist (`set_sex_player` is absent);
+  capture, news, island and assault-start screens have no server outcome to render; and the
+  ally selector has no applier for `set_resource_allies`.
+- **C = 15 — art-only shells that would double-count behaviour already implemented.**
+  These movieclips have no literals, state or gesture of their own: `PopupBreedingMC.as` is
+  the art-only shell behind `fusion.tsx`, and the rest are loading shells, tooltips and HUD
+  popovers whose behaviour is already drawn by the panels in `apps/client/src/ui/`. Test
+  guards explicitly pin many of them, so reclassifying them would misstate scope rather
+  than record new work.
+
+**Terminal statement.** Clean-room art settles the provenance of what is drawn; it does
+not add a command, a save field or a server outcome, and it does not close B3 or G3. No
+screen may be reclassified by art alone — a screen moves only when its behaviour is
+implemented from server-owned state and verified, or is honestly dropped. This is the
+terminal classification under the current contracts, not a new milestone or a release
+verdict.
+
+**Where the blockers stay preserved.** Every reason above is already owned by the
+existing register: the 38-screen row in *Externally Blocked Items → Live captures and
+differential tests*, the art/platform/release rows in *Externally Blocked Items → Art,
+platforms and release artefacts*, the in-repo gaps in *Unimplemented layers*, the ADR
+19/20/21 non-goals in *Deferred / Future Work*, and the open I6 licence gate. None of
+those rows was edited; no parity or release claim follows, and no publication is
+authorised.
+
+---
+
 ## Roadmap Amendment Log
 
 *The Locked Decisions section is binding: changing it, closing a deferred item, or adding
@@ -3342,6 +3393,25 @@ a milestone needs a written rationale. This is that record. Each entry names the
 what changed, why, and the evidence that makes the change verifiable, so a decision can be
 reviewed without reconstructing the conversation that led to it.*
 
+- **2026-11-23 — final screen re-audit under clean-room art (Groups B3, G3, I6).**
+  Merged PR #96 carried 53 CC0 assets, including the 17 gameplay motifs, through neutral
+  content properties into the PixiJS renderer; WebKit and Firefox end-to-end sessions pass
+  with the original art. Re-auditing the 38 still-planned screens against that state gives
+  **A 0 / B 23 / C 15**: art alone adds no command, save field or server outcome, so no
+  screen may be reclassified by art; 23 are blocked by missing contracts (ADR 20 scope,
+  absent save fields/commands such as `set_sex_player`, missing server outcomes and no
+  `set_resource_allies` applier), and 15 are art-only shells that would double-count
+  implemented behaviour. *Rationale:* the earlier "not wired" notes were true at the PR
+  #89 checkpoint but became factual drift after PR #96; this entry records the verified
+  state in the present tense and leaves the old claims as past-tense history. *Evidence:*
+  the re-audit section above and the merged PR #96 diff. *What did not change:* no checkbox
+  was ticked, no blocker removed, no gate or non-goal reversed — ADR 19/20/21 and the
+  no-publication rule still hold — the inventory stays 170 / 52 / 38 and the check stays
+  401 items / 22 open. Gates re-run on this docs branch: `git diff --check` → clean
+  (exit 0); `node scripts/check-roadmap.mjs` → 401 items, 22 open;
+  `node scripts/check-report-sync.mjs` → the report set agrees with the implementation
+  (4 claims, after `pnpm build:content`); `node scripts/check-adrs.mjs` → 21 ADRs, all well
+  formed.
 - **2026-11-23 — asset inventory corrected after the PR #89 merge (Groups G and I,
   ADR 0021).** PR #89 (`b158409`, `feat/gameplay-art-motifs`) added seventeen original
   CC0-1.0 gameplay motifs under `assets/original/gameplay/` — four terrain, five
@@ -3359,10 +3429,12 @@ reviewed without reconstructing the conversation that led to it.*
   removed, no non-goal reversed — ADR 19/20/21 and the no-publication rule still
   hold — the genuine blockers are all preserved, the B3/G3 boxes stay open at
   401 items / 22 open with 38 screens planned, and no parity or release verdict is
-  claimed. The gameplay motifs are generated and browser-exported but are **not**
-  wired into the client's gameplay renderer; original art still appears only in the
-  two UI galleries, and that integration is separate, unmerged work. The
-  release-licence gate (I6) stays open, no rights-holder request exists, and no
+  claimed. At that time the gameplay motifs were generated and browser-exported but
+  not yet wired into the client's gameplay renderer, and original art appeared only
+  in the two UI galleries; PR #96 later carried the motifs into the PixiJS renderer
+  through neutral content properties, and WebKit and Firefox sessions now pass with
+  the original art. The release-licence gate (I6) stays open, no rights-holder
+  request exists, and no
   publication is authorised. Gates re-run on this docs branch: `git diff --check` →
   clean (exit 0); `node scripts/check-roadmap.mjs` → 401 items, 22 open;
   `node scripts/check-report-sync.mjs` → the report set agrees with the implementation

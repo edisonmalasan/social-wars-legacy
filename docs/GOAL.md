@@ -507,7 +507,16 @@ Preserve a verifiable checkpoint if execution must be interrupted.
 This is the resume point for an interrupted session. It is updated at each
 verified checkpoint, not at every tool call.
 
-- **Last verified `main` (2026-11-23):** `b158409` — PR #89
+- **Documentation checkpoint (2026-11-23, in review — not merged):** the final screen
+  re-audit under clean-room art is recorded in *Final screen re-audit under clean-room
+  art* in `docs/ROADMAP.md`. With 53 CC0 assets, including the 17 gameplay motifs, wired
+  through neutral content properties into the PixiJS renderer by merged PR #96, the 38
+  planned screens classify **A 0 / B 23 / C 15**: art alone adds no command, save field or
+  server outcome, so no screen may be reclassified by art. Only `docs/ROADMAP.md` and
+  `docs/GOAL.md` changed; `node scripts/check-roadmap.mjs` still reports 401 items, 22
+  open, and no checkbox, blocker, count, gate or non-goal moved. No parity or publication
+  verdict follows.
+- **Historical checkpoint (superseded by the final screen re-audit): `b158409` — PR #89
   (`feat/gameplay-art-motifs`) is **MERGED**. This documentation-only increment
   corrects the asset-inventory drift that merge left behind. On merged `main`
   `assets/original/` holds **54 generated files**: **46 SVG** — sixteen Foundry
@@ -518,9 +527,10 @@ verified checkpoint, not at every tool call.
   six WAV effects, `LICENSE` and `manifest.json`; the manifest enumerates the
   other **53**, and a tracked `.gitattributes` pins the line endings the
   manifest hashes. The gameplay motifs are generated, hashed and
-  browser-exported by `@swl/art`, but the client still shows original art only
-  in its two UI galleries: the motifs are **not** wired into the gameplay
-  renderer, and that integration is separate, unmerged work. No parity or
+  browser-exported by `@swl/art`, and at that checkpoint the client still showed
+  original art only in its two UI galleries: the motifs were **not** yet wired
+  into the gameplay renderer, and that integration was separate, unmerged work;
+  PR #96 later carried them into the PixiJS renderer. No parity or
   release verdict follows. `node scripts/check-roadmap.mjs` still reports
   **401 items, 22 open** (B 4, E 1, G 8, H 4, I 5); the B3/G3 boxes stay open
   while 38 screens are planned, every genuine blocker is preserved, ADR 19/20/21
