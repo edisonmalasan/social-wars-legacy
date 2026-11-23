@@ -1,9 +1,39 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { registerHooks } from 'node:module';
+import { dirname, resolve as resolvePath } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { AtlasIndex, type FrameManifest } from '@swl/client';
+import {
+  AtlasIndex,
+  cameraCentredOn,
+  STAGE_HEIGHT,
+  STAGE_WIDTH,
+  viewportOf,
+  type FrameManifest,
+} from '@swl/client';
+import { Container } from 'pixi.js';
 
 import { buildScene, type SceneItem } from './scene.ts';
+
+// @swl/art is aliased by Vite but is deliberately not a client dependency, so
+// Node needs the same subpath mapping the gallery's test uses to load the
+// renderer and the art adapter.
+const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = resolvePath(HERE, '../../..');
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    if (specifier === '@swl/art/browser') {
+      return {
+        url: pathToFileURL(resolvePath(ROOT, 'packages/art/browser.ts')).href,
+        shortCircuit: true,
+      };
+    }
+    return nextResolve(specifier, context);
+  },
+});
+const { mountWorld, placementFor, preparedMotifIds } = await import('./renderer.ts');
+const { motifFor } = await import('./originalart-textures.ts');
 
 const VIEWPORT = { topX: 0, topY: 0, buildOutlineOffsetY: 0 };
 
@@ -179,5 +209,51 @@ describe('the scene', () => {
     assert.equal(withNeutral[0]!.y, plain[0]!.y);
     assert.equal(withNeutral[0]!.depth, plain[0]!.depth);
     assert.equal(withNeutral[0]!.frame?.frame, plain[0]!.frame?.frame);
+  });
+});
+
+describe('the drawn world', () => {
+  it('attaches the world container to the stage so its children are rendered', () => {
+    const stage = new Container();
+    const world = new Container();
+    assert.equal(stage.children.length, 0, 'a fresh stage has no world');
+    mountWorld(stage, world);
+    assert.ok(stage.children.includes(world), 'the world must be in the stage display list');
+    mountWorld(stage, world);
+    assert.equal(
+      stage.children.filter((child) => child === world).length,
+      1,
+      'mounting twice must not duplicate the world',
+    );
+  });
+
+  it('places one server-owned item as a visible sprite at the stage centre', () => {
+    const camera = cameraCentredOn(10, 20);
+    const scene = buildScene(
+      [item({ id: 'command-centre', type: 'b', groupType: 'COMMAND_CENTRE' })],
+      viewportOf(camera),
+      new AtlasIndex(MANIFEST),
+    );
+    assert.equal(scene.length, 1, 'the scene must contain the one item the server owns');
+
+    const placement = placementFor(scene[0]!);
+    assert.equal(placement.x, STAGE_WIDTH / 2, 'the item sits at the stage centre in x');
+    assert.equal(
+      placement.y,
+      STAGE_HEIGHT / 2 - scene[0]!.elevation,
+      'the item sits at the stage centre, lifted by its elevation',
+    );
+    assert.ok(placement.onStage, 'the item must land inside the 760x600 stage');
+
+    const motif = motifFor({
+      id: scene[0]!.id,
+      type: scene[0]!.type,
+      groupType: scene[0]!.groupType,
+    });
+    assert.ok(motif, 'the owned item must resolve to a generated motif');
+    assert.ok(
+      preparedMotifIds().has(motif.id),
+      `motif ${motif.id} must be rasterised before the first draw`,
+    );
   });
 });

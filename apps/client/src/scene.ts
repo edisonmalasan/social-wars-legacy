@@ -81,6 +81,8 @@ export interface SceneSprite {
   frame: AnimationFrame | null;
   /** The elevation, in pixels, which lifts the art off the ground. */
   elevation: number;
+  /** The generated ground shade, set only on ground tiles (see `GROUND_TONES`). */
+  tone?: string;
   /**
    * Neutral content properties, carried from the item so the renderer can
    * choose a gameplay motif. Art-derived names are deliberately absent.
@@ -98,6 +100,35 @@ export interface SceneSprite {
  * tile's top corner reaches still read as green field.
  */
 export const GROUND_COLOUR = '#669C2C';
+
+/** Brighten (`delta > 0`) or darken (`delta < 0`) a `#RRGGBB` colour. */
+function shadeHex(colour: string, delta: number): string {
+  const value = Number.parseInt(colour.slice(1), 16);
+  const channel = (shift: number): number =>
+    Math.max(0, Math.min(0xff, ((value >> shift) & 0xff) + delta));
+  const rgb = (channel(16) << 16) | (channel(8) << 8) | channel(0);
+  return `#${rgb.toString(16).padStart(6, '0')}`;
+}
+
+/**
+ * The two shades the renderer bakes into the generated diamond textures.
+ *
+ * A single flat green diamond is invisible against the green clear colour:
+ * every tile has the same fill, so the field reads as one uniform sheet and
+ * its geometry never shows. Two close shades alternate across the tiles; the
+ * difference is enough for the eye to pick out the edges of each diamond but
+ * small enough that the field still reads as the original green grass. Both
+ * shades keep green dominant, so the game's colour is unchanged in character.
+ */
+export const GROUND_TONES: readonly [string, string] = [
+  shadeHex(GROUND_COLOUR, 12),
+  shadeHex(GROUND_COLOUR, -12),
+];
+
+/** The deterministic shade of a tile, so neighbours always contrast. */
+export function groundToneFor(tx: number, ty: number): string {
+  return GROUND_TONES[((((tx + ty) % 2) + 2) % 2) as 0 | 1]!;
+}
 
 /** A ground tile sits behind every item sprite. */
 const GROUND_DEPTH = -1;
@@ -132,6 +163,7 @@ export function buildGround(viewport: Viewport): SceneSprite[] {
         art: null,
         frame: null,
         elevation: 0,
+        tone: groundToneFor(tx, ty),
       });
     }
   }
