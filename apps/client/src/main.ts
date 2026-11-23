@@ -91,6 +91,7 @@ import {
 } from '@swl/client';
 
 import { mountUi } from './ui/mount.tsx';
+import { setSurfaceHost, type ActiveSurface } from './ui/root.tsx';
 import { uiCss } from './ui/css.ts';
 import type { TutorialOverlayProps } from './ui/tutorial.tsx';
 import type { QuestPanelView } from './ui/quests.tsx';
@@ -333,6 +334,10 @@ export interface ClientHandle {
   showDialog?: (id: DialogId, kind: DialogKind, title: string) => void;
   /** Close the shared dialog. */
   dismissDialog?: () => void;
+  /** Select one non-modal surface; the debug handle can drive the navigation. */
+  setActiveSurface?: (surface: ActiveSurface) => void;
+  /** The one surface currently open, or `'none'` at rest. */
+  activeSurface?: () => ActiveSurface;
   /**
    * The last reward the server persisted, rebuilt as a result view.
    *
@@ -667,6 +672,18 @@ async function main(): Promise<void> {
   let dialogState: DialogState = CLOSED_DIALOG;
   let feedback: readonly FeedbackMessage[] = [];
   /**
+   * The one non-modal surface. At rest nothing but the HUD, the neighbour
+   * strip and the bottom navigation is mounted, so the world stays visible.
+   * It is UI state only: no panel decides an outcome, and the dialog's
+   * priority stack is a separate slot.
+   */
+  let activeSurface: ActiveSurface = 'none';
+  function setActiveSurface(next: ActiveSurface): void {
+    activeSurface = next;
+    setSurfaceHost({ surface: activeSurface, setSurface: setActiveSurface });
+  }
+  setActiveSurface('none');
+  /**
    * The onboarding panel and the pending confirmation. Both are client UI
    * state, not game state: the YES of a confirmation only sends the request
    * the host chose, and the server still owns every outcome.
@@ -770,6 +787,10 @@ async function main(): Promise<void> {
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
     const now = Math.floor(Date.now() / 1000);
+    // A dialog is the one modal focus. If a request opened one, retire the
+    // non-modal surface behind it so only the priority modal remains over the
+    // world; the dialog stack itself is untouched.
+    if (dialogState.dialog && activeSurface !== 'none') setActiveSurface('none');
     publishChrome();
     ui?.draw(world, placing, selected, neighbours, tutorialProps(), {
       dialog: dialogState,
@@ -1006,6 +1027,7 @@ async function main(): Promise<void> {
     // The menu entry carries its own wire type: a unit must be requested as
     // a unit, not as the building the old code hardcoded here.
     closeProductionDialog();
+    setActiveSurface('none');
     interaction.beginPlacement(itemId, type);
     placing = itemId;
     placingStored = null;
@@ -1023,6 +1045,7 @@ async function main(): Promise<void> {
    */
   function onPlaceStored(entry: StoredItemView): void {
     closeProductionDialog();
+    setActiveSurface('none');
     interaction.beginPlacement(entry.itemId, entry.type);
     placing = entry.itemId;
     placingStored = entry;
@@ -1410,6 +1433,7 @@ async function main(): Promise<void> {
       interaction.clear();
       selected = null;
       selectedIso = null;
+      setActiveSurface('none');
     } else {
       const definition = content.items.find((entry) => entry.id === found.itemId);
       const tuple = world.maps[0]?.items?.[String(found.isoId)];
@@ -1428,6 +1452,9 @@ async function main(): Promise<void> {
       );
       selected = found.itemId;
       selectedIso = found.isoId;
+      // Selecting a building is a request for its detail surface; it is not
+      // a game decision. Deselecting hands the world back.
+      setActiveSurface('info');
     }
     drawInterface();
   };
@@ -1631,6 +1658,8 @@ async function main(): Promise<void> {
       dialogState = closeDialog(dialogState);
       drawInterface();
     },
+    setActiveSurface,
+    activeSurface: () => activeSurface,
     lastReward: () => {
       const receipt = lastQuestReward(world);
       return receipt ? questResultFromReceipt(receipt, resultQuestOptions()) : null;

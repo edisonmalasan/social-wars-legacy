@@ -11,7 +11,7 @@
  * numbers are a **reading** of the world: the resources are the
  * server's, and the limits are the content's.
  */
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 
 import {
   CLOSED_DIALOG,
@@ -123,6 +123,91 @@ import {
   type AtomFusionPanelView,
   type ResearchPanelView,
 } from './state.ts';
+
+/**
+ * The one non-modal surface the player has open.
+ *
+ * At rest it is `'none'`: only the HUD, the neighbour strip and the bottom
+ * navigation are drawn, so the world is not buried under a dozen panels. A
+ * gesture selects exactly one surface; selecting the open one closes it. The
+ * dialog is deliberately not a surface — its priority stack stays its own.
+ */
+export type ActiveSurface =
+  | 'none'
+  | 'build'
+  | 'goals'
+  | 'expansion'
+  | 'inventory'
+  | 'chapters'
+  | 'info'
+  | 'recruit'
+  | 'store'
+  | 'controls'
+  | 'launchers'
+  | 'magiclab'
+  | 'spellbook';
+
+/** A surface the player can ask for with a control. */
+export type RequestedSurface = Exclude<ActiveSurface, 'none'>;
+
+/** The focus the host publishes; the view owns no game state in it. */
+export interface SurfaceHost {
+  /** The one open surface, or `'none'` at rest. */
+  readonly surface: ActiveSurface;
+  /** Select a surface; the host decides whether the request is accepted. */
+  readonly setSurface: (surface: ActiveSurface) => void;
+}
+
+const CLOSED_SURFACE: SurfaceHost = { surface: 'none', setSurface: () => {} };
+let surfaceHost: SurfaceHost = CLOSED_SURFACE;
+const surfaceListeners = new Set<() => void>();
+
+/** Publish the host's focus. This is UI state only; it decides no outcome. */
+export function setSurfaceHost(patch: Partial<SurfaceHost>): void {
+  surfaceHost = { ...surfaceHost, ...patch };
+  for (const listener of surfaceListeners) listener();
+}
+
+/** The current focus, for the view and for tests. */
+export function surfaceHostSnapshot(): SurfaceHost {
+  return surfaceHost;
+}
+
+function subscribeSurface(listener: () => void): () => void {
+  surfaceListeners.add(listener);
+  return () => {
+    surfaceListeners.delete(listener);
+  };
+}
+
+/** Read the one focus from the host. */
+export function useActiveSurface(): SurfaceHost {
+  return useSyncExternalStore(subscribeSurface, surfaceHostSnapshot, surfaceHostSnapshot);
+}
+
+/** Pressing an open surface's control closes it; another request replaces it. */
+export function toggleSurface(
+  current: ActiveSurface,
+  requested: RequestedSurface,
+): ActiveSurface {
+  return current === requested ? 'none' : requested;
+}
+
+/** The bottom navigation. Every panel the game owns stays one gesture away. */
+const SURFACE_CONTROLS: readonly { readonly id: RequestedSurface; readonly label: string }[] = [
+  { id: 'build', label: 'BUILD' },
+  { id: 'goals', label: 'GOALS' },
+  { id: 'chapters', label: 'MISSIONS' },
+  { id: 'inventory', label: 'BAG' },
+  { id: 'store', label: 'STORE' },
+  { id: 'magiclab', label: 'MAGIC' },
+  { id: 'spellbook', label: 'SPELLS' },
+  { id: 'expansion', label: 'LAND' },
+  { id: 'info', label: 'INFO' },
+  { id: 'recruit', label: 'ARMY' },
+  { id: 'controls', label: 'TOOLS' },
+  { id: 'launchers', label: 'MORE' },
+];
 
 /** The root's props. */
 export interface RootProps {
@@ -241,6 +326,7 @@ export function Root({
   const mystery = useMystery();
   const market = useMarket();
   const resourceButtons = useResourceButtons();
+  const surface = useActiveSurface();
   const state = hudState(hudInput(bundle, world));
   const bonus = useMemo(
     () => bonusPanel(world, now, tzOffsetHours),
@@ -401,51 +487,101 @@ export function Root({
   return (
     <div className="swl-ui">
       <Hud state={state} placing={placingName} bonus={bonus} onClaimBonus={onClaimBonus} />
-      <Goals goals={goals} onCommand={onCommand} />
-      <Expansion view={expansion} onCommand={onCommand} />
-      <Inventory
-        items={stored}
-        categories={tabs}
-        collections={collections}
-        army={army}
-        onPlace={onPlaceStored}
-      />
-      <Chapters
-        ranks={ranks}
-        minLevels={minLevels}
-        choices={choices}
-        onQuestPick={onQuestPick}
-      />
-      <InfoPanel
-        resource={panel}
-        unit={unit}
-        building={building}
-        onCollect={onCollect}
-        onUpgrade={onUpgrade}
-        onFinish={onFinish}
-        production={production}
-        onOpenProduction={onOpenProduction}
-      />
-      <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
-      <Store view={storeView} onCommand={onCommand} />
-      <MysteryLauncher bundle={bundle} />
-      <SoulMixerLauncher />
-      <FusionLauncher />
-      <MagicLab bundle={bundle} world={world} onCommand={onCommand} />
-      <SpellBook bundle={bundle} world={world} onCommand={onCommand} />
-      <Neighbours neighbours={neighbours} />
-      <OnboardingLauncher onOpen={onboarding.open ?? undefined} />
-      <OriginalArtLauncher onOpen={() => setOriginalArtOpen(true)} />
-      <OriginalFxLauncher onOpen={() => setOriginalFxOpen(true)} />
+      {/* The neighbours are the at-rest bottom-left strip; a request replaces them. */}
+      {surface.surface === 'none' ? <Neighbours neighbours={neighbours} /> : null}
+      {/*
+        One focus at a time. Every non-essential panel lives in this wrapper,
+        whose bottom edge is lifted clear of the bottom-right navigation so a
+        bottom-anchored panel (storage, store, magic) never covers the controls
+        that opened it. Conditional rendering, not a hide class, keeps an
+        unasked panel out of the tree entirely.
+      */}
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 48 }}>
+        {surface.surface === 'goals' ? <Goals goals={goals} onCommand={onCommand} /> : null}
+        {surface.surface === 'expansion' ? (
+          <Expansion view={expansion} onCommand={onCommand} />
+        ) : null}
+        {surface.surface === 'inventory' ? (
+          <Inventory
+            items={stored}
+            categories={tabs}
+            collections={collections}
+            army={army}
+            onPlace={onPlaceStored}
+          />
+        ) : null}
+        {surface.surface === 'chapters' ? (
+          <Chapters
+            ranks={ranks}
+            minLevels={minLevels}
+            choices={choices}
+            onQuestPick={onQuestPick}
+          />
+        ) : null}
+        {surface.surface === 'info' ? (
+          <InfoPanel
+            resource={panel}
+            unit={unit}
+            building={building}
+            onCollect={onCollect}
+            onUpgrade={onUpgrade}
+            onFinish={onFinish}
+            production={production}
+            onOpenProduction={onOpenProduction}
+          />
+        ) : null}
+        {surface.surface === 'recruit' ? (
+          <RecruitPanel view={recruit} onTrain={onTrain} onTake={onTake} />
+        ) : null}
+        {surface.surface === 'store' ? <Store view={storeView} onCommand={onCommand} /> : null}
+        {surface.surface === 'launchers' ? (
+          <>
+            <MysteryLauncher bundle={bundle} />
+            <SoulMixerLauncher />
+            <FusionLauncher />
+            <OnboardingLauncher onOpen={onboarding.open ?? undefined} />
+            <OriginalArtLauncher onOpen={() => setOriginalArtOpen(true)} />
+            <OriginalFxLauncher onOpen={() => setOriginalFxOpen(true)} />
+            <IconPanel view={iconView} />
+            <ExtendedPortraitButton
+              view={portraitView}
+              onOpen={portraitView ? () => setPortraitOpen(true) : undefined}
+            />
+          </>
+        ) : null}
+        {surface.surface === 'magiclab' ? (
+          <MagicLab bundle={bundle} world={world} onCommand={onCommand} />
+        ) : null}
+        {surface.surface === 'spellbook' ? (
+          <SpellBook bundle={bundle} world={world} onCommand={onCommand} />
+        ) : null}
+        {surface.surface === 'build' ? (
+          <BuildMenu
+            items={items}
+            categories={tabs}
+            playerLevel={state.level}
+            onPick={onPick ? (entry) => onPick(entry.id, entry.type) : undefined}
+          />
+        ) : null}
+        {surface.surface === 'controls' ? (
+          <ChromeDock
+            world={world}
+            bundle={bundle}
+            categories={tabs}
+            items={items}
+            playerLevel={state.level}
+            feedback={feedback}
+            building={building}
+            production={production}
+            selectedIso={selectedIso}
+            onCollect={onCollect}
+            onFinish={onFinish}
+            onPick={onPick ? (entryId, type) => onPick(entryId, type) : undefined}
+          />
+        ) : null}
+      </div>
       {tutorial ? <TutorialOverlay {...tutorial} /> : null}
       <Feedback messages={feedback} />
-      {/* The icon layout and the extended portrait launcher are presentations
-          of the wallet and the army the server already published. */}
-      <IconPanel view={iconView} />
-      <ExtendedPortraitButton
-        view={portraitView}
-        onOpen={portraitView ? () => setPortraitOpen(true) : undefined}
-      />
       <Dialog
         state={activeDialog}
         onDismiss={
@@ -599,26 +735,55 @@ export function Root({
           />
         ) : null}
       </Dialog>
-      <ChromeDock
-        world={world}
-        bundle={bundle}
-        categories={tabs}
-        items={items}
-        playerLevel={state.level}
-        feedback={feedback}
-        building={building}
-        production={production}
-        selectedIso={selectedIso}
-        onCollect={onCollect}
-        onFinish={onFinish}
-        onPick={onPick ? (entryId, type) => onPick(entryId, type) : undefined}
-      />
-      <BuildMenu
-        items={items}
-        categories={tabs}
-        playerLevel={state.level}
-        onPick={onPick ? (entry) => onPick(entry.id, entry.type) : undefined}
-      />
+      {/*
+        The bottom navigation. The BUILD control opens the list on request and
+        closes it again, so the list can never sit on top of the neighbour
+        strip. Every other panel is one control away, and only one is ever
+        pressed at a time. Inline geometry keeps this lane independent of the
+        stylesheet lane that owns `css.ts`.
+      */}
+      <nav
+        className="swl-surface-nav"
+        aria-label="Game navigation"
+        style={{
+          position: 'absolute',
+          right: 8,
+          bottom: 8,
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'flex-end',
+          gap: 2,
+          maxWidth: 360,
+          pointerEvents: 'auto',
+          zIndex: 15,
+        }}
+      >
+        {SURFACE_CONTROLS.map((control) => {
+          const pressed = surface.surface === control.id;
+          return (
+            <button
+              key={control.id}
+              type="button"
+              data-swl-surface={control.id}
+              aria-pressed={pressed}
+              className="swl-surface-control"
+              style={{
+                padding: '3px 5px',
+                border: '1px solid var(--swl-border, #38445a)',
+                borderRadius: 3,
+                background: pressed
+                  ? 'var(--swl-accent, #f5c542)'
+                  : 'var(--swl-surface, #131a24)',
+                color: pressed ? '#10151d' : 'var(--swl-ink, #e8e3d8)',
+                font: '10px var(--swl-font-body, sans-serif)',
+              }}
+              onClick={() => surface.setSurface(toggleSurface(surface.surface, control.id))}
+            >
+              {control.label}
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
