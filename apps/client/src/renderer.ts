@@ -166,6 +166,60 @@ export function preparedMotifIds(): ReadonlySet<string> {
   return new Set([...DEFAULT_MOTIFS, ...GAMEPLAY_MOTIFS].map((motif) => motif.id));
 }
 
+/**
+ * The reusable pool of ground tiles.
+ *
+ * A redraw used to construct every tile sprite again - around 173 allocations
+ * plus the same number of display-object insertions, inside the measured
+ * input-to-render window. The field does not change on a redraw: only the
+ * camera can move it. So the sprites are kept, and `sync()` either does
+ * nothing (the common case) or just refreshes the transforms of the sprites it
+ * already owns. A tile that leaves the stage is kept in the pool, out of the
+ * display list, ready for the next pan.
+ */
+export class GroundLayer {
+  private readonly sprites: Sprite[] = [];
+  private readonly container: Container;
+  private readonly textureFor: (tone: string) => Texture;
+  private key = '';
+
+  constructor(container: Container, textureFor: (tone: string) => Texture) {
+    this.container = container;
+    this.textureFor = textureFor;
+  }
+
+  /** Bring the layer in line with `viewport`, reusing every sprite it owns. */
+  sync(viewport: Viewport): void {
+    const key = `${viewport.topX}|${viewport.topY}|${viewport.buildOutlineOffsetY}`;
+    if (key === this.key) return;
+    this.key = key;
+
+    const tiles = buildGround(viewport);
+    const plain = GROUND_TONES[0]!;
+    for (let i = 0; i < tiles.length; i += 1) {
+      const tile = tiles[i]!;
+      const texture = this.textureFor(tile.tone ?? plain);
+      let sprite = this.sprites[i];
+      if (!sprite) {
+        sprite = new Sprite(texture);
+        // `tileToPixel` gives the tile's top corner; the diamond's anchor is
+        // its top vertex, so the tiles interlock exactly.
+        sprite.anchor.set(0.5, 0);
+        this.sprites.push(sprite);
+      }
+      if (sprite.texture !== texture) sprite.texture = texture;
+      sprite.x = tile.x;
+      sprite.y = tile.y;
+      if (sprite.parent !== this.container) this.container.addChild(sprite);
+    }
+    // Tiles that left the stage stay in the pool but leave the display list.
+    for (let i = tiles.length; i < this.sprites.length; i += 1) {
+      const extra = this.sprites[i]!;
+      if (extra.parent) extra.parent.removeChild(extra);
+    }
+  }
+}
+
 /** What the renderer needs to start. */
 export interface RendererOptions {
   /** The element the canvas goes into. */
@@ -189,6 +243,14 @@ export class WorldRenderer {
   private readonly originalTextures = new Map<string, Texture>();
   /** One generated diamond texture per green shade. */
   private readonly groundTextures = new Map<string, Texture>();
+  /** The ground and the items live in separate layers, so redrawing the
+   * items never touches the cached field. */
+  private readonly groundLayer = new Container();
+  private readonly itemLayer = new Container();
+  private readonly ground = new GroundLayer(
+    this.groundLayer,
+    (tone) => this.groundTextures.get(tone) ?? this.groundTextures.get(GROUND_TONES[0]!)!,
+  );
   private readonly options: RendererOptions;
   private readonly queue: string[] = [];
   private scene: readonly SceneSprite[] = [];
@@ -249,6 +311,7 @@ export class WorldRenderer {
     // The world must be in the stage's display list or Pixi draws nothing:
     // the green background alone made an orphaned world look like a field.
     mountWorld(app.stage, renderer.world);
+    renderer.world.addChild(renderer.groundLayer, renderer.itemLayer);
     for (const tone of GROUND_TONES) {
       renderer.groundTextures.set(tone, Texture.from(groundCanvas(tone)));
     }
@@ -335,26 +398,18 @@ export class WorldRenderer {
    */
   draw(scene: readonly SceneSprite[]): void {
     this.scene = scene;
-    this.world.removeChildren();
+    // The field is cached: a redraw of the same viewport reuses every tile
+    // sprite instead of allocating the whole ground again.
+    this.ground.sync(this.viewport);
+    // Only the items change between commands; the ground layer stays mounted.
+    this.itemLayer.removeChildren();
 
     // The green field goes down first, so every item is drawn on top of it.
     // Its tiles come from the server-owned map dimensions and the camera's
     // viewport, not from any client-invented gameplay.
-    const plain = GROUND_TONES[0]!;
-    for (const tile of buildGround(this.viewport)) {
-      const texture = this.groundTextures.get(tile.tone ?? plain) ?? this.groundTextures.get(plain)!;
-      const sprite = new Sprite(texture);
-      // `tileToPixel` gives the tile's top corner; the diamond texture's
-      // anchor is its top vertex, so the tiles interlock exactly.
-      sprite.anchor.set(0.5, 0);
-      sprite.x = tile.x;
-      sprite.y = tile.y;
-      this.world.addChild(sprite);
-    }
-
     for (const sprite of scene) {
       const drawn = this.spriteFor(sprite);
-      if (drawn) this.world.addChild(drawn);
+      if (drawn) this.itemLayer.addChild(drawn);
     }
   }
 
@@ -465,7 +520,7 @@ export class WorldRenderer {
    * motifs on the stage, which is what an end-to-end check can assert.
    */
   get drawnSprites(): number {
-    return this.world.children.length;
+    return this.groundLayer.children.length + this.itemLayer.children.length;
   }
 
   /** The canvas, for the interface to sit over. */
