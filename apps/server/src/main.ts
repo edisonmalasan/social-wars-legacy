@@ -38,6 +38,7 @@ import { PGlite } from '@electric-sql/pglite';
 import type { CostContent, DartsGame } from '@swl/rules';
 
 import { createApp, type AppRequest } from './app.ts';
+import { contentPathFrom } from './content-path.ts';
 import { DEFAULT_LIMITS } from './limits.ts';
 import { MemoryPlayerStore } from '@swl/server';
 import {
@@ -53,8 +54,14 @@ import { createApplier, createQuestHelpers, initialWorld, tracedDatabase } from 
 const PORT = Number(process.env['PORT'] ?? 8080);
 /** The host to bind. */
 const HOST = process.env['HOST'] ?? '127.0.0.1';
-/** The content bundle, built by `pnpm build:content`. */
-const CONTENT_PATH = path.join(process.cwd(), 'packages/content/dist/content-bundle.json');
+/**
+ * The content bundle, built by `pnpm build:content`.
+ *
+ * Resolved from this module's URL, not from `process.cwd()`: pnpm's `--filter`
+ * runs the entry with cwd=`apps/server`, so a cwd-relative path would look in
+ * `apps/server/packages/content/dist` and fail before the server starts.
+ */
+const CONTENT_PATH = contentPathFrom(import.meta.url);
 
 /** Read the body, refusing anything over the limit. */
 async function readBody(request: IncomingMessage, limit: number): Promise<string | null> {
