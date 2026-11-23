@@ -33,6 +33,7 @@ import type { CameraState, FrameManifest, Viewport, ViewportSize } from '@swl/cl
 import {
   atlasPageRequest,
   DEFAULT_MOTIFS,
+  GAMEPLAY_MOTIFS,
   motifFor,
   svgDataUri,
   type ArtMode,
@@ -141,7 +142,11 @@ export class WorldRenderer {
    * it runs. Decoding is done here, while `start()` is awaiting anyway.
    */
   private async prepareOriginalArt(): Promise<void> {
-    for (const motif of DEFAULT_MOTIFS) {
+    // Rasterise the gallery motifs (the seeded fallback) **and** the gameplay
+    // motifs. A sprite whose neutral properties select a gameplay motif must
+    // find its texture here, or it would be silently skipped. The two id
+    // families cannot collide: gameplay ids carry the `gameplay:` prefix.
+    for (const motif of [...DEFAULT_MOTIFS, ...GAMEPLAY_MOTIFS]) {
       const canvas = await motifCanvas(motif.svg);
       this.originalTextures.set(motif.id, Texture.from(canvas));
     }
@@ -267,6 +272,13 @@ export class WorldRenderer {
         frame: scene.frame?.frame,
         atlasX: scene.art?.atlas.x,
         atlasY: scene.art?.atlas.y,
+        // Only these neutral properties choose a gameplay motif. The frame
+        // and atlas coordinates above stay in the identity solely for the
+        // seeded gallery fallback when no neutral property is available.
+        type: scene.type,
+        groupType: scene.groupType,
+        categoryId: scene.categoryId,
+        subcategoryId: scene.subcategoryId,
       });
       const texture = motif ? this.originalTextures.get(motif.id) : undefined;
       if (!texture) return null;

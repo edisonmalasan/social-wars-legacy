@@ -268,6 +268,13 @@ function cameraFor(world: WorldSnapshot): CameraState {
       elevation: 0,
       orientation: orientation ?? 0,
       animation: 0,
+      // The neutral content properties are the only things that may choose a
+      // gameplay motif. The definition's name/img_name/SWF fields are never
+      // used for that choice.
+      type: definition.type,
+      groupType: definition.group_type,
+      categoryId: definition.category_id,
+      subcategoryId: definition.subcategory_id,
     });
   }
   return items;
