@@ -787,10 +787,6 @@ async function main(): Promise<void> {
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
     const now = Math.floor(Date.now() / 1000);
-    // A dialog is the one modal focus. If a request opened one, retire the
-    // non-modal surface behind it so only the priority modal remains over the
-    // world; the dialog stack itself is untouched.
-    if (dialogState.dialog && activeSurface !== 'none') setActiveSurface('none');
     publishChrome();
     ui?.draw(world, placing, selected, neighbours, tutorialProps(), {
       dialog: dialogState,
