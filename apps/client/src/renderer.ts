@@ -38,7 +38,12 @@ import {
   svgDataUri,
   type ArtMode,
 } from './originalart-textures.ts';
-import { buildGround, GROUND_COLOUR, type SceneSprite } from './scene.ts';
+import {
+  buildGround,
+  GROUND_COLOUR,
+  GROUND_TONES,
+  type SceneSprite,
+} from './scene.ts';
 import {
   STAGE_HEIGHT,
   STAGE_WIDTH,
@@ -99,18 +104,19 @@ async function motifCanvas(svg: string): Promise<HTMLCanvasElement> {
 }
 
 /**
- * A solid green isometric diamond, generated in code: no file, no fetch, no
- * proprietary art. The texture's top vertex sits at the sprite's anchor, so
- * diamonds placed at consecutive `tileToPixel()` positions interlock edge to
- * edge and cover the field.
+ * An isometric diamond in one of the two generated green shades: no file, no
+ * fetch, no proprietary art. The texture's top vertex sits at the sprite's
+ * anchor, so diamonds placed at consecutive `tileToPixel()` positions
+ * interlock edge to edge and cover the field. Alternating the two shades is
+ * what makes the grid visible instead of a flat green sheet.
  */
-function groundCanvas(): HTMLCanvasElement {
+function groundCanvas(tone: string): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = TILE_WIDTH_PIXELS;
   canvas.height = TILE_HEIGHT_PIXELS;
   const context = canvas.getContext('2d');
   if (context) {
-    context.fillStyle = GROUND_COLOUR;
+    context.fillStyle = tone;
     context.beginPath();
     context.moveTo(TILE_WIDTH_PIXELS / 2, 0);
     context.lineTo(TILE_WIDTH_PIXELS, TILE_HEIGHT_PIXELS / 2);
@@ -120,6 +126,44 @@ function groundCanvas(): HTMLCanvasElement {
     context.fill();
   }
   return canvas;
+}
+
+/**
+ * Put the world into the stage's display list.
+ *
+ * Pixi renders **only** the stage and its descendants. A `Container` that is
+ * never added to the stage may hold every sprite in the scene - and
+ * `drawnSprites` will count them - but none of it reaches the screen. The
+ * world is mounted once, here, so being in the container means being drawn.
+ */
+export function mountWorld(stage: Container, world: Container): void {
+  if (!stage.children.includes(world)) stage.addChild(world);
+}
+
+/** Where a scene sprite is placed on the stage, and whether it is on-screen. */
+export interface SpritePlacement {
+  /** The sprite's stage x. */
+  x: number;
+  /** The sprite's stage y, lifted by its elevation. */
+  y: number;
+  /** Whether the sprite lands inside the fixed 760 by 600 stage. */
+  onStage: boolean;
+}
+
+/** The sprite placement the renderer uses for every scene sprite. */
+export function placementFor(scene: SceneSprite): SpritePlacement {
+  const x = scene.x;
+  const y = scene.y - scene.elevation;
+  return {
+    x,
+    y,
+    onStage: x >= 0 && x < STAGE_WIDTH && y >= 0 && y < STAGE_HEIGHT,
+  };
+}
+
+/** The motif ids that `start()` rasterises before the first scene is drawn. */
+export function preparedMotifIds(): ReadonlySet<string> {
+  return new Set([...DEFAULT_MOTIFS, ...GAMEPLAY_MOTIFS].map((motif) => motif.id));
 }
 
 /** What the renderer needs to start. */
@@ -143,8 +187,8 @@ export class WorldRenderer {
   private readonly missing = new Set<string>();
   /** One texture per generated motif, ready before the first scene is drawn. */
   private readonly originalTextures = new Map<string, Texture>();
-  /** The solid-colour diamond used for every ground tile. */
-  private groundTexture!: Texture;
+  /** One generated diamond texture per green shade. */
+  private readonly groundTextures = new Map<string, Texture>();
   private readonly options: RendererOptions;
   private readonly queue: string[] = [];
   private scene: readonly SceneSprite[] = [];
@@ -202,7 +246,12 @@ export class WorldRenderer {
     options.element.appendChild(app.canvas);
 
     const renderer = new WorldRenderer(app, options);
-    renderer.groundTexture = Texture.from(groundCanvas());
+    // The world must be in the stage's display list or Pixi draws nothing:
+    // the green background alone made an orphaned world look like a field.
+    mountWorld(app.stage, renderer.world);
+    for (const tone of GROUND_TONES) {
+      renderer.groundTextures.set(tone, Texture.from(groundCanvas(tone)));
+    }
 
     // Original art needs no atlas pages, but its textures must exist before
     // the first draw. Atlas mode needs no preparation: pages arrive later.
@@ -291,8 +340,10 @@ export class WorldRenderer {
     // The green field goes down first, so every item is drawn on top of it.
     // Its tiles come from the server-owned map dimensions and the camera's
     // viewport, not from any client-invented gameplay.
+    const plain = GROUND_TONES[0]!;
     for (const tile of buildGround(this.viewport)) {
-      const sprite = new Sprite(this.groundTexture);
+      const texture = this.groundTextures.get(tile.tone ?? plain) ?? this.groundTextures.get(plain)!;
+      const sprite = new Sprite(texture);
       // `tileToPixel` gives the tile's top corner; the diamond texture's
       // anchor is its top vertex, so the tiles interlock exactly.
       sprite.anchor.set(0.5, 0);
@@ -329,8 +380,9 @@ export class WorldRenderer {
       if (!texture) return null;
       const sprite = new Sprite(texture);
       sprite.anchor.set(0.5, 0.5);
-      sprite.x = scene.x;
-      sprite.y = scene.y - scene.elevation;
+      const placement = placementFor(scene);
+      sprite.x = placement.x;
+      sprite.y = placement.y;
       return sprite;
     }
 
@@ -351,9 +403,10 @@ export class WorldRenderer {
     // The projection gives the item's **top corner**, and the art's
     // anchor is the top corner of the *trimmed* image, so the trim
     // offset has to come back off.
+    const placement = placementFor(scene);
     const trim = scene.art.trim;
-    sprite.x = scene.x + (trim ? trim.x : 0);
-    sprite.y = scene.y + (trim ? trim.y : 0) - scene.elevation;
+    sprite.x = placement.x + (trim ? trim.x : 0);
+    sprite.y = placement.y + (trim ? trim.y : 0);
     return sprite;
   }
 
