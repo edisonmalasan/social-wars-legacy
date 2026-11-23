@@ -286,3 +286,42 @@ describe('the chrome stylesheet', () => {
     }
   });
 });
+
+/** The body of one stylesheet rule, by exact selector. */
+function cssRule(css: string, selector: string): string {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = new RegExp(`${escaped}\\s*\\{([^}]*)\\}`).exec(css);
+  assert.ok(match, `${selector} has no stylesheet rule`);
+  return match![1]!;
+}
+
+describe('the olive and gold game chrome', () => {
+  const css = uiCss();
+
+  it('names the original game-bar and selected-tab colours', () => {
+    const root = /:root\s*\{([^}]*)\}/.exec(css);
+    assert.ok(root, 'the shared token block is missing');
+    const tokens = root![1]!;
+    assert.match(tokens, /--swl-olive:\s*#616807\s*;/); // rgb(97,104,7)
+    assert.match(tokens, /--swl-ochre:\s*#e9dd51\s*;/); // rgb(233,221,81)
+    assert.match(tokens, /--swl-game-bar:\s*var\(--swl-olive\)/);
+    assert.match(tokens, /--swl-game-bar-selected:\s*var\(--swl-ochre\)/);
+    assert.match(tokens, /--swl-game-ink:/);
+    assert.match(tokens, /--swl-game-label:/);
+  });
+
+  it('paints the HUD from the game tokens without moving it', () => {
+    const hud = cssRule(css, '.swl-hud');
+    assert.match(hud, /var\(--swl-game-bar\)/);
+    assert.match(cssRule(css, '.swl-readout-label'), /var\(--swl-game-label\)/);
+    assert.match(cssRule(css, '.swl-readout-value'), /var\(--swl-game-ink\)/);
+    assert.match(cssRule(css, '.swl-readout:focus-visible'), /var\(--swl-game-bar-selected\)/);
+    assert.match(cssRule(css, '.swl-hud'), /height:\s*48px/);
+  });
+
+  it('shares the bar colours with at-rest neighbours and selected tabs', () => {
+    assert.match(cssRule(css, '.swl-neighbour'), /var\(--swl-olive\)/);
+    assert.match(cssRule(css, '.swl-tab-active'), /var\(--swl-game-bar-selected\)/);
+    assert.match(cssRule(css, '.swl-tutorial-arrow'), /var\(--swl-ochre\)/);
+  });
+});
