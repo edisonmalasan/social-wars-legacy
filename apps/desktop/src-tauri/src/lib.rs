@@ -173,6 +173,82 @@ pub fn server_command(packaged: bool, exe_dir: &Path, resource_dir: &Path) -> Se
     }
 }
 
+/// The name of the server's database directory inside the app's data dir.
+pub const SERVER_DATA_DIRNAME: &str = "server-data";
+
+/// The per-user server data directory, below the app's own data directory.
+///
+/// The server is authoritative (ADR 19): this is the **server's** database,
+/// not a client-owned save. The shell only chooses where the server may write
+/// it, and never reads or edits the save itself.
+pub fn server_data_dir(app_data_dir: &Path) -> PathBuf {
+    app_data_dir.join(SERVER_DATA_DIRNAME)
+}
+
+/// Create the data directory before starting the server, so a missing parent
+/// cannot make a PGlite boot fail after the window has already appeared.
+pub fn prepare_data_dir(path: &Path) -> Result<PathBuf, String> {
+    std::fs::create_dir_all(path).map_err(|error| {
+        format!(
+            "could not create the server data directory {}: {error}",
+            path.display()
+        )
+    })?;
+    Ok(path.to_path_buf())
+}
+
+/// The environment the local server is started with.
+///
+/// `PORT` makes the server bind the port the shell advertised and probed;
+/// without it the spawned process keeps listening on its own default of
+/// 8080 while the web view and the health check look at `--port`.
+/// `SWL_DATA_DIR` points the server at a writable, per-user directory so
+/// saves and credentials survive a restart. `HOST` is deliberately absent:
+/// the server already binds the loopback interface, and the shell does not
+/// want a second source of truth for that decision.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerEnvironment {
+    /// The port the server binds.
+    pub port: u16,
+    /// The directory in which the server keeps its database.
+    pub data_dir: PathBuf,
+}
+
+impl ServerEnvironment {
+    /// Apply the environment to a command that starts the server.
+    pub fn apply_to(&self, command: &mut Command) {
+        command
+            .env("PORT", self.port.to_string())
+            .env("SWL_DATA_DIR", &self.data_dir);
+    }
+}
+
+/// A server command together with the environment it must run in.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerLaunch {
+    /// Which binary or development script starts the server.
+    pub command: ServerCommand,
+    /// What the spawned process is told about its port and data directory.
+    pub environment: ServerEnvironment,
+}
+
+impl ServerLaunch {
+    /// Combine a command with the port and data directory it needs.
+    pub fn new(command: ServerCommand, port: u16, data_dir: PathBuf) -> Self {
+        Self {
+            command,
+            environment: ServerEnvironment { port, data_dir },
+        }
+    }
+
+    /// The real `Command` handed to the OS, including its environment.
+    pub fn to_command(&self) -> Command {
+        let mut command = self.command.to_command();
+        self.environment.apply_to(&mut command);
+        command
+    }
+}
+
 /// The sidecar beside an executable, if there is one.
 fn find_sidecar(exe_dir: &Path) -> Option<PathBuf> {
     let mut found: Vec<PathBuf> = std::fs::read_dir(exe_dir)
@@ -199,8 +275,9 @@ pub struct LocalServer {
 
 impl LocalServer {
     /// Start the server and wait for it to answer.
-    pub fn start(command: ServerCommand, port: u16, timeout: Duration) -> Result<Self, String> {
-        let mut child = command
+    pub fn start(launch: ServerLaunch, timeout: Duration) -> Result<Self, String> {
+        let port = launch.environment.port;
+        let mut child = launch
             .to_command()
             .stdout(Stdio::null())
             .stderr(Stdio::null())
@@ -338,7 +415,17 @@ pub fn run() {
                     .unwrap_or_default();
                 let resource_dir = app.path().resource_dir().unwrap_or_default();
                 let command = server_command(packaged, &exe_dir, &resource_dir);
-                let server = LocalServer::start(command, port, Duration::from_secs(30))
+
+                // The server owns the save, but the shell owns the location:
+                // a writable directory in this user's application data, so a
+                // restart finds the same database and credentials (ADR 19).
+                let app_data_dir = app.path().app_data_dir().map_err(|error| {
+                    format!("could not find the application data directory: {error}")
+                })?;
+                let data_dir = prepare_data_dir(&server_data_dir(&app_data_dir))?;
+                let launch = ServerLaunch::new(command, port, data_dir);
+
+                let server = LocalServer::start(launch, Duration::from_secs(30))
                     .map_err(std::io::Error::other)?;
                 app.manage(server);
             }
@@ -465,7 +552,9 @@ mod tests {
             program: "no-such-binary-at-all".to_string(),
             args: vec![],
         };
-        let result = LocalServer::start(command, 1, Duration::from_millis(200));
+        let dir = tempfile::tempdir().unwrap();
+        let launch = ServerLaunch::new(command, 1, dir.path().to_path_buf());
+        let result = LocalServer::start(launch, Duration::from_millis(200));
         assert!(result.is_err());
     }
 
@@ -533,5 +622,137 @@ mod tests {
         let rendered = format!("{command:?}");
         assert!(rendered.contains(&format!("{program:?}")));
         assert!(rendered.contains(&format!("{entry:?}")));
+    }
+
+    /// The environment of a `Command`, as plain data. `Debug` on a `Command`
+    /// prints the program and its arguments, but not its environment, so the
+    /// environment has to be read back through `get_envs`.
+    fn command_env(command: &Command) -> std::collections::BTreeMap<String, String> {
+        command
+            .get_envs()
+            .map(|(key, value)| {
+                (
+                    key.to_string_lossy().into_owned(),
+                    value
+                        .map(|value| value.to_string_lossy().into_owned())
+                        .unwrap_or_default(),
+                )
+            })
+            .collect()
+    }
+
+    fn a_launch(port: u16, data_dir: &Path) -> ServerLaunch {
+        ServerLaunch::new(
+            ServerCommand::Development {
+                program: "node".to_string(),
+                script: DEV_SERVER_SCRIPT.to_string(),
+            },
+            port,
+            data_dir.to_path_buf(),
+        )
+    }
+
+    #[test]
+    fn the_spawned_server_receives_the_data_directory() {
+        let dir = tempfile::tempdir().unwrap();
+        let data_dir = dir.path().join("server-data");
+        let expected = data_dir.to_string_lossy().into_owned();
+        let command = a_launch(8080, &data_dir).to_command();
+        assert_eq!(
+            command_env(&command).get("SWL_DATA_DIR"),
+            Some(&expected),
+            "the server must persist saves in the shell's per-user data directory"
+        );
+    }
+
+    #[test]
+    fn the_spawned_server_receives_the_selected_port() {
+        let dir = tempfile::tempdir().unwrap();
+        let command = a_launch(9090, dir.path()).to_command();
+        assert_eq!(
+            command_env(&command).get("PORT").map(String::as_str),
+            Some("9090")
+        );
+    }
+
+    #[test]
+    fn a_custom_port_reaches_the_server_process() {
+        // The existing URL test only proves the web view follows `--port`.
+        // The spawned server has to be told the same port, or it keeps
+        // listening on 8080 and the health wait fails.
+        let target = resolve_server_target(&args(&["--port", "9090"]));
+        let ServerTarget::Local { port } = &target else {
+            panic!("--port must select the local server");
+        };
+        let dir = tempfile::tempdir().unwrap();
+        let command = a_launch(*port, dir.path()).to_command();
+        assert_eq!(
+            command_env(&command).get("PORT").map(String::as_str),
+            Some("9090")
+        );
+        assert_eq!(target.url(), "http://127.0.0.1:9090/");
+    }
+
+    #[test]
+    fn the_loopback_bind_is_left_to_the_server() {
+        // The server binds 127.0.0.1 itself. The shell must not override it
+        // with a HOST variable, or a configuration mistake could expose a
+        // local save server on every interface.
+        let dir = tempfile::tempdir().unwrap();
+        let command = a_launch(8080, dir.path()).to_command();
+        assert!(!command_env(&command).contains_key("HOST"));
+    }
+
+    #[test]
+    fn both_command_kinds_carry_the_environment() {
+        let dir = tempfile::tempdir().unwrap();
+        let data_dir = dir.path().join("per-user");
+        let expected = data_dir.to_string_lossy().into_owned();
+        for command in [
+            ServerCommand::Sidecar {
+                program: "swl-server".to_string(),
+                args: vec!["start.mjs".to_string()],
+            },
+            ServerCommand::Development {
+                program: "node".to_string(),
+                script: DEV_SERVER_SCRIPT.to_string(),
+            },
+        ] {
+            let rendered = ServerLaunch::new(command, 7777, data_dir.clone()).to_command();
+            let env = command_env(&rendered);
+            assert_eq!(env.get("PORT").map(String::as_str), Some("7777"));
+            assert_eq!(env.get("SWL_DATA_DIR"), Some(&expected));
+        }
+    }
+
+    #[test]
+    fn the_launch_keeps_the_program_and_arguments() {
+        let dir = tempfile::tempdir().unwrap();
+        let launch = ServerLaunch::new(
+            ServerCommand::Sidecar {
+                program: "swl-server-x86_64-pc-windows-msvc.exe".to_string(),
+                args: vec!["absolute/path/start.mjs".to_string()],
+            },
+            8080,
+            dir.path().to_path_buf(),
+        );
+        let rendered = format!("{:?}", launch.to_command());
+        assert!(rendered.contains("swl-server-x86_64-pc-windows-msvc.exe"));
+        assert!(rendered.contains("absolute/path/start.mjs"));
+    }
+
+    #[test]
+    fn the_server_data_dir_is_inside_the_app_data_dir() {
+        let base = Path::new("per-user-app-data");
+        assert_eq!(server_data_dir(base), base.join("server-data"));
+        assert!(server_data_dir(base).starts_with(base));
+    }
+
+    #[test]
+    fn preparing_the_data_dir_creates_it_on_disk() {
+        let root = tempfile::tempdir().unwrap();
+        let nested = root.path().join("nested").join("server-data");
+        assert_eq!(prepare_data_dir(&nested).unwrap(), nested);
+        assert!(nested.is_dir());
     }
 }
