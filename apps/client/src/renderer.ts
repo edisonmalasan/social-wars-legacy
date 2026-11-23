@@ -103,29 +103,70 @@ async function motifCanvas(svg: string): Promise<HTMLCanvasElement> {
   return canvas;
 }
 
+/** One diamond of the baked ground pattern, in stage coordinates. */
+export interface GroundDiamond {
+  /** The top corner's stage x. */
+  x: number;
+  /** The top corner's stage y. */
+  y: number;
+  /** One of the two generated green shades. */
+  tone: string;
+}
+
 /**
- * An isometric diamond in one of the two generated green shades: no file, no
- * fetch, no proprietary art. The texture's top vertex sits at the sprite's
- * anchor, so diamonds placed at consecutive `tileToPixel()` positions
- * interlock edge to edge and cover the field. Alternating the two shades is
- * what makes the grid visible instead of a flat green sheet.
+ * The diamonds to bake into one stage-sized ground texture.
+ *
+ * The positions are the very same `buildGround()` tiles the old per-tile
+ * sprites used, so the baked field is pixel-for-pixel the same two-tone
+ * isometric pattern - only the number of display objects changes.
  */
-function groundCanvas(tone: string): HTMLCanvasElement {
+export function groundPattern(viewport: Viewport): GroundDiamond[] {
+  const plain = GROUND_TONES[0]!;
+  return buildGround(viewport).map((tile) => ({
+    x: tile.x,
+    y: tile.y,
+    tone: tile.tone ?? plain,
+  }));
+}
+
+/**
+ * Bake every diamond into a single 760 by 600 canvas: no file, no fetch, no
+ * proprietary art. One texture and one sprite cover the whole field, instead
+ * of one sprite per tile, which keeps a redraw inside the latency budget even
+ * on a cold, loaded runner. The canvas is rebuilt only when the camera moves.
+ */
+function groundCanvas(diamonds: readonly GroundDiamond[]): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
-  canvas.width = TILE_WIDTH_PIXELS;
-  canvas.height = TILE_HEIGHT_PIXELS;
+  canvas.width = STAGE_WIDTH;
+  canvas.height = STAGE_HEIGHT;
   const context = canvas.getContext('2d');
   if (context) {
-    context.fillStyle = tone;
-    context.beginPath();
-    context.moveTo(TILE_WIDTH_PIXELS / 2, 0);
-    context.lineTo(TILE_WIDTH_PIXELS, TILE_HEIGHT_PIXELS / 2);
-    context.lineTo(TILE_WIDTH_PIXELS / 2, TILE_HEIGHT_PIXELS);
-    context.lineTo(0, TILE_HEIGHT_PIXELS / 2);
-    context.closePath();
-    context.fill();
+    context.fillStyle = GROUND_COLOUR;
+    context.fillRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
+    const halfWidth = TILE_WIDTH_PIXELS / 2;
+    const halfHeight = TILE_HEIGHT_PIXELS / 2;
+    for (const diamond of diamonds) {
+      context.fillStyle = diamond.tone;
+      context.beginPath();
+      context.moveTo(diamond.x + halfWidth, diamond.y);
+      context.lineTo(diamond.x + TILE_WIDTH_PIXELS, diamond.y + halfHeight);
+      context.lineTo(diamond.x + halfWidth, diamond.y + TILE_HEIGHT_PIXELS);
+      context.lineTo(diamond.x, diamond.y + halfHeight);
+      context.closePath();
+      context.fill();
+    }
   }
   return canvas;
+}
+
+/**
+ * The world's display list: one baked ground object, then the item layer.
+ * Pixi draws a container's children back to front, so items stay on top.
+ */
+export function buildWorld(ground: Container | Sprite, items: Container | Sprite): Container {
+  const world = new Container();
+  world.addChild(ground, items);
+  return world;
 }
 
 /**
@@ -166,60 +207,6 @@ export function preparedMotifIds(): ReadonlySet<string> {
   return new Set([...DEFAULT_MOTIFS, ...GAMEPLAY_MOTIFS].map((motif) => motif.id));
 }
 
-/**
- * The reusable pool of ground tiles.
- *
- * A redraw used to construct every tile sprite again - around 173 allocations
- * plus the same number of display-object insertions, inside the measured
- * input-to-render window. The field does not change on a redraw: only the
- * camera can move it. So the sprites are kept, and `sync()` either does
- * nothing (the common case) or just refreshes the transforms of the sprites it
- * already owns. A tile that leaves the stage is kept in the pool, out of the
- * display list, ready for the next pan.
- */
-export class GroundLayer {
-  private readonly sprites: Sprite[] = [];
-  private readonly container: Container;
-  private readonly textureFor: (tone: string) => Texture;
-  private key = '';
-
-  constructor(container: Container, textureFor: (tone: string) => Texture) {
-    this.container = container;
-    this.textureFor = textureFor;
-  }
-
-  /** Bring the layer in line with `viewport`, reusing every sprite it owns. */
-  sync(viewport: Viewport): void {
-    const key = `${viewport.topX}|${viewport.topY}|${viewport.buildOutlineOffsetY}`;
-    if (key === this.key) return;
-    this.key = key;
-
-    const tiles = buildGround(viewport);
-    const plain = GROUND_TONES[0]!;
-    for (let i = 0; i < tiles.length; i += 1) {
-      const tile = tiles[i]!;
-      const texture = this.textureFor(tile.tone ?? plain);
-      let sprite = this.sprites[i];
-      if (!sprite) {
-        sprite = new Sprite(texture);
-        // `tileToPixel` gives the tile's top corner; the diamond's anchor is
-        // its top vertex, so the tiles interlock exactly.
-        sprite.anchor.set(0.5, 0);
-        this.sprites.push(sprite);
-      }
-      if (sprite.texture !== texture) sprite.texture = texture;
-      sprite.x = tile.x;
-      sprite.y = tile.y;
-      if (sprite.parent !== this.container) this.container.addChild(sprite);
-    }
-    // Tiles that left the stage stay in the pool but leave the display list.
-    for (let i = tiles.length; i < this.sprites.length; i += 1) {
-      const extra = this.sprites[i]!;
-      if (extra.parent) extra.parent.removeChild(extra);
-    }
-  }
-}
-
 /** What the renderer needs to start. */
 export interface RendererOptions {
   /** The element the canvas goes into. */
@@ -235,22 +222,20 @@ export interface RendererOptions {
 /** The world renderer. */
 export class WorldRenderer {
   private readonly app: Application;
-  private readonly world = new Container();
+  private world!: Container;
   private readonly pages = new Map<string, Texture>();
   private readonly pending = new Map<string, Promise<void>>();
   private readonly missing = new Set<string>();
   /** One texture per generated motif, ready before the first scene is drawn. */
   private readonly originalTextures = new Map<string, Texture>();
-  /** One generated diamond texture per green shade. */
-  private readonly groundTextures = new Map<string, Texture>();
-  /** The ground and the items live in separate layers, so redrawing the
-   * items never touches the cached field. */
-  private readonly groundLayer = new Container();
+  /** The one baked field: a stage-sized pattern in a single display object. */
+  private groundSprite!: Sprite;
+  /** The field is re-baked only when the camera actually moves. */
+  private groundKey = '';
+  /** How many diamonds the one baked texture carries. */
+  private groundDiamonds = 0;
+  /** Items live above the baked field and are the only things a redraw swaps. */
   private readonly itemLayer = new Container();
-  private readonly ground = new GroundLayer(
-    this.groundLayer,
-    (tone) => this.groundTextures.get(tone) ?? this.groundTextures.get(GROUND_TONES[0]!)!,
-  );
   private readonly options: RendererOptions;
   private readonly queue: string[] = [];
   private scene: readonly SceneSprite[] = [];
@@ -308,13 +293,13 @@ export class WorldRenderer {
     options.element.appendChild(app.canvas);
 
     const renderer = new WorldRenderer(app, options);
+    // One baked sprite covers the whole field; the exact pattern is filled in
+    // on the first draw, once the camera knows where the player's town is.
+    renderer.groundSprite = new Sprite(Texture.EMPTY);
+    renderer.world = buildWorld(renderer.groundSprite, renderer.itemLayer);
     // The world must be in the stage's display list or Pixi draws nothing:
     // the green background alone made an orphaned world look like a field.
     mountWorld(app.stage, renderer.world);
-    renderer.world.addChild(renderer.groundLayer, renderer.itemLayer);
-    for (const tone of GROUND_TONES) {
-      renderer.groundTextures.set(tone, Texture.from(groundCanvas(tone)));
-    }
 
     // Original art needs no atlas pages, but its textures must exist before
     // the first draw. Atlas mode needs no preparation: pages arrive later.
@@ -396,16 +381,33 @@ export class WorldRenderer {
    * In original art mode every sprite is drawn from a motif rasterised
    * before the first draw, with no page request at all.
    */
+  /**
+   * Re-bake the one ground texture, but only when the camera has moved.
+   *
+   * A redraw after a command leaves the field untouched: no canvas work, no
+   * texture upload, no display-object churn. Only a pan or zoom changes the
+   * viewport, and even then a single texture is rebuilt.
+   */
+  private syncGround(viewport: Viewport): void {
+    const key = `${viewport.topX}|${viewport.topY}|${viewport.buildOutlineOffsetY}`;
+    if (key === this.groundKey) return;
+    this.groundKey = key;
+    const diamonds = groundPattern(viewport);
+    this.groundDiamonds = diamonds.length;
+    const texture = Texture.from(groundCanvas(diamonds));
+    const previous = this.groundSprite.texture;
+    this.groundSprite.texture = texture;
+    if (previous !== Texture.EMPTY) previous.destroy(true);
+  }
+
   draw(scene: readonly SceneSprite[]): void {
     this.scene = scene;
-    // The field is cached: a redraw of the same viewport reuses every tile
-    // sprite instead of allocating the whole ground again.
-    this.ground.sync(this.viewport);
-    // Only the items change between commands; the ground layer stays mounted.
+    this.syncGround(this.viewport);
+    // Only the items change between commands; the baked field stays mounted.
     this.itemLayer.removeChildren();
 
-    // The green field goes down first, so every item is drawn on top of it.
-    // Its tiles come from the server-owned map dimensions and the camera's
+    // The green field is one baked display object behind every item. Its
+    // diamonds come from the server-owned map dimensions and the camera's
     // viewport, not from any client-invented gameplay.
     for (const sprite of scene) {
       const drawn = this.spriteFor(sprite);
@@ -520,7 +522,10 @@ export class WorldRenderer {
    * motifs on the stage, which is what an end-to-end check can assert.
    */
   get drawnSprites(): number {
-    return this.groundLayer.children.length + this.itemLayer.children.length;
+    // This reports the world elements the player can see, not Pixi's child
+    // count. The field is one display object now, but it carries every baked
+    // diamond, so those tiles still count towards "the town is on screen".
+    return this.groundDiamonds + this.itemLayer.children.length;
   }
 
   /** The canvas, for the interface to sit over. */

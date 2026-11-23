@@ -5,7 +5,7 @@ import { dirname, resolve as resolvePath } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { STAGE_HEIGHT, STAGE_WIDTH, type Viewport } from '@swl/client';
-import { Container, Texture, type Sprite } from 'pixi.js';
+import { Container, Sprite, Texture } from 'pixi.js';
 
 import {
   buildGround,
@@ -29,7 +29,7 @@ registerHooks({
     return nextResolve(specifier, context);
   },
 });
-const { GroundLayer } = await import('./renderer.ts');
+const { buildWorld, groundPattern } = await import('./renderer.ts');
 
 const VIEWPORT: Viewport = { topX: 0, topY: 0, buildOutlineOffsetY: 0 };
 
@@ -122,50 +122,38 @@ describe('the ground layer', () => {
   });
 });
 
-describe('the reusable ground layer', () => {
-  /** A layer with one shared test texture, so no canvas or GPU is needed. */
-  function layer(): { container: Container; ground: InstanceType<typeof GroundLayer> } {
-    const container = new Container();
-    const texture = Texture.WHITE;
-    return { container, ground: new GroundLayer(container, () => texture) };
-  }
-
-  it('reuses the very same tile sprites when the viewport has not changed', () => {
-    const { container, ground } = layer();
-    ground.sync(VIEWPORT);
-    const first = [...container.children] as Sprite[];
-    assert.ok(first.length >= 100, `expected >= 100 ground sprites, got ${first.length}`);
-
-    ground.sync(VIEWPORT);
-    const second = [...container.children] as Sprite[];
-    assert.equal(second.length, first.length, 'the tile count must not change');
-    for (let i = 0; i < first.length; i += 1) {
-      assert.strictEqual(second[i], first[i], `tile sprite ${i} was reallocated`);
+describe('the baked ground pattern', () => {
+  it('bakes the two-tone diamonds into one stage-sized pattern', () => {
+    const pattern = groundPattern(VIEWPORT);
+    assert.ok(pattern.length >= 100, `expected >= 100 diamonds, got ${pattern.length}`);
+    assert.equal(
+      new Set(pattern.map((diamond) => diamond.tone)).size,
+      2,
+      'the baked pattern must contain exactly the two generated shades',
+    );
+    for (const diamond of pattern) {
+      assert.ok(GROUND_TONES.includes(diamond.tone as (typeof GROUND_TONES)[number]));
+      assert.ok(
+        diamond.x >= 0 && diamond.x < STAGE_WIDTH && diamond.y >= 0 && diamond.y < STAGE_HEIGHT,
+        `diamond at ${diamond.x},${diamond.y} is outside the stage`,
+      );
     }
   });
 
-  it('moves the reused sprites when the camera pans', () => {
-    const { container, ground } = layer();
-    ground.sync(VIEWPORT);
-    const first = [...container.children] as Sprite[];
-    // Snapshot the positions: the sprites are mutated in place, so keeping
-    // only their references would compare each sprite's new x to itself.
-    const before = first.map((sprite) => ({ sprite, x: sprite.x, y: sprite.y }));
+  it('is deterministic and follows the camera', () => {
+    const first = groundPattern(VIEWPORT);
+    assert.deepEqual(groundPattern(VIEWPORT), first, 'the pattern must be pure');
+    const panned = groundPattern({ ...VIEWPORT, topX: VIEWPORT.topX + 5 });
+    assert.ok(panned.length >= 100, `expected >= 100 diamonds, got ${panned.length}`);
+    assert.notDeepEqual(panned, first, 'panning must move the baked diamonds');
+  });
 
-    // A small pan keeps the same tiles on the stage (one edge column leaves),
-    // so every remaining sprite must be a reused object with a new position.
-    ground.sync({ ...VIEWPORT, topX: VIEWPORT.topX + 5 });
-    const second = [...container.children] as Sprite[];
-    assert.ok(second.length >= 100, `expected >= 100 ground sprites, got ${second.length}`);
-    for (const sprite of second) {
-      assert.ok(first.includes(sprite), 'every sprite after a pan must be a reused object');
-    }
-    assert.ok(
-      second.some((sprite) => {
-        const old = before.find((entry) => entry.sprite === sprite);
-        return !!old && (old.x !== sprite.x || old.y !== sprite.y);
-      }),
-      'the reused sprites must be moved to the new tile positions',
-    );
+  it('mounts exactly one ground object and the item layer', () => {
+    const ground = new Sprite(Texture.WHITE);
+    const items = new Container();
+    const world = buildWorld(ground, items);
+    assert.equal(world.children.length, 2, 'the world must have two display objects');
+    assert.strictEqual(world.children[0], ground, 'the baked ground goes down first');
+    assert.strictEqual(world.children[1], items, 'the items sit above the ground');
   });
 });
