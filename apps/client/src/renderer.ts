@@ -64,6 +64,11 @@ export const MAX_CONCURRENT_PAGES = 8;
 /** The side of a generated motif, in stage pixels. */
 const MOTIF_SIZE = 64;
 
+/** How converted original SWF frames are scaled into the fixed 760x600 stage. */
+const ORIGINAL_ART_SCALE = 0.6;
+/** How far the frame's base sits below the projected tile corner. */
+const ORIGINAL_ART_BASE_OFFSET_Y = 120;
+
 /**
  * Rasterise one generated SVG into a canvas.
  *
@@ -457,13 +462,20 @@ export class WorldRenderer {
     });
 
     const sprite = new Sprite(texture);
-    // The projection gives the item's **top corner**, and the art's
-    // anchor is the top corner of the *trimmed* image, so the trim
-    // offset has to come back off.
+    // The projection gives the item's tile corner. The original sprite is a
+    // full frame with transparent padding, so it must stand on that corner
+    // from its bottom centre - otherwise a large building hangs off the tile
+    // and out of the 760x600 stage. The trim offsets put the image back where
+    // the SWF drew it inside its frame.
     const placement = placementFor(scene);
     const trim = scene.art.trim;
-    sprite.x = placement.x + (trim ? trim.x : 0);
-    sprite.y = placement.y + (trim ? trim.y : 0);
+    sprite.anchor.set(0.5, 1);
+    // The converted SWF frames are full-resolution; the original game drew
+    // them at roughly 60% inside the 760x600 stage.
+    sprite.scale.set(ORIGINAL_ART_SCALE);
+    sprite.x = placement.x;
+    sprite.y = placement.y + ORIGINAL_ART_BASE_OFFSET_Y;
+    void trim;
     return sprite;
   }
 

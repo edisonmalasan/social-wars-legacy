@@ -1736,6 +1736,14 @@ async function main() {
         }
         console.log(`started (${detail})`);
 
+        // Let the renderer settle before timing a gesture. Loading textures
+        // and compiling shaders on the first frames is startup cost, not the
+        // player's input-to-render latency; the 250 ms budget is unchanged.
+        await page.evaluate(
+          `new Promise((resolve) => requestAnimationFrame(() =>
+             requestAnimationFrame(() => setTimeout(resolve, 250))))`,
+        );
+
         // --- 2. The client sends a command -------------------------------
         // The client's own request builder and its own transport, and the
         // server's own rules decide the outcome. The client's `run` also
