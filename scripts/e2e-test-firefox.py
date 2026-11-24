@@ -427,6 +427,40 @@ def click_and_wait(page, selector: str, signature: str, label: str, timeout: int
     return page.evaluate(signature)
 
 
+def open_surface(page, surface: str, selector: str, label: str):
+    """Open a contextual surface through its rendered bottom navigation."""
+    clicked = page.evaluate(
+        """(s) => {
+            const b = document.querySelector(`[data-swl-surface="${s}"]`);
+            if (!b) return false;
+            b.click();
+            return true;
+        }""",
+        surface,
+    )
+    if not clicked:
+        raise RuntimeError(f"the {surface} navigation control is missing")
+    wait_js(page, f"!!document.querySelector('{selector}')", label)
+
+
+def close_surface(page, surface: str, selector: str, label: str):
+    """Close a contextual surface through the same rendered control.
+
+    Picking a build item already closes the surface by starting placement, so
+    an already-closed surface is a success, not a timeout.
+    """
+    if not page.evaluate(f"!!document.querySelector('{selector}')"):
+        return
+    page.evaluate(
+        """(s) => {
+            const b = document.querySelector(`[data-swl-surface="${s}"]`);
+            if (b) b.click();
+        }""",
+        surface,
+    )
+    wait_js(page, f"!document.querySelector('{selector}')", label)
+
+
 def click_plain(page, selector: str, label: str):
     clicked = page.evaluate(
         """(s) => {
@@ -569,6 +603,11 @@ def play_session(page, context, server_port: int, player_id: str, password: str)
     print("  UI: skipped the tutorial with its rendered button", flush=True)
 
     # --- the 760x600 layout: the HUD and inventory must not overlap -------
+    # The inventory is a contextual surface since the one-active-surface UI:
+    # open it through its rendered navigation control before measuring, then
+    # close it again so the canvas is clear for the placement steps below.
+    open_surface(page, "inventory", "#ui .swl-inventory", "the inventory surface to open")
+
     layout = page.evaluate(
         """(() => {
             const rect = (s) => {
@@ -606,16 +645,19 @@ def play_session(page, context, server_port: int, player_id: str, password: str)
         f"and the inventory starts at y={inv['top']:.0f} (no overlap)",
         flush=True,
     )
+    close_surface(page, "inventory", "#ui .swl-inventory", "the inventory surface to close")
 
     # --- build and place a building through rendered controls -------------
     before_build = world_of(context, server_port, token)
     before_items = len((before_build or {}).get("maps", [{}])[0].get("items", {}))
+    open_surface(page, "build", "#ui .swl-build-menu", "the build menu to open")
     click_and_wait(
         page,
         "#ui .swl-build-menu .swl-build-item:not(.swl-build-locked) button",
         PLACING_TEXT,
         "build-menu item",
     )
+    close_surface(page, "build", "#ui .swl-build-menu", "the build menu to close")
     # The first unlocked item is a 4x4 building, so the tile must clear the
     # Command Center's own 4x4 footprint at 48,48.
     tile_click(page, 52, 51)
@@ -632,6 +674,7 @@ def play_session(page, context, server_port: int, player_id: str, password: str)
     print("  UI: picked a build-menu item and placed it on a tile through the canvas", flush=True)
 
     # --- a Wood Factory, then a rendered Collect the server must refuse ---
+    open_surface(page, "build", "#ui .swl-build-menu", "the build menu to open")
     factory_pick = page.evaluate(
         """() => {
             const items = Array.from(document.querySelectorAll(
@@ -646,6 +689,7 @@ def play_session(page, context, server_port: int, player_id: str, password: str)
     if not factory_pick or factory_pick.get("error"):
         raise RuntimeError(factory_pick.get("error") if factory_pick else "the factory could not be picked")
     wait_js(page, f"{PLACING_TEXT}.includes('Wood Factory I')", "the Wood Factory placement")
+    close_surface(page, "build", "#ui .swl-build-menu", "the build menu to close")
     tile_click(page, 46, 46)
     wait_js(page, "!document.querySelector('#ui .swl-placing')", "the Wood Factory to be placed")
     if factory_of(world_of(context, server_port, token)) is None:
@@ -670,6 +714,7 @@ def play_session(page, context, server_port: int, player_id: str, password: str)
 
     # --- train a unit through the rendered recruitment panel --------------
     tile_click(page, *COMMAND_CENTER_TILE)
+    open_surface(page, "recruit", "#ui .swl-recruit", "the recruitment surface to open")
     wait_js(page, f"{RECRUIT_TITLE}.includes('Command Center')", "the Command Center recruitment panel")
     click_and_wait(page, "#ui .swl-recruit button.swl-recruit-train", COUNTDOWN, "Train button")
     countdown = str(page.evaluate(COUNTDOWN))
@@ -685,6 +730,7 @@ def play_session(page, context, server_port: int, player_id: str, password: str)
     print(f"  UI: trained a unit ({countdown})", flush=True)
 
     # --- weekly quest, opened from the rendered chapter map ----------------
+    open_surface(page, "chapters", "#ui .swl-chapter", "the chapter map to open")
     slot = page.evaluate(
         """(s) => {
             const e = document.querySelector(s);
