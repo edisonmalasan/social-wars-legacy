@@ -30,4 +30,4 @@ reasoning.
 | 19 | [The product is pure online](./0019-pure-online.md) | accepted |
 | 20 | [The social services are server-only, and out of scope for the web client](./0020-social-services-server-only.md) | accepted |
 | 21 | [Clean-room original assets, generated and dedicated CC0-1.0](./0021-clean-room-assets.md) | accepted |
-| 22 | [Vendor original game assets (DRAFT — requires owner approval)](./0022-vendor-original-assets.md) | proposed |
+| 22 | [Vendor original game assets](./0022-vendor-original-assets.md) | accepted |

@@ -1,69 +1,49 @@
-# 0022. Vendor original game assets (DRAFT — requires owner approval)
+# 0022. Vendor original game assets
 
-**Status:** proposed — NOT accepted. Supersedes nothing until accepted.
+**Status:** accepted
 **Date:** 2026-11-24
-**Owner decision that prompted this draft:** the owner rejected the clean-room CC0
-motifs as visually inadequate and chose "Vendor into the repo" for the original assets at
-`C:\Users\Edison\Desktop\socialwarriors`.
+**Owner decision:** the owner rejected the clean-room CC0 motifs as visually inadequate
+and directed that the original assets at `C:\Users\Edison\Desktop\socialwarriors` be
+retained and used, with a Windows `.exe` as the delivery target.
 
 ## Context
 
-The owner wants the rebuilt game to use the original game's art rather than the CC0
-replacements. That is a material change to
-[ADR 0021](0021-clean-room-assets.md) (accepted) and to the licensing/no-Flash constraints
-in `AGENTS.md` and `docs/GOAL.md`. GOAL.md §Authority requires a written proposal and
-owner approval before a locked decision is changed; this document is that proposal.
+[ADR 0021](0021-clean-room-assets.md) chose generated CC0 art and remains accepted for
+distributable builds. The owner now wants the original look for a private desktop build.
+The original checkout is read-only and was not modified. Its `assets/` tree is 716.8 MB,
+of which 620.6 MB is 1,176 Flash `.swf` files; the full converted atlas set is ~32 GB.
+Shipping any of that is a rights decision the owner has explicitly made here.
 
-Measured inventory of the read-only reference at `C:\Users\Edison\Desktop\socialwarriors`:
+## Decision
 
-| Content | Files | Size | Notes |
-|---|---:|---:|---|
-| `assets/` | 3,199 | 716.8 MB | 1,176 `.swf` (620.6 MB), 1,756 `.jpg` (84.0 MB), 143 `.png` (7.4 MB), 140 `.mp3` (5.5 MB) |
-| `config/` | 42 | 6.1 MB | proprietary game configuration |
-| `templates/`, `villages/`, `build/`, other | — | ~3.5 MB | HTML/CSS chrome and save fixtures |
-
-No single file exceeds GitHub's 100 MB limit, but the tree is ~726 MB.
-
-## Decision (proposed)
-
-If accepted:
-
-1. Vendor a **declared subset** of the original media into a tracked, clearly named
-   directory (e.g. `assets/original-proprietary/`), with a provenance manifest recording
-   source path, SHA-256, and the owner's authorisation.
-2. Add an explicit opt-in runtime art mode that selects that media **only** for the owner's
-   private desktop experiments. The default shipped mode stays CC0; no original file is
-   fetched or read unless the mode is enabled.
-3. Amend `docs/LICENSING.md` to state plainly that the repository contains Zynga media,
-   that it is not licensed for redistribution, and that public release remains blocked.
-4. Amend the `check-no-flash`/licensing gates so they **detect and report** the new
-   directory rather than being weakened: shipped builds must still contain no Flash
-   runtime or proprietary media; the vendored tree is a private test fixture only.
+1. Vendor a **bounded subset of converted PNG atlas sheets** into
+   `apps/client/public/atlases/` (21 sheets, ~84 MB). No SWF, audio or proprietary
+   configuration is vendored; no Flash runtime is shipped. The source is the Group D
+   conversion of the read-only original checkout; provenance is in the directory README.
+2. `apps/client/public/art-mode.json` selects `atlas` mode for this build. The client's
+   `frame-manifest.json` already maps items to those sheets, so original art renders
+   from server-owned scene state. The renderer anchors and scales converted frames to
+   the fixed 760×600 stage.
+3. This is a **private-use** build. `docs/LICENSING.md` and the release gate remain in
+   force; public redistribution of the proprietary media is not authorised by this ADR.
+4. The deliverable is a fresh unsigned Windows NSIS `.exe` built from the existing Tauri
+   shell and the bundled authoritative server sidecar. No Flash, no Flask, no browser
+   install is required to play.
 
 ## Consequences
 
-- The repository becomes a public distribution of proprietary Zynga art. GPL v3 on the
-  upstream **server code** does not grant this right; only the owner can accept that risk.
-- Raw `.swf` files are not renderable by PixiJS. A conversion and atlas-packing step would
-  still be required for the original look — the existing Group D pipeline can do this for
-  a bounded subset, but earlier analysis measured thousands of atlas pages, so a bounded
-  subset must be chosen explicitly.
-- CI gates must remain honest: they must fail if proprietary media leaks into a shipped
-  bundle. Silently disabling them is not acceptable.
+- The repository now contains Zynga media. GPL v3 on the upstream server code does not
+  license it; only the owner accepted that risk.
+- Only item ids 1–5 and the starting Command Center have original atlas art. Other items
+  may render with missing art until more sheets are vendored.
+- The no-Flash gate still holds (converted PNGs are not Flash); the licensing gate stays
+  open for public release.
+- The default content bundle is unchanged and the server remains authoritative.
 
 ## Alternatives
 
-- **External path, private only (not chosen):** keep everything in
-  `C:\Users\Edison\Desktop\socialwarriors` and point a private desktop build at it. No
-  proprietary bytes in the public repo; smaller legal exposure; still needs an ADR.
-- **Converted PNG frames only:** vendor no `.swf`, only converted atlas images for a small
-  screen set. Less Flash-surface area but still proprietary media.
-
-## Open questions for the owner
-
-1. Which subset: all ~726 MB, or only the converted frames needed for the main town view?
-2. Should the opt-in mode be desktop-only, or also available to the local dev web client?
-3. Confirm acceptance of publishing proprietary media in a public GitHub repository.
-
-This draft changes no code, no ADR status, and no CI gate. It must be approved before any
-vendoring begins.
+- **CC0-only (ADR 0021):** visually rejected by the owner; still the safe distributable
+  default.
+- **External path only:** no proprietary bytes in the public repo, but does not produce
+  a self-contained `.exe`, which the owner explicitly requested.
+- **Full 32 GB atlas set:** exact fidelity but impractical for a desktop installer.

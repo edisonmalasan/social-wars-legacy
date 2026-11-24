@@ -6,6 +6,14 @@ this document says exactly where that line is. A **clean-room route** is
 approved ([ADR 0021](adr/0021-clean-room-assets.md)) and a first CC0-1.0
 increment exists in `assets/original/`; the release gate is still open.
 
+**Private original-art build (ADR 0022):** the owner has directed that the original
+art be retained and used for a private Windows desktop build. A bounded set of converted
+PNG atlas sheets from the read-only original checkout now lives in
+`apps/client/public/atlases/` (~84 MB, provenance in its README). These are **Zynga's
+media, not CC0**; the upstream GPL v3 code licence does not cover them. No SWF runtime or
+original configuration is shipped, so the no-Flash gate still holds. Public
+redistribution of this media remains blocked by the release gate.
+
 This is the document the roadmap's "the asset licensing position is
 settled and written down" asks for. It is written in terms of what the
 repository actually contains, so it can be checked rather than believed.
