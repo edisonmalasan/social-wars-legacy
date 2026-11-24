@@ -566,8 +566,12 @@ async function main() {
     console.log(`build surface opened by: ${openedBuild ?? 'already visible at rest'}`);
     await capture('03-build-menu');
 
-    // (d) a quest/dialog surface through the rendered chapter slot.
-    const openedQuest = await page.evaluate(`(() => {
+    // (d) a quest/dialog surface. Prefer the rendered chapter slot; when the
+    // fresh player's chapter list has no clickable quest yet, use the client's
+    // own debug handle to open the same shared dialog. This keeps the
+    // checkpoint honest: it must show a real dialog, not a duplicate of the
+    // build-menu view.
+    let openedQuest = await page.evaluate(`(() => {
       const selectors = ['#ui .swl-chapter:first-child .swl-chapter-quests > button:first-child',
         '#ui .swl-quest-slot', '#ui .swl-chapter button'];
       for (const selector of selectors) {
@@ -576,6 +580,14 @@ async function main() {
       }
       return null;
     })()`);
+    if (!openedQuest) {
+      openedQuest = await page.evaluate(`(() => {
+        const handle = window.__swl;
+        if (!handle || typeof handle.showMissionInfo !== 'function') return null;
+        handle.showMissionInfo();
+        return 'window.__swl.showMissionInfo()';
+      })()`);
+    }
     await page.waitFor('!!document.querySelector("#ui .swl-dialog")',
       (v) => v === true, 'the quest dialog', 10_000).catch(() => {});
     console.log(`quest surface opened by: ${openedQuest ?? 'no rendered slot found'}`);
