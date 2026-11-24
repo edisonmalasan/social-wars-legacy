@@ -3836,6 +3836,45 @@ reviewed without reconstructing the conversation that led to it.*
 
 ---
 
+## Visual fidelity recovery and original-art desktop build — verified checkpoint (2026-11-24)
+
+This round followed [`GOAL.md`](GOAL.md) and the plan in
+[`plans/VISUAL-FIDELITY-RECOVERY.md`](plans/VISUAL-FIDELITY-RECOVERY.md). It changed no
+checkbox: the roadmap still has **401** items and **22** open boxes, and inventory remains
+170 implemented / 52 dropped / 38 planned.
+
+- **Phase 0** — read-only audit, rendered 760×600 baseline (dark empty canvas, 20 overlapping
+  panels), component map, and acceptance criteria. Plan PR #101 was closed as a duplicate
+  when #102 carried the identical document. Art/licensing assessment is in
+  [`plans/PHASE-4-ART-ASSESSMENT.md`](plans/PHASE-4-ART-ASSESSMENT.md).
+- **Phase 1** — merged PRs #102/#103/#105/#104: green ground, olive/gold HUD and white
+  tutorial bubble, one-active-surface with non-overlapping bottom nav, and a five-checkpoint
+  screenshot harness. Rendered metrics: stage/canvas 760×600, 5 at-rest surfaces (was 20),
+  no neighbour/build intersection, canvas click-through, zero `/atlases/` requests in CC0 mode.
+- **Phase 2** — merged PRs #109/#108: the Pixi `world` container is now mounted to the stage
+  (the real cause of the blank world); two-tone isometric ground and a visible building;
+  contextual panels restyled. A cached single baked ground texture keeps input-to-render
+  under the 250 ms budget. PR #110 fixed the WebKit harness for contextual surfaces.
+- **Phase 3** — merged PR #106: the Tauri sidecar receives `PORT` and a per-user
+  `SWL_DATA_DIR`. A fresh unsigned NSIS installer was built from current `main`; the packaged
+  sidecar answered `/health` with 200 and persisted 989 files in a temp data dir. The
+  interactive Windows install/launch/persistence test remains a human step.
+- **Phase 4 / owner decision** — the owner rejected the CC0 motifs and directed that the
+  original assets at `C:\Users\Edison\Desktop\socialwarriors` be retained. ADR 0022 records the
+  accepted decision; merged PRs #113/#114 switch the client to atlas mode and ship **792
+  converted original frames (~57 MB)** covering all 885 buildable item identities. No SWF,
+  Flash runtime, audio or proprietary config ships. `docs/LICENSING.md` records that these
+  are Zynga media for private use; public redistribution remains blocked. The final unsigned
+  NSIS installer is 90.68 MiB.
+- **Tests** — `pnpm test` 2157 pass / 0 fail; `pnpm typecheck` clean; Chrome+Edge e2e passes;
+  five 760×600 checkpoints captured; `check-no-flash`, `check-adrs`, `check-report-sync`,
+  `check-roadmap` pass. No quality gate was weakened; CI latency flakes were re-run, never
+  re-thresholded.
+- **Not claimed** — branded Safari, real-device testing, signed/notarised installers,
+  auto-update, public release, or owner visual sign-off on the rebuilt interface.
+
+---
+
 ## Maintenance
 
 - The last group's items were once over-counted: `groupCounts()` kept the group
