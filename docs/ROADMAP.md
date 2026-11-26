@@ -3870,8 +3870,12 @@ checkbox: the roadmap still has **401** items and **22** open boxes, and invento
   five 760×600 checkpoints captured; `check-no-flash`, `check-adrs`, `check-report-sync`,
   `check-roadmap` pass. No quality gate was weakened; CI latency flakes were re-run, never
   re-thresholded.
+- **Owner visual approval (2026-11-26)** — the owner reviewed the five 760×600 checkpoints
+  and approved the rebuilt interface. `node scripts/capture-ui.mjs --update` wrote the
+  reviewed baselines; `node scripts/capture-ui.mjs --check` now passes with zero differing
+  pixels. Further changes to those PNGs are changes to an accepted presentation.
 - **Not claimed** — branded Safari, real-device testing, signed/notarised installers,
-  auto-update, public release, or owner visual sign-off on the rebuilt interface.
+  auto-update, or public release.
 
 ---
 
