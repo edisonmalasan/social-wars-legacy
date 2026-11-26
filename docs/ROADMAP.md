@@ -3857,8 +3857,12 @@ checkbox: the roadmap still has **401** items and **22** open boxes, and invento
   under the 250 ms budget. PR #110 fixed the WebKit harness for contextual surfaces.
 - **Phase 3** — merged PR #106: the Tauri sidecar receives `PORT` and a per-user
   `SWL_DATA_DIR`. A fresh unsigned NSIS installer was built from current `main`; the packaged
-  sidecar answered `/health` with 200 and persisted 989 files in a temp data dir. The
-  interactive Windows install/launch/persistence test remains a human step.
+  sidecar answered `/health` with 200 and persisted 989 files in a temp data dir.
+  The unpackaged `target/release/social-wars-legacy.exe` was also launched directly: it
+  spawned `msedgewebview2.exe` and `swl-server.exe`, answered
+  `GET /health` with 200 `{"status":"ok","protocol":1}`, and created 989 files in
+  `%APPDATA%\org.socialwars.legacy`; all processes were then terminated and port 8080
+  freed. The installed-NSIS interactive play/restart test remains a human step.
 - **Phase 4 / owner decision** — the owner rejected the CC0 motifs and directed that the
   original assets at `C:\Users\Edison\Desktop\socialwarriors` be retained. ADR 0022 records the
   accepted decision; merged PRs #113/#114 switch the client to atlas mode and ship **792
